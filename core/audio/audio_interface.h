@@ -17,21 +17,8 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "ViewController.h"
+#ifndef audio_interface_h
+#define audio_interface_h
 
-@interface ViewController ()
-@end
 
-@implementation ViewController
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
-
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
-}
-
-@end
+#endif /* audio_interface_h */

@@ -17,8 +17,18 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef lowrescore_audio_h
-#define lowrescore_audio_h
+#ifndef core_h
+#define core_h
 
+#include <stdio.h>
+#include "video_interface.h"
+#include "audio_interface.h"
 
-#endif /* lowrescore_audio_h */
+typedef struct {
+    VideoInterface videoInterface;
+} LRCore;
+
+void LRC_init(LRCore *core);
+void LRC_update(LRCore *core);
+
+#endif /* core_h */

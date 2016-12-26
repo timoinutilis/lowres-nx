@@ -17,21 +17,8 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "ViewController.h"
+#import <GLKit/GLKit.h>
 
-@interface ViewController ()
-@end
-
-@implementation ViewController
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
-
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
-}
+@interface RendererViewController : GLKViewController
 
 @end
