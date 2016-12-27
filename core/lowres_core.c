@@ -26,6 +26,11 @@ void LRC_init(LRCore *core)
     core->videoInterface.colors[1] = 12;
     core->videoInterface.colors[2] = 48;
     core->videoInterface.colors[3] = 63;
+    core->videoInterface.colors[5] = 20;
+    core->videoInterface.colors[6] = 25;
+    core->videoInterface.colors[7] = 12;
+    core->videoInterface.colors[11] = 48;
+    core->videoInterface.colors[15] = 60;
     
     Window *window = &core->videoInterface.window;
     window->cells[0][0].character = 'S';
@@ -36,11 +41,24 @@ void LRC_init(LRCore *core)
     window->cells[0][5].character = 255;
     window->cells[0][6].character = 254;
     window->cells[0][7].character = 253;
+    
+    Sprite *sprite = &core->videoInterface.sprites[0];
+    sprite->character = 252;
+    sprite->attr_palette = 1;
+    sprite->attr_priority = 1;
 }
 
 void LRC_update(LRCore *core)
 {
     core->videoInterface.planes[0].scrollX--;
     core->videoInterface.planes[1].scrollY--;
-    core->videoInterface.planes[rand()%2].cells[rand()%32][rand()%32].character = 32+(rand()%32);
+    int pli = rand()%2;
+    Cell *cell = &core->videoInterface.planes[pli].cells[rand()%32][rand()%32];
+    cell->character = 32+(rand()%32);
+    cell->attr_palette = rand()%4;
+    cell->attr_priority = rand()%2;
+    
+    Sprite *sprite = &core->videoInterface.sprites[0];
+    sprite->x += 2;
+    sprite->y += 2;
 }

@@ -33,6 +33,8 @@
 #define WINDOW_COLUMNS 16
 #define WINDOW_ROWS 16
 #define NUM_SPRITES 64
+#define SPRITE_OFFSET_X 8
+#define SPRITE_OFFSET_Y 8
 
 
 typedef struct {
@@ -47,12 +49,22 @@ typedef struct {
     uint8_t x;
     uint8_t y;
     uint8_t character;
-    uint8_t attributes; // bank, palette, flip, priority, size, zoom
+    // attributes (8 bit)
+    uint8_t attr_palette:3;
+    uint8_t attr_bank:1;
+    uint8_t attr_flipX:1;
+    uint8_t attr_flipY:1;
+    uint8_t attr_priority:1;
 } Sprite;
 
 typedef struct {
     uint8_t character;
-    uint8_t attributes; // bank, palette, flip, priority
+    // attributes (8 bit)
+    uint8_t attr_palette:3;
+    uint8_t attr_bank:1;
+    uint8_t attr_flipX:1;
+    uint8_t attr_flipY:1;
+    uint8_t attr_priority:1;
 } Cell;
 
 typedef struct {
