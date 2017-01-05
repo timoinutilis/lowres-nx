@@ -49,22 +49,34 @@ typedef struct {
     uint8_t x;
     uint8_t y;
     uint8_t character;
-    // attributes (8 bit)
-    uint8_t attr_palette:3;
-    uint8_t attr_bank:1;
-    uint8_t attr_flipX:1;
-    uint8_t attr_flipY:1;
-    uint8_t attr_priority:1;
+    union
+    {
+        // attributes (8 bit)
+        struct {
+            uint8_t attr_palette:3;
+            uint8_t attr_bank:2;
+            uint8_t attr_flipX:1;
+            uint8_t attr_flipY:1;
+            uint8_t attr_priority:1;
+        };
+        uint8_t attributes;
+    };
 } Sprite;
 
 typedef struct {
     uint8_t character;
-    // attributes (8 bit)
-    uint8_t attr_palette:3;
-    uint8_t attr_bank:1;
-    uint8_t attr_flipX:1;
-    uint8_t attr_flipY:1;
-    uint8_t attr_priority:1;
+    union
+    {
+        // attributes (8 bit)
+        struct {
+            uint8_t attr_palette:3;
+            uint8_t attr_bank:2;
+            uint8_t attr_flipX:1;
+            uint8_t attr_flipY:1;
+            uint8_t attr_priority:1;
+        };
+        uint8_t attributes;
+    };
 } Cell;
 
 typedef struct {

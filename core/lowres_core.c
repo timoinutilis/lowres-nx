@@ -46,6 +46,7 @@ void LRC_init(LRCore *core)
     sprite->character = 252;
     sprite->attr_palette = 1;
     sprite->attr_priority = 1;
+    sprite->attr_bank = 2;
 }
 
 void LRC_update(LRCore *core)
@@ -57,6 +58,7 @@ void LRC_update(LRCore *core)
     cell->character = 32+(rand()%32);
     cell->attr_palette = rand()%4;
     cell->attr_priority = rand()%2;
+    cell->attr_bank = 2;
     
     Sprite *sprite = &core->videoInterface.sprites[0];
     sprite->x += 2;

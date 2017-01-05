@@ -39,8 +39,15 @@ void LRC_renderPlane(VideoInterface *vi, int index, int priority, int y, uint8_t
         Cell *cell = &plane->cells[row][column];
         if (cell->attr_priority == priority)
         {
-    //        Character *character = &vi->characterBanks[0].characters[cell->character];
-            Character *character = (Character *)CharacterRom[cell->character];
+            Character *character;
+            if (cell->attr_bank < 2)
+            {
+                character = &vi->characterBanks[cell->attr_bank].characters[cell->character];
+            }
+            else
+            {
+                character = (Character *)CharacterRom[cell->character];
+            }
             int pixel = LRC_getCharacterPixel(character, cellX, cellY);
             if (pixel != 0)
             {
@@ -63,8 +70,15 @@ void LRC_renderWindow(VideoInterface *vi, int priority, int y, uint8_t *scanline
         Cell *cell = &window->cells[row][column];
         if (cell->attr_priority == priority)
         {
-    //        Character *character = &vi->characterBanks[0].characters[cell->character];
-            Character *character = (Character *)CharacterRom[cell->character];
+            Character *character;
+            if (cell->attr_bank < 2)
+            {
+                character = &vi->characterBanks[cell->attr_bank].characters[cell->character];
+            }
+            else
+            {
+                character = (Character *)CharacterRom[cell->character];
+            }
             int pixel = LRC_getCharacterPixel(character, cellX, cellY);
             if (pixel != 0)
             {
@@ -85,8 +99,15 @@ void LRC_renderSprites(VideoInterface *vi, int priority, int y, uint8_t *scanlin
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
             if (spriteY >= 0 && spriteY < 8)
             {
-        //        Character *character = &vi->characterBanks[0].characters[sprite->character];
-                Character *character = (Character *)CharacterRom[sprite->character];
+                Character *character;
+                if (sprite->attr_bank < 2)
+                {
+                    character = &vi->characterBanks[sprite->attr_bank].characters[sprite->character];
+                }
+                else
+                {
+                    character = (Character *)CharacterRom[sprite->character];
+                }
                 int minX = sprite->x - SPRITE_OFFSET_X;
                 int maxX = minX + 8;
                 if (minX < 0) minX = 0;
