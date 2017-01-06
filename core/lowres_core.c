@@ -20,11 +20,13 @@
 #include "lowres_core.h"
 #include <stdlib.h>
 
-void setCell(Window *window, int x, int y, int character, int bank)
+void setChar(Window *window, int x, int y, char character)
 {
     Cell *cell = &window->cells[y][x];
-    cell->character = character;
-    cell->attr_bank = bank;
+    cell->character = character + 32 + 64;
+    cell->attr_bank = 2;
+    cell->attr_priority = 1;
+    cell->attr_palette = 4;
 }
 
 void LRC_init(LRCore *core)
@@ -38,17 +40,19 @@ void LRC_init(LRCore *core)
     core->videoInterface.colors[7] = 12;
     core->videoInterface.colors[11] = 48;
     core->videoInterface.colors[15] = 60;
+    core->videoInterface.colors[17] = 0;
+    core->videoInterface.colors[19] = 63;
     
     Window *window = &core->videoInterface.window;
-    setCell(window, 0, 0, 'S', 2);
-    setCell(window, 1, 0, 'C', 2);
-    setCell(window, 2, 0, 'O', 2);
-    setCell(window, 3, 0, 'R', 2);
-    setCell(window, 4, 0, 'E', 2);
+    setChar(window, 0, 0, 'S');
+    setChar(window, 1, 0, 'C');
+    setChar(window, 2, 0, 'O');
+    setChar(window, 3, 0, 'R');
+    setChar(window, 4, 0, 'E');
     
     Sprite *sprite = &core->videoInterface.sprites[0];
-    sprite->character = 252;
-    sprite->attr_palette = 1;
+    sprite->character = 128+32;
+    sprite->attr_palette = 4;
     sprite->attr_priority = 1;
     sprite->attr_bank = 2;
 }
