@@ -19,6 +19,9 @@
 
 #include "lowres_core.h"
 #include <stdlib.h>
+#include <math.h>
+
+float rotation = 0;
 
 void setChar(Window *window, int x, int y, char character)
 {
@@ -55,6 +58,14 @@ void LRC_init(LRCore *core)
     sprite->attr_palette = 4;
     sprite->attr_priority = 1;
     sprite->attr_bank = 2;
+
+    sprite = &core->videoInterface.sprites[1];
+    sprite->character = 129;
+    sprite->attr_palette = 4;
+    sprite->attr_priority = 1;
+    sprite->attr_bank = 2;
+    sprite->attr_width = 3;
+    sprite->attr_height = 3;
 }
 
 void LRC_update(LRCore *core)
@@ -71,4 +82,10 @@ void LRC_update(LRCore *core)
     Sprite *sprite = &core->videoInterface.sprites[0];
     sprite->x += 2;
     sprite->y += 2;
+    
+    rotation += 0.1;
+    
+    sprite = &core->videoInterface.sprites[1];
+    sprite->x = 64 + SPRITE_OFFSET_X - 16 + sinf(rotation) * 32;
+    sprite->y = 64 + SPRITE_OFFSET_Y - 16 - cos(rotation) * 32;
 }

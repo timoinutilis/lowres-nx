@@ -97,32 +97,39 @@ void LRC_renderSprites(VideoInterface *vi, int priority, int y, uint8_t *scanlin
         if (sprite->attr_priority == priority && !(sprite->x == 0 && sprite->y == 0))
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
-            if (spriteY >= 0 && spriteY < 8)
+            int height = (sprite->attr_height + 1) << 3;
+            if (spriteY >= 0 && spriteY < height)
             {
                 Character *character;
+                int charIndex = sprite->character + ((spriteY >> 3) << 4);
                 if (sprite->attr_bank < 2)
                 {
-                    character = &vi->characterBanks[sprite->attr_bank].characters[sprite->character];
+                    character = &vi->characterBanks[sprite->attr_bank].characters[charIndex];
                 }
                 else
                 {
-                    character = (Character *)CharacterRom[sprite->character];
+                    character = (Character *)CharacterRom[charIndex];
                 }
+                int width = (sprite->attr_width + 1) << 3;
                 int minX = sprite->x - SPRITE_OFFSET_X;
-                int maxX = minX + 8;
+                int maxX = minX + width;
                 if (minX < 0) minX = 0;
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
                 uint8_t *buffer = &scanlineBuffer[minX];
                 int spriteX = minX - sprite->x + SPRITE_OFFSET_X;
                 for (int x = minX; x < maxX; x++)
                 {
-                    int pixel = LRC_getCharacterPixel(character, spriteX, spriteY);
+                    int pixel = LRC_getCharacterPixel(character, spriteX & 0x07, spriteY & 0x07);
                     if (pixel != 0)
                     {
                         *buffer = pixel | (sprite->attr_palette << 2);
                     }
                     buffer++;
                     spriteX++;
+                    if (!(spriteX & 0x07))
+                    {
+                        character++;
+                    }
                 }
             }
         }
