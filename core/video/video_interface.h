@@ -49,9 +49,8 @@ typedef struct {
     uint8_t x;
     uint8_t y;
     uint8_t character;
-    union
+    union // attributes 1 (8 bit)
     {
-        // attributes (8 bit)
         struct {
             uint8_t attr_palette:3;
             uint8_t attr_bank:2;
@@ -59,15 +58,24 @@ typedef struct {
             uint8_t attr_flipY:1;
             uint8_t attr_priority:1;
         };
-        uint8_t attributes;
+        uint8_t attributes1;
     };
+    union // attributes 2 (8 bit)
+    {
+        struct {
+            uint8_t attr_width:2; // 1-4 characters
+            uint8_t attr_height:2; // 1-4 characters
+            uint8_t attr_reserved:4;
+        };
+        uint8_t attributes2;
+    };
+    uint8_t reserved1; // keep struct size even
 } Sprite;
 
 typedef struct {
     uint8_t character;
-    union
+    union // attributes (8 bit)
     {
-        // attributes (8 bit)
         struct {
             uint8_t attr_palette:3;
             uint8_t attr_bank:2;

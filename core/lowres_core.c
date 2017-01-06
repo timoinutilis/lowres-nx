@@ -20,6 +20,13 @@
 #include "lowres_core.h"
 #include <stdlib.h>
 
+void setCell(Window *window, int x, int y, int character, int bank)
+{
+    Cell *cell = &window->cells[y][x];
+    cell->character = character;
+    cell->attr_bank = bank;
+}
+
 void LRC_init(LRCore *core)
 {
     core->videoInterface.colors[0] = 3;
@@ -33,14 +40,11 @@ void LRC_init(LRCore *core)
     core->videoInterface.colors[15] = 60;
     
     Window *window = &core->videoInterface.window;
-    window->cells[0][0].character = 'S';
-    window->cells[0][1].character = 'C';
-    window->cells[0][2].character = 'O';
-    window->cells[0][3].character = 'R';
-    window->cells[0][4].character = 'E';
-    window->cells[0][5].character = 255;
-    window->cells[0][6].character = 254;
-    window->cells[0][7].character = 253;
+    setCell(window, 0, 0, 'S', 2);
+    setCell(window, 1, 0, 'C', 2);
+    setCell(window, 2, 0, 'O', 2);
+    setCell(window, 3, 0, 'R', 2);
+    setCell(window, 4, 0, 'E', 2);
     
     Sprite *sprite = &core->videoInterface.sprites[0];
     sprite->character = 252;
