@@ -70,7 +70,9 @@ void LRC_init(LRCore *core)
     sprite->attr_bank = 2;
     sprite->attr_width = 3;
     sprite->attr_height = 3;
-
+    sprite->attr_flipX = 1;
+    sprite->attr_flipY = 0;
+    
     for (int i = 0; i < 640; i++)
     {
         int pli = i%2;
@@ -91,7 +93,7 @@ void LRC_update(LRCore *core)
     sprite->x += 2;
     sprite->y += 2;
     
-    rotation += 0.1;
+    rotation += 0.01;
     
     sprite = &core->videoInterface.sprites[1];
     sprite->x = 64 + SPRITE_OFFSET_X - 16 + sinf(rotation) * 32;

@@ -99,7 +99,15 @@ void LRC_renderSprites(VideoInterface *vi, int y, uint8_t *scanlineBuffer, uint8
             int height = (sprite->attr_height + 1) << 3;
             if (spriteY >= 0 && spriteY < height)
             {
+                if (sprite->attr_flipY)
+                {
+                    spriteY = height - spriteY - 1;
+                }
                 int charIndex = sprite->character + ((spriteY >> 3) << 4);
+                if (sprite->attr_flipX)
+                {
+                    charIndex += sprite->attr_width;
+                }
                 Character *character = LRC_getCharacter(vi, sprite->attr_bank, charIndex);
                 int width = (sprite->attr_width + 1) << 3;
                 int minX = sprite->x - SPRITE_OFFSET_X;
@@ -108,6 +116,10 @@ void LRC_renderSprites(VideoInterface *vi, int y, uint8_t *scanlineBuffer, uint8
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
                 uint8_t *buffer = &scanlineSpriteBuffer[minX];
                 int spriteX = minX - sprite->x + SPRITE_OFFSET_X;
+                if (sprite->attr_flipX)
+                {
+                    spriteX = width - spriteX - 1;
+                }
                 for (int x = minX; x < maxX; x++)
                 {
                     int pixel = LRC_getCharacterPixel(character, spriteX & 0x07, spriteY & 0x07);
@@ -116,10 +128,21 @@ void LRC_renderSprites(VideoInterface *vi, int y, uint8_t *scanlineBuffer, uint8
                         *buffer = pixel | (sprite->attr_palette << 2) | (sprite->attr_priority << 7);
                     }
                     buffer++;
-                    spriteX++;
-                    if (!(spriteX & 0x07))
+                    if (sprite->attr_flipX)
                     {
-                        character++;
+                        if (!(spriteX & 0x07))
+                        {
+                            character--;
+                        }
+                        spriteX--;
+                    }
+                    else
+                    {
+                        spriteX++;
+                        if (!(spriteX & 0x07))
+                        {
+                            character++;
+                        }
                     }
                 }
             }
