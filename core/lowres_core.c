@@ -52,6 +52,10 @@ void LRC_init(LRCore *core)
     setChar(window, 2, 0, 'O');
     setChar(window, 3, 0, 'R');
     setChar(window, 4, 0, 'E');
+    setChar(window, 12, 0, '4');
+    setChar(window, 13, 0, '2');
+    setChar(window, 14, 0, '0');
+    setChar(window, 15, 0, '0');
     
     Sprite *sprite = &core->videoInterface.sprites[0];
     sprite->character = 128+32;
@@ -62,22 +66,26 @@ void LRC_init(LRCore *core)
     sprite = &core->videoInterface.sprites[1];
     sprite->character = 129;
     sprite->attr_palette = 4;
-    sprite->attr_priority = 1;
+    sprite->attr_priority = 0;
     sprite->attr_bank = 2;
     sprite->attr_width = 3;
     sprite->attr_height = 3;
+
+    for (int i = 0; i < 640; i++)
+    {
+        int pli = i%2;
+        Cell *cell = &core->videoInterface.planes[pli].cells[rand()%32][rand()%32];
+        cell->character = 64+(rand()%48);
+        cell->attr_palette = rand()%4;
+        cell->attr_priority = rand()%2;
+        cell->attr_bank = 2;
+    }
 }
 
 void LRC_update(LRCore *core)
 {
     core->videoInterface.planes[0].scrollX--;
     core->videoInterface.planes[1].scrollY--;
-    int pli = rand()%2;
-    Cell *cell = &core->videoInterface.planes[pli].cells[rand()%32][rand()%32];
-    cell->character = 32+(rand()%32);
-    cell->attr_palette = rand()%4;
-    cell->attr_priority = rand()%2;
-    cell->attr_bank = 2;
     
     Sprite *sprite = &core->videoInterface.sprites[0];
     sprite->x += 2;

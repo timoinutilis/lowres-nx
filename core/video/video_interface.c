@@ -19,13 +19,28 @@
 
 #include "video_interface.h"
 #include "character_rom.h"
+#include <string.h>
 
 int LRC_getCharacterPixel(Character *character, int x, int y)
 {
     return (character->data[y] >> ((7 - x) << 1)) & 0x03;
 }
 
-void LRC_renderPlane(VideoInterface *vi, int index, int priority, int y, uint8_t *scanlineBuffer)
+Character *LRC_getCharacter(VideoInterface *vi, int bank, int characterIndex)
+{
+    Character *character;
+    if (bank < 2)
+    {
+        character = &vi->characterBanks[bank].characters[characterIndex];
+    }
+    else
+    {
+        character = (Character *)CharacterRom[characterIndex];
+    }
+    return character;
+}
+
+void LRC_renderPlane(VideoInterface *vi, int index, int y, uint8_t *scanlineBuffer)
 {
     Plane *plane = &vi->planes[index];
     int planeY = y + plane->scrollY;
@@ -35,30 +50,22 @@ void LRC_renderPlane(VideoInterface *vi, int index, int priority, int y, uint8_t
     {
         int planeX = x + plane->scrollX;
         int column = (planeX >> 3) & 31;
-        int cellX = planeX & 7;
         Cell *cell = &plane->cells[row][column];
-        if (cell->attr_priority == priority)
+        if (cell->attr_priority >= (*scanlineBuffer >> 7))
         {
-            Character *character;
-            if (cell->attr_bank < 2)
-            {
-                character = &vi->characterBanks[cell->attr_bank].characters[cell->character];
-            }
-            else
-            {
-                character = (Character *)CharacterRom[cell->character];
-            }
+            int cellX = planeX & 7;
+            Character *character = LRC_getCharacter(vi, cell->attr_bank, cell->character);
             int pixel = LRC_getCharacterPixel(character, cellX, cellY);
-            if (pixel != 0)
+            if (pixel)
             {
-                *scanlineBuffer = pixel | (cell->attr_palette << 2);
+                *scanlineBuffer = pixel | (cell->attr_palette << 2) | (cell->attr_priority << 7);
             }
         }
         scanlineBuffer++;
     }
 }
 
-void LRC_renderWindow(VideoInterface *vi, int priority, int y, uint8_t *scanlineBuffer)
+void LRC_renderWindow(VideoInterface *vi, int y, uint8_t *scanlineBuffer)
 {
     Window *window = &vi->window;
     int row = y >> 3;
@@ -68,61 +75,45 @@ void LRC_renderWindow(VideoInterface *vi, int priority, int y, uint8_t *scanline
         int column = x >> 3;
         int cellX = x & 7;
         Cell *cell = &window->cells[row][column];
-        if (cell->attr_priority == priority)
+        if (cell->attr_priority >= (*scanlineBuffer >> 7))
         {
-            Character *character;
-            if (cell->attr_bank < 2)
-            {
-                character = &vi->characterBanks[cell->attr_bank].characters[cell->character];
-            }
-            else
-            {
-                character = (Character *)CharacterRom[cell->character];
-            }
+            Character *character = LRC_getCharacter(vi, cell->attr_bank, cell->character);
             int pixel = LRC_getCharacterPixel(character, cellX, cellY);
-            if (pixel != 0)
+            if (pixel)
             {
-                *scanlineBuffer = pixel | (cell->attr_palette << 2);
+                *scanlineBuffer = pixel | (cell->attr_palette << 2) | (cell->attr_priority << 7);
             }
         }
         scanlineBuffer++;
     }
 }
 
-void LRC_renderSprites(VideoInterface *vi, int priority, int y, uint8_t *scanlineBuffer)
+void LRC_renderSprites(VideoInterface *vi, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
 {
     for (int i = 0; i < NUM_SPRITES; i++)
     {
         Sprite *sprite = &vi->sprites[i];
-        if (sprite->attr_priority == priority && !(sprite->x == 0 && sprite->y == 0))
+        if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
             int height = (sprite->attr_height + 1) << 3;
             if (spriteY >= 0 && spriteY < height)
             {
-                Character *character;
                 int charIndex = sprite->character + ((spriteY >> 3) << 4);
-                if (sprite->attr_bank < 2)
-                {
-                    character = &vi->characterBanks[sprite->attr_bank].characters[charIndex];
-                }
-                else
-                {
-                    character = (Character *)CharacterRom[charIndex];
-                }
+                Character *character = LRC_getCharacter(vi, sprite->attr_bank, charIndex);
                 int width = (sprite->attr_width + 1) << 3;
                 int minX = sprite->x - SPRITE_OFFSET_X;
                 int maxX = minX + width;
                 if (minX < 0) minX = 0;
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
-                uint8_t *buffer = &scanlineBuffer[minX];
+                uint8_t *buffer = &scanlineSpriteBuffer[minX];
                 int spriteX = minX - sprite->x + SPRITE_OFFSET_X;
                 for (int x = minX; x < maxX; x++)
                 {
                     int pixel = LRC_getCharacterPixel(character, spriteX & 0x07, spriteY & 0x07);
-                    if (pixel != 0)
+                    if (pixel)
                     {
-                        *buffer = pixel | (sprite->attr_palette << 2);
+                        *buffer = pixel | (sprite->attr_palette << 2) | (sprite->attr_priority << 7);
                     }
                     buffer++;
                     spriteX++;
@@ -134,29 +125,35 @@ void LRC_renderSprites(VideoInterface *vi, int priority, int y, uint8_t *scanlin
             }
         }
     }
+    for (int x = 0; x < SCREEN_WIDTH; x++)
+    {
+        int pixel = *scanlineSpriteBuffer;
+        if (pixel && (pixel >> 7) >= (*scanlineBuffer >> 7))
+        {
+            *scanlineBuffer = pixel;
+        }
+        scanlineSpriteBuffer++;
+        scanlineBuffer++;
+    }
 }
 
 void LRC_renderScreen(VideoInterface *vi, uint8_t *outputRGB)
 {
     uint8_t scanlineBuffer[SCREEN_WIDTH];
+    uint8_t scanlineSpriteBuffer[SCREEN_WIDTH];
     uint8_t *outputByte = outputRGB;
     
     for (int y = 0; y < SCREEN_HEIGHT; y++)
     {
+        memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
+        memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
+        LRC_renderPlane(vi, 0, y, scanlineBuffer);
+        LRC_renderPlane(vi, 1, y, scanlineBuffer);
+        LRC_renderSprites(vi, y, scanlineBuffer, scanlineSpriteBuffer);
+        LRC_renderWindow(vi, y, scanlineBuffer);
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
-            scanlineBuffer[x] = 0;
-        }
-        for (int priority = 0; priority < 2; priority++)
-        {
-            LRC_renderPlane(vi, 0, priority, y, scanlineBuffer);
-            LRC_renderPlane(vi, 1, priority, y, scanlineBuffer);
-            LRC_renderSprites(vi, priority, y, scanlineBuffer);
-            LRC_renderWindow(vi, priority, y, scanlineBuffer);
-        }
-        for (int x = 0; x < SCREEN_WIDTH; x++)
-        {
-            int color = vi->colors[scanlineBuffer[x]];
+            int color = vi->colors[scanlineBuffer[x] & 0x7F];
             int r = (color >> 4) & 0x03;
             int g = (color >> 2) & 0x03;
             int b = color & 0x03;
