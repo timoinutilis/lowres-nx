@@ -33,8 +33,8 @@
 #define WINDOW_COLUMNS 16
 #define WINDOW_ROWS 16
 #define NUM_SPRITES 64
-#define SPRITE_OFFSET_X 8
-#define SPRITE_OFFSET_Y 8
+#define SPRITE_OFFSET_X 32
+#define SPRITE_OFFSET_Y 32
 
 
 typedef struct {

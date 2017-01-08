@@ -55,7 +55,7 @@ void LRC_renderPlane(VideoInterface *vi, int index, int y, uint8_t *scanlineBuff
         {
             int cellX = planeX & 7;
             Character *character = LRC_getCharacter(vi, cell->attr_bank, cell->character);
-            int pixel = LRC_getCharacterPixel(character, cellX, cellY);
+            int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
                 *scanlineBuffer = pixel | (cell->attr_palette << 2) | (cell->attr_priority << 7);
@@ -78,7 +78,7 @@ void LRC_renderWindow(VideoInterface *vi, int y, uint8_t *scanlineBuffer)
         if (cell->attr_priority >= (*scanlineBuffer >> 7))
         {
             Character *character = LRC_getCharacter(vi, cell->attr_bank, cell->character);
-            int pixel = LRC_getCharacterPixel(character, cellX, cellY);
+            int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
                 *scanlineBuffer = pixel | (cell->attr_palette << 2) | (cell->attr_priority << 7);

@@ -17,8 +17,9 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef audio_interface_h
-#define audio_interface_h
+#ifndef text_h
+#define text_h
 
+#include <stdio.h>
 
-#endif /* audio_interface_h */
+#endif /* text_h */
