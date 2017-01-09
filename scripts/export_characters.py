@@ -1,6 +1,11 @@
+import sys
 from PIL import Image
 
-im = Image.open("../assets/characters.png")
+if len(sys.argv) >= 2:
+	filename = sys.argv[1]
+else:
+	filename = "../assets/characters.png"
+im = Image.open(filename)
 print im.format, im.size, im.mode
 print "{",
 for row in range(16):

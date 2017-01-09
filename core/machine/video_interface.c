@@ -29,13 +29,13 @@ int LRC_getCharacterPixel(Character *character, int x, int y)
 Character *LRC_getCharacter(VideoInterface *vi, int bank, int characterIndex)
 {
     Character *character;
-    if (bank < 2)
+    if (bank)
     {
-        character = &vi->characterBanks[bank].characters[characterIndex];
+        character = (Character *)CharacterRom[characterIndex];
     }
     else
     {
-        character = (Character *)CharacterRom[characterIndex];
+        character = &vi->characters[characterIndex];
     }
     return character;
 }

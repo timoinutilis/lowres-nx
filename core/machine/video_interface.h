@@ -24,7 +24,6 @@
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 128
-#define NUM_CHARACTER_BANKS 2
 #define NUM_CHARACTERS 256
 #define NUM_COLORS 32
 #define NUM_PLANES 2
@@ -42,43 +41,34 @@ typedef struct {
 } Character;
 
 typedef struct {
-    Character characters[NUM_CHARACTERS];
-} CharacterBank;
-
-typedef struct {
     uint8_t x;
     uint8_t y;
     uint8_t character;
-    union // attributes 1 (8 bit)
-    {
+    union { // attributes 1 (8 bit)
         struct {
             uint8_t attr_palette:3;
-            uint8_t attr_bank:2;
+            uint8_t attr_bank:1;
             uint8_t attr_flipX:1;
             uint8_t attr_flipY:1;
             uint8_t attr_priority:1;
         };
         uint8_t attributes1;
     };
-    union // attributes 2 (8 bit)
-    {
+    union { // attributes 2 (8 bit)
         struct {
             uint8_t attr_width:2; // 1-4 characters
             uint8_t attr_height:2; // 1-4 characters
-            uint8_t attr_reserved:4;
         };
         uint8_t attributes2;
     };
-    uint8_t reserved1; // keep struct size even
 } Sprite;
 
 typedef struct {
     uint8_t character;
-    union // attributes (8 bit)
-    {
+    union { // attributes (8 bit)
         struct {
             uint8_t attr_palette:3;
-            uint8_t attr_bank:2;
+            uint8_t attr_bank:1;
             uint8_t attr_flipX:1;
             uint8_t attr_flipY:1;
             uint8_t attr_priority:1;
@@ -98,7 +88,7 @@ typedef struct {
 } Window;
 
 typedef struct {
-    CharacterBank characterBanks[NUM_CHARACTER_BANKS];
+    Character characters[NUM_CHARACTERS];
     Plane planes[NUM_PLANES];
     Window window;
     Sprite sprites[NUM_SPRITES];

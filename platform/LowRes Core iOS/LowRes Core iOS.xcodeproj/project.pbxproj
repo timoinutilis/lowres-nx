@@ -22,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		920D88861E24332000B51F40 /* demo_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = demo_data.h; sourceTree = "<group>"; };
 		924DA4FD1E100F8A001B65EB /* RendererViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RendererViewController.h; sourceTree = "<group>"; };
 		924DA4FE1E100F8A001B65EB /* RendererViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RendererViewController.m; sourceTree = "<group>"; };
 		924DA5001E1095DC001B65EB /* lowres_core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lowres_core.c; sourceTree = "<group>"; };
@@ -105,8 +106,9 @@
 			children = (
 				92F00CB31E226F110027C9F6 /* machine */,
 				92F00CB21E226F110027C9F6 /* libraries */,
-				924DA5001E1095DC001B65EB /* lowres_core.c */,
 				924DA5011E1095DC001B65EB /* lowres_core.h */,
+				924DA5001E1095DC001B65EB /* lowres_core.c */,
+				920D88861E24332000B51F40 /* demo_data.h */,
 			);
 			name = core;
 			path = ../../core;
@@ -115,8 +117,8 @@
 		92F00CB21E226F110027C9F6 /* libraries */ = {
 			isa = PBXGroup;
 			children = (
-				92F00CBD1E226FF40027C9F6 /* text.c */,
 				92F00CBE1E226FF40027C9F6 /* text.h */,
+				92F00CBD1E226FF40027C9F6 /* text.c */,
 			);
 			path = libraries;
 			sourceTree = "<group>";
@@ -124,12 +126,12 @@
 		92F00CB31E226F110027C9F6 /* machine */ = {
 			isa = PBXGroup;
 			children = (
-				92F00CBB1E226F510027C9F6 /* audio_interface.c */,
 				92F00CB41E226F110027C9F6 /* audio_interface.h */,
-				92F00CB71E226F110027C9F6 /* video_interface.c */,
+				92F00CBB1E226F510027C9F6 /* audio_interface.c */,
 				92F00CB81E226F110027C9F6 /* video_interface.h */,
-				92F00CB51E226F110027C9F6 /* character_rom.c */,
+				92F00CB71E226F110027C9F6 /* video_interface.c */,
 				92F00CB61E226F110027C9F6 /* character_rom.h */,
+				92F00CB51E226F110027C9F6 /* character_rom.c */,
 			);
 			path = machine;
 			sourceTree = "<group>";
