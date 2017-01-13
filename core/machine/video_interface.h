@@ -24,9 +24,9 @@
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 128
+#define NUM_CHARACTER_BANKS 2
 #define NUM_CHARACTERS 256
-#define NUM_COLORS 32
-#define NUM_PLANES 2
+#define NUM_COLORS 64
 #define PLANE_COLUMNS 32
 #define PLANE_ROWS 32
 #define WINDOW_COLUMNS 16
@@ -35,18 +35,30 @@
 #define SPRITE_OFFSET_X 32
 #define SPRITE_OFFSET_Y 32
 
+// ================ Character ================
 
+// 16 bytes
 typedef struct {
     uint16_t data[8];
 } Character;
 
+// ================ Character Bank ================
+
+// 4096 bytes
+typedef struct {
+    Character characters[NUM_CHARACTERS];
+} CharacterBank;
+
+// ================ Sprite ================
+
+// 8 bytes
 typedef struct {
     uint8_t x;
     uint8_t y;
     uint8_t character;
-    union { // attributes 1 (8 bit)
+    union {
         struct {
-            uint8_t attr_palette:3;
+            uint8_t attr_palette:4;
             uint8_t attr_bank:1;
             uint8_t attr_flipX:1;
             uint8_t attr_flipY:1;
@@ -54,20 +66,24 @@ typedef struct {
         };
         uint8_t attributes1;
     };
-    union { // attributes 2 (8 bit)
+    union {
         struct {
             uint8_t attr_width:2; // 1-4 characters
             uint8_t attr_height:2; // 1-4 characters
         };
         uint8_t attributes2;
     };
+    uint8_t reserved[3];
 } Sprite;
 
+// ================ Cell ================
+
+// 2 bytes
 typedef struct {
     uint8_t character;
-    union { // attributes (8 bit)
+    union {
         struct {
-            uint8_t attr_palette:3;
+            uint8_t attr_palette:4;
             uint8_t attr_bank:1;
             uint8_t attr_flipX:1;
             uint8_t attr_flipY:1;
@@ -77,25 +93,59 @@ typedef struct {
     };
 } Cell;
 
+// ================ Plane ================
+
+// 2048 bytes
 typedef struct {
-    uint8_t scrollX;
-    uint8_t scrollY;
     Cell cells[PLANE_ROWS][PLANE_COLUMNS];
 } Plane;
 
+// ================ Window ================
+
+// 512 bytes
 typedef struct {
     Cell cells[WINDOW_ROWS][WINDOW_COLUMNS];
 } Window;
 
+// ===========================================
+// ================ Video RAM ================
+// ===========================================
+
+// 16 KB
 typedef struct {
-    Character characters[NUM_CHARACTERS];
-    Plane planes[NUM_PLANES];
-    Window window;
-    Sprite sprites[NUM_SPRITES];
-    uint8_t colors[NUM_COLORS];
-} VideoInterface;
+    CharacterBank characterBanks[NUM_CHARACTER_BANKS]; // 8 KB
+    Plane planeB; // 2 KB
+    Plane planeA; // 2 KB
+    Window window; // 512 bytes
+    uint8_t reserved[3584]; // 4 KB - 512 bytes
+} VideoRam;
 
+// =================================================
+// ================ Video Registers ================
+// =================================================
 
-void LRC_renderScreen(VideoInterface *vi, uint8_t *outputRGB);
+// 1 KB
+typedef struct {
+    Sprite sprites[NUM_SPRITES]; // 512 bytes
+    uint8_t colors[NUM_COLORS]; // 64 bytes
+    union {
+        struct {
+            uint8_t attr_romCells:1;
+            uint8_t attr_romSprites:1;
+        };
+        uint8_t attributes;
+    };
+    uint8_t scrollAX;
+    uint8_t scrollAY;
+    uint8_t scrollBX;
+    uint8_t scrollBY;
+    uint8_t reserved[443]; //1 KB - 581 bytes
+} VideoRegisters;
+
+// ===========================================
+// ================ Functions ================
+// ===========================================
+
+void LRC_renderScreen(VideoRegisters *reg, VideoRam *ram, uint8_t *outputRGB);
 
 #endif /* video_interface_h */

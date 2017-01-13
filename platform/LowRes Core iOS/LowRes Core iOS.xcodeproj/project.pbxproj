@@ -23,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		920D88861E24332000B51F40 /* demo_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = demo_data.h; sourceTree = "<group>"; };
+		921393D51E296BD200940DBC /* io_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = io_interface.h; sourceTree = "<group>"; };
 		924DA4FD1E100F8A001B65EB /* RendererViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RendererViewController.h; sourceTree = "<group>"; };
 		924DA4FE1E100F8A001B65EB /* RendererViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RendererViewController.m; sourceTree = "<group>"; };
 		924DA5001E1095DC001B65EB /* lowres_core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lowres_core.c; sourceTree = "<group>"; };
@@ -126,6 +127,7 @@
 		92F00CB31E226F110027C9F6 /* machine */ = {
 			isa = PBXGroup;
 			children = (
+				921393D51E296BD200940DBC /* io_interface.h */,
 				92F00CB41E226F110027C9F6 /* audio_interface.h */,
 				92F00CBB1E226F510027C9F6 /* audio_interface.c */,
 				92F00CB81E226F110027C9F6 /* video_interface.h */,

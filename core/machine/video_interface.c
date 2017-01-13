@@ -26,35 +26,34 @@ int LRC_getCharacterPixel(Character *character, int x, int y)
     return (character->data[y] >> ((7 - x) << 1)) & 0x03;
 }
 
-Character *LRC_getCharacter(VideoInterface *vi, int bank, int characterIndex)
+Character *LRC_getCharacter(VideoRam *ram, int rom, int bank, int characterIndex)
 {
     Character *character;
-    if (bank)
+    if (rom && bank)
     {
         character = (Character *)CharacterRom[characterIndex];
     }
     else
     {
-        character = &vi->characters[characterIndex];
+        character = &ram->characterBanks[bank].characters[characterIndex];
     }
     return character;
 }
 
-void LRC_renderPlane(VideoInterface *vi, int index, int y, uint8_t *scanlineBuffer)
+void LRC_renderPlane(VideoRegisters *reg, VideoRam *ram, Plane *plane, int y, int scrollX, int scrollY, uint8_t *scanlineBuffer)
 {
-    Plane *plane = &vi->planes[index];
-    int planeY = y + plane->scrollY;
+    int planeY = y + scrollY;
     int row = (planeY >> 3) & 31;
     int cellY = planeY & 7;
     for (int x = 0; x < SCREEN_WIDTH; x++)
     {
-        int planeX = x + plane->scrollX;
+        int planeX = x + scrollX;
         int column = (planeX >> 3) & 31;
         Cell *cell = &plane->cells[row][column];
         if (cell->attr_priority >= (*scanlineBuffer >> 7))
         {
             int cellX = planeX & 7;
-            Character *character = LRC_getCharacter(vi, cell->attr_bank, cell->character);
+            Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
             int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
@@ -65,9 +64,9 @@ void LRC_renderPlane(VideoInterface *vi, int index, int y, uint8_t *scanlineBuff
     }
 }
 
-void LRC_renderWindow(VideoInterface *vi, int y, uint8_t *scanlineBuffer)
+void LRC_renderWindow(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanlineBuffer)
 {
-    Window *window = &vi->window;
+    Window *window = &ram->window;
     int row = y >> 3;
     int cellY = y & 7;
     for (int x = 0; x < SCREEN_WIDTH; x++)
@@ -77,7 +76,7 @@ void LRC_renderWindow(VideoInterface *vi, int y, uint8_t *scanlineBuffer)
         Cell *cell = &window->cells[row][column];
         if (cell->attr_priority >= (*scanlineBuffer >> 7))
         {
-            Character *character = LRC_getCharacter(vi, cell->attr_bank, cell->character);
+            Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
             int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
@@ -88,11 +87,11 @@ void LRC_renderWindow(VideoInterface *vi, int y, uint8_t *scanlineBuffer)
     }
 }
 
-void LRC_renderSprites(VideoInterface *vi, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
+void LRC_renderSprites(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
 {
     for (int i = 0; i < NUM_SPRITES; i++)
     {
-        Sprite *sprite = &vi->sprites[i];
+        Sprite *sprite = &reg->sprites[i];
         if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
@@ -108,7 +107,7 @@ void LRC_renderSprites(VideoInterface *vi, int y, uint8_t *scanlineBuffer, uint8
                 {
                     charIndex += sprite->attr_width;
                 }
-                Character *character = LRC_getCharacter(vi, sprite->attr_bank, charIndex);
+                Character *character = LRC_getCharacter(ram, reg->attr_romSprites, sprite->attr_bank, charIndex);
                 int width = (sprite->attr_width + 1) << 3;
                 int minX = sprite->x - SPRITE_OFFSET_X;
                 int maxX = minX + width;
@@ -160,7 +159,7 @@ void LRC_renderSprites(VideoInterface *vi, int y, uint8_t *scanlineBuffer, uint8
     }
 }
 
-void LRC_renderScreen(VideoInterface *vi, uint8_t *outputRGB)
+void LRC_renderScreen(VideoRegisters *reg, VideoRam *ram, uint8_t *outputRGB)
 {
     uint8_t scanlineBuffer[SCREEN_WIDTH];
     uint8_t scanlineSpriteBuffer[SCREEN_WIDTH];
@@ -170,13 +169,13 @@ void LRC_renderScreen(VideoInterface *vi, uint8_t *outputRGB)
     {
         memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
         memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
-        LRC_renderPlane(vi, 0, y, scanlineBuffer);
-        LRC_renderPlane(vi, 1, y, scanlineBuffer);
-        LRC_renderSprites(vi, y, scanlineBuffer, scanlineSpriteBuffer);
-        LRC_renderWindow(vi, y, scanlineBuffer);
+        LRC_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
+        LRC_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
+        LRC_renderSprites(reg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
+        LRC_renderWindow(reg, ram, y, scanlineBuffer);
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
-            int color = vi->colors[scanlineBuffer[x] & 0x7F];
+            int color = reg->colors[scanlineBuffer[x] & 0x7F];
             int r = (color >> 4) & 0x03;
             int g = (color >> 2) & 0x03;
             int b = color & 0x03;

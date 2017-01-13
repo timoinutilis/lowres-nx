@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <assert.h>
 #include "demo_data.h"
 
 int tick = 0;
@@ -36,7 +37,14 @@ void setChar(Window *window, int x, int y, char character)
 
 void LRC_init(LRCore *core)
 {
-    uint8_t *colors = core->videoInterface.colors;
+    assert(sizeof(VideoRam) == 0x4000);
+    assert(sizeof(VideoRegisters) == 0x400);
+    assert(sizeof(IORegisters) == 0x100);
+    assert(sizeof(LRCore) == 0x10000);
+    
+    core->videoRegisters.attr_romCells = 1;
+    
+    uint8_t *colors = core->videoRegisters.colors;
     colors[0] = (0<<4) | (1<<2) | 3;
     
     colors[1] = (1<<4) | (0<<2) | 0;
@@ -63,7 +71,7 @@ void LRC_init(LRCore *core)
     colors[30] = (1<<4) | (1<<2) | 1;
     colors[31] = (3<<4) | (3<<2) | 3;
     
-    Window *window = &core->videoInterface.window;
+    Window *window = &core->videoRam.window;
     setChar(window, 0, 0, 'S');
     setChar(window, 1, 0, 'C');
     setChar(window, 2, 0, 'O');
@@ -74,11 +82,11 @@ void LRC_init(LRCore *core)
     setChar(window, 14, 0, '0');
     setChar(window, 15, 0, '0');
     
-    memcpy(core->videoInterface.characters, DemoCharacters, sizeof(DemoCharacters));
-    memcpy(core->videoInterface.planes[0].cells, DemoBackground, sizeof(DemoBackground));
-    memcpy(core->videoInterface.planes[1].cells, DemoMap, sizeof(DemoMap));
+    memcpy(&core->videoRam.characterBanks[0], DemoCharacters, sizeof(DemoCharacters));
+    memcpy(core->videoRam.planeB.cells, DemoBackground, sizeof(DemoBackground));
+    memcpy(core->videoRam.planeA.cells, DemoMap, sizeof(DemoMap));
     
-    Sprite *sprite = &core->videoInterface.sprites[0];
+    Sprite *sprite = &core->videoRegisters.sprites[0];
     sprite->character = 128;
     sprite->x = 96;
     sprite->y = 96;
@@ -90,10 +98,10 @@ void LRC_init(LRCore *core)
 
 void LRC_update(LRCore *core)
 {
-    core->videoInterface.planes[0].scrollX = tick;
-    core->videoInterface.planes[1].scrollX = tick * 2;
+    core->videoRegisters.scrollBX = tick;
+    core->videoRegisters.scrollAX = tick * 2;
     
-    Sprite *sprite = &core->videoInterface.sprites[0];
+    Sprite *sprite = &core->videoRegisters.sprites[0];
     sprite->character = 130 + ((tick/4)%3) * 2;
     tick++;
 
