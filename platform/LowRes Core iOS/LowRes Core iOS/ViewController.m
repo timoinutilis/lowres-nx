@@ -18,6 +18,7 @@
 //
 
 #import "ViewController.h"
+#import "interpreter.h"
 
 @interface ViewController ()
 @end
@@ -27,6 +28,20 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"bas" inDirectory:@"bas"];
+    NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
+    
+    Interpreter interpreter;
+    ErrorCode errorCode = LRC_tokenizeProgram(&interpreter, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
+    if (errorCode != ErrorNone)
+    {
+        printf("Tokenizer error: %d\n", errorCode);
+    }
+    else
+    {
+        printf("Tokenizer success\n");
+        // run!
+    }
 }
 
 - (BOOL)prefersStatusBarHidden
