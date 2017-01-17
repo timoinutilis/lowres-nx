@@ -40,7 +40,8 @@
     else
     {
         printf("Tokenizer success\n");
-        // run!
+        ErrorCode errorCode = LRC_runProgram(&interpreter);
+        printf("Finished with error code: %d\n", errorCode);
     }
 }
 

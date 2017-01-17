@@ -261,3 +261,133 @@ ErrorCode LRC_tokenizeProgram(Interpreter *interpreter, const char *sourceCode)
     }
     return ErrorNone;
 }
+
+ErrorCode LRC_runProgram(Interpreter *interpreter)
+{
+    interpreter->pc = &interpreter->tokens[0];
+    ErrorCode errorCode = ErrorNone;
+    
+    do
+    {
+        errorCode = LRC_runCommand(interpreter);
+    }
+    while (errorCode == ErrorNone);
+    
+    return errorCode;
+}
+
+Value *LRC_evaluateExpression(Interpreter *interpreter)
+{
+    switch (interpreter->pc->type)
+    {
+        case TokenFloat:
+            ++interpreter->pc;
+            break;
+            
+        case TokenString:
+            ++interpreter->pc;
+            break;
+            
+        case TokenIdentifier:
+            ++interpreter->pc; // A
+            ++interpreter->pc; // =
+            ++interpreter->pc; // 1
+            break;
+            
+        default:
+            return NULL; //ErrorUnexpectedToken;
+    }
+    return NULL;
+}
+
+ErrorCode LRC_runCommand(Interpreter *interpreter)
+{
+    switch (interpreter->pc->type)
+    {
+        case TokenUndefined:
+            return ErrorEndOfProgram;
+            
+        case TokenEND:
+            ++interpreter->pc;
+            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+            ++interpreter->pc;
+            return ErrorEndOfProgram;
+            
+        case TokenIdentifier: {
+            ++interpreter->pc;
+            if (interpreter->pc->type == TokenEq)
+            {
+                ++interpreter->pc;
+                Value *value = LRC_evaluateExpression(interpreter);
+            }
+            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+            ++interpreter->pc;
+            break;
+        }
+        case TokenLabel: {
+            ++interpreter->pc;
+            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+            ++interpreter->pc;
+            break;
+        }
+        case TokenEol: {
+            ++interpreter->pc;
+            break;
+        }
+        case TokenPRINT: {
+            ++interpreter->pc;
+            Value *value = LRC_evaluateExpression(interpreter);
+            printf("print something\n");
+            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+            ++interpreter->pc;
+            break;
+        }
+        case TokenIF: {
+            ++interpreter->pc;
+            Value *value = LRC_evaluateExpression(interpreter);
+            if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
+            ++interpreter->pc;
+            if (!value)
+            {
+                while (   interpreter->pc->type != TokenELSE
+                       && interpreter->pc->type != TokenEol)
+                {
+                    ++interpreter->pc;
+                }
+                if (interpreter->pc->type == TokenELSE)
+                {
+                    ++interpreter->pc;
+                }
+            }
+            break;
+        }
+        case TokenELSE: {
+            while (interpreter->pc->type != TokenEol)
+            {
+                ++interpreter->pc;
+            }
+            ++interpreter->pc;
+            break;
+        }
+        case TokenDATA:
+        case TokenDIM:
+        case TokenFOR:
+        case TokenGOSUB:
+        case TokenGOTO:
+        case TokenINPUT:
+        case TokenLET:
+        case TokenNEXT:
+        case TokenON:
+        case TokenRANDOMIZE:
+        case TokenREAD:
+        case TokenREM:
+        case TokenRESTORE:
+        case TokenRETURN:
+            printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
+            return ErrorUnexpectedToken;
+            
+        default:
+            return ErrorUnexpectedToken;
+    }
+    return ErrorNone;
+}

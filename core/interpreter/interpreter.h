@@ -79,7 +79,6 @@ typedef enum {
     TokenXOR,
     
     Token_count
-    
 } TokenType;
 
 typedef enum {
@@ -95,6 +94,10 @@ typedef enum {
     ErrorExpectedEndOfString,
     ErrorUnexpectedCharacter,
     ErrorSyntax,
+    ErrorEndOfProgram,
+    ErrorUnexpectedToken,
+    ErrorExpectedEndOfLine,
+    ErrorExpectedThen
 } ErrorCode;
 
 typedef struct {
@@ -115,8 +118,11 @@ typedef struct {
 typedef struct {
     int numTokens;
     Token tokens[MAX_TOKENS];
+    Token *pc;
 } Interpreter;
 
 ErrorCode LRC_tokenizeProgram(Interpreter *interpreter, const char *sourceCode);
+ErrorCode LRC_runProgram(Interpreter *interpreter);
+ErrorCode LRC_runCommand(Interpreter *interpreter);
 
 #endif /* interpreter_h */
