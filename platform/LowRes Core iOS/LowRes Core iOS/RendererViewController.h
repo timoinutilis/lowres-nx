@@ -18,7 +18,10 @@
 //
 
 #import <GLKit/GLKit.h>
+#import "lowres_core.h"
 
 @interface RendererViewController : GLKViewController
+
+- (void)setCore:(LRCore *)core;
 
 @end

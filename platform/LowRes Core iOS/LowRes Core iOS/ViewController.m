@@ -18,36 +18,68 @@
 //
 
 #import "ViewController.h"
-#import "interpreter.h"
+#import "lowres_core.h"
+#import "RendererViewController.h"
 
 @interface ViewController ()
+@property RendererViewController *rendererViewController;
 @end
 
-@implementation ViewController
+@implementation ViewController {
+    LRCore *_core;
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"bas" inDirectory:@"bas"];
-    NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
     
-    Interpreter interpreter;
-    ErrorCode errorCode = LRC_tokenizeProgram(&interpreter, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
-    if (errorCode != ErrorNone)
+    _core = calloc(1, sizeof(LRCore));
+    if (!_core)
     {
-        printf("Tokenizer error: %d\n", errorCode);
+        printf("Alloc failed\n");
     }
     else
     {
-        printf("Tokenizer success\n");
-        ErrorCode errorCode = LRC_runProgram(&interpreter);
-        printf("Finished with error code: %d\n", errorCode);
+        LRC_init(_core);
+        
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"bas" inDirectory:@"bas"];
+        NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
+        
+        ErrorCode errorCode = LRC_tokenizeProgram(&_core->interpreter, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
+        if (errorCode != ErrorNone)
+        {
+            printf("Tokenizer error: %d\n", errorCode);
+        }
+        else
+        {
+            printf("Tokenizer success\n");
+            [self.rendererViewController setCore:_core];
+            ErrorCode errorCode = LRC_runProgram(&_core->interpreter);
+            printf("Finished with error code: %d\n", errorCode);
+        }
+    }
+}
+
+- (void)dealloc
+{
+    if (_core)
+    {
+        [self.rendererViewController setCore:NULL];
+        free(_core);
     }
 }
 
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"renderer"])
+    {
+        self.rendererViewController = segue.destinationViewController;
+    }
 }
 
 @end

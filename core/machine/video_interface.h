@@ -117,16 +117,15 @@ typedef struct {
     Plane planeB; // 2 KB
     Plane planeA; // 2 KB
     Window window; // 512 bytes
-    uint8_t reserved[3584]; // 4 KB - 512 bytes
+    Sprite sprites[NUM_SPRITES]; // 512 bytes
+    uint8_t reserved[3072]; // 3 KB
 } VideoRam;
 
 // =================================================
 // ================ Video Registers ================
 // =================================================
 
-// 1 KB
 typedef struct {
-    Sprite sprites[NUM_SPRITES]; // 512 bytes
     uint8_t colors[NUM_COLORS]; // 64 bytes
     union {
         struct {
@@ -139,7 +138,6 @@ typedef struct {
     uint8_t scrollAY;
     uint8_t scrollBX;
     uint8_t scrollBY;
-    uint8_t reserved[443]; //1 KB - 581 bytes
 } VideoRegisters;
 
 // ===========================================

@@ -52,7 +52,6 @@ typedef struct {
         };
         uint8_t status;
     };
-    uint8_t reserved[250]; //256 - 6 bytes
 } IORegisters;
 
 #endif /* io_interface_h */

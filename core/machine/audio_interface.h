@@ -22,4 +22,7 @@
 
 #include <stdio.h>
 
+typedef struct {
+} AudioRegisters;
+
 #endif /* audio_interface_h */

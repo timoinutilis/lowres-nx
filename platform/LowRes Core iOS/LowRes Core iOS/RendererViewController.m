@@ -60,12 +60,6 @@ const GLushort Indices[] = {
     self.effect = [[GLKBaseEffect alloc] init];
     
     _textureData = (GLubyte *)calloc(SCREEN_WIDTH * SCREEN_HEIGHT * 3, sizeof(GLubyte));
-    _core = calloc(1, sizeof(LRCore));
-    
-    if (_core && _textureData)
-    {
-        LRC_init(_core);
-    }
 }
 
 - (void)dealloc
@@ -86,10 +80,11 @@ const GLushort Indices[] = {
     {
         free(_textureData);
     }
-    if (_core)
-    {
-        free(_core);
-    }
+}
+
+- (void)setCore:(LRCore *)core
+{
+    _core = core;
 }
 
 - (void)update
@@ -97,7 +92,7 @@ const GLushort Indices[] = {
     if (_core && _textureData)
     {
         LRC_update(_core);
-        LRC_renderScreen(&_core->videoRegisters, &_core->videoRam, _textureData);
+        LRC_renderScreen(&_core->machine.videoRegisters, &_core->machine.videoRam, _textureData);
     }
 }
 

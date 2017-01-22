@@ -89,9 +89,9 @@ void LRC_renderWindow(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanli
 
 void LRC_renderSprites(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
 {
-    for (int i = 0; i < NUM_SPRITES; i++)
+    for (int i = NUM_SPRITES - 1; i >= 0; i--)
     {
-        Sprite *sprite = &reg->sprites[i];
+        Sprite *sprite = &ram->sprites[i];
         if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;

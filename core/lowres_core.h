@@ -21,41 +21,12 @@
 #define core_h
 
 #include <stdio.h>
-#include "io_interface.h"
-#include "video_interface.h"
-#include "audio_interface.h"
+#include "machine.h"
+#include "interpreter.h"
 
-// 64 KB
 typedef struct {
-    // ==== RAM (48 KB) ====
-    
-    // 0x0000
-    VideoRam videoRam;
-    
-    // 0x4000
-    uint8_t workingRam[0x4000];
-    
-    // 0x8000
-    uint8_t systemRam[0x4000];
-    
-    // ==== ROM (8 KB) ====
-    
-    // 0xC000
-    CharacterBank characterRom;
-    
-    // 0xD000
-    uint8_t reservedRom[0x1000];
-    
-    // ==== Registers (8 KB) ====
-    
-    // 0xE000
-    VideoRegisters videoRegisters;
-    
-    // 0xE400
-    IORegisters ioRegisters;
-    
-    // 0xE500
-    uint8_t reservedRegisters[0x1B00];
+    Machine machine;
+    Interpreter interpreter;
 } LRCore;
 
 void LRC_init(LRCore *core);

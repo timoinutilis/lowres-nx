@@ -17,6 +17,7 @@
 		927838D81DF5F50300035E0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 927838D71DF5F50300035E0D /* Assets.xcassets */; };
 		927838DB1DF5F50300035E0D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 927838D91DF5F50300035E0D /* LaunchScreen.storyboard */; };
 		929D20661E2B9961001FF319 /* interpreter.c in Sources */ = {isa = PBXBuildFile; fileRef = 929D20641E2B9961001FF319 /* interpreter.c */; };
+		92D4FD541E34F1CB0068321E /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D4FD521E34F1CB0068321E /* machine.c */; };
 		92F00CB91E226F110027C9F6 /* character_rom.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CB51E226F110027C9F6 /* character_rom.c */; };
 		92F00CBA1E226F110027C9F6 /* video_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CB71E226F110027C9F6 /* video_interface.c */; };
 		92F00CBC1E226F510027C9F6 /* audio_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CBB1E226F510027C9F6 /* audio_interface.c */; };
@@ -43,6 +44,8 @@
 		927838E31DF5F51F00035E0D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/Main.storyboard; sourceTree = "<group>"; };
 		929D20641E2B9961001FF319 /* interpreter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = interpreter.c; sourceTree = "<group>"; };
 		929D20651E2B9961001FF319 /* interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interpreter.h; sourceTree = "<group>"; };
+		92D4FD521E34F1CB0068321E /* machine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = machine.c; sourceTree = "<group>"; };
+		92D4FD531E34F1CB0068321E /* machine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machine.h; sourceTree = "<group>"; };
 		92F00CB41E226F110027C9F6 /* audio_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_interface.h; sourceTree = "<group>"; };
 		92F00CB51E226F110027C9F6 /* character_rom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = character_rom.c; sourceTree = "<group>"; };
 		92F00CB61E226F110027C9F6 /* character_rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = character_rom.h; sourceTree = "<group>"; };
@@ -143,6 +146,8 @@
 		92F00CB31E226F110027C9F6 /* machine */ = {
 			isa = PBXGroup;
 			children = (
+				92D4FD531E34F1CB0068321E /* machine.h */,
+				92D4FD521E34F1CB0068321E /* machine.c */,
 				921393D51E296BD200940DBC /* io_interface.h */,
 				92F00CB41E226F110027C9F6 /* audio_interface.h */,
 				92F00CBB1E226F510027C9F6 /* audio_interface.c */,
@@ -229,6 +234,7 @@
 				929D20661E2B9961001FF319 /* interpreter.c in Sources */,
 				92F00CB91E226F110027C9F6 /* character_rom.c in Sources */,
 				92F00CBA1E226F110027C9F6 /* video_interface.c in Sources */,
+				92D4FD541E34F1CB0068321E /* machine.c in Sources */,
 				92F00CBF1E226FF40027C9F6 /* text.c in Sources */,
 				927838D31DF5F50300035E0D /* ViewController.m in Sources */,
 				927838D01DF5F50300035E0D /* AppDelegate.m in Sources */,
