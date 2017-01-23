@@ -38,21 +38,21 @@
 // ================ Character ================
 
 // 16 bytes
-typedef struct {
+struct Character {
     uint16_t data[8];
-} Character;
+};
 
 // ================ Character Bank ================
 
 // 4096 bytes
-typedef struct {
-    Character characters[NUM_CHARACTERS];
-} CharacterBank;
+struct CharacterBank {
+    struct Character characters[NUM_CHARACTERS];
+};
 
 // ================ Sprite ================
 
 // 8 bytes
-typedef struct {
+struct Sprite {
     uint8_t x;
     uint8_t y;
     uint8_t character;
@@ -74,12 +74,12 @@ typedef struct {
         uint8_t attributes2;
     };
     uint8_t reserved[3];
-} Sprite;
+};
 
 // ================ Cell ================
 
 // 2 bytes
-typedef struct {
+struct Cell {
     uint8_t character;
     union {
         struct {
@@ -91,41 +91,41 @@ typedef struct {
         };
         uint8_t attributes;
     };
-} Cell;
+};
 
 // ================ Plane ================
 
 // 2048 bytes
-typedef struct {
-    Cell cells[PLANE_ROWS][PLANE_COLUMNS];
-} Plane;
+struct Plane {
+    struct Cell cells[PLANE_ROWS][PLANE_COLUMNS];
+};
 
 // ================ Window ================
 
 // 512 bytes
-typedef struct {
-    Cell cells[WINDOW_ROWS][WINDOW_COLUMNS];
-} Window;
+struct Window {
+    struct Cell cells[WINDOW_ROWS][WINDOW_COLUMNS];
+};
 
 // ===========================================
 // ================ Video RAM ================
 // ===========================================
 
 // 16 KB
-typedef struct {
-    CharacterBank characterBanks[NUM_CHARACTER_BANKS]; // 8 KB
-    Plane planeB; // 2 KB
-    Plane planeA; // 2 KB
-    Window window; // 512 bytes
-    Sprite sprites[NUM_SPRITES]; // 512 bytes
+struct VideoRam {
+    struct CharacterBank characterBanks[NUM_CHARACTER_BANKS]; // 8 KB
+    struct Plane planeB; // 2 KB
+    struct Plane planeA; // 2 KB
+    struct Window window; // 512 bytes
+    struct Sprite sprites[NUM_SPRITES]; // 512 bytes
     uint8_t reserved[3072]; // 3 KB
-} VideoRam;
+};
 
 // =================================================
 // ================ Video Registers ================
 // =================================================
 
-typedef struct {
+struct VideoRegisters {
     uint8_t colors[NUM_COLORS]; // 64 bytes
     union {
         struct {
@@ -138,12 +138,12 @@ typedef struct {
     uint8_t scrollAY;
     uint8_t scrollBX;
     uint8_t scrollBY;
-} VideoRegisters;
+};
 
 // ===========================================
 // ================ Functions ================
 // ===========================================
 
-void LRC_renderScreen(VideoRegisters *reg, VideoRam *ram, uint8_t *outputRGB);
+void LRC_renderScreen(struct VideoRegisters *reg, struct VideoRam *ram, uint8_t *outputRGB);
 
 #endif /* video_interface_h */

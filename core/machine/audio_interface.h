@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-typedef struct {
-} AudioRegisters;
+struct AudioRegisters {
+};
 
 #endif /* audio_interface_h */

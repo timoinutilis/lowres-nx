@@ -43,7 +43,7 @@ const GLushort Indices[] = {
 @end
 
 @implementation RendererViewController {
-    LRCore *_core;
+    struct LowResCore *_core;
     GLuint _vertexBuffer;
     GLuint _indexBuffer;
     GLuint _texName;
@@ -82,7 +82,7 @@ const GLushort Indices[] = {
     }
 }
 
-- (void)setCore:(LRCore *)core
+- (void)setCore:(struct LowResCore *)core
 {
     _core = core;
 }

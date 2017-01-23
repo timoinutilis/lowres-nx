@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
+    <device id="ipad9_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -19,13 +18,18 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jss-1y-PUI">
-                                <rect key="frame" x="0.0" y="20" width="375" height="375"/>
+                                <rect key="frame" x="128" y="256" width="512" height="512"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="Jss-1y-PUI" secondAttribute="height" multiplier="1:1" id="hp4-Ln-8vK"/>
+                                    <constraint firstAttribute="width" constant="256" id="4kv-Cs-jUX">
+                                        <variation key="heightClass=regular-widthClass=regular" constant="512"/>
+                                    </constraint>
+                                    <constraint firstAttribute="height" constant="256" id="wKY-KK-m2W">
+                                        <variation key="heightClass=regular-widthClass=regular" constant="512"/>
+                                    </constraint>
                                 </constraints>
                                 <connections>
                                     <segue destination="KsR-Z1-l36" kind="embed" identifier="renderer" id="WXc-Ca-MLc"/>
@@ -34,11 +38,8 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Jss-1y-PUI" secondAttribute="bottom" id="DvK-ny-SqB"/>
-                            <constraint firstItem="Jss-1y-PUI" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="L28-tl-9UQ"/>
-                            <constraint firstItem="Jss-1y-PUI" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="Tgw-Gk-NHb"/>
-                            <constraint firstAttribute="trailing" secondItem="Jss-1y-PUI" secondAttribute="trailing" priority="750" id="ojW-U9-PuU"/>
-                            <constraint firstItem="Jss-1y-PUI" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" priority="750" id="qxL-V1-Uu0"/>
+                            <constraint firstItem="Jss-1y-PUI" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="1s9-46-GNu"/>
+                            <constraint firstItem="Jss-1y-PUI" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="lLy-C8-XoC"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -55,7 +56,7 @@
                         <viewControllerLayoutGuide type="bottom" id="Zb5-Cq-krD"/>
                     </layoutGuides>
                     <glkView key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" enableSetNeedsDisplay="NO" id="W6m-ib-QUU">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="375"/>
+                        <rect key="frame" x="0.0" y="0.0" width="512" height="512"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <connections>
                             <outlet property="delegate" destination="KsR-Z1-l36" id="V9L-K7-U6J"/>

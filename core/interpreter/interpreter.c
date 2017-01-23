@@ -19,6 +19,7 @@
 
 #include "interpreter.h"
 #include <string.h>
+#include "lowres_core.h"
 
 const char *TokenStrings[] = {
     NULL,
@@ -75,13 +76,13 @@ const char *TokenStrings[] = {
     "XOR"
 };
 
-ErrorCode LRC_tokenizeProgram(Interpreter *interpreter, const char *sourceCode)
+enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode)
 {
     const char *charSetDigits = "0123456789";
     const char *charSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
     const char *charSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
     
-    memset(interpreter, 0, sizeof(Interpreter));
+    struct Interpreter *interpreter = &core->interpreter;
     const char *character = sourceCode;
     
     while (*character)
@@ -90,7 +91,7 @@ ErrorCode LRC_tokenizeProgram(Interpreter *interpreter, const char *sourceCode)
         {
             return ErrorTooManyTokens;
         }
-        Token *token = &interpreter->tokens[interpreter->numTokens];
+        struct Token *token = &interpreter->tokens[interpreter->numTokens];
         
         // line break
         if (*character == '\n')
@@ -166,7 +167,7 @@ ErrorCode LRC_tokenizeProgram(Interpreter *interpreter, const char *sourceCode)
         }
         
         // Keyword
-        TokenType foundKeywordToken = TokenUndefined;
+        enum TokenType foundKeywordToken = TokenUndefined;
         for (int i = 0; i < Token_count; i++)
         {
             const char *keyword = TokenStrings[i];
@@ -262,22 +263,23 @@ ErrorCode LRC_tokenizeProgram(Interpreter *interpreter, const char *sourceCode)
     return ErrorNone;
 }
 
-ErrorCode LRC_runProgram(Interpreter *interpreter)
+enum ErrorCode LRC_runProgram(struct LowResCore *core)
 {
-    interpreter->pc = &interpreter->tokens[0];
-    ErrorCode errorCode = ErrorNone;
+    core->interpreter.pc = &core->interpreter.tokens[0];
+    enum ErrorCode errorCode = ErrorNone;
     
     do
     {
-        errorCode = LRC_runCommand(interpreter);
+        errorCode = LRC_runCommand(core);
     }
     while (errorCode == ErrorNone);
     
     return errorCode;
 }
 
-Value *LRC_evaluateExpression(Interpreter *interpreter)
+struct Value *LRC_evaluateExpression(struct LowResCore *core)
 {
+    struct Interpreter *interpreter = &core->interpreter;
     switch (interpreter->pc->type)
     {
         case TokenFloat:
@@ -300,8 +302,9 @@ Value *LRC_evaluateExpression(Interpreter *interpreter)
     return NULL;
 }
 
-ErrorCode LRC_runCommand(Interpreter *interpreter)
+enum ErrorCode LRC_runCommand(struct LowResCore *core)
 {
+    struct Interpreter *interpreter = &core->interpreter;
     switch (interpreter->pc->type)
     {
         case TokenUndefined:
@@ -318,7 +321,7 @@ ErrorCode LRC_runCommand(Interpreter *interpreter)
             if (interpreter->pc->type == TokenEq)
             {
                 ++interpreter->pc;
-                Value *value = LRC_evaluateExpression(interpreter);
+                struct Value *value = LRC_evaluateExpression(core);
             }
             if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
             ++interpreter->pc;
@@ -336,7 +339,7 @@ ErrorCode LRC_runCommand(Interpreter *interpreter)
         }
         case TokenPRINT: {
             ++interpreter->pc;
-            Value *value = LRC_evaluateExpression(interpreter);
+            struct Value *value = LRC_evaluateExpression(core);
             printf("print something\n");
             if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
             ++interpreter->pc;
@@ -344,7 +347,7 @@ ErrorCode LRC_runCommand(Interpreter *interpreter)
         }
         case TokenIF: {
             ++interpreter->pc;
-            Value *value = LRC_evaluateExpression(interpreter);
+            struct Value *value = LRC_evaluateExpression(core);
             if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
             ++interpreter->pc;
             if (!value)

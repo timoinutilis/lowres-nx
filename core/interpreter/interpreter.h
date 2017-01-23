@@ -24,7 +24,9 @@
 
 #define MAX_TOKENS 1024
 
-typedef enum {
+struct LowResCore;
+
+enum TokenType {
     TokenUndefined,
     
     TokenIdentifier,
@@ -79,16 +81,16 @@ typedef enum {
     TokenXOR,
     
     Token_count
-} TokenType;
+};
 
-typedef enum {
+enum ValueType {
     ValueNull,
     ValueError,
     ValueFloat,
     ValueString
-} ValueType;
+};
 
-typedef enum {
+enum ErrorCode {
     ErrorNone,
     ErrorTooManyTokens,
     ErrorExpectedEndOfString,
@@ -98,31 +100,31 @@ typedef enum {
     ErrorUnexpectedToken,
     ErrorExpectedEndOfLine,
     ErrorExpectedThen
-} ErrorCode;
+};
 
-typedef struct {
-    ValueType type;
+struct Value {
+    enum ValueType type;
     union {
         float floatValue;
-        ErrorCode errorCode;
+        enum ErrorCode errorCode;
     };
-} Value;
+};
 
-typedef struct {
-    TokenType type;
+struct Token {
+    enum TokenType type;
     union {
         /* TokenFloat */    float floatValue;
     };
-} Token;
+};
 
-typedef struct {
+struct Interpreter {
     int numTokens;
-    Token tokens[MAX_TOKENS];
-    Token *pc;
-} Interpreter;
+    struct Token tokens[MAX_TOKENS];
+    struct Token *pc;
+};
 
-ErrorCode LRC_tokenizeProgram(Interpreter *interpreter, const char *sourceCode);
-ErrorCode LRC_runProgram(Interpreter *interpreter);
-ErrorCode LRC_runCommand(Interpreter *interpreter);
+enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
+enum ErrorCode LRC_runProgram(struct LowResCore *core);
+enum ErrorCode LRC_runCommand(struct LowResCore *core);
 
 #endif /* interpreter_h */

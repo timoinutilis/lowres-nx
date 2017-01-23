@@ -24,12 +24,12 @@
 #include "machine.h"
 #include "interpreter.h"
 
-typedef struct {
-    Machine machine;
-    Interpreter interpreter;
-} LRCore;
+struct LowResCore {
+    struct Machine machine;
+    struct Interpreter interpreter;
+};
 
-void LRC_init(LRCore *core);
-void LRC_update(LRCore *core);
+void LRC_init(struct LowResCore *core);
+void LRC_update(struct LowResCore *core);
 
 #endif /* core_h */

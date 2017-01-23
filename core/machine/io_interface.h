@@ -24,7 +24,7 @@
 
 // ================ Gamepad ================
 
-typedef union {
+union Gamepad {
     struct {
         uint8_t status_up:1;
         uint8_t status_down:1;
@@ -34,14 +34,14 @@ typedef union {
         uint8_t status_buttonB:1;
     };
     uint8_t status;
-} Gamepad;
+} ;
 
 // ===============================================
 // ================ I/O Registers ================
 // ===============================================
 
-typedef struct {
-    Gamepad gamepads[NUM_GAMEPADS]; // 2 bytes
+struct IORegisters {
+    union Gamepad gamepads[NUM_GAMEPADS]; // 2 bytes
     uint8_t mouseX;
     uint8_t mouseY;
     uint8_t key;
@@ -52,6 +52,6 @@ typedef struct {
         };
         uint8_t status;
     };
-} IORegisters;
+};
 
 #endif /* io_interface_h */

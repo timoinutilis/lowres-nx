@@ -17,9 +17,34 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef text_h
-#define text_h
+#ifndef text_lib_h
+#define text_lib_h
 
 #include <stdio.h>
+#include "machine.h"
 
-#endif /* text_h */
+struct TextLib {
+    uint8_t characterOffset;
+    union {
+        struct {
+            uint8_t attr_palette:4;
+            uint8_t attr_bank:1;
+            uint8_t attr_flipX:1;
+            uint8_t attr_flipY:1;
+            uint8_t attr_priority:1;
+        };
+        uint8_t attributes;
+    };
+    uint8_t areaX;
+    uint8_t areaY;
+    uint8_t areaWidth;
+    uint8_t areaHeight;
+    uint8_t cursorX;
+    uint8_t cursorY;
+};
+
+void LRC_printText(struct Machine *machine, const char *text);
+void LRC_writeText(struct Machine *machine, const char *text, int x, int y);
+void LRC_writeNumber(struct Machine *machine, int number, int digits, int x, int y);
+
+#endif /* text_lib_h */

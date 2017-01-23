@@ -22,19 +22,12 @@
 #include <math.h>
 #include <string.h>
 #include "demo_data.h"
+#include "text_lib.h"
+#include "system_ram.h"
 
 int tick = 0;
 
-void setChar(Window *window, int x, int y, char character)
-{
-    Cell *cell = &window->cells[y][x];
-    cell->character = character + 32 + 64;
-    cell->attr_bank = 1;
-    cell->attr_priority = 1;
-    cell->attr_palette = 7;
-}
-
-void LRC_init(LRCore *core)
+void LRC_init(struct LowResCore *core)
 {
     LRC_initMachine(&core->machine);
     
@@ -43,48 +36,65 @@ void LRC_init(LRCore *core)
     uint8_t *colors = core->machine.videoRegisters.colors;
     colors[0] = (0<<4) | (1<<2) | 3;
     
+    // 0 brown
     colors[1] = (1<<4) | (0<<2) | 0;
     colors[2] = (2<<4) | (1<<2) | 0;
     colors[3] = (3<<4) | (2<<2) | 0;
     
+    // 1 green
     colors[5] = (0<<4) | (1<<2) | 0;
     colors[6] = (0<<4) | (2<<2) | 0;
     colors[7] = (0<<4) | (3<<2) | 0;
 
+    // 2 sea blue
     colors[9]  = (0<<4) | (1<<2) | 3;
     colors[10] = (0<<4) | (2<<2) | 3;
     colors[11] = (0<<4) | (3<<2) | 3;
-
+    
+    // 3 ?
     colors[13] = (1<<4) | (2<<2) | 3;
     colors[14] = (2<<4) | (3<<2) | 3;
     colors[15] = (3<<4) | (3<<2) | 3;
-
+    
+    // 4 orange
+    colors[17] = (3<<4) | (1<<2) | 0;
+    colors[18] = (3<<4) | (2<<2) | 0;
+    colors[19] = (3<<4) | (3<<2) | 0;
+    
+    // 5 red
+    colors[21] = (1<<4) | (0<<2) | 0;
+    colors[22] = (2<<4) | (0<<2) | 0;
+    colors[23] = (3<<4) | (0<<2) | 0;
+    
+    // 6 mario sprite
     colors[25] = (1<<4) | (0<<2) | 0;
     colors[26] = (3<<4) | (0<<2) | 0;
     colors[27] = (3<<4) | (2<<2) | 1;
-
+    
+    // 7 white text
     colors[29] = 0;
     colors[30] = (1<<4) | (1<<2) | 1;
     colors[31] = (3<<4) | (3<<2) | 3;
     
-    Window *window = &core->machine.videoRam.window;
-    setChar(window, 0, 0, 'S');
-    setChar(window, 1, 0, 'C');
-    setChar(window, 2, 0, 'O');
-    setChar(window, 3, 0, 'R');
-    setChar(window, 4, 0, 'E');
-    setChar(window, 12, 0, '4');
-    setChar(window, 13, 0, '2');
-    setChar(window, 14, 0, '0');
-    setChar(window, 15, 0, '0');
+    struct SystemRam *systemRam = (struct SystemRam *)core->machine.workingRam;
+    struct TextLib *textLib = &systemRam->textLib;
+    textLib->attr_bank = 1;
+    textLib->attr_priority = 1;
+    textLib->attr_palette = 7;
+    textLib->characterOffset = 128;
+    textLib->areaX = 0;
+    textLib->areaY = 12;
+    textLib->areaWidth = 16;
+    textLib->areaHeight = 4;
+    LRC_writeText(&core->machine, "SCORE", 0, 0);
     
     memcpy(&core->machine.videoRam.characterBanks[0], DemoCharacters, sizeof(DemoCharacters));
     memcpy(core->machine.videoRam.planeB.cells, DemoBackground, sizeof(DemoBackground));
     memcpy(core->machine.videoRam.planeA.cells, DemoMap, sizeof(DemoMap));
     
-    Sprite *sprite = &core->machine.videoRam.sprites[0];
+    struct Sprite *sprite = &core->machine.videoRam.sprites[0];
     sprite->character = 128;
-    sprite->x = 96;
+    sprite->x = 64;
     sprite->y = 96;
     sprite->attr_palette = 6;
     sprite->attr_priority = 0;
@@ -92,13 +102,28 @@ void LRC_init(LRCore *core)
     sprite->attr_height = 1;
 }
 
-void LRC_update(LRCore *core)
+void LRC_update(struct LowResCore *core)
 {
+    struct SystemRam *systemRam = (struct SystemRam *)core->machine.workingRam;
+    struct TextLib *textLib = &systemRam->textLib;
+    
     core->machine.videoRegisters.scrollBX = tick;
     core->machine.videoRegisters.scrollAX = tick * 2;
     
-    Sprite *sprite = &core->machine.videoRam.sprites[0];
+    struct Sprite *sprite = &core->machine.videoRam.sprites[0];
     sprite->character = 130 + ((tick/4)%3) * 2;
-    tick++;
+    
+    if (tick%15 == 0)
+    {
+        textLib->attr_palette = rand() % 8;
+        textLib->attr_flipX = rand()%2;
+        textLib->attr_flipY = rand()%2;
+        LRC_printText(&core->machine, "PRINT TEXT! ");
+    }
+    textLib->attr_palette = 7;
+    textLib->attr_flipX = 0;
+    textLib->attr_flipY = 0;
+    LRC_writeNumber(&core->machine, tick/10, 5, 11, 0);
 
+    tick++;
 }

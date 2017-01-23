@@ -26,14 +26,14 @@
 @end
 
 @implementation ViewController {
-    LRCore *_core;
+    struct LowResCore *_core;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    _core = calloc(1, sizeof(LRCore));
+    _core = calloc(1, sizeof(struct LowResCore));
     if (!_core)
     {
         printf("Alloc failed\n");
@@ -45,7 +45,7 @@
         NSString *filePath = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"bas" inDirectory:@"bas"];
         NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
         
-        ErrorCode errorCode = LRC_tokenizeProgram(&_core->interpreter, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
+        enum ErrorCode errorCode = LRC_tokenizeProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
         if (errorCode != ErrorNone)
         {
             printf("Tokenizer error: %d\n", errorCode);
@@ -54,7 +54,7 @@
         {
             printf("Tokenizer success\n");
             [self.rendererViewController setCore:_core];
-            ErrorCode errorCode = LRC_runProgram(&_core->interpreter);
+            enum ErrorCode errorCode = LRC_runProgram(_core);
             printf("Finished with error code: %d\n", errorCode);
         }
     }

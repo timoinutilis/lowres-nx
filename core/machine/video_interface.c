@@ -21,17 +21,17 @@
 #include "character_rom.h"
 #include <string.h>
 
-int LRC_getCharacterPixel(Character *character, int x, int y)
+int LRC_getCharacterPixel(struct Character *character, int x, int y)
 {
     return (character->data[y] >> ((7 - x) << 1)) & 0x03;
 }
 
-Character *LRC_getCharacter(VideoRam *ram, int rom, int bank, int characterIndex)
+struct Character *LRC_getCharacter(struct VideoRam *ram, int rom, int bank, int characterIndex)
 {
-    Character *character;
+    struct Character *character;
     if (rom && bank)
     {
-        character = (Character *)CharacterRom[characterIndex];
+        character = (struct Character *)CharacterRom[characterIndex];
     }
     else
     {
@@ -40,7 +40,7 @@ Character *LRC_getCharacter(VideoRam *ram, int rom, int bank, int characterIndex
     return character;
 }
 
-void LRC_renderPlane(VideoRegisters *reg, VideoRam *ram, Plane *plane, int y, int scrollX, int scrollY, uint8_t *scanlineBuffer)
+void LRC_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct Plane *plane, int y, int scrollX, int scrollY, uint8_t *scanlineBuffer)
 {
     int planeY = y + scrollY;
     int row = (planeY >> 3) & 31;
@@ -49,11 +49,11 @@ void LRC_renderPlane(VideoRegisters *reg, VideoRam *ram, Plane *plane, int y, in
     {
         int planeX = x + scrollX;
         int column = (planeX >> 3) & 31;
-        Cell *cell = &plane->cells[row][column];
+        struct Cell *cell = &plane->cells[row][column];
         if (cell->attr_priority >= (*scanlineBuffer >> 7))
         {
             int cellX = planeX & 7;
-            Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
+            struct Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
             int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
@@ -64,19 +64,19 @@ void LRC_renderPlane(VideoRegisters *reg, VideoRam *ram, Plane *plane, int y, in
     }
 }
 
-void LRC_renderWindow(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanlineBuffer)
+void LRC_renderWindow(struct VideoRegisters *reg, struct VideoRam *ram, int y, uint8_t *scanlineBuffer)
 {
-    Window *window = &ram->window;
+    struct Window *window = &ram->window;
     int row = y >> 3;
     int cellY = y & 7;
     for (int x = 0; x < SCREEN_WIDTH; x++)
     {
         int column = x >> 3;
         int cellX = x & 7;
-        Cell *cell = &window->cells[row][column];
+        struct Cell *cell = &window->cells[row][column];
         if (cell->attr_priority >= (*scanlineBuffer >> 7))
         {
-            Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
+            struct Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
             int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
@@ -87,11 +87,11 @@ void LRC_renderWindow(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanli
     }
 }
 
-void LRC_renderSprites(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
+void LRC_renderSprites(struct VideoRegisters *reg, struct VideoRam *ram, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
 {
     for (int i = NUM_SPRITES - 1; i >= 0; i--)
     {
-        Sprite *sprite = &ram->sprites[i];
+        struct Sprite *sprite = &ram->sprites[i];
         if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
@@ -107,7 +107,7 @@ void LRC_renderSprites(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanl
                 {
                     charIndex += sprite->attr_width;
                 }
-                Character *character = LRC_getCharacter(ram, reg->attr_romSprites, sprite->attr_bank, charIndex);
+                struct Character *character = LRC_getCharacter(ram, reg->attr_romSprites, sprite->attr_bank, charIndex);
                 int width = (sprite->attr_width + 1) << 3;
                 int minX = sprite->x - SPRITE_OFFSET_X;
                 int maxX = minX + width;
@@ -159,7 +159,7 @@ void LRC_renderSprites(VideoRegisters *reg, VideoRam *ram, int y, uint8_t *scanl
     }
 }
 
-void LRC_renderScreen(VideoRegisters *reg, VideoRam *ram, uint8_t *outputRGB)
+void LRC_renderScreen(struct VideoRegisters *reg, struct VideoRam *ram, uint8_t *outputRGB)
 {
     uint8_t scanlineBuffer[SCREEN_WIDTH];
     uint8_t scanlineSpriteBuffer[SCREEN_WIDTH];

@@ -22,6 +22,6 @@
 
 @interface RendererViewController : GLKViewController
 
-- (void)setCore:(LRCore *)core;
+- (void)setCore:(struct LowResCore *)core;
 
 @end
