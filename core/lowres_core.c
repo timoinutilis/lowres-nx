@@ -160,7 +160,26 @@ void LRC_rasterUpdate(struct LowResCore *core)
     {
         reflectionPalette(core);
     }
-    
+
+    uint8_t *colors = core->machine.videoRegisters.colors;
+    int cy = y + (y%2 * 4);
+    if (cy < 12)
+    {
+        colors[0] = (3<<4) | (1<<2) | 3;
+    }
+    else if (cy < 24)
+    {
+        colors[0] = (2<<4) | (1<<2) | 3;
+    }
+    else if (cy < 36)
+    {
+        colors[0] = (1<<4) | (1<<2) | 3;
+    }
+    else
+    {
+        colors[0] = (0<<4) | (1<<2) | 3;
+    }
+
     if (y < 8)
     {
         core->machine.videoRegisters.scrollBX = 0;
