@@ -23,7 +23,7 @@
 void LRC_printText(struct Machine *machine, const char *text)
 {
     struct TextLib *lib = &((struct SystemRam *)machine->workingRam)->textLib;
-    struct Window *window = &machine->videoRam.window;
+    struct Plane *plane = &machine->videoRam.planeB;
     const char *letter = text;
     while (*letter)
     {
@@ -36,16 +36,16 @@ void LRC_printText(struct Machine *machine, const char *text)
                 for (int x = 0; x < lib->areaWidth; x++)
                 {
                     int px = x + lib->areaX;
-                    window->cells[py][px] = window->cells[py+1][px];
+                    plane->cells[py][px] = plane->cells[py+1][px];
                 }
             }
             int py = lib->areaY + lib->areaHeight - 1;
             for (int x = 0; x < lib->areaWidth; x++)
             {
                 int px = x + lib->areaX;
-                struct Cell *cell = &window->cells[py][px];
+                struct Cell *cell = &plane->cells[py][px];
                 cell->character = lib->characterOffset; // space
-                cell->attributes = lib->attributes;
+                cell->attr.value = lib->charAttr.value;
             }
             
             lib->cursorY = lib->areaHeight - 1;
@@ -53,8 +53,8 @@ void LRC_printText(struct Machine *machine, const char *text)
         
         if (*letter >= 32)
         {
-            struct Cell *cell = &window->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
-            cell->attributes = lib->attributes;
+            struct Cell *cell = &plane->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
+            cell->attr.value = lib->charAttr.value;
             cell->character = lib->characterOffset + (*letter - 32);
         
             lib->cursorX++;
@@ -78,14 +78,14 @@ void LRC_printText(struct Machine *machine, const char *text)
 void LRC_writeText(struct Machine *machine, const char *text, int x, int y)
 {
     struct TextLib *lib = &((struct SystemRam *)machine->workingRam)->textLib;
-    struct Window *window = &machine->videoRam.window;
+    struct Plane *plane = &machine->videoRam.planeB;
     const char *letter = text;
     while (*letter)
     {
         if (*letter >= 32)
         {
-            struct Cell *cell = &window->cells[y][x];
-            cell->attributes = lib->attributes;
+            struct Cell *cell = &plane->cells[y][x];
+            cell->attr.value = lib->charAttr.value;
             cell->character = lib->characterOffset + (*letter - 32);
             
             x++;
@@ -97,15 +97,15 @@ void LRC_writeText(struct Machine *machine, const char *text, int x, int y)
 void LRC_writeNumber(struct Machine *machine, int number, int digits, int x, int y)
 {
     struct TextLib *lib = &((struct SystemRam *)machine->workingRam)->textLib;
-    struct Window *window = &machine->videoRam.window;
+    struct Plane *plane = &machine->videoRam.planeB;
     
     x += digits;
     int div = 1;
     for (int i = 0; i < digits; i++)
     {
         x--;
-        struct Cell *cell = &window->cells[y][x];
-        cell->attributes = lib->attributes;
+        struct Cell *cell = &plane->cells[y][x];
+        cell->attr.value = lib->charAttr.value;
         cell->character = lib->characterOffset + ((number / div) % 10 + 16);
         div *= 10;
     }

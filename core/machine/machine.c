@@ -24,11 +24,11 @@
 
 void LRC_initMachine(struct Machine *machine)
 {
-    assert(sizeof(struct VideoRam) == 0x4000);
+    assert(sizeof(struct VideoRam) == 0x2000);
     assert(sizeof(struct CharacterBank) == 0x1000);
     assert(sizeof(struct Machine) == 0xA0000);
     assert(sizeof(struct IORegisters) < 0x100);
-    assert(sizeof(struct VideoRegisters) < 0x100);
+    assert(sizeof(struct VideoRegisters) < 0x200);
     assert(sizeof(struct IORegisters) < 0x100);
     
     // Copy character ROM data to machine

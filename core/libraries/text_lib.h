@@ -25,16 +25,7 @@
 
 struct TextLib {
     uint8_t characterOffset;
-    union {
-        struct {
-            uint8_t attr_palette:4;
-            uint8_t attr_bank:1;
-            uint8_t attr_flipX:1;
-            uint8_t attr_flipY:1;
-            uint8_t attr_priority:1;
-        };
-        uint8_t attributes;
-    };
+    union CharacterAttributes charAttr;
     uint8_t areaX;
     uint8_t areaY;
     uint8_t areaWidth;

@@ -27,18 +27,18 @@ int LRC_getCharacterPixel(struct Character *character, int x, int y)
     return (character->data[y] >> ((7 - x) << 1)) & 0x03;
 }
 
-struct Character *LRC_getCharacter(struct VideoRam *ram, int rom, int bank, int characterIndex)
+struct Character *LRC_getCharacter(struct VideoRam *ram, int bank, int characterIndex)
 {
-    struct Character *character;
-    if (rom && bank)
+    struct CharacterBank *characterBank;
+    if (bank)
     {
-        character = (struct Character *)CharacterRom[characterIndex];
+        characterBank = (struct CharacterBank *)CharacterRom;
     }
     else
     {
-        character = &ram->characterBanks[bank].characters[characterIndex];
+        characterBank = &ram->characterBank;
     }
-    return character;
+    return &characterBank->characters[characterIndex];
 }
 
 void LRC_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct Plane *plane, int y, int scrollX, int scrollY, uint8_t *scanlineBuffer)
@@ -51,37 +51,14 @@ void LRC_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct Pl
         int planeX = x + scrollX;
         int column = (planeX >> 3) & 31;
         struct Cell *cell = &plane->cells[row][column];
-        if (cell->attr_priority >= (*scanlineBuffer >> 7))
+        if (cell->attr.priority >= (*scanlineBuffer >> 7))
         {
             int cellX = planeX & 7;
-            struct Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
-            int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
+            struct Character *character = LRC_getCharacter(ram, cell->attr.bank, cell->character);
+            int pixel = LRC_getCharacterPixel(character, cell->attr.flipX ? (7 - cellX) : cellX, cell->attr.flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
-                *scanlineBuffer = pixel | (cell->attr_palette << 2) | (cell->attr_priority << 7);
-            }
-        }
-        scanlineBuffer++;
-    }
-}
-
-void LRC_renderWindow(struct VideoRegisters *reg, struct VideoRam *ram, int y, uint8_t *scanlineBuffer)
-{
-    struct Window *window = &ram->window;
-    int row = y >> 3;
-    int cellY = y & 7;
-    for (int x = 0; x < SCREEN_WIDTH; x++)
-    {
-        int column = x >> 3;
-        int cellX = x & 7;
-        struct Cell *cell = &window->cells[row][column];
-        if (cell->attr_priority >= (*scanlineBuffer >> 7))
-        {
-            struct Character *character = LRC_getCharacter(ram, reg->attr_romCells, cell->attr_bank, cell->character);
-            int pixel = LRC_getCharacterPixel(character, cell->attr_flipX ? (7 - cellX) : cellX, cell->attr_flipY ? (7 - cellY) : cellY);
-            if (pixel)
-            {
-                *scanlineBuffer = pixel | (cell->attr_palette << 2) | (cell->attr_priority << 7);
+                *scanlineBuffer = pixel | (cell->attr.palette << 2) | (cell->attr.priority << 7);
             }
         }
         scanlineBuffer++;
@@ -92,31 +69,31 @@ void LRC_renderSprites(struct VideoRegisters *reg, struct VideoRam *ram, int y, 
 {
     for (int i = NUM_SPRITES - 1; i >= 0; i--)
     {
-        struct Sprite *sprite = &ram->sprites[i];
+        struct Sprite *sprite = &reg->sprites[i];
         if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
-            int height = (sprite->attr_height + 1) << 3;
+            int height = (sprite->attr2.height + 1) << 3;
             if (spriteY >= 0 && spriteY < height)
             {
-                if (sprite->attr_flipY)
+                if (sprite->attr1.flipY)
                 {
                     spriteY = height - spriteY - 1;
                 }
                 int charIndex = sprite->character + ((spriteY >> 3) << 4);
-                if (sprite->attr_flipX)
+                if (sprite->attr1.flipX)
                 {
-                    charIndex += sprite->attr_width;
+                    charIndex += sprite->attr2.width;
                 }
-                struct Character *character = LRC_getCharacter(ram, reg->attr_romSprites, sprite->attr_bank, charIndex);
-                int width = (sprite->attr_width + 1) << 3;
+                struct Character *character = LRC_getCharacter(ram, sprite->attr1.bank, charIndex);
+                int width = (sprite->attr2.width + 1) << 3;
                 int minX = sprite->x - SPRITE_OFFSET_X;
                 int maxX = minX + width;
                 if (minX < 0) minX = 0;
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
                 uint8_t *buffer = &scanlineSpriteBuffer[minX];
                 int spriteX = minX - sprite->x + SPRITE_OFFSET_X;
-                if (sprite->attr_flipX)
+                if (sprite->attr1.flipX)
                 {
                     spriteX = width - spriteX - 1;
                 }
@@ -125,10 +102,10 @@ void LRC_renderSprites(struct VideoRegisters *reg, struct VideoRam *ram, int y, 
                     int pixel = LRC_getCharacterPixel(character, spriteX & 0x07, spriteY & 0x07);
                     if (pixel)
                     {
-                        *buffer = pixel | (sprite->attr_palette << 2) | (sprite->attr_priority << 7);
+                        *buffer = pixel | (sprite->attr1.palette << 2) | (sprite->attr1.priority << 7);
                     }
                     buffer++;
-                    if (sprite->attr_flipX)
+                    if (sprite->attr1.flipX)
                     {
                         if (!(spriteX & 0x07))
                         {
@@ -177,7 +154,6 @@ void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB)
         LRC_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
         LRC_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
         LRC_renderSprites(reg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
-        LRC_renderWindow(reg, ram, y, scanlineBuffer);
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
             int color = reg->colors[scanlineBuffer[x] & 0x7F];

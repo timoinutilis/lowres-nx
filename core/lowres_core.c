@@ -113,47 +113,36 @@ void LRC_init(struct LowResCore *core)
 {
     LRC_initMachine(&core->machine);
     
-    core->machine.videoRegisters.attr_romCells = 1;
-    
     struct SystemRam *systemRam = (struct SystemRam *)core->machine.workingRam;
     struct TextLib *textLib = &systemRam->textLib;
-    textLib->attr_bank = 1;
-    textLib->attr_priority = 1;
-    textLib->attr_palette = 7;
+    textLib->charAttr.bank = 1;
+    textLib->charAttr.priority = 1;
+    textLib->charAttr.palette = 7;
     textLib->characterOffset = 128;
-    textLib->areaX = 0;
-    textLib->areaY = 14;
-    textLib->areaWidth = 16;
-    textLib->areaHeight = 2;
-    LRC_writeText(&core->machine, "SCORE", 0, 0);
     
-    memcpy(&core->machine.videoRam.characterBanks[0], DemoCharacters, sizeof(DemoCharacters));
+    memcpy(&core->machine.videoRam.characterBank, DemoCharacters, sizeof(DemoCharacters));
     memcpy(core->machine.videoRam.planeB.cells, DemoBackground, sizeof(DemoBackground));
     memcpy(core->machine.videoRam.planeA.cells, DemoMap, sizeof(DemoMap));
     
-    struct Sprite *sprite = &core->machine.videoRam.sprites[0];
+    LRC_writeText(&core->machine, "SCORE", 0, 0);
+    
+    struct Sprite *sprite = &core->machine.videoRegisters.sprites[0];
     sprite->character = 128;
     sprite->x = 64;
     sprite->y = 96;
-    sprite->attr_palette = 6;
-    sprite->attr_priority = 0;
-    sprite->attr_width = 1;
-    sprite->attr_height = 1;
+    sprite->attr1.palette = 6;
+    sprite->attr1.priority = 0;
+    sprite->attr2.width = 1;
+    sprite->attr2.height = 1;
 }
 
 void LRC_update(struct LowResCore *core)
 {
-    struct SystemRam *systemRam = (struct SystemRam *)core->machine.workingRam;
-    struct TextLib *textLib = &systemRam->textLib;
-    
     core->machine.videoRegisters.scrollAX = tick * 2;
     
-    struct Sprite *sprite = &core->machine.videoRam.sprites[0];
+    struct Sprite *sprite = &core->machine.videoRegisters.sprites[0];
     sprite->character = 130 + ((tick/4)%3) * 2;
-
-    textLib->attr_palette = 7;
-    textLib->attr_flipX = 0;
-    textLib->attr_flipY = 0;
+    
     LRC_writeNumber(&core->machine, tick/10, 5, 11, 0);
 
     tick++;
@@ -172,7 +161,11 @@ void LRC_rasterUpdate(struct LowResCore *core)
         reflectionPalette(core);
     }
     
-    if (y < 32)
+    if (y < 8)
+    {
+        core->machine.videoRegisters.scrollBX = 0;
+    }
+    else if (y < 32)
     {
         core->machine.videoRegisters.scrollBX = tick * 3 / 4;
     }

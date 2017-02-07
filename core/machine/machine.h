@@ -31,22 +31,22 @@ struct Machine {
     uint8_t cartridgeRom[0x80000]; // 512 KB
     
     // 0x80000
-    struct VideoRam videoRam; // 16 KB
+    struct VideoRam videoRam; // 8 KB
     
-    // 0x84000
+    // 0x82000
     struct IORegisters ioRegisters;
     uint8_t reserved1[0x100 - sizeof(struct IORegisters)];
     
-    // 0x84100
+    // 0x82100
     struct VideoRegisters videoRegisters;
-    uint8_t reserved2[0x100 - sizeof(struct VideoRegisters)];
+    uint8_t reserved2[0x200 - sizeof(struct VideoRegisters)];
     
-    // 0x84200
+    // 0x82300
     struct AudioRegisters audioRegisters;
     uint8_t reserved3[0x100 - sizeof(struct AudioRegisters)];
     
-    // 0x84300
-    uint8_t reserved4[0x8D000 - 0x84300];
+    // 0x82400
+    uint8_t reserved4[0x8D000 - 0x82400];
     
     // 0x8D000
     uint8_t cartridgeBackupRam[0x2000]; // 8 KB
