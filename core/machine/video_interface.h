@@ -35,6 +35,8 @@
 #define SPRITE_OFFSET_X 32
 #define SPRITE_OFFSET_Y 32
 
+struct LowResCore;
+
 // ================ Character ================
 
 // 16 bytes
@@ -138,12 +140,13 @@ struct VideoRegisters {
     uint8_t scrollAY;
     uint8_t scrollBX;
     uint8_t scrollBY;
+    uint8_t rasterLine;
 };
 
 // ===========================================
 // ================ Functions ================
 // ===========================================
 
-void LRC_renderScreen(struct VideoRegisters *reg, struct VideoRam *ram, uint8_t *outputRGB);
+void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB);
 
 #endif /* video_interface_h */

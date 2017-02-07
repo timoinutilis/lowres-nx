@@ -27,25 +27,6 @@ void LRC_printText(struct Machine *machine, const char *text)
     const char *letter = text;
     while (*letter)
     {
-        if (*letter >= 32)
-        {
-            struct Cell *cell = &window->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
-            cell->attributes = lib->attributes;
-            cell->character = lib->characterOffset + (*letter - 32);
-        
-            lib->cursorX++;
-        }
-        else if (*letter == '\n')
-        {
-            lib->cursorX = 0;
-            lib->cursorY++;
-        }
-        
-        if (lib->cursorX >= lib->areaWidth)
-        {
-            lib->cursorX = 0;
-            lib->cursorY++;
-        }
         if (lib->cursorY >= lib->areaHeight)
         {
             // scroll
@@ -68,6 +49,26 @@ void LRC_printText(struct Machine *machine, const char *text)
             }
             
             lib->cursorY = lib->areaHeight - 1;
+        }
+        
+        if (*letter >= 32)
+        {
+            struct Cell *cell = &window->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
+            cell->attributes = lib->attributes;
+            cell->character = lib->characterOffset + (*letter - 32);
+        
+            lib->cursorX++;
+        }
+        else if (*letter == '\n')
+        {
+            lib->cursorX = 0;
+            lib->cursorY++;
+        }
+        
+        if (lib->cursorX >= lib->areaWidth)
+        {
+            lib->cursorX = 0;
+            lib->cursorY++;
         }
         
         letter++;

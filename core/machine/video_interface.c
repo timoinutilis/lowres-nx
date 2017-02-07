@@ -19,6 +19,7 @@
 
 #include "video_interface.h"
 #include "character_rom.h"
+#include "lowres_core.h"
 #include <string.h>
 
 int LRC_getCharacterPixel(struct Character *character, int x, int y)
@@ -159,14 +160,18 @@ void LRC_renderSprites(struct VideoRegisters *reg, struct VideoRam *ram, int y, 
     }
 }
 
-void LRC_renderScreen(struct VideoRegisters *reg, struct VideoRam *ram, uint8_t *outputRGB)
+void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB)
 {
     uint8_t scanlineBuffer[SCREEN_WIDTH];
     uint8_t scanlineSpriteBuffer[SCREEN_WIDTH];
     uint8_t *outputByte = outputRGB;
     
+    struct VideoRam *ram = &core->machine.videoRam;
+    struct VideoRegisters *reg = &core->machine.videoRegisters;
     for (int y = 0; y < SCREEN_HEIGHT; y++)
     {
+        reg->rasterLine = y;
+        LRC_rasterUpdate(core);
         memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
         memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
         LRC_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);

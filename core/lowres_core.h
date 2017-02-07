@@ -31,5 +31,6 @@ struct LowResCore {
 
 void LRC_init(struct LowResCore *core);
 void LRC_update(struct LowResCore *core);
+void LRC_rasterUpdate(struct LowResCore *core);
 
 #endif /* core_h */

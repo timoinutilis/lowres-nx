@@ -92,7 +92,7 @@ const GLushort Indices[] = {
     if (_core && _textureData)
     {
         LRC_update(_core);
-        LRC_renderScreen(&_core->machine.videoRegisters, &_core->machine.videoRam, _textureData);
+        LRC_renderScreen(_core, _textureData);
     }
 }
 

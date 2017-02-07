@@ -32,7 +32,7 @@
 		924DA4FE1E100F8A001B65EB /* RendererViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RendererViewController.m; sourceTree = "<group>"; };
 		924DA5001E1095DC001B65EB /* lowres_core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lowres_core.c; sourceTree = "<group>"; };
 		924DA5011E1095DC001B65EB /* lowres_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lowres_core.h; sourceTree = "<group>"; };
-		927838C81DF5F50300035E0D /* LowRes Core iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes Core iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		927838C81DF5F50300035E0D /* LowRes Core.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes Core.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		927838CC1DF5F50300035E0D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		927838CE1DF5F50300035E0D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		927838CF1DF5F50300035E0D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -80,7 +80,7 @@
 		927838C91DF5F50300035E0D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				927838C81DF5F50300035E0D /* LowRes Core iOS.app */,
+				927838C81DF5F50300035E0D /* LowRes Core.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -164,9 +164,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		927838C71DF5F50200035E0D /* LowRes Core iOS */ = {
+		927838C71DF5F50200035E0D /* LowRes Core */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes Core iOS" */;
+			buildConfigurationList = 927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes Core" */;
 			buildPhases = (
 				927838C41DF5F50200035E0D /* Sources */,
 				927838C51DF5F50200035E0D /* Frameworks */,
@@ -176,9 +176,9 @@
 			);
 			dependencies = (
 			);
-			name = "LowRes Core iOS";
+			name = "LowRes Core";
 			productName = "LowRes Core iOS";
-			productReference = 927838C81DF5F50300035E0D /* LowRes Core iOS.app */;
+			productReference = 927838C81DF5F50300035E0D /* LowRes Core.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -209,7 +209,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				927838C71DF5F50200035E0D /* LowRes Core iOS */,
+				927838C71DF5F50200035E0D /* LowRes Core */,
 			);
 		};
 /* End PBXProject section */
@@ -395,7 +395,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes Core iOS" */ = {
+		927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes Core" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				927838E01DF5F50300035E0D /* Debug */,

@@ -27,12 +27,8 @@
 
 int tick = 0;
 
-void LRC_init(struct LowResCore *core)
+void normalPalette(struct LowResCore *core)
 {
-    LRC_initMachine(&core->machine);
-    
-    core->machine.videoRegisters.attr_romCells = 1;
-    
     uint8_t *colors = core->machine.videoRegisters.colors;
     colors[0] = (0<<4) | (1<<2) | 3;
     
@@ -45,7 +41,7 @@ void LRC_init(struct LowResCore *core)
     colors[5] = (0<<4) | (1<<2) | 0;
     colors[6] = (0<<4) | (2<<2) | 0;
     colors[7] = (0<<4) | (3<<2) | 0;
-
+    
     // 2 sea blue
     colors[9]  = (0<<4) | (1<<2) | 3;
     colors[10] = (0<<4) | (2<<2) | 3;
@@ -75,6 +71,49 @@ void LRC_init(struct LowResCore *core)
     colors[29] = 0;
     colors[30] = (1<<4) | (1<<2) | 1;
     colors[31] = (3<<4) | (3<<2) | 3;
+}
+
+void reflectionPalette(struct LowResCore *core)
+{
+    uint8_t *colors = core->machine.videoRegisters.colors;
+    colors[0] = (1<<2) | 3;
+    
+    // 0 brown
+    colors[1] = (1<<2) | 3;
+    colors[2] = (2<<2) | 3;
+    colors[3] = (3<<2) | 3;
+    
+    // 1 green
+    colors[5] = (2<<2) | 3;
+    colors[6] = (3<<2) | 3;
+    colors[7] = (3<<2) | 3;
+    
+    // 2 sea blue
+    colors[9]  = (2<<2) | 3;
+    colors[10] = (3<<2) | 3;
+    colors[11] = (3<<2) | 3;
+    
+    // 3 ?
+    colors[13] = (3<<2) | 3;
+    colors[14] = (3<<2) | 3;
+    colors[15] = (3<<2) | 3;
+    
+    // 4 orange
+    colors[17] = (2<<2) | 3;
+    colors[18] = (3<<2) | 3;
+    colors[19] = (3<<2) | 3;
+    
+    // 5 red
+    colors[21] = (1<<2) | 3;
+    colors[22] = (1<<2) | 3;
+    colors[23] = (1<<2) | 3;
+}
+
+void LRC_init(struct LowResCore *core)
+{
+    LRC_initMachine(&core->machine);
+    
+    core->machine.videoRegisters.attr_romCells = 1;
     
     struct SystemRam *systemRam = (struct SystemRam *)core->machine.workingRam;
     struct TextLib *textLib = &systemRam->textLib;
@@ -83,9 +122,9 @@ void LRC_init(struct LowResCore *core)
     textLib->attr_palette = 7;
     textLib->characterOffset = 128;
     textLib->areaX = 0;
-    textLib->areaY = 12;
+    textLib->areaY = 14;
     textLib->areaWidth = 16;
-    textLib->areaHeight = 4;
+    textLib->areaHeight = 2;
     LRC_writeText(&core->machine, "SCORE", 0, 0);
     
     memcpy(&core->machine.videoRam.characterBanks[0], DemoCharacters, sizeof(DemoCharacters));
@@ -107,23 +146,51 @@ void LRC_update(struct LowResCore *core)
     struct SystemRam *systemRam = (struct SystemRam *)core->machine.workingRam;
     struct TextLib *textLib = &systemRam->textLib;
     
-    core->machine.videoRegisters.scrollBX = tick;
     core->machine.videoRegisters.scrollAX = tick * 2;
     
     struct Sprite *sprite = &core->machine.videoRam.sprites[0];
     sprite->character = 130 + ((tick/4)%3) * 2;
-    
-    if (tick%15 == 0)
-    {
-        textLib->attr_palette = rand() % 8;
-        textLib->attr_flipX = rand()%2;
-        textLib->attr_flipY = rand()%2;
-        LRC_printText(&core->machine, "PRINT TEXT! ");
-    }
+
     textLib->attr_palette = 7;
     textLib->attr_flipX = 0;
     textLib->attr_flipY = 0;
     LRC_writeNumber(&core->machine, tick/10, 5, 11, 0);
 
     tick++;
+}
+
+void LRC_rasterUpdate(struct LowResCore *core)
+{
+    int y = core->machine.videoRegisters.rasterLine;
+    int wy = 112+sin(tick*0.02)*16;
+    if (y == 0)
+    {
+        normalPalette(core);
+    }
+    else if (y == wy)
+    {
+        reflectionPalette(core);
+    }
+    
+    if (y < 32)
+    {
+        core->machine.videoRegisters.scrollBX = tick * 3 / 4;
+    }
+    else if (y < 56)
+    {
+        core->machine.videoRegisters.scrollBX = tick / 2;
+    }
+    else if (y > 56 + 3*8)
+    {
+        core->machine.videoRegisters.scrollBX = tick * 3;
+    }
+    else
+    {
+        core->machine.videoRegisters.scrollBX = tick * (0.5 + (y - 55.0) / 32.0);
+    }
+    if (y > wy)
+    {
+        core->machine.videoRegisters.scrollAX += (tick/8 + y)%3;
+        core->machine.videoRegisters.scrollBX += (tick/8 + y)%3;
+    }
 }
