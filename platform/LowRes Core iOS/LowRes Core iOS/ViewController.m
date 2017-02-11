@@ -48,14 +48,14 @@
         enum ErrorCode errorCode = LRC_tokenizeProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
         if (errorCode != ErrorNone)
         {
-            printf("Tokenizer error: %d\n", errorCode);
+            printf("Tokenizer error: %s\n", ErrorStrings[errorCode]);
         }
         else
         {
             printf("Tokenizer success\n");
             [self.rendererViewController setCore:_core];
             enum ErrorCode errorCode = LRC_runProgram(_core);
-            printf("Finished with error code: %d\n", errorCode);
+            printf("Finished: %s\n", ErrorStrings[errorCode]);
         }
     }
 }

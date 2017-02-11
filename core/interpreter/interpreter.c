@@ -28,6 +28,7 @@ const char *TokenStrings[] = {
     NULL,
     NULL,
     NULL,
+    NULL,
     
     ":",
     ",",
@@ -64,6 +65,8 @@ const char *TokenStrings[] = {
     "NOT",
     "ON",
     "OR",
+    "PEEK",
+    "POKE",
     "PRINT",
     "RANDOMIZE",
     "READ",
@@ -76,6 +79,31 @@ const char *TokenStrings[] = {
     "XOR"
 };
 
+const char *ErrorStrings[] = {
+    "OK",
+    "Too Many Tokens",
+    "Expected End Of String",
+    "Unexpected Character",
+    "Syntax Error",
+    "End Of Program",
+    "Unexpected Token",
+    "Expected End Of Line",
+    "Expected THEN",
+    "Expected Equal Sign '='",
+    "Expected Variable Identifier",
+    "Expected Right Parenthesis ')'",
+    "Symbol Name Too Long",
+    "Too Many Symbols",
+    "Type Mismatch",
+    "Out Of Memory"
+};
+
+union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode);
+struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
+enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
+enum ErrorCode LRC_runCommand(struct LowResCore *core);
+
+
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode)
 {
     const char *charSetDigits = "0123456789";
@@ -84,6 +112,8 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
     
     struct Interpreter *interpreter = &core->interpreter;
     const char *character = sourceCode;
+    
+    uint8_t *currentRomByte = core->machine.cartridgeRom;
     
     while (*character)
     {
@@ -122,7 +152,12 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
                     return ErrorExpectedEndOfString;
                 }
             }
+            int len = (int)(character - firstCharacter);
+            memcpy(currentRomByte, firstCharacter, len);
             token->type = TokenString;
+            token->stringValue = (const char *)currentRomByte;
+            currentRomByte += len;
+            *currentRomByte++ = 0;
             interpreter->numTokens++;
             character++;
             continue;
@@ -217,6 +252,7 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
                     character++;
                     if (*character == '\n')
                     {
+                        character++;
                         break;
                     }
                 }
@@ -229,10 +265,11 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
             continue;
         }
         
-        // Identifier
+        // Symbol
         if (strchr(charSetLetters, *character))
         {
             const char *firstCharacter = character;
+            char isString = 0;
             while (*character)
             {
                 if (strchr(charSetAlphaNum, *character))
@@ -241,10 +278,47 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
                 }
                 else
                 {
+                    if (*character == '$')
+                    {
+                        isString = 1;
+                        character++;
+                    }
                     break;
                 }
             }
-            if (*character == ':')
+            if (interpreter->numSymbols >= MAX_SYMBOLS)
+            {
+                return ErrorTooManySymbols;
+            }
+            int len = (int)(character - firstCharacter);
+            if (len >= SYMBOL_NAME_SIZE)
+            {
+                return ErrorSymbolNameTooLong;
+            }
+            char symbolName[SYMBOL_NAME_SIZE];
+            memcpy(symbolName, firstCharacter, len);
+            symbolName[len] = 0;
+            int symbolIndex = -1;
+            // find existing symbol
+            for (int i = 0; i < MAX_SYMBOLS && interpreter->symbols[i].name[0] != 0; i++)
+            {
+                if (strcmp(symbolName, interpreter->symbols[i].name) == 0)
+                {
+                    symbolIndex = i;
+                    break;
+                }
+            }
+            if (symbolIndex == -1)
+            {
+                // add new symbol
+                strcpy(interpreter->symbols[interpreter->numSymbols].name, symbolName);
+                symbolIndex = interpreter->numSymbols++;
+            }
+            if (isString)
+            {
+                token->type = TokenStringIdentifier;
+            }
+            else if (*character == ':')
             {
                 token->type = TokenLabel;
                 character++;
@@ -253,6 +327,7 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
             {
                 token->type = TokenIdentifier;
             }
+            token->symbolIndex = symbolIndex;
             interpreter->numTokens++;
             continue;
         }
@@ -265,7 +340,9 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
 
 enum ErrorCode LRC_runProgram(struct LowResCore *core)
 {
-    core->interpreter.pc = &core->interpreter.tokens[0];
+    struct Interpreter *interpreter = &core->interpreter;
+    interpreter->pc = interpreter->tokens;
+    interpreter->simpleVariablesEnd = (struct SimpleVariable *)interpreter->variablesStack;
     enum ErrorCode errorCode = ErrorNone;
     
     do
@@ -277,29 +354,111 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
     return errorCode;
 }
 
-struct Value *LRC_evaluateExpression(struct LowResCore *core)
+union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode)
 {
     struct Interpreter *interpreter = &core->interpreter;
+    int symbolIndex = interpreter->pc->symbolIndex;
+    ++interpreter->pc;
+    
+    struct SimpleVariable *variable = (struct SimpleVariable *)interpreter->variablesStack;
+    while (variable < interpreter->simpleVariablesEnd)
+    {
+        if (variable->symbolIndex == symbolIndex)
+        {
+            // variable found
+            return &variable->v;
+        }
+        variable++;
+    }
+    
+    // create new variable
+    variable = interpreter->simpleVariablesEnd;
+    if ((void *)(variable + 1) >= (void *)&interpreter->variablesStack[VARIABLES_STACK_SIZE])
+    {
+        *errorCode = ErrorOutOfMemory;
+        return NULL;
+    }
+    memset(variable, 0, sizeof(struct SimpleVariable));
+    variable->symbolIndex = symbolIndex;
+    interpreter->simpleVariablesEnd++;
+    return &variable->v;
+    
+    /*
+    if (interpreter->pc->type == TokenBracketOpen)
+    {
+        ++interpreter->pc;
+        struct TypedValue indexValue = LRC_evaluateExpression(core);
+        if (indexValue.type == TypeError)
+        {
+            *errorCode = indexValue.v.errorCode;
+            return NULL;
+        }
+
+        if (interpreter->pc->type != TokenBracketClose)
+        {
+            *errorCode = ErrorExpectedRightParenthesis;
+            return NULL;
+        }
+        ++interpreter->pc;
+    }
+     */
+}
+
+struct TypedValue LRC_evaluateExpression(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    struct TypedValue value;
     switch (interpreter->pc->type)
     {
         case TokenFloat:
+            value.type = ValueFloat;
+            value.v.floatValue = interpreter->pc->floatValue;
             ++interpreter->pc;
             break;
             
         case TokenString:
+            value.type = ValueString;
+            value.v.stringValue = interpreter->pc->stringValue;
             ++interpreter->pc;
             break;
             
-        case TokenIdentifier:
-            ++interpreter->pc; // A
-            ++interpreter->pc; // =
-            ++interpreter->pc; // 1
+        case TokenIdentifier: {
+            enum ErrorCode errorCode = ErrorNone;
+            union Value *varValue = LRC_readVariable(core, &errorCode);
+            if (varValue)
+            {
+                value.type = ValueFloat;
+                value.v.floatValue = value.v.floatValue;
+            }
+            else
+            {
+                value.type = ValueError;
+                value.v.errorCode = errorCode;
+            }
             break;
-            
+        }
+        case TokenStringIdentifier:
+            value.type = ValueString;
+            value.v.stringValue = "VARIABLE STRING";
+            ++interpreter->pc;
+            break;
+
         default:
-            return NULL; //ErrorUnexpectedToken;
+            value.type = ValueError;
+            value.v.errorCode = ErrorSyntax;
     }
-    return NULL;
+    return value;
+}
+
+enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
+{
+    enum TokenType type = interpreter->pc->type;
+    if (type == TokenEol)
+    {
+        ++interpreter->pc;
+        return ErrorNone;
+    }
+    return (type == TokenELSE) ? ErrorNone : ErrorUnexpectedToken;
 }
 
 enum ErrorCode LRC_runCommand(struct LowResCore *core)
@@ -312,20 +471,23 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
             
         case TokenEND:
             ++interpreter->pc;
-            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
-            ++interpreter->pc;
-            return ErrorEndOfProgram;
+            return LRC_endOfCommand(interpreter) ?: ErrorEndOfProgram;
             
-        case TokenIdentifier: {
+        case TokenLET:
             ++interpreter->pc;
-            if (interpreter->pc->type == TokenEq)
-            {
-                ++interpreter->pc;
-                struct Value *value = LRC_evaluateExpression(core);
-            }
-            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+            if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+            // fall through
+        case TokenIdentifier:
+        case TokenStringIdentifier: {
+            enum ErrorCode errorCode = ErrorNone;
+            union Value *varValue = LRC_readVariable(core, &errorCode);
+            if (!varValue) return errorCode;
+            if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
             ++interpreter->pc;
-            break;
+            struct TypedValue value = LRC_evaluateExpression(core);
+            if (value.type == ValueError) return value.v.errorCode;
+            varValue->floatValue = value.v.floatValue;
+            return LRC_endOfCommand(interpreter);
         }
         case TokenLabel: {
             ++interpreter->pc;
@@ -339,18 +501,30 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
         }
         case TokenPRINT: {
             ++interpreter->pc;
-            struct Value *value = LRC_evaluateExpression(core);
-            printf("print something\n");
-            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
-            ++interpreter->pc;
-            break;
+            struct TypedValue value = LRC_evaluateExpression(core);
+            if (value.type == ValueError) return value.v.errorCode;
+            if (value.type == ValueString)
+            {
+                printf("print string: %s\n", value.v.stringValue);
+            }
+            else if (value.type == ValueFloat)
+            {
+                printf("print float: %f\n", value.v.floatValue);
+            }
+            else
+            {
+                printf("print unknown\n");
+            }
+            return LRC_endOfCommand(interpreter);
         }
         case TokenIF: {
             ++interpreter->pc;
-            struct Value *value = LRC_evaluateExpression(core);
+            struct TypedValue value = LRC_evaluateExpression(core);
+            if (value.type == ValueError) return value.v.errorCode;
+            if (value.type != ValueFloat) return ErrorTypeMismatch;
             if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
             ++interpreter->pc;
-            if (!value)
+            if (value.v.floatValue == 0)
             {
                 while (   interpreter->pc->type != TokenELSE
                        && interpreter->pc->type != TokenEol)
@@ -378,18 +552,17 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
         case TokenGOSUB:
         case TokenGOTO:
         case TokenINPUT:
-        case TokenLET:
         case TokenNEXT:
         case TokenON:
+        case TokenPEEK:
+        case TokenPOKE:
         case TokenRANDOMIZE:
         case TokenREAD:
         case TokenREM:
         case TokenRESTORE:
         case TokenRETURN:
-            printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
-            return ErrorUnexpectedToken;
-            
         default:
+            printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;
     }
     return ErrorNone;

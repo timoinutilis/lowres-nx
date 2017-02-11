@@ -23,13 +23,19 @@
 #include <stdio.h>
 
 #define MAX_TOKENS 1024
+#define MAX_SYMBOLS 128
+#define SYMBOL_NAME_SIZE 11
+#define VARIABLES_STACK_SIZE 4096
 
 struct LowResCore;
+
+extern const char *ErrorStrings[];
 
 enum TokenType {
     TokenUndefined,
     
     TokenIdentifier,
+    TokenStringIdentifier,
     TokenLabel,
     TokenFloat,
     TokenString,
@@ -69,6 +75,8 @@ enum TokenType {
     TokenNOT,
     TokenON,
     TokenOR,
+    TokenPEEK,
+    TokenPOKE,
     TokenPRINT,
     TokenRANDOMIZE,
     TokenREAD,
@@ -83,13 +91,6 @@ enum TokenType {
     Token_count
 };
 
-enum ValueType {
-    ValueNull,
-    ValueError,
-    ValueFloat,
-    ValueString
-};
-
 enum ErrorCode {
     ErrorNone,
     ErrorTooManyTokens,
@@ -99,32 +100,63 @@ enum ErrorCode {
     ErrorEndOfProgram,
     ErrorUnexpectedToken,
     ErrorExpectedEndOfLine,
-    ErrorExpectedThen
+    ErrorExpectedThen,
+    ErrorExpectedEqualSign,
+    ErrorExpectedVariableIdentifier,
+    ErrorExpectedRightParenthesis,
+    ErrorSymbolNameTooLong,
+    ErrorTooManySymbols,
+    ErrorTypeMismatch,
+    ErrorOutOfMemory
 };
 
-struct Value {
+enum ValueType {
+    ValueNull,
+    ValueError,
+    ValueFloat,
+    ValueString
+};
+
+union Value {
+    float floatValue;
+    const char *stringValue;
+    enum ErrorCode errorCode;
+};
+
+struct TypedValue {
     enum ValueType type;
-    union {
-        float floatValue;
-        enum ErrorCode errorCode;
-    };
+    union Value v;
 };
 
 struct Token {
     enum TokenType type;
     union {
-        /* TokenFloat */    float floatValue;
+        float floatValue;
+        const char *stringValue;
+        uint16_t symbolIndex;
     };
+};
+
+struct Symbol {
+    char name[SYMBOL_NAME_SIZE];
+};
+
+struct SimpleVariable {
+    uint16_t symbolIndex;
+    union Value v;
 };
 
 struct Interpreter {
     int numTokens;
+    int numSymbols;
     struct Token tokens[MAX_TOKENS];
+    struct Symbol symbols[MAX_SYMBOLS];
     struct Token *pc;
+    uint8_t variablesStack[VARIABLES_STACK_SIZE];
+    struct SimpleVariable *simpleVariablesEnd;
 };
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
 enum ErrorCode LRC_runProgram(struct LowResCore *core);
-enum ErrorCode LRC_runCommand(struct LowResCore *core);
 
 #endif /* interpreter_h */
