@@ -373,14 +373,14 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode
     
     // create new variable
     variable = interpreter->simpleVariablesEnd;
-    if ((void *)(variable + 1) >= (void *)&interpreter->variablesStack[VARIABLES_STACK_SIZE])
+    interpreter->simpleVariablesEnd++;
+    if ((void *)(interpreter->simpleVariablesEnd) >= (void *)&interpreter->variablesStack[VARIABLES_STACK_SIZE])
     {
         *errorCode = ErrorOutOfMemory;
         return NULL;
     }
     memset(variable, 0, sizeof(struct SimpleVariable));
     variable->symbolIndex = symbolIndex;
-    interpreter->simpleVariablesEnd++;
     return &variable->v;
     
     /*
@@ -428,7 +428,7 @@ struct TypedValue LRC_evaluateExpression(struct LowResCore *core)
             if (varValue)
             {
                 value.type = ValueFloat;
-                value.v.floatValue = value.v.floatValue;
+                value.v.floatValue = varValue->floatValue;
             }
             else
             {
