@@ -21,7 +21,9 @@
 #define text_lib_h
 
 #include <stdio.h>
-#include "machine.h"
+#include "video_interface.h"
+
+struct LowResCore;
 
 struct TextLib {
     uint8_t characterOffset;
@@ -34,8 +36,8 @@ struct TextLib {
     uint8_t cursorY;
 };
 
-void LRC_printText(struct Machine *machine, const char *text);
-void LRC_writeText(struct Machine *machine, const char *text, int x, int y);
-void LRC_writeNumber(struct Machine *machine, int number, int digits, int x, int y);
+void LRC_printText(struct LowResCore *core, const char *text);
+void LRC_writeText(struct LowResCore *core, const char *text, int x, int y);
+void LRC_writeNumber(struct LowResCore *core, int number, int digits, int x, int y);
 
 #endif /* text_lib_h */

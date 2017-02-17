@@ -23,7 +23,6 @@
 #include <string.h>
 #include "demo_data.h"
 #include "text_lib.h"
-#include "system_ram.h"
 
 int tick = 0;
 
@@ -113,8 +112,7 @@ void LRC_init(struct LowResCore *core)
 {
     LRC_initMachine(&core->machine);
     
-    struct SystemRam *systemRam = (struct SystemRam *)core->machine.workingRam;
-    struct TextLib *textLib = &systemRam->textLib;
+    struct TextLib *textLib = &core->interpreter.textLib;
     textLib->charAttr.bank = 1;
     textLib->charAttr.priority = 1;
     textLib->charAttr.palette = 7;
@@ -124,7 +122,7 @@ void LRC_init(struct LowResCore *core)
     memcpy(core->machine.videoRam.planeB.cells, DemoBackground, sizeof(DemoBackground));
     memcpy(core->machine.videoRam.planeA.cells, DemoMap, sizeof(DemoMap));
     
-    LRC_writeText(&core->machine, "SCORE", 0, 0);
+    LRC_writeText(core, "SCORE", 0, 0);
     
     struct Sprite *sprite = &core->machine.videoRegisters.sprites[0];
     sprite->character = 128;
@@ -143,7 +141,7 @@ void LRC_update(struct LowResCore *core)
     struct Sprite *sprite = &core->machine.videoRegisters.sprites[0];
     sprite->character = 130 + ((tick/4)%3) * 2;
     
-    LRC_writeNumber(&core->machine, tick/10, 5, 11, 0);
+    LRC_writeNumber(core, tick/10, 5, 11, 0);
 
     tick++;
 }

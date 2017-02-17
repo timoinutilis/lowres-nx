@@ -21,6 +21,7 @@
 #define interpreter_h
 
 #include <stdio.h>
+#include "text_lib.h"
 
 #define MAX_TOKENS 1024
 #define MAX_SYMBOLS 128
@@ -154,6 +155,8 @@ struct Interpreter {
     struct Token *pc;
     uint8_t variablesStack[VARIABLES_STACK_SIZE];
     struct SimpleVariable *simpleVariablesEnd;
+    
+    struct TextLib textLib;
 };
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);

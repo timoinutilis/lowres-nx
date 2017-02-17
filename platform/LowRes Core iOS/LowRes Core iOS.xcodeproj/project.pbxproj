@@ -46,7 +46,6 @@
 		929D20651E2B9961001FF319 /* interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interpreter.h; sourceTree = "<group>"; };
 		92D4FD521E34F1CB0068321E /* machine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = machine.c; sourceTree = "<group>"; };
 		92D4FD531E34F1CB0068321E /* machine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machine.h; sourceTree = "<group>"; };
-		92D4FD551E3523190068321E /* system_ram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = system_ram.h; sourceTree = "<group>"; };
 		92F00CB41E226F110027C9F6 /* audio_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_interface.h; sourceTree = "<group>"; };
 		92F00CB51E226F110027C9F6 /* character_rom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = character_rom.c; sourceTree = "<group>"; };
 		92F00CB61E226F110027C9F6 /* character_rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = character_rom.h; sourceTree = "<group>"; };
@@ -120,7 +119,6 @@
 				92F00CB21E226F110027C9F6 /* libraries */,
 				924DA5011E1095DC001B65EB /* lowres_core.h */,
 				924DA5001E1095DC001B65EB /* lowres_core.c */,
-				92D4FD551E3523190068321E /* system_ram.h */,
 				920D88861E24332000B51F40 /* demo_data.h */,
 			);
 			name = core;

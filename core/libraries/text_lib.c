@@ -18,12 +18,12 @@
 //
 
 #include "text_lib.h"
-#include "system_ram.h"
+#include "lowres_core.h"
 
-void LRC_printText(struct Machine *machine, const char *text)
+void LRC_printText(struct LowResCore *core, const char *text)
 {
-    struct TextLib *lib = &((struct SystemRam *)machine->workingRam)->textLib;
-    struct Plane *plane = &machine->videoRam.planeB;
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct Plane *plane = &core->machine.videoRam.planeB;
     const char *letter = text;
     while (*letter)
     {
@@ -75,10 +75,10 @@ void LRC_printText(struct Machine *machine, const char *text)
     }
 }
 
-void LRC_writeText(struct Machine *machine, const char *text, int x, int y)
+void LRC_writeText(struct LowResCore *core, const char *text, int x, int y)
 {
-    struct TextLib *lib = &((struct SystemRam *)machine->workingRam)->textLib;
-    struct Plane *plane = &machine->videoRam.planeB;
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct Plane *plane = &core->machine.videoRam.planeB;
     const char *letter = text;
     while (*letter)
     {
@@ -94,10 +94,10 @@ void LRC_writeText(struct Machine *machine, const char *text, int x, int y)
     }
 }
 
-void LRC_writeNumber(struct Machine *machine, int number, int digits, int x, int y)
+void LRC_writeNumber(struct LowResCore *core, int number, int digits, int x, int y)
 {
-    struct TextLib *lib = &((struct SystemRam *)machine->workingRam)->textLib;
-    struct Plane *plane = &machine->videoRam.planeB;
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct Plane *plane = &core->machine.videoRam.planeB;
     
     x += digits;
     int div = 1;
