@@ -65,7 +65,7 @@ void LRC_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct Pl
     }
 }
 
-void LRC_renderSprites(struct VideoRegisters *reg, struct VideoRam *ram, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
+void LRC_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int y, uint8_t *scanlineBuffer, uint8_t *scanlineSpriteBuffer)
 {
     for (int i = NUM_SPRITES - 1; i >= 0; i--)
     {
@@ -145,6 +145,8 @@ void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB)
     
     struct VideoRam *ram = &core->machine.videoRam;
     struct VideoRegisters *reg = &core->machine.videoRegisters;
+    struct SpriteRegisters *sreg = &core->machine.spriteRegisters;
+    struct ColorRegisters *creg = &core->machine.colorRegisters;
     for (int y = 0; y < SCREEN_HEIGHT; y++)
     {
         reg->rasterLine = y;
@@ -153,10 +155,10 @@ void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB)
         memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
         LRC_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
         LRC_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
-        LRC_renderSprites(reg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
+        LRC_renderSprites(sreg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
-            int color = reg->colors[scanlineBuffer[x] & 0x7F];
+            int color = creg->colors[scanlineBuffer[x] & 0x7F];
             int r = (color >> 4) & 0x03;
             int g = (color >> 2) & 0x03;
             int b = color & 0x03;

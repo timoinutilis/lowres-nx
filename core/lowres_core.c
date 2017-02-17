@@ -28,7 +28,7 @@ int tick = 0;
 
 void normalPalette(struct LowResCore *core)
 {
-    uint8_t *colors = core->machine.videoRegisters.colors;
+    uint8_t *colors = core->machine.colorRegisters.colors;
     colors[0] = (0<<4) | (1<<2) | 3;
     
     // 0 brown
@@ -74,7 +74,7 @@ void normalPalette(struct LowResCore *core)
 
 void reflectionPalette(struct LowResCore *core)
 {
-    uint8_t *colors = core->machine.videoRegisters.colors;
+    uint8_t *colors = core->machine.colorRegisters.colors;
     colors[0] = (1<<2) | 3;
     
     // 0 brown
@@ -124,7 +124,7 @@ void LRC_init(struct LowResCore *core)
     
     LRC_writeText(core, "SCORE", 0, 0);
     
-    struct Sprite *sprite = &core->machine.videoRegisters.sprites[0];
+    struct Sprite *sprite = &core->machine.spriteRegisters.sprites[0];
     sprite->character = 128;
     sprite->x = 64;
     sprite->y = 96;
@@ -138,7 +138,7 @@ void LRC_update(struct LowResCore *core)
 {
     core->machine.videoRegisters.scrollAX = tick * 2;
     
-    struct Sprite *sprite = &core->machine.videoRegisters.sprites[0];
+    struct Sprite *sprite = &core->machine.spriteRegisters.sprites[0];
     sprite->character = 130 + ((tick/4)%3) * 2;
     
     LRC_writeNumber(core, tick/10, 5, 11, 0);
@@ -159,7 +159,7 @@ void LRC_rasterUpdate(struct LowResCore *core)
         reflectionPalette(core);
     }
 
-    uint8_t *colors = core->machine.videoRegisters.colors;
+    uint8_t *colors = core->machine.colorRegisters.colors;
     int cy = y + (y%2 * 4);
     if (cy < 12)
     {

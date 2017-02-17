@@ -25,38 +25,44 @@
 #include "video_interface.h"
 #include "audio_interface.h"
 
+// 64 KB
 struct Machine {
     
-    // 0x00000
-    uint8_t cartridgeRom[0x80000]; // 512 KB
+    // 0x0000
+    uint8_t cartridgeRom[0x8000]; // 32 KB
     
-    // 0x80000
+    // 0x8000
     struct VideoRam videoRam; // 8 KB
+
+    // 0xA000
+    uint8_t workingRam[0x2000]; // 8 KB
     
-    // 0x82000
-    struct IORegisters ioRegisters;
-    uint8_t reserved1[0x100 - sizeof(struct IORegisters)];
-    
-    // 0x82100
-    struct VideoRegisters videoRegisters;
-    uint8_t reserved2[0x200 - sizeof(struct VideoRegisters)];
-    
-    // 0x82300
-    struct AudioRegisters audioRegisters;
-    uint8_t reserved3[0x100 - sizeof(struct AudioRegisters)];
-    
-    // 0x82400
-    uint8_t reserved4[0x8D000 - 0x82400];
-    
-    // 0x8D000
-    uint8_t cartridgeBackupRam[0x2000]; // 8 KB
-    
-    // 0x8F000
+    // 0xC000
+    uint8_t persistentRam[0x2000]; // 8 KB
+
+    // 0xE000
     struct CharacterBank characterRom; // 4 KB
+
+    // 0xF000
+    struct SpriteRegisters spriteRegisters; // 512 B
     
-    // 0x90000
-    uint8_t workingRam[0x10000]; // 64 KB
+    // 0xF200
+    struct ColorRegisters colorRegisters; // 64 B
     
+    // 0xF240
+    uint8_t reserved2[0xFF40 - 0xF240];
+    
+    // 0xFF40
+    struct VideoRegisters videoRegisters;
+    uint8_t reserved3[0x40 - sizeof(struct VideoRegisters)];
+    
+    // 0xFF80
+    struct AudioRegisters audioRegisters;
+    uint8_t reserved4[0x40 - sizeof(struct AudioRegisters)];
+
+    // 0xFFC0
+    struct IORegisters ioRegisters;
+    uint8_t reserved5[0x40 - sizeof(struct IORegisters)];
 };
 
 void LRC_initMachine(struct Machine *machine);

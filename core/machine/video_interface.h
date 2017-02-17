@@ -63,7 +63,7 @@ union CharacterAttributes {
 
 // ================ Sprite ================
 
-// 6 bytes
+// 8 bytes
 struct Sprite {
     uint8_t x;
     uint8_t y;
@@ -76,7 +76,7 @@ struct Sprite {
         };
         uint8_t value;
     } attr2;
-    uint8_t reserved;
+    uint8_t reserved[3];
 };
 
 // ================ Cell ================
@@ -101,17 +101,23 @@ struct Plane {
 // 8 KB
 struct VideoRam {
     struct CharacterBank characterBank; // 4 KB
-    struct Plane planeB; // 2 KB
     struct Plane planeA; // 2 KB
+    struct Plane planeB; // 2 KB
 };
 
 // =================================================
 // ================ Video Registers ================
 // =================================================
 
-struct VideoRegisters {
-    struct Sprite sprites[NUM_SPRITES]; // 384 bytes
+struct SpriteRegisters {
+    struct Sprite sprites[NUM_SPRITES]; // 512 bytes
+};
+
+struct ColorRegisters {
     uint8_t colors[NUM_COLORS]; // 64 bytes
+};
+
+struct VideoRegisters {
     union {
         uint8_t attributes;
     };
@@ -121,7 +127,6 @@ struct VideoRegisters {
     uint8_t scrollBY;
     uint8_t rasterLine;
 };
-
 
 // ===========================================
 // ================ Functions ================
