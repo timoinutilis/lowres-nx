@@ -89,6 +89,30 @@ enum TokenType {
     TokenTO,
     TokenXOR,
     
+    TokenABS,
+    TokenASC,
+    TokenATN,
+    TokenCHR,
+    TokenCOS,
+    TokenEXP,
+    TokenHEX,
+    TokenINSTR,
+    TokenINT,
+    TokenLEFT,
+    TokenLEN,
+    TokenLOG,
+    TokenMAX,
+    TokenMID,
+    TokenMIN,
+    TokenRIGHT,
+    TokenRND,
+    TokenSGN,
+    TokenSIN,
+    TokenSQR,
+    TokenSTR,
+    TokenTAN,
+    TokenVAL,
+    
     Token_count
 };
 

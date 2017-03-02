@@ -19,6 +19,7 @@
 
 #include "interpreter.h"
 #include <string.h>
+#include <math.h>
 #include "lowres_core.h"
 
 const char *TokenStrings[] = {
@@ -76,7 +77,31 @@ const char *TokenStrings[] = {
     "STEP",
     "THEN",
     "TO",
-    "XOR"
+    "XOR",
+    
+    "ABS",
+    "ASC",
+    "ATN",
+    "CHR$",
+    "COS",
+    "EXP",
+    "HEX$",
+    "INSTR",
+    "INT",
+    "LEFT$",
+    "LEN",
+    "LOG",
+    "MAX",
+    "MID$",
+    "MIN",
+    "RIGHT$",
+    "RND",
+    "SGN",
+    "SIN",
+    "SQR",
+    "STR$",
+    "TAN",
+    "VAL"
 };
 
 const char *ErrorStrings[] = {
@@ -100,6 +125,8 @@ const char *ErrorStrings[] = {
 
 union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode);
 struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
+struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level);
+struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_runCommand(struct LowResCore *core);
 
@@ -406,22 +433,181 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode
 
 struct TypedValue LRC_evaluateExpression(struct LowResCore *core)
 {
+    return LRC_evaluateExpressionLevel(core, 0);
+}
+
+int LRC_isTokenLevel(enum TokenType token, int level)
+{
+    switch (level)
+    {
+        case 0:
+            return token == TokenXOR || token == TokenOR;
+        case 1:
+            return token == TokenAND;
+//        case 2:
+//            return token == TokenNOT;
+        case 3:
+            return token == TokenEq || token == TokenUneq || token == TokenGr || token == TokenLe || token == TokenGrEq || token == TokenLeEq;
+        case 4:
+            return token == TokenPlus || token == TokenMinus;
+        case 5:
+            return token == TokenMOD;
+        case 6:
+            return token == TokenMul || token == TokenDiv;
+//        case 7:
+//            return token == TokenPlus || token == TokenMinus; // unary
+        case 8:
+            return token == TokenPow;
+    }
+    return 0;
+}
+
+struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    enum TokenType type = interpreter->pc->type;
+    
+    if (level == 2 && type == TokenNOT)
+    {
+        ++interpreter->pc;
+        struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
+        if (value.type == ValueError) return value;
+        value.v.floatValue = ~((int)value.v.floatValue);
+        return value;
+    }
+    if (level == 7 && (type == TokenPlus || type == TokenMinus))
+    {
+        ++interpreter->pc;
+        struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
+        if (value.type == ValueError) return value;
+        if (type == TokenMinus)
+        {
+            value.v.floatValue = -value.v.floatValue;
+        }
+        return value;
+    }
+    if (level == 9)
+    {
+        return LRC_evaluatePrimaryExpression(core);
+    }
+    
+    struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
+    if (value.type == ValueError) return value;
+    
+    while (LRC_isTokenLevel(interpreter->pc->type, level))
+    {
+        enum TokenType type = interpreter->pc->type;
+        ++interpreter->pc;
+        struct TypedValue rightValue = LRC_evaluateExpressionLevel(core, level + 1);
+        if (rightValue.type == ValueError) return rightValue;
+        
+        struct TypedValue newValue;
+        if (value.type != rightValue.type)
+        {
+            newValue.type = ValueError;
+            newValue.v.errorCode = ErrorTypeMismatch;
+            return newValue;
+        }
+        newValue.type = value.type;
+        
+        switch (type)
+        {
+            case TokenXOR: {
+                int leftInt = value.v.floatValue;
+                int rightInt = rightValue.v.floatValue;
+                newValue.v.floatValue = (leftInt ^ rightInt);
+                break;
+            }
+            case TokenOR: {
+                int leftInt = value.v.floatValue;
+                int rightInt = rightValue.v.floatValue;
+                newValue.v.floatValue = (leftInt | rightInt);
+                break;
+            }
+            case TokenAND: {
+                int leftInt = value.v.floatValue;
+                int rightInt = rightValue.v.floatValue;
+                newValue.v.floatValue = (leftInt & rightInt);
+                break;
+            }
+            case TokenEq: {
+                newValue.v.floatValue = (value.v.floatValue == rightValue.v.floatValue) ? -1.0f : 0.0f;
+                break;
+            }
+            case TokenUneq: {
+                newValue.v.floatValue = (value.v.floatValue != rightValue.v.floatValue) ? -1.0f : 0.0f;
+                break;
+            }
+            case TokenGr: {
+                newValue.v.floatValue = (value.v.floatValue > rightValue.v.floatValue) ? -1.0f : 0.0f;
+                break;
+            }
+            case TokenLe: {
+                newValue.v.floatValue = (value.v.floatValue < rightValue.v.floatValue) ? -1.0f : 0.0f;
+                break;
+            }
+            case TokenGrEq: {
+                newValue.v.floatValue = (value.v.floatValue >= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                break;
+            }
+            case TokenLeEq: {
+                newValue.v.floatValue = (value.v.floatValue <= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                break;
+            }
+            case TokenPlus: {
+                newValue.v.floatValue = value.v.floatValue + rightValue.v.floatValue;
+                break;
+            }
+            case TokenMinus: {
+                newValue.v.floatValue = value.v.floatValue - rightValue.v.floatValue;
+                break;
+            }
+            case TokenMOD: {
+                newValue.v.floatValue = (int)value.v.floatValue % (int)rightValue.v.floatValue;
+                break;
+            }
+            case TokenMul: {
+                newValue.v.floatValue = value.v.floatValue * rightValue.v.floatValue;
+                break;
+            }
+            case TokenDiv: {
+                newValue.v.floatValue = value.v.floatValue / rightValue.v.floatValue;
+                break;
+            }
+            case TokenPow: {
+                newValue.v.floatValue = powf(value.v.floatValue, rightValue.v.floatValue);
+                break;
+            }
+            default: {
+                newValue.type = ValueError;
+                newValue.v.errorCode = ErrorSyntax;
+            }
+        }
+        
+        value = newValue;
+        if (value.type == ValueError) break;
+    }
+    return value;
+}
+
+struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
+{
     struct Interpreter *interpreter = &core->interpreter;
     struct TypedValue value;
     switch (interpreter->pc->type)
     {
-        case TokenFloat:
+        case TokenFloat: {
             value.type = ValueFloat;
             value.v.floatValue = interpreter->pc->floatValue;
             ++interpreter->pc;
             break;
-            
-        case TokenString:
+        }
+        case TokenString: {
             value.type = ValueString;
             value.v.stringValue = interpreter->pc->stringValue;
             ++interpreter->pc;
             break;
-            
+        }
         case TokenIdentifier: {
             enum ErrorCode errorCode = ErrorNone;
             union Value *varValue = LRC_readVariable(core, &errorCode);
@@ -437,17 +623,38 @@ struct TypedValue LRC_evaluateExpression(struct LowResCore *core)
             }
             break;
         }
-        case TokenStringIdentifier:
+        case TokenStringIdentifier: {
             value.type = ValueString;
             value.v.stringValue = "VARIABLE STRING";
             ++interpreter->pc;
             break;
-
-        default:
+        }
+        case TokenBracketOpen: {
+            ++interpreter->pc;
+            value = LRC_evaluateExpression(core);
+            if (interpreter->pc->type != TokenBracketClose)
+            {
+                value.type = ValueError;
+                value.v.errorCode = ErrorExpectedRightParenthesis;
+            }
+            else
+            {
+                ++interpreter->pc;
+            }
+            break;
+        }
+        default: {
             value.type = ValueError;
             value.v.errorCode = ErrorSyntax;
+        }
     }
     return value;
+}
+
+int LRC_isEndOfCommand(struct Interpreter *interpreter)
+{
+    enum TokenType type = interpreter->pc->type;
+    return (type == TokenEol || type == TokenELSE);
 }
 
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
@@ -500,20 +707,43 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
             break;
         }
         case TokenPRINT: {
+            int newLine = 0;
             ++interpreter->pc;
-            struct TypedValue value = LRC_evaluateExpression(core);
-            if (value.type == ValueError) return value.v.errorCode;
-            if (value.type == ValueString)
+            do
             {
-                printf("print string: %s\n", value.v.stringValue);
-            }
-            else if (value.type == ValueFloat)
+                struct TypedValue value = LRC_evaluateExpression(core);
+                if (value.type == ValueError) return value.v.errorCode;
+                if (value.type == ValueString)
+                {
+                    printf("%s", value.v.stringValue);
+                }
+                else if (value.type == ValueFloat)
+                {
+                    printf("%f", value.v.floatValue);
+                }
+                else
+                {
+                    printf("<unknown type>");
+                }
+                
+                if (interpreter->pc->type == TokenComma)
+                {
+                    printf(" ");
+                    ++interpreter->pc;
+                }
+                else if (interpreter->pc->type == TokenSemicolon)
+                {
+                    ++interpreter->pc;
+                }
+                else
+                {
+                    newLine = 1;
+                }
+            } while (!LRC_isEndOfCommand(interpreter));
+            
+            if (newLine)
             {
-                printf("print float: %f\n", value.v.floatValue);
-            }
-            else
-            {
-                printf("print unknown\n");
+                printf("\n");
             }
             return LRC_endOfCommand(interpreter);
         }
