@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2017 Timo Kloss
 //
 // This file is part of LowRes Core.
 //
@@ -21,115 +21,12 @@
 #include <string.h>
 #include <math.h>
 #include "lowres_core.h"
+#include "cmd_control.h"
+#include "cmd_variables.h"
+#include "cmd_text.h"
 
-const char *TokenStrings[] = {
-    NULL,
-    
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    
-    ":",
-    ",",
-    ";",
-    NULL,
-    
-    "=",
-    ">=",
-    "<=",
-    "<>",
-    ">",
-    "<",
-    "(",
-    ")",
-    "+",
-    "-",
-    "*",
-    "/",
-    "^",
-    
-    "AND",
-    "DATA",
-    "DIM",
-    "ELSE",
-    "END",
-    "FOR",
-    "GOSUB",
-    "GOTO",
-    "IF",
-    "INPUT",
-    "LET",
-    "MOD",
-    "NEXT",
-    "NOT",
-    "ON",
-    "OR",
-    "PEEK",
-    "POKE",
-    "PRINT",
-    "RANDOMIZE",
-    "READ",
-    "REM",
-    "RESTORE",
-    "RETURN",
-    "STEP",
-    "THEN",
-    "TO",
-    "XOR",
-    
-    "ABS",
-    "ASC",
-    "ATN",
-    "CHR$",
-    "COS",
-    "EXP",
-    "HEX$",
-    "INSTR",
-    "INT",
-    "LEFT$",
-    "LEN",
-    "LOG",
-    "MAX",
-    "MID$",
-    "MIN",
-    "RIGHT$",
-    "RND",
-    "SGN",
-    "SIN",
-    "SQR",
-    "STR$",
-    "TAN",
-    "VAL"
-};
-
-const char *ErrorStrings[] = {
-    "OK",
-    "Too Many Tokens",
-    "Expected End Of String",
-    "Unexpected Character",
-    "Syntax Error",
-    "End Of Program",
-    "Unexpected Token",
-    "Expected End Of Line",
-    "Expected THEN",
-    "Expected Equal Sign '='",
-    "Expected Variable Identifier",
-    "Expected Right Parenthesis ')'",
-    "Symbol Name Too Long",
-    "Too Many Symbols",
-    "Type Mismatch",
-    "Out Of Memory"
-};
-
-union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode);
-struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
 struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level);
 struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core);
-enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
-enum ErrorCode LRC_runCommand(struct LowResCore *core);
-
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode)
 {
@@ -676,106 +573,33 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
         case TokenUndefined:
             return ErrorEndOfProgram;
             
-        case TokenEND:
-            ++interpreter->pc;
-            return LRC_endOfCommand(interpreter) ?: ErrorEndOfProgram;
-            
-        case TokenLET:
-            ++interpreter->pc;
-            if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
-            // fall through
-        case TokenIdentifier:
-        case TokenStringIdentifier: {
-            enum ErrorCode errorCode = ErrorNone;
-            union Value *varValue = LRC_readVariable(core, &errorCode);
-            if (!varValue) return errorCode;
-            if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
-            ++interpreter->pc;
-            struct TypedValue value = LRC_evaluateExpression(core);
-            if (value.type == ValueError) return value.v.errorCode;
-            varValue->floatValue = value.v.floatValue;
-            return LRC_endOfCommand(interpreter);
-        }
-        case TokenLabel: {
+        case TokenLabel:
             ++interpreter->pc;
             if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
             ++interpreter->pc;
             break;
-        }
-        case TokenEol: {
+        
+        case TokenEol:
             ++interpreter->pc;
             break;
-        }
-        case TokenPRINT: {
-            int newLine = 0;
-            ++interpreter->pc;
-            do
-            {
-                struct TypedValue value = LRC_evaluateExpression(core);
-                if (value.type == ValueError) return value.v.errorCode;
-                if (value.type == ValueString)
-                {
-                    printf("%s", value.v.stringValue);
-                }
-                else if (value.type == ValueFloat)
-                {
-                    printf("%f", value.v.floatValue);
-                }
-                else
-                {
-                    printf("<unknown type>");
-                }
-                
-                if (interpreter->pc->type == TokenComma)
-                {
-                    printf(" ");
-                    ++interpreter->pc;
-                }
-                else if (interpreter->pc->type == TokenSemicolon)
-                {
-                    ++interpreter->pc;
-                }
-                else
-                {
-                    newLine = 1;
-                }
-            } while (!LRC_isEndOfCommand(interpreter));
             
-            if (newLine)
-            {
-                printf("\n");
-            }
-            return LRC_endOfCommand(interpreter);
-        }
-        case TokenIF: {
-            ++interpreter->pc;
-            struct TypedValue value = LRC_evaluateExpression(core);
-            if (value.type == ValueError) return value.v.errorCode;
-            if (value.type != ValueFloat) return ErrorTypeMismatch;
-            if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
-            ++interpreter->pc;
-            if (value.v.floatValue == 0)
-            {
-                while (   interpreter->pc->type != TokenELSE
-                       && interpreter->pc->type != TokenEol)
-                {
-                    ++interpreter->pc;
-                }
-                if (interpreter->pc->type == TokenELSE)
-                {
-                    ++interpreter->pc;
-                }
-            }
-            break;
-        }
-        case TokenELSE: {
-            while (interpreter->pc->type != TokenEol)
-            {
-                ++interpreter->pc;
-            }
-            ++interpreter->pc;
-            break;
-        }
+        case TokenEND:
+            return cmd_END(core);
+            
+        case TokenLET:
+        case TokenIdentifier:
+        case TokenStringIdentifier:
+            return cmd_LET(core);
+        
+        case TokenPRINT:
+            return cmd_PRINT(core);
+        
+        case TokenIF:
+            return cmd_IF(core);
+        
+        case TokenELSE:
+            return cmd_ELSE(core);
+        
         case TokenDATA:
         case TokenDIM:
         case TokenFOR:

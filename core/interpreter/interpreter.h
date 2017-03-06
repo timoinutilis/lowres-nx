@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2017 Timo Kloss
 //
 // This file is part of LowRes Core.
 //
@@ -21,6 +21,9 @@
 #define interpreter_h
 
 #include <stdio.h>
+#include "token.h"
+#include "error.h"
+#include "value.h"
 #include "text_lib.h"
 
 #define MAX_TOKENS 1024
@@ -30,136 +33,9 @@
 
 struct LowResCore;
 
-extern const char *ErrorStrings[];
-
-enum TokenType {
-    TokenUndefined,
-    
-    TokenIdentifier,
-    TokenStringIdentifier,
-    TokenLabel,
-    TokenFloat,
-    TokenString,
-    
-    TokenColon,
-    TokenComma,
-    TokenSemicolon,
-    TokenEol,
-    
-    TokenEq,
-    TokenGrEq,
-    TokenLeEq,
-    TokenUneq,
-    TokenGr,
-    TokenLe,
-    TokenBracketOpen,
-    TokenBracketClose,
-    TokenPlus,
-    TokenMinus,
-    TokenMul,
-    TokenDiv,
-    TokenPow,
-    
-    TokenAND,
-    TokenDATA,
-    TokenDIM,
-    TokenELSE,
-    TokenEND,
-    TokenFOR,
-    TokenGOSUB,
-    TokenGOTO,
-    TokenIF,
-    TokenINPUT,
-    TokenLET,
-    TokenMOD,
-    TokenNEXT,
-    TokenNOT,
-    TokenON,
-    TokenOR,
-    TokenPEEK,
-    TokenPOKE,
-    TokenPRINT,
-    TokenRANDOMIZE,
-    TokenREAD,
-    TokenREM,
-    TokenRESTORE,
-    TokenRETURN,
-    TokenSTEP,
-    TokenTHEN,
-    TokenTO,
-    TokenXOR,
-    
-    TokenABS,
-    TokenASC,
-    TokenATN,
-    TokenCHR,
-    TokenCOS,
-    TokenEXP,
-    TokenHEX,
-    TokenINSTR,
-    TokenINT,
-    TokenLEFT,
-    TokenLEN,
-    TokenLOG,
-    TokenMAX,
-    TokenMID,
-    TokenMIN,
-    TokenRIGHT,
-    TokenRND,
-    TokenSGN,
-    TokenSIN,
-    TokenSQR,
-    TokenSTR,
-    TokenTAN,
-    TokenVAL,
-    
-    Token_count
-};
-
-enum ErrorCode {
-    ErrorNone,
-    ErrorTooManyTokens,
-    ErrorExpectedEndOfString,
-    ErrorUnexpectedCharacter,
-    ErrorSyntax,
-    ErrorEndOfProgram,
-    ErrorUnexpectedToken,
-    ErrorExpectedEndOfLine,
-    ErrorExpectedThen,
-    ErrorExpectedEqualSign,
-    ErrorExpectedVariableIdentifier,
-    ErrorExpectedRightParenthesis,
-    ErrorSymbolNameTooLong,
-    ErrorTooManySymbols,
-    ErrorTypeMismatch,
-    ErrorOutOfMemory
-};
-
-enum ValueType {
-    ValueNull,
-    ValueError,
-    ValueFloat,
-    ValueString
-};
-
-union Value {
-    float floatValue;
-    const char *stringValue;
-    enum ErrorCode errorCode;
-};
-
 struct TypedValue {
     enum ValueType type;
     union Value v;
-};
-
-struct Token {
-    enum TokenType type;
-    union {
-        float floatValue;
-        const char *stringValue;
-        uint16_t symbolIndex;
-    };
 };
 
 struct Symbol {
@@ -185,5 +61,11 @@ struct Interpreter {
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
 enum ErrorCode LRC_runProgram(struct LowResCore *core);
+
+union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode);
+struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
+int LRC_isEndOfCommand(struct Interpreter *interpreter);
+enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
+enum ErrorCode LRC_runCommand(struct LowResCore *core);
 
 #endif /* interpreter_h */
