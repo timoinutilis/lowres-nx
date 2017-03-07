@@ -18,3 +18,5 @@
 //
 
 #include "value.h"
+
+union Value ValueDummy = {0};

@@ -112,6 +112,7 @@ struct Token {
         float floatValue;
         const char *stringValue;
         uint16_t symbolIndex;
+        struct Token *jumpToken;
     };
 };
 

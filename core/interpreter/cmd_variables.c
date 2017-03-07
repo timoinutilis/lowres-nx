@@ -36,6 +36,11 @@ enum ErrorCode cmd_LET(struct LowResCore *core)
     ++interpreter->pc;
     struct TypedValue value = LRC_evaluateExpression(core);
     if (value.type == ValueError) return value.v.errorCode;
-    varValue->floatValue = value.v.floatValue;
+    
+    if (interpreter->pass == PASS_RUN)
+    {
+        varValue->floatValue = value.v.floatValue;
+    }
+    
     return LRC_endOfCommand(interpreter);
 }

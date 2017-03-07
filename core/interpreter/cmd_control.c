@@ -25,31 +25,39 @@ enum ErrorCode cmd_END(struct LowResCore *core)
     struct Interpreter *interpreter = &core->interpreter;
     
     ++interpreter->pc;
-    return LRC_endOfCommand(interpreter) ?: ErrorEndOfProgram;
+    if (interpreter->pass == PASS_RUN)
+    {
+        return LRC_endOfCommand(interpreter) ?: ErrorEndOfProgram;
+    }
+    return LRC_endOfCommand(interpreter);
 }
 
 enum ErrorCode cmd_IF(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-
+    
+    // IF
+    struct Token *tokenIF = interpreter->pc;
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        LRC_pushLabelStackItem(interpreter, TokenIF, tokenIF);
+    }
     ++interpreter->pc;
+    
+    // Expression
     struct TypedValue value = LRC_evaluateExpression(core);
     if (value.type == ValueError) return value.v.errorCode;
     if (value.type != ValueFloat) return ErrorTypeMismatch;
+    
+    // THEN
     if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
-    ++interpreter->pc;
-    if (value.v.floatValue == 0)
+    ++interpreter->pc; // THEN
+    
+    if (interpreter->pass == PASS_RUN && value.v.floatValue == 0)
     {
-        while (   interpreter->pc->type != TokenELSE
-               && interpreter->pc->type != TokenEol)
-        {
-            ++interpreter->pc;
-        }
-        if (interpreter->pc->type == TokenELSE)
-        {
-            ++interpreter->pc;
-        }
+        interpreter->pc = tokenIF->jumpToken; // after ELSE or END IF
     }
+    
     return ErrorNone;
 }
 
@@ -57,10 +65,65 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    while (interpreter->pc->type != TokenEol)
-    {
-        ++interpreter->pc;
-    }
+    // ELSE
+    struct Token *tokenELSE = interpreter->pc;
     ++interpreter->pc;
+    
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
+        if (item->type != TokenIF) return ErrorElseWithoutIf;
+        item->token->jumpToken = interpreter->pc;
+        
+        LRC_pushLabelStackItem(interpreter, TokenELSE, tokenELSE);
+    }
+    else if (interpreter->pass == PASS_RUN)
+    {
+        interpreter->pc = tokenELSE->jumpToken; // after END IF
+    }
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_ENDIF(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // END IF
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
+        if (item->type == TokenIF)
+        {
+            item->token->jumpToken = interpreter->pc;
+        }
+        else if (item->type == TokenELSE)
+        {
+            while (1)
+            {
+                item->token->jumpToken = interpreter->pc;
+                
+                item = LRC_peekLabelStackItem(interpreter);
+                if (item && item->type == TokenELSE)
+                {
+                    item = LRC_popLabelStackItem(interpreter);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            return ErrorEndIfWithoutIf;
+        }
+    }
     return ErrorNone;
 }

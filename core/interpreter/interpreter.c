@@ -18,6 +18,7 @@
 //
 
 #include "interpreter.h"
+#include <assert.h>
 #include <string.h>
 #include <math.h>
 #include "lowres_core.h"
@@ -25,8 +26,48 @@
 #include "cmd_variables.h"
 #include "cmd_text.h"
 
+enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
 struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level);
 struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core);
+
+enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode)
+{
+    enum ErrorCode errorCode = LRC_tokenizeProgram(core, sourceCode);
+    if (errorCode != ErrorNone) return errorCode;
+    
+    struct Interpreter *interpreter = &core->interpreter;
+    interpreter->pc = interpreter->tokens;
+    interpreter->pass = PASS_PREPARE;
+    
+    do
+    {
+        errorCode = LRC_runCommand(core);
+    } while (errorCode == ErrorNone);
+    
+    assert(interpreter->numLabelStackItems == 0);
+    
+    if (errorCode == ErrorEndOfProgram)
+    {
+        return ErrorNone;
+    }
+    return errorCode;
+}
+
+enum ErrorCode LRC_runProgram(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    interpreter->pc = interpreter->tokens;
+    interpreter->simpleVariablesEnd = (struct SimpleVariable *)interpreter->variablesStack;
+    interpreter->pass = PASS_RUN;
+    enum ErrorCode errorCode = ErrorNone;
+    
+    do
+    {
+        errorCode = LRC_runCommand(core);
+    } while (errorCode == ErrorNone);
+    
+    return errorCode;
+}
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode)
 {
@@ -262,50 +303,41 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
     return ErrorNone;
 }
 
-enum ErrorCode LRC_runProgram(struct LowResCore *core)
-{
-    struct Interpreter *interpreter = &core->interpreter;
-    interpreter->pc = interpreter->tokens;
-    interpreter->simpleVariablesEnd = (struct SimpleVariable *)interpreter->variablesStack;
-    enum ErrorCode errorCode = ErrorNone;
-    
-    do
-    {
-        errorCode = LRC_runCommand(core);
-    }
-    while (errorCode == ErrorNone);
-    
-    return errorCode;
-}
-
 union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode)
 {
     struct Interpreter *interpreter = &core->interpreter;
     int symbolIndex = interpreter->pc->symbolIndex;
     ++interpreter->pc;
     
-    struct SimpleVariable *variable = (struct SimpleVariable *)interpreter->variablesStack;
-    while (variable < interpreter->simpleVariablesEnd)
+    if (interpreter->pass == PASS_RUN)
     {
-        if (variable->symbolIndex == symbolIndex)
+        struct SimpleVariable *variable = (struct SimpleVariable *)interpreter->variablesStack;
+        while (variable < interpreter->simpleVariablesEnd)
         {
-            // variable found
-            return &variable->v;
+            if (variable->symbolIndex == symbolIndex)
+            {
+                // variable found
+                return &variable->v;
+            }
+            variable++;
         }
-        variable++;
+        
+        // create new variable
+        variable = interpreter->simpleVariablesEnd;
+        interpreter->simpleVariablesEnd++;
+        if ((void *)(interpreter->simpleVariablesEnd) >= (void *)&interpreter->variablesStack[VARIABLES_STACK_SIZE])
+        {
+            *errorCode = ErrorOutOfMemory;
+            return NULL;
+        }
+        memset(variable, 0, sizeof(struct SimpleVariable));
+        variable->symbolIndex = symbolIndex;
+        return &variable->v;
     }
-    
-    // create new variable
-    variable = interpreter->simpleVariablesEnd;
-    interpreter->simpleVariablesEnd++;
-    if ((void *)(interpreter->simpleVariablesEnd) >= (void *)&interpreter->variablesStack[VARIABLES_STACK_SIZE])
+    else
     {
-        *errorCode = ErrorOutOfMemory;
-        return NULL;
+        return &ValueDummy;
     }
-    memset(variable, 0, sizeof(struct SimpleVariable));
-    variable->symbolIndex = symbolIndex;
-    return &variable->v;
     
     /*
     if (interpreter->pc->type == TokenBracketOpen)
@@ -565,6 +597,11 @@ enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
     return (type == TokenELSE) ? ErrorNone : ErrorUnexpectedToken;
 }
 
+enum TokenType LRC_getNextTokenType(struct Interpreter *interpreter)
+{
+    return (interpreter->pc + 1)->type;
+}
+
 enum ErrorCode LRC_runCommand(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
@@ -584,6 +621,10 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
             break;
             
         case TokenEND:
+            if (LRC_getNextTokenType(interpreter) == TokenIF)
+            {
+                return cmd_ENDIF(core);
+            }
             return cmd_END(core);
             
         case TokenLET:
@@ -620,4 +661,29 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
             return ErrorUnexpectedToken;
     }
     return ErrorNone;
+}
+
+void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum TokenType type, struct Token *token)
+{
+    assert(interpreter->numLabelStackItems < MAX_LABEL_STACK_ITEMS);
+    struct LabelStackItem *item = &interpreter->labelStackItems[interpreter->numLabelStackItems];
+    item->type = type;
+    item->token = token;
+    interpreter->numLabelStackItems++;
+}
+
+struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter)
+{
+    assert(interpreter->numLabelStackItems > 0);
+    interpreter->numLabelStackItems--;
+    return &interpreter->labelStackItems[interpreter->numLabelStackItems];
+}
+
+struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter)
+{
+    if (interpreter->numLabelStackItems > 0)
+    {
+        return &interpreter->labelStackItems[interpreter->numLabelStackItems - 1];
+    }
+    return NULL;
 }

@@ -28,10 +28,21 @@
 
 #define MAX_TOKENS 1024
 #define MAX_SYMBOLS 128
+#define MAX_LABEL_STACK_ITEMS 128
 #define SYMBOL_NAME_SIZE 11
 #define VARIABLES_STACK_SIZE 4096
 
 struct LowResCore;
+
+enum Pass {
+    PASS_PREPARE,
+    PASS_RUN
+};
+
+struct LabelStackItem {
+    enum TokenType type;
+    struct Token *token;
+};
 
 struct TypedValue {
     enum ValueType type;
@@ -48,10 +59,13 @@ struct SimpleVariable {
 };
 
 struct Interpreter {
-    int numTokens;
-    int numSymbols;
+    enum Pass pass;
     struct Token tokens[MAX_TOKENS];
+    int numTokens;
     struct Symbol symbols[MAX_SYMBOLS];
+    int numSymbols;
+    struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
+    int numLabelStackItems;
     struct Token *pc;
     uint8_t variablesStack[VARIABLES_STACK_SIZE];
     struct SimpleVariable *simpleVariablesEnd;
@@ -59,7 +73,7 @@ struct Interpreter {
     struct TextLib textLib;
 };
 
-enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
+enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode);
 enum ErrorCode LRC_runProgram(struct LowResCore *core);
 
 union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode);
@@ -67,5 +81,8 @@ struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_runCommand(struct LowResCore *core);
+void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum TokenType type, struct Token *token);
+struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter);
+struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter);
 
 #endif /* interpreter_h */

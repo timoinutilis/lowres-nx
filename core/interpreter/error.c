@@ -35,5 +35,7 @@ const char *ErrorStrings[] = {
     "Symbol Name Too Long",
     "Too Many Symbols",
     "Type Mismatch",
-    "Out Of Memory"
+    "Out Of Memory",
+    "Else Without If",
+    "End If Without If"
 };

@@ -30,22 +30,29 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
     {
         struct TypedValue value = LRC_evaluateExpression(core);
         if (value.type == ValueError) return value.v.errorCode;
-        if (value.type == ValueString)
+        
+        if (interpreter->pass == PASS_RUN)
         {
-            printf("%s", value.v.stringValue);
-        }
-        else if (value.type == ValueFloat)
-        {
-            printf("%f", value.v.floatValue);
-        }
-        else
-        {
-            printf("<unknown type>");
+            if (value.type == ValueString)
+            {
+                printf("%s", value.v.stringValue);
+            }
+            else if (value.type == ValueFloat)
+            {
+                printf("%f", value.v.floatValue);
+            }
+            else
+            {
+                printf("<unknown type>");
+            }
         }
         
         if (interpreter->pc->type == TokenComma)
         {
-            printf(" ");
+            if (interpreter->pass == PASS_RUN)
+            {
+                printf(" ");
+            }
             ++interpreter->pc;
         }
         else if (interpreter->pc->type == TokenSemicolon)
@@ -58,7 +65,7 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         }
     } while (!LRC_isEndOfCommand(interpreter));
     
-    if (newLine)
+    if (interpreter->pass == PASS_RUN && newLine)
     {
         printf("\n");
     }

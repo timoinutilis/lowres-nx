@@ -36,4 +36,6 @@ union Value {
     enum ErrorCode errorCode;
 };
 
+extern union Value ValueDummy;
+
 #endif /* value_h */

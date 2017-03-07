@@ -45,14 +45,14 @@
         NSString *filePath = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"bas" inDirectory:@"bas"];
         NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
         
-        enum ErrorCode errorCode = LRC_tokenizeProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
+        enum ErrorCode errorCode = LRC_compileProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
         if (errorCode != ErrorNone)
         {
-            printf("Tokenizer error: %s\n", ErrorStrings[errorCode]);
+            printf("Compiler error: %s\n", ErrorStrings[errorCode]);
         }
         else
         {
-            printf("Tokenizer success\n");
+            printf("Compiler success\n");
             [self.rendererViewController setCore:_core];
             enum ErrorCode errorCode = LRC_runProgram(_core);
             printf("Finished: %s\n", ErrorStrings[errorCode]);

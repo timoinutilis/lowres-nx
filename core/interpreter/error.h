@@ -38,7 +38,9 @@ enum ErrorCode {
     ErrorSymbolNameTooLong,
     ErrorTooManySymbols,
     ErrorTypeMismatch,
-    ErrorOutOfMemory
+    ErrorOutOfMemory,
+    ErrorElseWithoutIf,
+    ErrorEndIfWithoutIf
 };
 
 extern const char *ErrorStrings[];
