@@ -40,7 +40,8 @@ enum ErrorCode {
     ErrorTypeMismatch,
     ErrorOutOfMemory,
     ErrorElseWithoutIf,
-    ErrorEndIfWithoutIf
+    ErrorEndIfWithoutIf,
+    ErrorExpectedCommand
 };
 
 extern const char *ErrorStrings[];

@@ -37,5 +37,6 @@ const char *ErrorStrings[] = {
     "Type Mismatch",
     "Out Of Memory",
     "Else Without If",
-    "End If Without If"
+    "End If Without If",
+    "Expected Command"
 };

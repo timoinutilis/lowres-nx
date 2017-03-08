@@ -38,10 +38,6 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
     
     // IF
     struct Token *tokenIF = interpreter->pc;
-    if (interpreter->pass == PASS_PREPARE)
-    {
-        LRC_pushLabelStackItem(interpreter, TokenIF, tokenIF);
-    }
     ++interpreter->pc;
     
     // Expression
@@ -51,11 +47,37 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
     
     // THEN
     if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
-    ++interpreter->pc; // THEN
+    ++interpreter->pc;
     
-    if (interpreter->pass == PASS_RUN && value.v.floatValue == 0)
+    if (interpreter->pass == PASS_PREPARE)
     {
-        interpreter->pc = tokenIF->jumpToken; // after ELSE or END IF
+        if (interpreter->pc->type == TokenEol)
+        {
+            // IF block
+            if (interpreter->isSingleLineIf) return ErrorExpectedCommand;
+            LRC_pushLabelStackItem(interpreter, TokenIF, tokenIF);
+            
+            // Eol
+            ++interpreter->pc;
+        }
+        else
+        {
+            // single line IF
+            interpreter->isSingleLineIf = true;
+            struct Token *token = interpreter->pc;
+            while (token->type != TokenEol && token->type != TokenELSE)
+            {
+                token++;
+            }
+            tokenIF->jumpToken = token + 1; // after ELSE or Eol
+        }
+    }
+    else if (interpreter->pass == PASS_RUN)
+    {
+        if (value.v.floatValue == 0)
+        {
+            interpreter->pc = tokenIF->jumpToken; // after ELSE or END IF, or Eol for single line
+        }
     }
     
     return ErrorNone;
@@ -71,15 +93,35 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core)
     
     if (interpreter->pass == PASS_PREPARE)
     {
-        struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
-        if (item->type != TokenIF) return ErrorElseWithoutIf;
-        item->token->jumpToken = interpreter->pc;
+        if (interpreter->isSingleLineIf)
+        {
+            if (interpreter->pc->type == TokenEol) return ErrorExpectedCommand;
+            struct Token *token = interpreter->pc;
+            while (token->type != TokenEol)
+            {
+                token++;
+            }
+            tokenELSE->jumpToken = token + 1; // after Eol
+        }
+        else
+        {
+            struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
+            if (!item || item->type != TokenIF) return ErrorElseWithoutIf;
+            item->token->jumpToken = interpreter->pc;
         
-        LRC_pushLabelStackItem(interpreter, TokenELSE, tokenELSE);
+            LRC_pushLabelStackItem(interpreter, TokenELSE, tokenELSE);
+            
+            if (interpreter->pc->type != TokenIF)
+            {
+                // Eol
+                if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+                ++interpreter->pc;
+            }
+        }
     }
     else if (interpreter->pass == PASS_RUN)
     {
-        interpreter->pc = tokenELSE->jumpToken; // after END IF
+        interpreter->pc = tokenELSE->jumpToken; // after END IF, or Eol for single line
     }
     return ErrorNone;
 }
@@ -99,7 +141,11 @@ enum ErrorCode cmd_ENDIF(struct LowResCore *core)
     if (interpreter->pass == PASS_PREPARE)
     {
         struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
-        if (item->type == TokenIF)
+        if (!item)
+        {
+            return ErrorEndIfWithoutIf;
+        }
+        else if (item->type == TokenIF)
         {
             item->token->jumpToken = interpreter->pc;
         }

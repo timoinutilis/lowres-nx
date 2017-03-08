@@ -21,6 +21,7 @@
 #define interpreter_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "token.h"
 #include "error.h"
 #include "value.h"
@@ -66,6 +67,7 @@ struct Interpreter {
     int numSymbols;
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
     int numLabelStackItems;
+    bool isSingleLineIf;
     struct Token *pc;
     uint8_t variablesStack[VARIABLES_STACK_SIZE];
     struct SimpleVariable *simpleVariablesEnd;

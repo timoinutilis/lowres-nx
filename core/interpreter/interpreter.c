@@ -44,12 +44,15 @@ enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCod
         errorCode = LRC_runCommand(core);
     } while (errorCode == ErrorNone);
     
-    assert(interpreter->numLabelStackItems == 0);
-    
     if (errorCode == ErrorEndOfProgram)
     {
-        return ErrorNone;
+        errorCode = ErrorNone;
     }
+    if (errorCode == ErrorNone)
+    {
+        assert(interpreter->numLabelStackItems == 0);
+    }
+    
     return errorCode;
 }
 
@@ -591,6 +594,7 @@ enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
     enum TokenType type = interpreter->pc->type;
     if (type == TokenEol)
     {
+        interpreter->isSingleLineIf = false;
         ++interpreter->pc;
         return ErrorNone;
     }
@@ -617,6 +621,7 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
             break;
         
         case TokenEol:
+            interpreter->isSingleLineIf = false;
             ++interpreter->pc;
             break;
             
@@ -674,9 +679,12 @@ void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum TokenType type
 
 struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter)
 {
-    assert(interpreter->numLabelStackItems > 0);
-    interpreter->numLabelStackItems--;
-    return &interpreter->labelStackItems[interpreter->numLabelStackItems];
+    if (interpreter->numLabelStackItems > 0)
+    {
+        interpreter->numLabelStackItems--;
+        return &interpreter->labelStackItems[interpreter->numLabelStackItems];
+    }
+    return NULL;
 }
 
 struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter)
