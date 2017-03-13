@@ -40,8 +40,16 @@ enum Pass {
     PASS_RUN
 };
 
+enum LabelType {
+    LabelTypeIF,
+    LabelTypeELSE,
+    LabelTypeFOR,
+    LabelTypeFORVar,
+    LabelTypeFORLimit,
+};
+
 struct LabelStackItem {
-    enum TokenType type;
+    enum LabelType type;
     struct Token *token;
 };
 
@@ -83,7 +91,7 @@ struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_runCommand(struct LowResCore *core);
-void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum TokenType type, struct Token *token);
+void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
 struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter);
 struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter);
 

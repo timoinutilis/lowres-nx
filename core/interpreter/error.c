@@ -36,7 +36,9 @@ const char *ErrorStrings[] = {
     "Too Many Symbols",
     "Type Mismatch",
     "Out Of Memory",
-    "Else Without If",
-    "End If Without If",
-    "Expected Command"
+    "ELSE Without IF",
+    "END IF Without IF",
+    "Expected Command",
+    "Expected TO",
+    "NEXT Without FOR"
 };

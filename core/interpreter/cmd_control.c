@@ -19,6 +19,7 @@
 
 #include "cmd_control.h"
 #include "lowres_core.h"
+#include <assert.h>
 
 enum ErrorCode cmd_END(struct LowResCore *core)
 {
@@ -55,7 +56,7 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
         {
             // IF block
             if (interpreter->isSingleLineIf) return ErrorExpectedCommand;
-            LRC_pushLabelStackItem(interpreter, TokenIF, tokenIF);
+            LRC_pushLabelStackItem(interpreter, LabelTypeIF, tokenIF);
             
             // Eol
             ++interpreter->pc;
@@ -106,10 +107,10 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core)
         else
         {
             struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
-            if (!item || item->type != TokenIF) return ErrorElseWithoutIf;
+            if (!item || item->type != LabelTypeIF) return ErrorElseWithoutIf;
             item->token->jumpToken = interpreter->pc;
         
-            LRC_pushLabelStackItem(interpreter, TokenELSE, tokenELSE);
+            LRC_pushLabelStackItem(interpreter, LabelTypeELSE, tokenELSE);
             
             if (interpreter->pc->type != TokenIF)
             {
@@ -145,18 +146,18 @@ enum ErrorCode cmd_ENDIF(struct LowResCore *core)
         {
             return ErrorEndIfWithoutIf;
         }
-        else if (item->type == TokenIF)
+        else if (item->type == LabelTypeIF)
         {
             item->token->jumpToken = interpreter->pc;
         }
-        else if (item->type == TokenELSE)
+        else if (item->type == LabelTypeELSE)
         {
             while (1)
             {
                 item->token->jumpToken = interpreter->pc;
                 
                 item = LRC_peekLabelStackItem(interpreter);
-                if (item && item->type == TokenELSE)
+                if (item && item->type == LabelTypeELSE)
                 {
                     item = LRC_popLabelStackItem(interpreter);
                 }
@@ -171,5 +172,160 @@ enum ErrorCode cmd_ENDIF(struct LowResCore *core)
             return ErrorEndIfWithoutIf;
         }
     }
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_FOR(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // FOR
+    struct Token *tokenFOR = interpreter->pc;
+    ++interpreter->pc;
+    
+    // Variable
+    struct Token *tokenFORVar = interpreter->pc;
+    enum ErrorCode errorCode = ErrorNone;
+    union Value *varValue = LRC_readVariable(core, &errorCode);
+    if (!varValue) return errorCode;
+    
+    // Eq
+    if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
+    ++interpreter->pc;
+    
+    // start value
+    struct TypedValue startValue = LRC_evaluateExpression(core);
+    if (startValue.type == ValueError) return startValue.v.errorCode;
+    
+    // TO
+    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+    ++interpreter->pc;
+
+    // limit value
+    struct Token *tokenFORLimit = interpreter->pc;
+    struct TypedValue limitValue = LRC_evaluateExpression(core);
+    if (limitValue.type == ValueError) return limitValue.v.errorCode;
+    
+    // STEP
+    struct TypedValue stepValue;
+    if (interpreter->pc->type == TokenSTEP)
+    {
+        ++interpreter->pc;
+        
+        // step value
+        stepValue = LRC_evaluateExpression(core);
+        if (stepValue.type == ValueError) return stepValue.v.errorCode;
+    }
+    else
+    {
+        stepValue.type = ValueFloat;
+        stepValue.v.floatValue = 1.0f;
+    }
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        LRC_pushLabelStackItem(interpreter, LabelTypeFORLimit, tokenFORLimit);
+        LRC_pushLabelStackItem(interpreter, LabelTypeFORVar, tokenFORVar);
+        LRC_pushLabelStackItem(interpreter, LabelTypeFOR, tokenFOR);
+    }
+    else if (interpreter->pass == PASS_RUN)
+    {
+        varValue->floatValue = startValue.v.floatValue;
+        
+        // limit check
+        if ((stepValue.v.floatValue > 0 && varValue->floatValue > limitValue.v.floatValue) || (stepValue.v.floatValue < 0 && varValue->floatValue < limitValue.v.floatValue))
+        {
+            interpreter->pc = tokenFOR->jumpToken; // after NEXT's Eol
+        }
+    }
+    
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_NEXT(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    struct LabelStackItem *itemFORLimit = NULL;
+    struct LabelStackItem *itemFORVar = NULL;
+    struct LabelStackItem *itemFOR = NULL;
+    
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        itemFOR = LRC_popLabelStackItem(interpreter);
+        if (!itemFOR || itemFOR->type != LabelTypeFOR) return ErrorNextWithoutFor;
+        
+        itemFORVar = LRC_popLabelStackItem(interpreter);
+        assert(itemFORVar && itemFORVar->type == LabelTypeFORVar);
+        
+        itemFORLimit = LRC_popLabelStackItem(interpreter);
+        assert(itemFORLimit && itemFORLimit->type == LabelTypeFORLimit);
+    }
+    
+    // NEXT
+    struct Token *tokenNEXT = interpreter->pc;
+    ++interpreter->pc;
+    
+    // Variable
+    enum ErrorCode errorCode = ErrorNone;
+    struct Token *tokenVar = interpreter->pc;
+    union Value *varValue = LRC_readVariable(core, &errorCode);
+    if (!varValue) return errorCode;
+    
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        if (tokenVar->symbolIndex != itemFORVar->token->symbolIndex) return ErrorNextWithoutFor;
+    }
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        itemFOR->token->jumpToken = interpreter->pc;
+        tokenNEXT->jumpToken = itemFORLimit->token;
+    }
+    else if (interpreter->pass == PASS_RUN)
+    {
+        struct Token *storedPc = interpreter->pc;
+        interpreter->pc = tokenNEXT->jumpToken;
+        
+        // limit value
+        struct TypedValue limitValue = LRC_evaluateExpression(core);
+        if (limitValue.type == ValueError) return limitValue.v.errorCode;
+        
+        // STEP
+        struct TypedValue stepValue;
+        if (interpreter->pc->type == TokenSTEP)
+        {
+            ++interpreter->pc;
+            
+            // step value
+            stepValue = LRC_evaluateExpression(core);
+            if (stepValue.type == ValueError) return stepValue.v.errorCode;
+        }
+        else
+        {
+            stepValue.type = ValueFloat;
+            stepValue.v.floatValue = 1.0f;
+        }
+        
+        // Eol
+        if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+        ++interpreter->pc;
+
+        varValue->floatValue += stepValue.v.floatValue;
+        
+        // limit check
+        if ((stepValue.v.floatValue > 0 && varValue->floatValue > limitValue.v.floatValue) || (stepValue.v.floatValue < 0 && varValue->floatValue < limitValue.v.floatValue))
+        {
+            interpreter->pc = storedPc; // after NEXT's Eol
+        }
+    }
+    
     return ErrorNone;
 }

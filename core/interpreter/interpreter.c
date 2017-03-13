@@ -645,14 +645,18 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
         
         case TokenELSE:
             return cmd_ELSE(core);
-        
+
+        case TokenFOR:
+            return cmd_FOR(core);
+
+        case TokenNEXT:
+            return cmd_NEXT(core);
+
         case TokenDATA:
         case TokenDIM:
-        case TokenFOR:
         case TokenGOSUB:
         case TokenGOTO:
         case TokenINPUT:
-        case TokenNEXT:
         case TokenON:
         case TokenPEEK:
         case TokenPOKE:
@@ -668,7 +672,7 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
     return ErrorNone;
 }
 
-void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum TokenType type, struct Token *token)
+void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token)
 {
     assert(interpreter->numLabelStackItems < MAX_LABEL_STACK_ITEMS);
     struct LabelStackItem *item = &interpreter->labelStackItems[interpreter->numLabelStackItems];
