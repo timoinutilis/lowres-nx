@@ -43,7 +43,7 @@ enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCod
     // Prepare
     
     interpreter->pc = interpreter->tokens;
-    interpreter->pass = PASS_PREPARE;
+    interpreter->pass = PassPrepare;
     do
     {
         errorCode = LRC_evaluateCommand(core);
@@ -59,8 +59,7 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     interpreter->pc = interpreter->tokens;
-    interpreter->simpleVariablesEnd = (struct SimpleVariable *)interpreter->variablesStack;
-    interpreter->pass = PASS_RUN;
+    interpreter->pass = PassRun;
     enum ErrorCode errorCode = ErrorNone;
     
     do
@@ -310,32 +309,40 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
 union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode)
 {
     struct Interpreter *interpreter = &core->interpreter;
+    
+    if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier)
+    {
+        *errorCode = ErrorExpectedVariableIdentifier;
+        return NULL;
+    }
+    struct Token *tokenIdentifier = interpreter->pc;
     int symbolIndex = interpreter->pc->symbolIndex;
     ++interpreter->pc;
     
-    if (interpreter->pass == PASS_RUN)
+    if (interpreter->pass == PassRun)
     {
-        struct SimpleVariable *variable = (struct SimpleVariable *)interpreter->variablesStack;
-        while (variable < interpreter->simpleVariablesEnd)
+        struct SimpleVariable *variable = NULL;
+        for (int i = 0; i < interpreter->numSimpleVariables; i++)
         {
+            variable = &interpreter->simpleVariables[i];
             if (variable->symbolIndex == symbolIndex)
             {
                 // variable found
                 return &variable->v;
             }
-            variable++;
         }
         
         // create new variable
-        variable = interpreter->simpleVariablesEnd;
-        interpreter->simpleVariablesEnd++;
-        if ((void *)(interpreter->simpleVariablesEnd) >= (void *)&interpreter->variablesStack[VARIABLES_STACK_SIZE])
+        if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
         {
             *errorCode = ErrorOutOfMemory;
             return NULL;
         }
+        variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
+        interpreter->numSimpleVariables++;
         memset(variable, 0, sizeof(struct SimpleVariable));
         variable->symbolIndex = symbolIndex;
+        variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueString : ValueFloat;
         return &variable->v;
     }
     else

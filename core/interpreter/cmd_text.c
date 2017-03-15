@@ -31,7 +31,7 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         struct TypedValue value = LRC_evaluateExpression(core);
         if (value.type == ValueError) return value.v.errorCode;
         
-        if (interpreter->pass == PASS_RUN)
+        if (interpreter->pass == PassRun)
         {
             if (value.type == ValueString)
             {
@@ -49,7 +49,7 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         
         if (interpreter->pc->type == TokenComma)
         {
-            if (interpreter->pass == PASS_RUN)
+            if (interpreter->pass == PassRun)
             {
                 printf(" ");
             }
@@ -65,7 +65,7 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         }
     } while (!LRC_isEndOfCommand(interpreter));
     
-    if (interpreter->pass == PASS_RUN && newLine)
+    if (interpreter->pass == PassRun && newLine)
     {
         printf("\n");
     }

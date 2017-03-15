@@ -31,14 +31,14 @@
 #define MAX_SYMBOLS 128
 #define MAX_LABEL_STACK_ITEMS 128
 #define MAX_JUMP_LABEL_ITEMS 128
+#define MAX_SIMPLE_VARIABLES 128
 #define SYMBOL_NAME_SIZE 11
-#define VARIABLES_STACK_SIZE 4096
 
 struct LowResCore;
 
 enum Pass {
-    PASS_PREPARE,
-    PASS_RUN
+    PassPrepare,
+    PassRun
 };
 
 enum LabelType {
@@ -70,6 +70,7 @@ struct Symbol {
 
 struct SimpleVariable {
     uint16_t symbolIndex;
+    enum ValueType type;
     union Value v;
 };
 
@@ -85,8 +86,8 @@ struct Interpreter {
     struct JumpLabelItem jumpLabelItems[MAX_JUMP_LABEL_ITEMS];
     int numJumpLabelItems;
     struct Token *pc;
-    uint8_t variablesStack[VARIABLES_STACK_SIZE];
-    struct SimpleVariable *simpleVariablesEnd;
+    struct SimpleVariable simpleVariables[MAX_SIMPLE_VARIABLES];
+    int numSimpleVariables;
     
     struct TextLib textLib;
 };

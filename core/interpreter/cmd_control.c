@@ -26,7 +26,7 @@ enum ErrorCode cmd_END(struct LowResCore *core)
     struct Interpreter *interpreter = &core->interpreter;
     
     ++interpreter->pc;
-    if (interpreter->pass == PASS_RUN)
+    if (interpreter->pass == PassRun)
     {
         return LRC_endOfCommand(interpreter) ?: ErrorEndOfProgram;
     }
@@ -50,7 +50,7 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
     if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
     ++interpreter->pc;
     
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         if (interpreter->pc->type == TokenEol)
         {
@@ -73,7 +73,7 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
             tokenIF->jumpToken = token + 1; // after ELSE or Eol
         }
     }
-    else if (interpreter->pass == PASS_RUN)
+    else if (interpreter->pass == PassRun)
     {
         if (value.v.floatValue == 0)
         {
@@ -92,7 +92,7 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core)
     struct Token *tokenELSE = interpreter->pc;
     ++interpreter->pc;
     
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         if (interpreter->isSingleLineIf)
         {
@@ -120,7 +120,7 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core)
             }
         }
     }
-    else if (interpreter->pass == PASS_RUN)
+    else if (interpreter->pass == PassRun)
     {
         interpreter->pc = tokenELSE->jumpToken; // after END IF, or Eol for single line
     }
@@ -139,7 +139,7 @@ enum ErrorCode cmd_ENDIF(struct LowResCore *core)
     if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
     ++interpreter->pc;
     
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
         if (!item)
@@ -226,13 +226,13 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
     if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
     ++interpreter->pc;
     
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         LRC_pushLabelStackItem(interpreter, LabelTypeFORLimit, tokenFORLimit);
         LRC_pushLabelStackItem(interpreter, LabelTypeFORVar, tokenFORVar);
         LRC_pushLabelStackItem(interpreter, LabelTypeFOR, tokenFOR);
     }
-    else if (interpreter->pass == PASS_RUN)
+    else if (interpreter->pass == PassRun)
     {
         varValue->floatValue = startValue.v.floatValue;
         
@@ -253,7 +253,7 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     struct LabelStackItem *itemFORVar = NULL;
     struct LabelStackItem *itemFOR = NULL;
     
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         itemFOR = LRC_popLabelStackItem(interpreter);
         if (!itemFOR || itemFOR->type != LabelTypeFOR) return ErrorNextWithoutFor;
@@ -275,7 +275,7 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     union Value *varValue = LRC_readVariable(core, &errorCode);
     if (!varValue) return errorCode;
     
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         if (tokenVar->symbolIndex != itemFORVar->token->symbolIndex) return ErrorNextWithoutFor;
     }
@@ -284,12 +284,12 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
     ++interpreter->pc;
     
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         itemFOR->token->jumpToken = interpreter->pc;
         tokenNEXT->jumpToken = itemFORLimit->token;
     }
-    else if (interpreter->pass == PASS_RUN)
+    else if (interpreter->pass == PassRun)
     {
         struct Token *storedPc = interpreter->pc;
         interpreter->pc = tokenNEXT->jumpToken;
@@ -343,13 +343,13 @@ enum ErrorCode cmd_GOTO(struct LowResCore *core)
     struct Token *tokenIdentifier = interpreter->pc;
     ++interpreter->pc;
 
-    if (interpreter->pass == PASS_PREPARE)
+    if (interpreter->pass == PassPrepare)
     {
         struct JumpLabelItem *item = LRC_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedLabel;
         tokenGOTO->jumpToken = item->token;
     }
-    else if (interpreter->pass == PASS_RUN)
+    else if (interpreter->pass == PassRun)
     {
         interpreter->pc = tokenGOTO->jumpToken; // after label
     }
