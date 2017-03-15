@@ -29,31 +29,30 @@
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
 struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level);
 struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core);
+enum ErrorCode LRC_evaluateCommand(struct LowResCore *core);
 
 enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode)
 {
+    // Tokenize
+    
     enum ErrorCode errorCode = LRC_tokenizeProgram(core, sourceCode);
     if (errorCode != ErrorNone) return errorCode;
     
     struct Interpreter *interpreter = &core->interpreter;
+    
+    // Prepare
+    
     interpreter->pc = interpreter->tokens;
     interpreter->pass = PASS_PREPARE;
-    
     do
     {
-        errorCode = LRC_runCommand(core);
+        errorCode = LRC_evaluateCommand(core);
     } while (errorCode == ErrorNone);
     
-    if (errorCode == ErrorEndOfProgram)
-    {
-        errorCode = ErrorNone;
-    }
-    if (errorCode == ErrorNone)
-    {
-        assert(interpreter->numLabelStackItems == 0);
-    }
+    if (errorCode != ErrorNone && errorCode != ErrorEndOfProgram) return errorCode;
+    assert(interpreter->numLabelStackItems == 0);
     
-    return errorCode;
+    return ErrorNone;
 }
 
 enum ErrorCode LRC_runProgram(struct LowResCore *core)
@@ -66,7 +65,7 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
     
     do
     {
-        errorCode = LRC_runCommand(core);
+        errorCode = LRC_evaluateCommand(core);
     } while (errorCode == ErrorNone);
     
     return errorCode;
@@ -290,6 +289,8 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
             {
                 token->type = TokenLabel;
                 character++;
+                enum ErrorCode errorCode = LRC_setJumpLabel(interpreter, symbolIndex, token + 1);
+                if (errorCode != ErrorNone) return errorCode;
             }
             else
             {
@@ -606,7 +607,7 @@ enum TokenType LRC_getNextTokenType(struct Interpreter *interpreter)
     return (interpreter->pc + 1)->type;
 }
 
-enum ErrorCode LRC_runCommand(struct LowResCore *core)
+enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     switch (interpreter->pc->type)
@@ -652,10 +653,12 @@ enum ErrorCode LRC_runCommand(struct LowResCore *core)
         case TokenNEXT:
             return cmd_NEXT(core);
 
+        case TokenGOTO:
+            return cmd_GOTO(core);
+
         case TokenDATA:
         case TokenDIM:
         case TokenGOSUB:
-        case TokenGOTO:
         case TokenINPUT:
         case TokenON:
         case TokenPEEK:
@@ -698,4 +701,35 @@ struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter)
         return &interpreter->labelStackItems[interpreter->numLabelStackItems - 1];
     }
     return NULL;
+}
+
+struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex)
+{
+    struct JumpLabelItem *item;
+    for (int i = 0; i < interpreter->numJumpLabelItems; i++)
+    {
+        item = &interpreter->jumpLabelItems[i];
+        if (item->symbolIndex == symbolIndex)
+        {
+            return item;
+        }
+    }
+    return NULL;
+}
+
+enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token)
+{
+    if (LRC_getJumpLabel(interpreter, symbolIndex) != NULL)
+    {
+        return ErrorLabelAlreadyDefined;
+    }
+    if (interpreter->numJumpLabelItems >= MAX_JUMP_LABEL_ITEMS)
+    {
+        return ErrorTooManyLabels;
+    }
+    struct JumpLabelItem *item = &interpreter->jumpLabelItems[interpreter->numJumpLabelItems];
+    item->symbolIndex = symbolIndex;
+    item->token = token;
+    interpreter->numJumpLabelItems++;
+    return ErrorNone;
 }

@@ -329,3 +329,30 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     
     return ErrorNone;
 }
+
+enum ErrorCode cmd_GOTO(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // GOTO
+    struct Token *tokenGOTO = interpreter->pc;
+    ++interpreter->pc;
+    
+    // Identifier
+    if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedLabel;
+    struct Token *tokenIdentifier = interpreter->pc;
+    ++interpreter->pc;
+
+    if (interpreter->pass == PASS_PREPARE)
+    {
+        struct JumpLabelItem *item = LRC_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+        if (!item) return ErrorUndefinedLabel;
+        tokenGOTO->jumpToken = item->token;
+    }
+    else if (interpreter->pass == PASS_RUN)
+    {
+        interpreter->pc = tokenGOTO->jumpToken; // after label
+    }
+
+    return ErrorNone;
+}

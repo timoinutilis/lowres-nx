@@ -40,5 +40,9 @@ const char *ErrorStrings[] = {
     "END IF Without IF",
     "Expected Command",
     "Expected TO",
-    "NEXT Without FOR"
+    "NEXT Without FOR",
+    "Label Already Defined",
+    "Too Many Labels",
+    "ErrorExpectedLabel",
+    "Undefined Label"
 };

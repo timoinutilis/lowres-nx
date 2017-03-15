@@ -31,5 +31,6 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core);
 enum ErrorCode cmd_ENDIF(struct LowResCore *core);
 enum ErrorCode cmd_FOR(struct LowResCore *core);
 enum ErrorCode cmd_NEXT(struct LowResCore *core);
+enum ErrorCode cmd_GOTO(struct LowResCore *core);
 
 #endif /* cmd_control_h */

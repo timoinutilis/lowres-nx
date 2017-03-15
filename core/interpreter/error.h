@@ -43,7 +43,11 @@ enum ErrorCode {
     ErrorEndIfWithoutIf,
     ErrorExpectedCommand,
     ErrorExpectedTo,
-    ErrorNextWithoutFor
+    ErrorNextWithoutFor,
+    ErrorLabelAlreadyDefined,
+    ErrorTooManyLabels,
+    ErrorExpectedLabel,
+    ErrorUndefinedLabel
 };
 
 extern const char *ErrorStrings[];

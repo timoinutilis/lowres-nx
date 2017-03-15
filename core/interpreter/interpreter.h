@@ -30,6 +30,7 @@
 #define MAX_TOKENS 1024
 #define MAX_SYMBOLS 128
 #define MAX_LABEL_STACK_ITEMS 128
+#define MAX_JUMP_LABEL_ITEMS 128
 #define SYMBOL_NAME_SIZE 11
 #define VARIABLES_STACK_SIZE 4096
 
@@ -50,6 +51,11 @@ enum LabelType {
 
 struct LabelStackItem {
     enum LabelType type;
+    struct Token *token;
+};
+
+struct JumpLabelItem {
+    uint16_t symbolIndex;
     struct Token *token;
 };
 
@@ -76,6 +82,8 @@ struct Interpreter {
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
     int numLabelStackItems;
     bool isSingleLineIf;
+    struct JumpLabelItem jumpLabelItems[MAX_JUMP_LABEL_ITEMS];
+    int numJumpLabelItems;
     struct Token *pc;
     uint8_t variablesStack[VARIABLES_STACK_SIZE];
     struct SimpleVariable *simpleVariablesEnd;
@@ -90,9 +98,10 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode
 struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
-enum ErrorCode LRC_runCommand(struct LowResCore *core);
 void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
 struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter);
 struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter);
+struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex);
+enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token);
 
 #endif /* interpreter_h */
