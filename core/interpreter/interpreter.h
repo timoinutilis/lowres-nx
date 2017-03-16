@@ -94,8 +94,9 @@ struct Interpreter {
 
 enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode);
 enum ErrorCode LRC_runProgram(struct LowResCore *core);
+void LRC_freeProgram(struct LowResCore *core);
 
-union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode);
+union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode);
 struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);

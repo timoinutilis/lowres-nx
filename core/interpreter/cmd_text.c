@@ -35,7 +35,10 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         {
             if (value.type == ValueString)
             {
-                printf("%s", value.v.stringValue);
+                if (value.v.stringValue)
+                {
+                    printf("%s", value.v.stringValue);
+                }
             }
             else if (value.type == ValueFloat)
             {

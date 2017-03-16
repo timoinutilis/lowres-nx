@@ -18,6 +18,7 @@
 //
 
 #include "interpreter.h"
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <math.h>
@@ -70,6 +71,19 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
     return errorCode;
 }
 
+void LRC_freeProgram(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    for (int i = 0; i < interpreter->numTokens; i++)
+    {
+        struct Token *token = &interpreter->tokens[i];
+        if (token->type == TokenString && token->stringValue)
+        {
+            free((void *)token->stringValue);
+        }
+    }
+}
+
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode)
 {
     const char *charSetDigits = "0123456789";
@@ -79,7 +93,7 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
     struct Interpreter *interpreter = &core->interpreter;
     const char *character = sourceCode;
     
-    uint8_t *currentRomByte = core->machine.cartridgeRom;
+//    uint8_t *currentRomByte = core->machine.cartridgeRom;
     
     while (*character)
     {
@@ -119,11 +133,12 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
                 }
             }
             int len = (int)(character - firstCharacter);
-            memcpy(currentRomByte, firstCharacter, len);
+            char *string = malloc(len + 1);
+            if (!string) return ErrorOutOfMemory;
+            memcpy(string, firstCharacter, len);
+            string[len] = 0;
             token->type = TokenString;
-            token->stringValue = (const char *)currentRomByte;
-            currentRomByte += len;
-            *currentRomByte++ = 0;
+            token->stringValue = (const char *)string;
             interpreter->numTokens++;
             character++;
             continue;
@@ -306,17 +321,31 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
     return ErrorNone;
 }
 
-union Value *LRC_readVariable(struct LowResCore *core, enum ErrorCode *errorCode)
+union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode)
 {
     struct Interpreter *interpreter = &core->interpreter;
+
+    struct Token *tokenIdentifier = interpreter->pc;
     
-    if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier)
+    if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier)
     {
         *errorCode = ErrorExpectedVariableIdentifier;
         return NULL;
     }
-    struct Token *tokenIdentifier = interpreter->pc;
-    int symbolIndex = interpreter->pc->symbolIndex;
+    
+    if (type)
+    {
+        if (tokenIdentifier->type == TokenIdentifier)
+        {
+            *type = ValueFloat;
+        }
+        else if (tokenIdentifier->type == TokenStringIdentifier)
+        {
+            *type = ValueString;
+        }
+    }
+    
+    int symbolIndex = tokenIdentifier->symbolIndex;
     ++interpreter->pc;
     
     if (interpreter->pass == PassRun)
@@ -548,25 +577,21 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
             ++interpreter->pc;
             break;
         }
-        case TokenIdentifier: {
+        case TokenIdentifier:
+        case TokenStringIdentifier: {
             enum ErrorCode errorCode = ErrorNone;
-            union Value *varValue = LRC_readVariable(core, &errorCode);
+            enum ValueType valueType = ValueNull;
+            union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
             if (varValue)
             {
-                value.type = ValueFloat;
-                value.v.floatValue = varValue->floatValue;
+                value.type = valueType;
+                value.v = *varValue;
             }
             else
             {
                 value.type = ValueError;
                 value.v.errorCode = errorCode;
             }
-            break;
-        }
-        case TokenStringIdentifier: {
-            value.type = ValueString;
-            value.v.stringValue = "VARIABLE STRING";
-            ++interpreter->pc;
             break;
         }
         case TokenBracketOpen: {

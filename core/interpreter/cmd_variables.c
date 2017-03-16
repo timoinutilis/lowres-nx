@@ -30,16 +30,18 @@ enum ErrorCode cmd_LET(struct LowResCore *core)
         if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
     }
     enum ErrorCode errorCode = ErrorNone;
-    union Value *varValue = LRC_readVariable(core, &errorCode);
+    enum ValueType valueType = ValueNull;
+    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
     if (!varValue) return errorCode;
     if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
     ++interpreter->pc;
     struct TypedValue value = LRC_evaluateExpression(core);
     if (value.type == ValueError) return value.v.errorCode;
+    if (value.type != valueType) return ErrorTypeMismatch;
     
     if (interpreter->pass == PassRun)
     {
-        varValue->floatValue = value.v.floatValue;
+        *varValue = value.v;
     }
     
     return LRC_endOfCommand(interpreter);

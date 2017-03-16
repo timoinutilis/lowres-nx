@@ -186,8 +186,10 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
     // Variable
     struct Token *tokenFORVar = interpreter->pc;
     enum ErrorCode errorCode = ErrorNone;
-    union Value *varValue = LRC_readVariable(core, &errorCode);
+    enum ValueType valueType = ValueNull;
+    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
     if (!varValue) return errorCode;
+    if (valueType != ValueFloat) return ErrorTypeMismatch;
     
     // Eq
     if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
@@ -272,8 +274,10 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     // Variable
     enum ErrorCode errorCode = ErrorNone;
     struct Token *tokenVar = interpreter->pc;
-    union Value *varValue = LRC_readVariable(core, &errorCode);
+    enum ValueType valueType = ValueNull;
+    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
     if (!varValue) return errorCode;
+    if (valueType != ValueFloat) return ErrorTypeMismatch;
     
     if (interpreter->pass == PassPrepare)
     {

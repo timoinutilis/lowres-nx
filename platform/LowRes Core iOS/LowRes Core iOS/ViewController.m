@@ -65,6 +65,7 @@
     if (_core)
     {
         [self.rendererViewController setCore:NULL];
+        LRC_freeProgram(_core);
         free(_core);
     }
 }
