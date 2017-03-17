@@ -57,6 +57,7 @@
             enum ErrorCode errorCode = LRC_runProgram(_core);
             printf("Finished: %s\n", ErrorStrings[errorCode]);
         }
+        LRC_freeProgram(_core);
     }
 }
 
@@ -65,7 +66,6 @@
     if (_core)
     {
         [self.rendererViewController setCore:NULL];
-        LRC_freeProgram(_core);
         free(_core);
     }
 }

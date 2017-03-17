@@ -41,7 +41,15 @@ enum ErrorCode cmd_LET(struct LowResCore *core)
     
     if (interpreter->pass == PassRun)
     {
+        if (valueType == ValueString && varValue->stringValue)
+        {
+            rcstring_release(varValue->stringValue);
+        }
         *varValue = value.v;
+        if (value.type == ValueString)
+        {
+            rcstring_retain(value.v.stringValue);
+        }
     }
     
     return LRC_endOfCommand(interpreter);

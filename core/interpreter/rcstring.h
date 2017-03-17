@@ -17,26 +17,18 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef value_h
-#define value_h
+#ifndef string_h
+#define string_h
 
 #include <stdio.h>
-#include "error.h"
-#include "rcstring.h"
 
-enum ValueType {
-    ValueNull,
-    ValueError,
-    ValueFloat,
-    ValueString
+struct RCString {
+    int refCount;
+    char chars[1]; // ...
 };
 
-union Value {
-    float floatValue;
-    struct RCString *stringValue;
-    enum ErrorCode errorCode;
-};
+struct RCString *rcstring_new(const char *chars, int len);
+void rcstring_retain(struct RCString *string);
+void rcstring_release(struct RCString *string);
 
-extern union Value ValueDummy;
-
-#endif /* value_h */
+#endif /* string_h */

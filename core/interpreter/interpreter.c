@@ -74,12 +74,25 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
 void LRC_freeProgram(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
+    
+    // Free variables
+    for (int i = 0; i < interpreter->numSimpleVariables; i++)
+    {
+        struct SimpleVariable *variable = &interpreter->simpleVariables[i];
+        if (variable->type == ValueString)
+        {
+            rcstring_release(variable->v.stringValue);
+        }
+    }
+    
+    // Free string tokens
     for (int i = 0; i < interpreter->numTokens; i++)
     {
         struct Token *token = &interpreter->tokens[i];
-        if (token->type == TokenString && token->stringValue)
+        if (token->type == TokenString)
         {
-            free((void *)token->stringValue);
+            assert(token->stringValue && token->stringValue->refCount == 1);
+            rcstring_release(token->stringValue);
         }
     }
 }
@@ -133,12 +146,10 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
                 }
             }
             int len = (int)(character - firstCharacter);
-            char *string = malloc(len + 1);
+            struct RCString *string = rcstring_new(firstCharacter, len);
             if (!string) return ErrorOutOfMemory;
-            memcpy(string, firstCharacter, len);
-            string[len] = 0;
             token->type = TokenString;
-            token->stringValue = (const char *)string;
+            token->stringValue = string;
             interpreter->numTokens++;
             character++;
             continue;

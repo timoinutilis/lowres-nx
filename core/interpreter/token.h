@@ -21,6 +21,7 @@
 #define token_h
 
 #include <stdio.h>
+#include "rcstring.h"
 
 enum TokenType {
     TokenUndefined,
@@ -110,7 +111,7 @@ struct Token {
     enum TokenType type;
     union {
         float floatValue;
-        const char *stringValue;
+        struct RCString *stringValue;
         uint16_t symbolIndex;
         struct Token *jumpToken;
     };

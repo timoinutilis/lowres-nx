@@ -37,7 +37,7 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
             {
                 if (value.v.stringValue)
                 {
-                    printf("%s", value.v.stringValue);
+                    printf("%s", value.v.stringValue->chars);
                 }
             }
             else if (value.type == ValueFloat)
