@@ -28,17 +28,15 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
     ++interpreter->pc;
     do
     {
-        struct TypedValue value = LRC_evaluateExpression(core);
+        struct TypedValue value = LRC_evaluateExpression(core, TypeClassAny);
         if (value.type == ValueError) return value.v.errorCode;
         
         if (interpreter->pass == PassRun)
         {
             if (value.type == ValueString)
             {
-                if (value.v.stringValue)
-                {
-                    printf("%s", value.v.stringValue->chars);
-                }
+                printf("%s", value.v.stringValue->chars);
+                rcstring_release(value.v.stringValue);
             }
             else if (value.type == ValueFloat)
             {

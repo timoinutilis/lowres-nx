@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct RCString *rcstring_new(const char *chars, int len)
+struct RCString *rcstring_new(const char *chars, size_t len)
 {
     size_t size = sizeof(struct RCString) + len;
     struct RCString *string = malloc(size);
@@ -41,13 +41,13 @@ struct RCString *rcstring_new(const char *chars, int len)
 void rcstring_retain(struct RCString *string)
 {
     string->refCount++;
-    printf("retain string %lx refc: %d\n", (unsigned long)string, string->refCount);
+//    printf("retain string %lx refc: %d\n", (unsigned long)string, string->refCount);
 }
 
 void rcstring_release(struct RCString *string)
 {
     string->refCount--;
-    printf("release string %lx refc: %d\n", (unsigned long)string, string->refCount);
+//    printf("release string %lx refc: %d\n", (unsigned long)string, string->refCount);
     if (string->refCount == 0)
     {
         printf("--- free\n");

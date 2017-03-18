@@ -411,12 +411,35 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
      */
 }
 
-struct TypedValue LRC_evaluateExpression(struct LowResCore *core)
+enum ErrorCode LRC_checkTypeClass(struct Interpreter *interpreter, enum ValueType valueType, enum TypeClass typeClass)
 {
-    return LRC_evaluateExpressionLevel(core, 0);
+    if (interpreter->pass == PassPrepare && valueType != ValueError)
+    {
+        if (typeClass == TypeClassString && valueType != ValueString)
+        {
+            return ErrorExpectedStringExpression;
+        }
+        else if (typeClass == TypeClassNumeric && valueType != ValueFloat)
+        {
+            return ErrorExpectedNumericExpression;
+        }
+    }
+    return ErrorNone;
 }
 
-int LRC_isTokenLevel(enum TokenType token, int level)
+struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass typeClass)
+{
+    struct TypedValue value = LRC_evaluateExpressionLevel(core, 0);
+    enum ErrorCode errorCode = LRC_checkTypeClass(&core->interpreter, value.type, typeClass);
+    if (errorCode != ErrorNone)
+    {
+        value.type = ValueError;
+        value.v.errorCode = errorCode;
+    }
+    return value;
+}
+
+bool LRC_isTokenLevel(enum TokenType token, int level)
 {
     switch (level)
     {
@@ -439,7 +462,7 @@ int LRC_isTokenLevel(enum TokenType token, int level)
         case 8:
             return token == TokenPow;
     }
-    return 0;
+    return false;
 }
 
 struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level)
@@ -452,15 +475,30 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
         ++interpreter->pc;
         struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
         if (value.type == ValueError) return value;
-        value.v.floatValue = ~((int)value.v.floatValue);
+        enum ErrorCode errorCode = LRC_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        if (errorCode != ErrorNone)
+        {
+            value.type = ValueError;
+            value.v.errorCode = errorCode;
+        }
+        else
+        {
+            value.v.floatValue = ~((int)value.v.floatValue);
+        }
         return value;
     }
-    if (level == 7 && (type == TokenPlus || type == TokenMinus))
+    if (level == 7 && (type == TokenPlus || type == TokenMinus)) // unary
     {
         ++interpreter->pc;
         struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
         if (value.type == ValueError) return value;
-        if (type == TokenMinus)
+        enum ErrorCode errorCode = LRC_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        if (errorCode != ErrorNone)
+        {
+            value.type = ValueError;
+            value.v.errorCode = errorCode;
+        }
+        else if (type == TokenMinus)
         {
             value.v.floatValue = -value.v.floatValue;
         }
@@ -488,79 +526,169 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
             newValue.v.errorCode = ErrorTypeMismatch;
             return newValue;
         }
-        newValue.type = value.type;
         
-        switch (type)
+        if (value.type == ValueFloat)
         {
-            case TokenXOR: {
-                int leftInt = value.v.floatValue;
-                int rightInt = rightValue.v.floatValue;
-                newValue.v.floatValue = (leftInt ^ rightInt);
-                break;
+            newValue.type = ValueFloat;
+            switch (type)
+            {
+                case TokenXOR: {
+                    int leftInt = value.v.floatValue;
+                    int rightInt = rightValue.v.floatValue;
+                    newValue.v.floatValue = (leftInt ^ rightInt);
+                    break;
+                }
+                case TokenOR: {
+                    int leftInt = value.v.floatValue;
+                    int rightInt = rightValue.v.floatValue;
+                    newValue.v.floatValue = (leftInt | rightInt);
+                    break;
+                }
+                case TokenAND: {
+                    int leftInt = value.v.floatValue;
+                    int rightInt = rightValue.v.floatValue;
+                    newValue.v.floatValue = (leftInt & rightInt);
+                    break;
+                }
+                case TokenEq: {
+                    newValue.v.floatValue = (value.v.floatValue == rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    break;
+                }
+                case TokenUneq: {
+                    newValue.v.floatValue = (value.v.floatValue != rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    break;
+                }
+                case TokenGr: {
+                    newValue.v.floatValue = (value.v.floatValue > rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    break;
+                }
+                case TokenLe: {
+                    newValue.v.floatValue = (value.v.floatValue < rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    break;
+                }
+                case TokenGrEq: {
+                    newValue.v.floatValue = (value.v.floatValue >= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    break;
+                }
+                case TokenLeEq: {
+                    newValue.v.floatValue = (value.v.floatValue <= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    break;
+                }
+                case TokenPlus: {
+                    newValue.v.floatValue = value.v.floatValue + rightValue.v.floatValue;
+                    break;
+                }
+                case TokenMinus: {
+                    newValue.v.floatValue = value.v.floatValue - rightValue.v.floatValue;
+                    break;
+                }
+                case TokenMOD: {
+                    newValue.v.floatValue = (int)value.v.floatValue % (int)rightValue.v.floatValue;
+                    break;
+                }
+                case TokenMul: {
+                    newValue.v.floatValue = value.v.floatValue * rightValue.v.floatValue;
+                    break;
+                }
+                case TokenDiv: {
+                    newValue.v.floatValue = value.v.floatValue / rightValue.v.floatValue;
+                    break;
+                }
+                case TokenPow: {
+                    newValue.v.floatValue = powf(value.v.floatValue, rightValue.v.floatValue);
+                    break;
+                }
+                default: {
+                    newValue.type = ValueError;
+                    newValue.v.errorCode = ErrorSyntax;
+                }
             }
-            case TokenOR: {
-                int leftInt = value.v.floatValue;
-                int rightInt = rightValue.v.floatValue;
-                newValue.v.floatValue = (leftInt | rightInt);
-                break;
+        }
+        else if (value.type == ValueString)
+        {
+            switch (type)
+            {
+                case TokenEq: {
+                    newValue.type = ValueFloat;
+                    if (interpreter->pass == PassRun)
+                    {
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) == 0) ? -1.0f : 0.0f;
+                    }
+                    break;
+                }
+                case TokenUneq: {
+                    newValue.type = ValueFloat;
+                    if (interpreter->pass == PassRun)
+                    {
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) != 0) ? -1.0f : 0.0f;
+                    }
+                    break;
+                }
+                case TokenGr: {
+                    newValue.type = ValueFloat;
+                    if (interpreter->pass == PassRun)
+                    {
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) > 0) ? -1.0f : 0.0f;
+                    }
+                    break;
+                }
+                case TokenLe: {
+                    newValue.type = ValueFloat;
+                    if (interpreter->pass == PassRun)
+                    {
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) < 0) ? -1.0f : 0.0f;
+                    }
+                    break;
+                }
+                case TokenGrEq: {
+                    newValue.type = ValueFloat;
+                    if (interpreter->pass == PassRun)
+                    {
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) >= 0) ? -1.0f : 0.0f;
+                    }
+                    break;
+                }
+                case TokenLeEq: {
+                    newValue.type = ValueFloat;
+                    if (interpreter->pass == PassRun)
+                    {
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) <= 0) ? -1.0f : 0.0f;
+                    }
+                    break;
+                }
+                case TokenPlus: {
+                    newValue.type = ValueString;
+                    if (interpreter->pass == PassRun)
+                    {
+                        size_t len1 = strlen(value.v.stringValue->chars);
+                        size_t len2 = strlen(rightValue.v.stringValue->chars);
+                        newValue.v.stringValue = rcstring_new(NULL, len1 + len2);
+                        strcpy(newValue.v.stringValue->chars, value.v.stringValue->chars);
+                        strcpy(&newValue.v.stringValue->chars[len1], rightValue.v.stringValue->chars);
+                    }
+                    break;
+                }
+                case TokenXOR:
+                case TokenOR:
+                case TokenAND:
+                case TokenMinus:
+                case TokenMOD:
+                case TokenMul:
+                case TokenDiv:
+                case TokenPow: {
+                    newValue.type = ValueError;
+                    newValue.v.errorCode = ErrorTypeMismatch;
+                    break;
+                }
+                default: {
+                    newValue.type = ValueError;
+                    newValue.v.errorCode = ErrorSyntax;
+                }
             }
-            case TokenAND: {
-                int leftInt = value.v.floatValue;
-                int rightInt = rightValue.v.floatValue;
-                newValue.v.floatValue = (leftInt & rightInt);
-                break;
-            }
-            case TokenEq: {
-                newValue.v.floatValue = (value.v.floatValue == rightValue.v.floatValue) ? -1.0f : 0.0f;
-                break;
-            }
-            case TokenUneq: {
-                newValue.v.floatValue = (value.v.floatValue != rightValue.v.floatValue) ? -1.0f : 0.0f;
-                break;
-            }
-            case TokenGr: {
-                newValue.v.floatValue = (value.v.floatValue > rightValue.v.floatValue) ? -1.0f : 0.0f;
-                break;
-            }
-            case TokenLe: {
-                newValue.v.floatValue = (value.v.floatValue < rightValue.v.floatValue) ? -1.0f : 0.0f;
-                break;
-            }
-            case TokenGrEq: {
-                newValue.v.floatValue = (value.v.floatValue >= rightValue.v.floatValue) ? -1.0f : 0.0f;
-                break;
-            }
-            case TokenLeEq: {
-                newValue.v.floatValue = (value.v.floatValue <= rightValue.v.floatValue) ? -1.0f : 0.0f;
-                break;
-            }
-            case TokenPlus: {
-                newValue.v.floatValue = value.v.floatValue + rightValue.v.floatValue;
-                break;
-            }
-            case TokenMinus: {
-                newValue.v.floatValue = value.v.floatValue - rightValue.v.floatValue;
-                break;
-            }
-            case TokenMOD: {
-                newValue.v.floatValue = (int)value.v.floatValue % (int)rightValue.v.floatValue;
-                break;
-            }
-            case TokenMul: {
-                newValue.v.floatValue = value.v.floatValue * rightValue.v.floatValue;
-                break;
-            }
-            case TokenDiv: {
-                newValue.v.floatValue = value.v.floatValue / rightValue.v.floatValue;
-                break;
-            }
-            case TokenPow: {
-                newValue.v.floatValue = powf(value.v.floatValue, rightValue.v.floatValue);
-                break;
-            }
-            default: {
-                newValue.type = ValueError;
-                newValue.v.errorCode = ErrorSyntax;
+            if (interpreter->pass == PassRun)
+            {
+                rcstring_release(value.v.stringValue);
+                rcstring_release(rightValue.v.stringValue);
             }
         }
         
@@ -585,6 +713,10 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
         case TokenString: {
             value.type = ValueString;
             value.v.stringValue = interpreter->pc->stringValue;
+            if (interpreter->pass == PassRun)
+            {
+                rcstring_retain(interpreter->pc->stringValue);
+            }
             ++interpreter->pc;
             break;
         }
@@ -597,6 +729,10 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
             {
                 value.type = valueType;
                 value.v = *varValue;
+                if (interpreter->pass == PassRun && valueType == ValueString)
+                {
+                    rcstring_retain(varValue->stringValue);
+                }
             }
             else
             {
@@ -607,7 +743,7 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
         }
         case TokenBracketOpen: {
             ++interpreter->pc;
-            value = LRC_evaluateExpression(core);
+            value = LRC_evaluateExpression(core, TypeClassAny);
             if (interpreter->pc->type != TokenBracketClose)
             {
                 value.type = ValueError;

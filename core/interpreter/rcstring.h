@@ -27,7 +27,7 @@ struct RCString {
     char chars[1]; // ...
 };
 
-struct RCString *rcstring_new(const char *chars, int len);
+struct RCString *rcstring_new(const char *chars, size_t len);
 void rcstring_retain(struct RCString *string);
 void rcstring_release(struct RCString *string);
 

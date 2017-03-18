@@ -35,7 +35,7 @@ enum ErrorCode cmd_LET(struct LowResCore *core)
     if (!varValue) return errorCode;
     if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
     ++interpreter->pc;
-    struct TypedValue value = LRC_evaluateExpression(core);
+    struct TypedValue value = LRC_evaluateExpression(core, TypeClassAny);
     if (value.type == ValueError) return value.v.errorCode;
     if (value.type != valueType) return ErrorTypeMismatch;
     
@@ -46,10 +46,6 @@ enum ErrorCode cmd_LET(struct LowResCore *core)
             rcstring_release(varValue->stringValue);
         }
         *varValue = value.v;
-        if (value.type == ValueString)
-        {
-            rcstring_retain(value.v.stringValue);
-        }
     }
     
     return LRC_endOfCommand(interpreter);

@@ -44,5 +44,7 @@ const char *ErrorStrings[] = {
     "Label Already Defined",
     "Too Many Labels",
     "ErrorExpectedLabel",
-    "Undefined Label"
+    "Undefined Label",
+    "Expected Numeric Expression",
+    "Expected String Expression"
 };

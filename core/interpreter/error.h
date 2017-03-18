@@ -47,7 +47,9 @@ enum ErrorCode {
     ErrorLabelAlreadyDefined,
     ErrorTooManyLabels,
     ErrorExpectedLabel,
-    ErrorUndefinedLabel
+    ErrorUndefinedLabel,
+    ErrorExpectedNumericExpression,
+    ErrorExpectedStringExpression
 };
 
 extern const char *ErrorStrings[];

@@ -64,6 +64,12 @@ struct TypedValue {
     union Value v;
 };
 
+enum TypeClass {
+    TypeClassAny,
+    TypeClassNumeric,
+    TypeClassString
+};
+
 struct Symbol {
     char name[SYMBOL_NAME_SIZE];
 };
@@ -97,7 +103,7 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core);
 void LRC_freeProgram(struct LowResCore *core);
 
 union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode);
-struct TypedValue LRC_evaluateExpression(struct LowResCore *core);
+struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass typeClass);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
 void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);

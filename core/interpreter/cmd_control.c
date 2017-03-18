@@ -42,7 +42,7 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
     ++interpreter->pc;
     
     // Expression
-    struct TypedValue value = LRC_evaluateExpression(core);
+    struct TypedValue value = LRC_evaluateExpression(core, TypeClassNumeric);
     if (value.type == ValueError) return value.v.errorCode;
     if (value.type != ValueFloat) return ErrorTypeMismatch;
     
@@ -196,7 +196,7 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
     ++interpreter->pc;
     
     // start value
-    struct TypedValue startValue = LRC_evaluateExpression(core);
+    struct TypedValue startValue = LRC_evaluateExpression(core, TypeClassNumeric);
     if (startValue.type == ValueError) return startValue.v.errorCode;
     
     // TO
@@ -205,7 +205,7 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
 
     // limit value
     struct Token *tokenFORLimit = interpreter->pc;
-    struct TypedValue limitValue = LRC_evaluateExpression(core);
+    struct TypedValue limitValue = LRC_evaluateExpression(core, TypeClassNumeric);
     if (limitValue.type == ValueError) return limitValue.v.errorCode;
     
     // STEP
@@ -215,7 +215,7 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
         ++interpreter->pc;
         
         // step value
-        stepValue = LRC_evaluateExpression(core);
+        stepValue = LRC_evaluateExpression(core, TypeClassNumeric);
         if (stepValue.type == ValueError) return stepValue.v.errorCode;
     }
     else
@@ -299,7 +299,7 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
         interpreter->pc = tokenNEXT->jumpToken;
         
         // limit value
-        struct TypedValue limitValue = LRC_evaluateExpression(core);
+        struct TypedValue limitValue = LRC_evaluateExpression(core, TypeClassNumeric);
         if (limitValue.type == ValueError) return limitValue.v.errorCode;
         
         // STEP
@@ -309,7 +309,7 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
             ++interpreter->pc;
             
             // step value
-            stepValue = LRC_evaluateExpression(core);
+            stepValue = LRC_evaluateExpression(core, TypeClassNumeric);
             if (stepValue.type == ValueError) return stepValue.v.errorCode;
         }
         else
