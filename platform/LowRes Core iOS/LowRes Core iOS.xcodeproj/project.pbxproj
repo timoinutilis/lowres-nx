@@ -24,6 +24,7 @@
 		927838DB1DF5F50300035E0D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 927838D91DF5F50300035E0D /* LaunchScreen.storyboard */; };
 		929D20661E2B9961001FF319 /* interpreter.c in Sources */ = {isa = PBXBuildFile; fileRef = 929D20641E2B9961001FF319 /* interpreter.c */; };
 		92D4FD541E34F1CB0068321E /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D4FD521E34F1CB0068321E /* machine.c */; };
+		92D6CA701E7EFF5A006F21C5 /* cmd_strings.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D6CA6E1E7EFF5A006F21C5 /* cmd_strings.c */; };
 		92E9EACC1E7C5714009DA598 /* rcstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 92E9EACA1E7C5714009DA598 /* rcstring.c */; };
 		92F00CB91E226F110027C9F6 /* character_rom.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CB51E226F110027C9F6 /* character_rom.c */; };
 		92F00CBA1E226F110027C9F6 /* video_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CB71E226F110027C9F6 /* video_interface.c */; };
@@ -65,6 +66,8 @@
 		929D20651E2B9961001FF319 /* interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interpreter.h; sourceTree = "<group>"; };
 		92D4FD521E34F1CB0068321E /* machine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = machine.c; sourceTree = "<group>"; };
 		92D4FD531E34F1CB0068321E /* machine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machine.h; sourceTree = "<group>"; };
+		92D6CA6E1E7EFF5A006F21C5 /* cmd_strings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_strings.c; sourceTree = "<group>"; };
+		92D6CA6F1E7EFF5A006F21C5 /* cmd_strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_strings.h; sourceTree = "<group>"; };
 		92E9EACA1E7C5714009DA598 /* rcstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rcstring.c; sourceTree = "<group>"; };
 		92E9EACB1E7C5714009DA598 /* rcstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rcstring.h; sourceTree = "<group>"; };
 		92F00CB41E226F110027C9F6 /* audio_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_interface.h; sourceTree = "<group>"; };
@@ -163,6 +166,8 @@
 				9219E1F51E6E0C5600C13BB3 /* cmd_control.c */,
 				9219E1F91E6E10F900C13BB3 /* cmd_variables.h */,
 				9219E1F81E6E10F900C13BB3 /* cmd_variables.c */,
+				92D6CA6F1E7EFF5A006F21C5 /* cmd_strings.h */,
+				92D6CA6E1E7EFF5A006F21C5 /* cmd_strings.c */,
 				9219E1F31E6E0BF600C13BB3 /* cmd_text.h */,
 				9219E1F21E6E0BF600C13BB3 /* cmd_text.c */,
 			);
@@ -279,6 +284,7 @@
 				927838D01DF5F50300035E0D /* AppDelegate.m in Sources */,
 				92F00CBC1E226F510027C9F6 /* audio_interface.c in Sources */,
 				924DA5021E1095DC001B65EB /* lowres_core.c in Sources */,
+				92D6CA701E7EFF5A006F21C5 /* cmd_strings.c in Sources */,
 				9219E1E81E6E038000C13BB3 /* token.c in Sources */,
 				924DA4FF1E100F8A001B65EB /* RendererViewController.m in Sources */,
 				927838CD1DF5F50300035E0D /* main.m in Sources */,

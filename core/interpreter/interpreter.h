@@ -120,6 +120,7 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
 struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int symbolIndex);
 struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes);
 struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass typeClass);
+struct TypedValue LRC_makeError(enum ErrorCode errorCode);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
 void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);

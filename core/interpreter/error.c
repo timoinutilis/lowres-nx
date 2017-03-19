@@ -51,6 +51,7 @@ const char *ErrorStrings[] = {
     "Array Not Dimensionized",
     "Array Already Dimensionized",
     "Index Out Of Bounds",
-    "Wrong Number Of Dimensions"
+    "Wrong Number Of Dimensions",
+    "Invalid Parameter"
 
 };

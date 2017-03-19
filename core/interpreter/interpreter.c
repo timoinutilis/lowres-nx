@@ -25,11 +25,13 @@
 #include "lowres_core.h"
 #include "cmd_control.h"
 #include "cmd_variables.h"
+#include "cmd_strings.h"
 #include "cmd_text.h"
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
 struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level);
 struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core);
+struct TypedValue LRC_evaluateFunction(struct LowResCore *core);
 enum ErrorCode LRC_evaluateCommand(struct LowResCore *core);
 
 enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode)
@@ -116,13 +118,15 @@ void LRC_freeProgram(struct LowResCore *core)
         struct Token *token = &interpreter->tokens[i];
         if (token->type == TokenString)
         {
-            assert(token->stringValue && token->stringValue->refCount == 1);
             rcstring_release(token->stringValue);
         }
     }
     
     // Free null string
-    rcstring_release(interpreter->nullString);
+    if (interpreter->nullString)
+    {
+        rcstring_release(interpreter->nullString);
+    }
     
     assert(rcstring_count == 0);
 }
@@ -844,7 +848,12 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
 struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    struct TypedValue value;
+    
+    // check for function
+    struct TypedValue value = LRC_evaluateFunction(core);
+    if (value.type != ValueNull) return value;
+    
+    // native types
     switch (interpreter->pc->type)
     {
         case TokenFloat: {
@@ -903,6 +912,61 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
             value.v.errorCode = ErrorSyntax;
         }
     }
+    return value;
+}
+
+struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    switch (interpreter->pc->type)
+    {
+        case TokenSTR:
+            return fnc_STR(core);
+            
+        case TokenASC:
+            return fnc_ASC(core);
+            
+        case TokenCHR:
+            return fnc_CHR(core);
+            
+        case TokenLEN:
+            return fnc_LEN(core);
+            
+        case TokenABS:
+        case TokenATN:
+        case TokenCOS:
+        case TokenEXP:
+        case TokenHEX:
+        case TokenINSTR:
+        case TokenINT:
+        case TokenLEFT:
+        case TokenLOG:
+        case TokenMAX:
+        case TokenMID:
+        case TokenMIN:
+        case TokenRIGHT:
+        case TokenRND:
+        case TokenSGN:
+        case TokenSIN:
+        case TokenSQR:
+        case TokenTAN:
+        case TokenVAL:
+            printf("Function not implemented: %s\n", TokenStrings[interpreter->pc->type]);
+            return LRC_makeError(ErrorUnexpectedToken);
+
+        default:
+            break;
+    }
+    struct TypedValue value;
+    value.type = ValueNull;
+    return value;
+}
+
+struct TypedValue LRC_makeError(enum ErrorCode errorCode)
+{
+    struct TypedValue value;
+    value.type = ValueError;
+    value.v.errorCode = errorCode;
     return value;
 }
 
