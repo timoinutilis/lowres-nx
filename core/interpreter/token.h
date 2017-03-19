@@ -112,7 +112,7 @@ struct Token {
     union {
         float floatValue;
         struct RCString *stringValue;
-        uint16_t symbolIndex;
+        int symbolIndex;
         struct Token *jumpToken;
     };
 };

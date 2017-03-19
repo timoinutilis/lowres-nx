@@ -32,7 +32,10 @@
 #define MAX_LABEL_STACK_ITEMS 128
 #define MAX_JUMP_LABEL_ITEMS 128
 #define MAX_SIMPLE_VARIABLES 128
+#define MAX_ARRAY_VARIABLES 128
 #define SYMBOL_NAME_SIZE 11
+#define MAX_ARRAY_DIMENSIONS 8
+#define MAX_ARRAY_SIZE 32768
 
 struct LowResCore;
 
@@ -55,7 +58,7 @@ struct LabelStackItem {
 };
 
 struct JumpLabelItem {
-    uint16_t symbolIndex;
+    int symbolIndex;
     struct Token *token;
 };
 
@@ -75,9 +78,17 @@ struct Symbol {
 };
 
 struct SimpleVariable {
-    uint16_t symbolIndex;
+    int symbolIndex;
     enum ValueType type;
     union Value v;
+};
+
+struct ArrayVariable {
+    int symbolIndex;
+    enum ValueType type;
+    int numDimensions;
+    int dimensionSizes[MAX_ARRAY_DIMENSIONS];
+    union Value *values;
 };
 
 struct Interpreter {
@@ -94,6 +105,9 @@ struct Interpreter {
     struct Token *pc;
     struct SimpleVariable simpleVariables[MAX_SIMPLE_VARIABLES];
     int numSimpleVariables;
+    struct ArrayVariable arrayVariables[MAX_ARRAY_VARIABLES];
+    int numArrayVariables;
+    struct RCString *nullString;
     
     struct TextLib textLib;
 };
@@ -103,6 +117,8 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core);
 void LRC_freeProgram(struct LowResCore *core);
 
 union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode);
+struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int symbolIndex);
+struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes);
 struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass typeClass);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);

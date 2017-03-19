@@ -31,6 +31,7 @@ const char *ErrorStrings[] = {
     "Expected THEN",
     "Expected Equal Sign '='",
     "Expected Variable Identifier",
+    "Expected Left Parenthesis '('",
     "Expected Right Parenthesis ')'",
     "Symbol Name Too Long",
     "Too Many Symbols",
@@ -46,5 +47,10 @@ const char *ErrorStrings[] = {
     "ErrorExpectedLabel",
     "Undefined Label",
     "Expected Numeric Expression",
-    "Expected String Expression"
+    "Expected String Expression",
+    "Array Not Dimensionized",
+    "Array Already Dimensionized",
+    "Index Out Of Bounds",
+    "Wrong Number Of Dimensions"
+
 };

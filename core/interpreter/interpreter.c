@@ -53,6 +53,9 @@ enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCod
     if (errorCode != ErrorNone && errorCode != ErrorEndOfProgram) return errorCode;
     assert(interpreter->numLabelStackItems == 0);
     
+    // global null string
+    interpreter->nullString = rcstring_new(NULL, 0);
+    
     return ErrorNone;
 }
 
@@ -75,13 +78,35 @@ void LRC_freeProgram(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    // Free variables
+    // Free simple variables
     for (int i = 0; i < interpreter->numSimpleVariables; i++)
     {
         struct SimpleVariable *variable = &interpreter->simpleVariables[i];
         if (variable->type == ValueString)
         {
             rcstring_release(variable->v.stringValue);
+        }
+    }
+    
+    // Free array variables
+    for (int i = 0; i < interpreter->numArrayVariables; i++)
+    {
+        struct ArrayVariable *variable = &interpreter->arrayVariables[i];
+        if (variable->type == ValueString)
+        {
+            int numElements = 1;
+            for (int di = 0; di < variable->numDimensions; di++)
+            {
+                numElements *= variable->dimensionSizes[di];
+            }
+            for (int ei = 0; ei < numElements; ei++)
+            {
+                union Value *value = &variable->values[ei];
+                if (value->stringValue)
+                {
+                    rcstring_release(value->stringValue);
+                }
+            }
         }
     }
     
@@ -95,6 +120,11 @@ void LRC_freeProgram(struct LowResCore *core)
             rcstring_release(token->stringValue);
         }
     }
+    
+    // Free null string
+    rcstring_release(interpreter->nullString);
+    
+    assert(rcstring_count == 0);
 }
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode)
@@ -344,71 +374,184 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
         return NULL;
     }
     
+    enum ValueType varType = ValueNull;
+    if (tokenIdentifier->type == TokenIdentifier)
+    {
+        varType = ValueFloat;
+    }
+    else if (tokenIdentifier->type == TokenStringIdentifier)
+    {
+        varType = ValueString;
+    }
     if (type)
     {
-        if (tokenIdentifier->type == TokenIdentifier)
-        {
-            *type = ValueFloat;
-        }
-        else if (tokenIdentifier->type == TokenStringIdentifier)
-        {
-            *type = ValueString;
-        }
+        *type = varType;
     }
     
     int symbolIndex = tokenIdentifier->symbolIndex;
     ++interpreter->pc;
     
-    if (interpreter->pass == PassRun)
+    if (interpreter->pc->type == TokenBracketOpen)
     {
-        struct SimpleVariable *variable = NULL;
-        for (int i = 0; i < interpreter->numSimpleVariables; i++)
+        // array
+        ++interpreter->pc;
+        
+        struct ArrayVariable *variable = NULL;
+        if (interpreter->pass == PassRun)
         {
-            variable = &interpreter->simpleVariables[i];
-            if (variable->symbolIndex == symbolIndex)
+            variable = LRC_getArrayVariable(interpreter, symbolIndex);
+            if (!variable)
             {
-                // variable found
-                return &variable->v;
+                *errorCode = ErrorArrayNotDimensionized;
+                return NULL;
             }
         }
         
-        // create new variable
-        if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
+        int indices[MAX_ARRAY_DIMENSIONS];
+        int numDimensions = 0;
+        
+        for (int i = 0; i < MAX_ARRAY_DIMENSIONS; i++)
         {
-            *errorCode = ErrorOutOfMemory;
-            return NULL;
+            struct TypedValue indexValue = LRC_evaluateExpression(core, TypeClassNumeric);
+            if (indexValue.type == ValueError)
+            {
+                *errorCode = indexValue.v.errorCode;
+                return NULL;
+            }
+            
+            numDimensions++;
+            
+            if (interpreter->pass == PassRun)
+            {
+                if (numDimensions <= variable->numDimensions && (indexValue.v.floatValue < 0 || indexValue.v.floatValue >= variable->dimensionSizes[i]))
+                {
+                    *errorCode = ErrorIndexOutOfBounds;
+                    return NULL;
+                }
+                
+                indices[i] = indexValue.v.floatValue;
+            }
+            
+            if (interpreter->pc->type == TokenComma)
+            {
+                interpreter->pc++;
+            }
+            else
+            {
+                break;
+            }
         }
-        variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
-        interpreter->numSimpleVariables++;
-        memset(variable, 0, sizeof(struct SimpleVariable));
-        variable->symbolIndex = symbolIndex;
-        variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueString : ValueFloat;
-        return &variable->v;
-    }
-    else
-    {
-        return &ValueDummy;
-    }
-    
-    /*
-    if (interpreter->pc->type == TokenBracketOpen)
-    {
-        ++interpreter->pc;
-        struct TypedValue indexValue = LRC_evaluateExpression(core);
-        if (indexValue.type == TypeError)
-        {
-            *errorCode = indexValue.v.errorCode;
-            return NULL;
-        }
-
+        
         if (interpreter->pc->type != TokenBracketClose)
         {
             *errorCode = ErrorExpectedRightParenthesis;
             return NULL;
         }
         ++interpreter->pc;
+        
+        if (interpreter->pass == PassRun)
+        {
+            if (numDimensions != variable->numDimensions)
+            {
+                *errorCode = ErrorWrongNumberOfDimensions;
+                return NULL;
+            }
+            
+            int offset = 0;
+            int factor = 1;
+            for (int i = variable->numDimensions - 1; i >= 0; i--)
+            {
+                offset += indices[i] * factor;
+                factor *= variable->dimensionSizes[i];
+            }
+            union Value *value = &variable->values[offset];
+            if (varType == ValueString && !value->stringValue)
+            {
+                // string variable was still uninitialized, assign global NullString
+                value->stringValue = interpreter->nullString;
+                rcstring_retain(value->stringValue);
+            }
+            return value;
+        }
     }
-     */
+    else
+    {
+        // simple variable
+        if (interpreter->pass == PassRun)
+        {
+            struct SimpleVariable *variable = NULL;
+            for (int i = 0; i < interpreter->numSimpleVariables; i++)
+            {
+                variable = &interpreter->simpleVariables[i];
+                if (variable->symbolIndex == symbolIndex)
+                {
+                    // variable found
+                    return &variable->v;
+                }
+            }
+            
+            // create new variable
+            if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
+            {
+                *errorCode = ErrorOutOfMemory;
+                return NULL;
+            }
+            variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
+            interpreter->numSimpleVariables++;
+            memset(variable, 0, sizeof(struct SimpleVariable));
+            variable->symbolIndex = symbolIndex;
+            variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueString : ValueFloat;
+            return &variable->v;
+        }
+    }
+    return &ValueDummy;
+}
+
+struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int symbolIndex)
+{
+    struct ArrayVariable *variable = NULL;
+    for (int i = 0; i < interpreter->numArrayVariables; i++)
+    {
+        variable = &interpreter->arrayVariables[i];
+        if (variable->symbolIndex == symbolIndex)
+        {
+            // variable found
+            return variable;
+        }
+    }
+    return NULL;
+}
+
+struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes)
+{
+    if (LRC_getArrayVariable(interpreter, symbolIndex))
+    {
+        *errorCode = ErrorArrayAlreadyDimensionized;
+        return NULL;
+    }
+    if (interpreter->numArrayVariables >= MAX_ARRAY_VARIABLES)
+    {
+        *errorCode = ErrorOutOfMemory;
+        return NULL;
+    }
+    struct ArrayVariable *variable = &interpreter->arrayVariables[interpreter->numArrayVariables];
+    interpreter->numArrayVariables++;
+    memset(variable, 0, sizeof(struct ArrayVariable));
+    variable->symbolIndex = symbolIndex;
+    variable->numDimensions = numDimensions;
+    size_t size = 1;
+    for (int i = 0; i < numDimensions; i++)
+    {
+        size *= dimensionSizes[i];
+        variable->dimensionSizes[i] = dimensionSizes[i];
+    }
+    if (size > MAX_ARRAY_SIZE)
+    {
+        *errorCode = ErrorOutOfMemory;
+        return NULL;
+    }
+    variable->values = calloc(size, sizeof(union Value));
+    return variable;
 }
 
 enum ErrorCode LRC_checkTypeClass(struct Interpreter *interpreter, enum ValueType valueType, enum TypeClass typeClass)
@@ -816,6 +959,9 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenIdentifier:
         case TokenStringIdentifier:
             return cmd_LET(core);
+            
+        case TokenDIM:
+            return cmd_DIM(core);
         
         case TokenPRINT:
             return cmd_PRINT(core);
@@ -836,7 +982,6 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
             return cmd_GOTO(core);
 
         case TokenDATA:
-        case TokenDIM:
         case TokenGOSUB:
         case TokenINPUT:
         case TokenON:

@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int rcstring_count = 0;
+
 struct RCString *rcstring_new(const char *chars, size_t len)
 {
     size_t size = sizeof(struct RCString) + len;
@@ -33,7 +35,8 @@ struct RCString *rcstring_new(const char *chars, size_t len)
             memcpy(string->chars, chars, len);
         }
         string->chars[len] = 0; // end of string
-        printf("new string %lx: %s\n", (unsigned long)string, string->chars);
+        rcstring_count++;
+//        printf("new string %lx: %s\n", (unsigned long)string, string->chars);
     }
     return string;
 }
@@ -50,7 +53,8 @@ void rcstring_release(struct RCString *string)
 //    printf("release string %lx refc: %d\n", (unsigned long)string, string->refCount);
     if (string->refCount == 0)
     {
-        printf("--- free\n");
+//        printf("--- free\n");
         free((void *)string);
+        rcstring_count--;
     }
 }

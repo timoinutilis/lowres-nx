@@ -34,6 +34,7 @@ enum ErrorCode {
     ErrorExpectedThen,
     ErrorExpectedEqualSign,
     ErrorExpectedVariableIdentifier,
+    ErrorExpectedLeftParenthesis,
     ErrorExpectedRightParenthesis,
     ErrorSymbolNameTooLong,
     ErrorTooManySymbols,
@@ -49,7 +50,11 @@ enum ErrorCode {
     ErrorExpectedLabel,
     ErrorUndefinedLabel,
     ErrorExpectedNumericExpression,
-    ErrorExpectedStringExpression
+    ErrorExpectedStringExpression,
+    ErrorArrayNotDimensionized,
+    ErrorArrayAlreadyDimensionized,
+    ErrorIndexOutOfBounds,
+    ErrorWrongNumberOfDimensions
 };
 
 extern const char *ErrorStrings[];

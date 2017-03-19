@@ -26,5 +26,6 @@
 struct LowResCore;
 
 enum ErrorCode cmd_LET(struct LowResCore *core);
+enum ErrorCode cmd_DIM(struct LowResCore *core);
 
 #endif /* cmd_variables_h */
