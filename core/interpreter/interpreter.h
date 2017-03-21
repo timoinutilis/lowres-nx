@@ -50,6 +50,7 @@ enum LabelType {
     LabelTypeFOR,
     LabelTypeFORVar,
     LabelTypeFORLimit,
+    LabelTypeGOSUB
 };
 
 struct LabelStackItem {
@@ -123,7 +124,7 @@ struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass
 struct TypedValue LRC_makeError(enum ErrorCode errorCode);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
-void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
+enum ErrorCode LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
 struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter);
 struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter);
 struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex);

@@ -55,7 +55,9 @@ enum ErrorCode {
     ErrorArrayAlreadyDimensionized,
     ErrorIndexOutOfBounds,
     ErrorWrongNumberOfDimensions,
-    ErrorInvalidParameter
+    ErrorInvalidParameter,
+    ErrorReturnWithoutGosub,
+    ErrorStackOverflow
 };
 
 extern const char *ErrorStrings[];

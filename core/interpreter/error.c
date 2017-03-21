@@ -52,6 +52,7 @@ const char *ErrorStrings[] = {
     "Array Already Dimensionized",
     "Index Out Of Bounds",
     "Wrong Number Of Dimensions",
-    "Invalid Parameter"
-
+    "Invalid Parameter",
+    "RETURN Without GOSUB",
+    "Stack Overflow"
 };

@@ -66,6 +66,11 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
     struct Interpreter *interpreter = &core->interpreter;
     interpreter->pc = interpreter->tokens;
     interpreter->pass = PassRun;
+    interpreter->numLabelStackItems = 0;
+    interpreter->isSingleLineIf = false;
+    interpreter->numSimpleVariables = 0;
+    interpreter->numArrayVariables = 0;
+    
     enum ErrorCode errorCode = ErrorNone;
     
     do
@@ -1045,8 +1050,13 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenGOTO:
             return cmd_GOTO(core);
 
-        case TokenDATA:
         case TokenGOSUB:
+            return cmd_GOSUB(core);
+            
+        case TokenRETURN:
+            return cmd_RETURN(core);
+            
+        case TokenDATA:
         case TokenINPUT:
         case TokenON:
         case TokenPEEK:
@@ -1055,7 +1065,6 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenREAD:
         case TokenREM:
         case TokenRESTORE:
-        case TokenRETURN:
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;
@@ -1063,13 +1072,14 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
     return ErrorNone;
 }
 
-void LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token)
+enum ErrorCode LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token)
 {
-    assert(interpreter->numLabelStackItems < MAX_LABEL_STACK_ITEMS);
+    if (interpreter->numLabelStackItems >= MAX_LABEL_STACK_ITEMS) return ErrorStackOverflow;
     struct LabelStackItem *item = &interpreter->labelStackItems[interpreter->numLabelStackItems];
     item->type = type;
     item->token = token;
     interpreter->numLabelStackItems++;
+    return ErrorNone;
 }
 
 struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter)
