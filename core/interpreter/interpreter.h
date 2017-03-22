@@ -109,6 +109,10 @@ struct Interpreter {
     struct ArrayVariable arrayVariables[MAX_ARRAY_VARIABLES];
     int numArrayVariables;
     struct RCString *nullString;
+    struct Token *firstData;
+    struct Token *lastData;
+    struct Token *currentDataToken;
+    struct Token *currentDataValueToken;
     
     struct TextLib textLib;
 };
@@ -129,5 +133,7 @@ struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter);
 struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter);
 struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex);
 enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token);
+void LRC_nextData(struct Interpreter *interpreter);
+void LRC_restoreData(struct Interpreter *interpreter, struct Token *jumpToken);
 
 #endif /* interpreter_h */

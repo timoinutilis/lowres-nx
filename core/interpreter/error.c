@@ -54,5 +54,6 @@ const char *ErrorStrings[] = {
     "Wrong Number Of Dimensions",
     "Invalid Parameter",
     "RETURN Without GOSUB",
-    "Stack Overflow"
+    "Stack Overflow",
+    "Out Of Data"
 };

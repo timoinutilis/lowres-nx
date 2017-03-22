@@ -25,6 +25,7 @@
 #include "lowres_core.h"
 #include "cmd_control.h"
 #include "cmd_variables.h"
+#include "cmd_data.h"
 #include "cmd_strings.h"
 #include "cmd_text.h"
 
@@ -70,6 +71,8 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
     interpreter->isSingleLineIf = false;
     interpreter->numSimpleVariables = 0;
     interpreter->numArrayVariables = 0;
+    interpreter->currentDataToken = interpreter->firstData;
+    interpreter->currentDataValueToken = interpreter->firstData + 1;
     
     enum ErrorCode errorCode = ErrorNone;
     
@@ -509,7 +512,13 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
             interpreter->numSimpleVariables++;
             memset(variable, 0, sizeof(struct SimpleVariable));
             variable->symbolIndex = symbolIndex;
-            variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueString : ValueFloat;
+            variable->type = varType;
+            if (varType == ValueString)
+            {
+                // assign global NullString
+                variable->v.stringValue = interpreter->nullString;
+                rcstring_retain(variable->v.stringValue);
+            }
             return &variable->v;
         }
     }
@@ -1057,14 +1066,20 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
             return cmd_RETURN(core);
             
         case TokenDATA:
+            return cmd_DATA(core);
+
+        case TokenREAD:
+            return cmd_READ(core);
+
+        case TokenRESTORE:
+            return cmd_RESTORE(core);
+
         case TokenINPUT:
         case TokenON:
         case TokenPEEK:
         case TokenPOKE:
         case TokenRANDOMIZE:
-        case TokenREAD:
         case TokenREM:
-        case TokenRESTORE:
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;
@@ -1130,4 +1145,53 @@ enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex
     item->token = token;
     interpreter->numJumpLabelItems++;
     return ErrorNone;
+}
+
+void LRC_nextData(struct Interpreter *interpreter)
+{
+    interpreter->currentDataValueToken++;
+    if (interpreter->currentDataValueToken->type == TokenComma)
+    {
+        // value follows
+        interpreter->currentDataValueToken++;
+    }
+    else
+    {
+        // next DATA line
+        interpreter->currentDataToken = interpreter->currentDataToken->jumpToken;
+        if (interpreter->currentDataToken)
+        {
+            interpreter->currentDataValueToken = interpreter->currentDataToken + 1; // after DATA
+        }
+        else
+        {
+            interpreter->currentDataValueToken = NULL;
+        }
+    }
+}
+
+void LRC_restoreData(struct Interpreter *interpreter, struct Token *jumpToken)
+{
+    if (jumpToken)
+    {
+        struct Token *dataToken = interpreter->firstData;
+        while (dataToken && dataToken < jumpToken)
+        {
+            dataToken = dataToken->jumpToken;
+        }
+        interpreter->currentDataToken = dataToken;
+    }
+    else
+    {
+        interpreter->currentDataToken = interpreter->firstData;
+    }
+    
+    if (interpreter->currentDataToken)
+    {
+        interpreter->currentDataValueToken = interpreter->currentDataToken + 1; // after DATA
+    }
+    else
+    {
+        interpreter->currentDataValueToken = NULL;
+    }
 }

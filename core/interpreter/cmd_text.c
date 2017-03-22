@@ -25,7 +25,10 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
     struct Interpreter *interpreter = &core->interpreter;
     
     int newLine = 0;
+    
+    // PRINT
     ++interpreter->pc;
+    
     do
     {
         struct TypedValue value = LRC_evaluateExpression(core, TypeClassAny);
