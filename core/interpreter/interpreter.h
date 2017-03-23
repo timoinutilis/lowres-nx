@@ -22,20 +22,14 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "config.h"
 #include "token.h"
 #include "error.h"
 #include "value.h"
+#include "labels.h"
+#include "variables.h"
+#include "data.h"
 #include "text_lib.h"
-
-#define MAX_TOKENS 1024
-#define MAX_SYMBOLS 128
-#define MAX_LABEL_STACK_ITEMS 128
-#define MAX_JUMP_LABEL_ITEMS 128
-#define MAX_SIMPLE_VARIABLES 128
-#define MAX_ARRAY_VARIABLES 128
-#define SYMBOL_NAME_SIZE 11
-#define MAX_ARRAY_DIMENSIONS 8
-#define MAX_ARRAY_SIZE 32768
 
 struct LowResCore;
 
@@ -44,71 +38,31 @@ enum Pass {
     PassRun
 };
 
-enum LabelType {
-    LabelTypeIF,
-    LabelTypeELSE,
-    LabelTypeFOR,
-    LabelTypeFORVar,
-    LabelTypeFORLimit,
-    LabelTypeGOSUB
-};
-
-struct LabelStackItem {
-    enum LabelType type;
-    struct Token *token;
-};
-
-struct JumpLabelItem {
-    int symbolIndex;
-    struct Token *token;
-};
-
-struct TypedValue {
-    enum ValueType type;
-    union Value v;
-};
-
-enum TypeClass {
-    TypeClassAny,
-    TypeClassNumeric,
-    TypeClassString
-};
-
 struct Symbol {
     char name[SYMBOL_NAME_SIZE];
 };
 
-struct SimpleVariable {
-    int symbolIndex;
-    enum ValueType type;
-    union Value v;
-};
-
-struct ArrayVariable {
-    int symbolIndex;
-    enum ValueType type;
-    int numDimensions;
-    int dimensionSizes[MAX_ARRAY_DIMENSIONS];
-    union Value *values;
-};
-
 struct Interpreter {
     enum Pass pass;
+    struct Token *pc;
+    
     struct Token tokens[MAX_TOKENS];
     int numTokens;
     struct Symbol symbols[MAX_SYMBOLS];
     int numSymbols;
+    
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
     int numLabelStackItems;
-    bool isSingleLineIf;
     struct JumpLabelItem jumpLabelItems[MAX_JUMP_LABEL_ITEMS];
     int numJumpLabelItems;
-    struct Token *pc;
+    bool isSingleLineIf;
+    
     struct SimpleVariable simpleVariables[MAX_SIMPLE_VARIABLES];
     int numSimpleVariables;
     struct ArrayVariable arrayVariables[MAX_ARRAY_VARIABLES];
     int numArrayVariables;
     struct RCString *nullString;
+    
     struct Token *firstData;
     struct Token *lastData;
     struct Token *currentDataToken;
@@ -122,18 +76,9 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core);
 void LRC_freeProgram(struct LowResCore *core);
 
 union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode);
-struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int symbolIndex);
-struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes);
 struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass typeClass);
-struct TypedValue LRC_makeError(enum ErrorCode errorCode);
 int LRC_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
-enum ErrorCode LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
-struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter);
-struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter);
-struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex);
-enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token);
-void LRC_nextData(struct Interpreter *interpreter);
-void LRC_restoreData(struct Interpreter *interpreter, struct Token *jumpToken);
+struct TypedValue LRC_makeError(enum ErrorCode errorCode);
 
 #endif /* interpreter_h */

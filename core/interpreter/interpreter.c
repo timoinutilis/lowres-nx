@@ -88,37 +88,8 @@ void LRC_freeProgram(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    // Free simple variables
-    for (int i = 0; i < interpreter->numSimpleVariables; i++)
-    {
-        struct SimpleVariable *variable = &interpreter->simpleVariables[i];
-        if (variable->type == ValueString)
-        {
-            rcstring_release(variable->v.stringValue);
-        }
-    }
-    
-    // Free array variables
-    for (int i = 0; i < interpreter->numArrayVariables; i++)
-    {
-        struct ArrayVariable *variable = &interpreter->arrayVariables[i];
-        if (variable->type == ValueString)
-        {
-            int numElements = 1;
-            for (int di = 0; di < variable->numDimensions; di++)
-            {
-                numElements *= variable->dimensionSizes[di];
-            }
-            for (int ei = 0; ei < numElements; ei++)
-            {
-                union Value *value = &variable->values[ei];
-                if (value->stringValue)
-                {
-                    rcstring_release(value->stringValue);
-                }
-            }
-        }
-    }
+    LRC_freeSimpleVariables(interpreter);
+    LRC_freeArrayVariables(interpreter);
     
     // Free string tokens
     for (int i = 0; i < interpreter->numTokens; i++)
@@ -157,6 +128,8 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
             return ErrorTooManyTokens;
         }
         struct Token *token = &interpreter->tokens[interpreter->numTokens];
+        token->sourcePosition = (int)(character - sourceCode);
+        interpreter->pc = token; // for error handling
         
         // line break
         if (*character == '\n')
@@ -377,7 +350,7 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
 union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode)
 {
     struct Interpreter *interpreter = &core->interpreter;
-
+    
     struct Token *tokenIdentifier = interpreter->pc;
     
     if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier)
@@ -468,22 +441,7 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
                 *errorCode = ErrorWrongNumberOfDimensions;
                 return NULL;
             }
-            
-            int offset = 0;
-            int factor = 1;
-            for (int i = variable->numDimensions - 1; i >= 0; i--)
-            {
-                offset += indices[i] * factor;
-                factor *= variable->dimensionSizes[i];
-            }
-            union Value *value = &variable->values[offset];
-            if (varType == ValueString && !value->stringValue)
-            {
-                // string variable was still uninitialized, assign global NullString
-                value->stringValue = interpreter->nullString;
-                rcstring_retain(value->stringValue);
-            }
-            return value;
+            return LRC_getArrayValue(interpreter, variable, indices);
         }
     }
     else
@@ -491,85 +449,12 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
         // simple variable
         if (interpreter->pass == PassRun)
         {
-            struct SimpleVariable *variable = NULL;
-            for (int i = 0; i < interpreter->numSimpleVariables; i++)
-            {
-                variable = &interpreter->simpleVariables[i];
-                if (variable->symbolIndex == symbolIndex)
-                {
-                    // variable found
-                    return &variable->v;
-                }
-            }
-            
-            // create new variable
-            if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
-            {
-                *errorCode = ErrorOutOfMemory;
-                return NULL;
-            }
-            variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
-            interpreter->numSimpleVariables++;
-            memset(variable, 0, sizeof(struct SimpleVariable));
-            variable->symbolIndex = symbolIndex;
-            variable->type = varType;
-            if (varType == ValueString)
-            {
-                // assign global NullString
-                variable->v.stringValue = interpreter->nullString;
-                rcstring_retain(variable->v.stringValue);
-            }
+            struct SimpleVariable *variable = LRC_getSimpleVariable(interpreter, errorCode, symbolIndex, varType);
+            if (!variable) return NULL;
             return &variable->v;
         }
     }
     return &ValueDummy;
-}
-
-struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int symbolIndex)
-{
-    struct ArrayVariable *variable = NULL;
-    for (int i = 0; i < interpreter->numArrayVariables; i++)
-    {
-        variable = &interpreter->arrayVariables[i];
-        if (variable->symbolIndex == symbolIndex)
-        {
-            // variable found
-            return variable;
-        }
-    }
-    return NULL;
-}
-
-struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes)
-{
-    if (LRC_getArrayVariable(interpreter, symbolIndex))
-    {
-        *errorCode = ErrorArrayAlreadyDimensionized;
-        return NULL;
-    }
-    if (interpreter->numArrayVariables >= MAX_ARRAY_VARIABLES)
-    {
-        *errorCode = ErrorOutOfMemory;
-        return NULL;
-    }
-    struct ArrayVariable *variable = &interpreter->arrayVariables[interpreter->numArrayVariables];
-    interpreter->numArrayVariables++;
-    memset(variable, 0, sizeof(struct ArrayVariable));
-    variable->symbolIndex = symbolIndex;
-    variable->numDimensions = numDimensions;
-    size_t size = 1;
-    for (int i = 0; i < numDimensions; i++)
-    {
-        size *= dimensionSizes[i];
-        variable->dimensionSizes[i] = dimensionSizes[i];
-    }
-    if (size > MAX_ARRAY_SIZE)
-    {
-        *errorCode = ErrorOutOfMemory;
-        return NULL;
-    }
-    variable->values = calloc(size, sizeof(union Value));
-    return variable;
 }
 
 enum ErrorCode LRC_checkTypeClass(struct Interpreter *interpreter, enum ValueType valueType, enum TypeClass typeClass)
@@ -929,6 +814,37 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
     return value;
 }
 
+int LRC_isEndOfCommand(struct Interpreter *interpreter)
+{
+    enum TokenType type = interpreter->pc->type;
+    return (type == TokenEol || type == TokenELSE);
+}
+
+enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
+{
+    enum TokenType type = interpreter->pc->type;
+    if (type == TokenEol)
+    {
+        interpreter->isSingleLineIf = false;
+        ++interpreter->pc;
+        return ErrorNone;
+    }
+    return (type == TokenELSE) ? ErrorNone : ErrorUnexpectedToken;
+}
+
+struct TypedValue LRC_makeError(enum ErrorCode errorCode)
+{
+    struct TypedValue value;
+    value.type = ValueError;
+    value.v.errorCode = errorCode;
+    return value;
+}
+
+enum TokenType LRC_getNextTokenType(struct Interpreter *interpreter)
+{
+    return (interpreter->pc + 1)->type;
+}
+
 struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
@@ -967,44 +883,13 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
         case TokenVAL:
             printf("Function not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return LRC_makeError(ErrorUnexpectedToken);
-
+            
         default:
             break;
     }
     struct TypedValue value;
     value.type = ValueNull;
     return value;
-}
-
-struct TypedValue LRC_makeError(enum ErrorCode errorCode)
-{
-    struct TypedValue value;
-    value.type = ValueError;
-    value.v.errorCode = errorCode;
-    return value;
-}
-
-int LRC_isEndOfCommand(struct Interpreter *interpreter)
-{
-    enum TokenType type = interpreter->pc->type;
-    return (type == TokenEol || type == TokenELSE);
-}
-
-enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
-{
-    enum TokenType type = interpreter->pc->type;
-    if (type == TokenEol)
-    {
-        interpreter->isSingleLineIf = false;
-        ++interpreter->pc;
-        return ErrorNone;
-    }
-    return (type == TokenELSE) ? ErrorNone : ErrorUnexpectedToken;
-}
-
-enum TokenType LRC_getNextTokenType(struct Interpreter *interpreter)
-{
-    return (interpreter->pc + 1)->type;
 }
 
 enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
@@ -1085,113 +970,4 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
             return ErrorUnexpectedToken;
     }
     return ErrorNone;
-}
-
-enum ErrorCode LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token)
-{
-    if (interpreter->numLabelStackItems >= MAX_LABEL_STACK_ITEMS) return ErrorStackOverflow;
-    struct LabelStackItem *item = &interpreter->labelStackItems[interpreter->numLabelStackItems];
-    item->type = type;
-    item->token = token;
-    interpreter->numLabelStackItems++;
-    return ErrorNone;
-}
-
-struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter)
-{
-    if (interpreter->numLabelStackItems > 0)
-    {
-        interpreter->numLabelStackItems--;
-        return &interpreter->labelStackItems[interpreter->numLabelStackItems];
-    }
-    return NULL;
-}
-
-struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter)
-{
-    if (interpreter->numLabelStackItems > 0)
-    {
-        return &interpreter->labelStackItems[interpreter->numLabelStackItems - 1];
-    }
-    return NULL;
-}
-
-struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex)
-{
-    struct JumpLabelItem *item;
-    for (int i = 0; i < interpreter->numJumpLabelItems; i++)
-    {
-        item = &interpreter->jumpLabelItems[i];
-        if (item->symbolIndex == symbolIndex)
-        {
-            return item;
-        }
-    }
-    return NULL;
-}
-
-enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token)
-{
-    if (LRC_getJumpLabel(interpreter, symbolIndex) != NULL)
-    {
-        return ErrorLabelAlreadyDefined;
-    }
-    if (interpreter->numJumpLabelItems >= MAX_JUMP_LABEL_ITEMS)
-    {
-        return ErrorTooManyLabels;
-    }
-    struct JumpLabelItem *item = &interpreter->jumpLabelItems[interpreter->numJumpLabelItems];
-    item->symbolIndex = symbolIndex;
-    item->token = token;
-    interpreter->numJumpLabelItems++;
-    return ErrorNone;
-}
-
-void LRC_nextData(struct Interpreter *interpreter)
-{
-    interpreter->currentDataValueToken++;
-    if (interpreter->currentDataValueToken->type == TokenComma)
-    {
-        // value follows
-        interpreter->currentDataValueToken++;
-    }
-    else
-    {
-        // next DATA line
-        interpreter->currentDataToken = interpreter->currentDataToken->jumpToken;
-        if (interpreter->currentDataToken)
-        {
-            interpreter->currentDataValueToken = interpreter->currentDataToken + 1; // after DATA
-        }
-        else
-        {
-            interpreter->currentDataValueToken = NULL;
-        }
-    }
-}
-
-void LRC_restoreData(struct Interpreter *interpreter, struct Token *jumpToken)
-{
-    if (jumpToken)
-    {
-        struct Token *dataToken = interpreter->firstData;
-        while (dataToken && dataToken < jumpToken)
-        {
-            dataToken = dataToken->jumpToken;
-        }
-        interpreter->currentDataToken = dataToken;
-    }
-    else
-    {
-        interpreter->currentDataToken = interpreter->firstData;
-    }
-    
-    if (interpreter->currentDataToken)
-    {
-        interpreter->currentDataValueToken = interpreter->currentDataToken + 1; // after DATA
-    }
-    else
-    {
-        interpreter->currentDataValueToken = NULL;
-    }
 }

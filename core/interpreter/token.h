@@ -115,6 +115,7 @@ struct Token {
         int symbolIndex;
         struct Token *jumpToken;
     };
+    int sourcePosition;
 };
 
 extern const char *TokenStrings[];

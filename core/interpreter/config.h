@@ -17,37 +17,17 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef value_h
-#define value_h
+#ifndef config_h
+#define config_h
 
-#include <stdio.h>
-#include "error.h"
-#include "rcstring.h"
+#define MAX_TOKENS 1024
+#define MAX_SYMBOLS 128
+#define MAX_LABEL_STACK_ITEMS 128
+#define MAX_JUMP_LABEL_ITEMS 128
+#define MAX_SIMPLE_VARIABLES 128
+#define MAX_ARRAY_VARIABLES 128
+#define SYMBOL_NAME_SIZE 11
+#define MAX_ARRAY_DIMENSIONS 8
+#define MAX_ARRAY_SIZE 32768
 
-enum ValueType {
-    ValueNull,
-    ValueError,
-    ValueFloat,
-    ValueString
-};
-
-union Value {
-    float floatValue;
-    struct RCString *stringValue;
-    enum ErrorCode errorCode;
-};
-
-struct TypedValue {
-    enum ValueType type;
-    union Value v;
-};
-
-enum TypeClass {
-    TypeClassAny,
-    TypeClassNumeric,
-    TypeClassString
-};
-
-extern union Value ValueDummy;
-
-#endif /* value_h */
+#endif /* config_h */

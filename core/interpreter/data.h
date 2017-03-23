@@ -17,37 +17,15 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef value_h
-#define value_h
+#ifndef data_h
+#define data_h
 
 #include <stdio.h>
-#include "error.h"
-#include "rcstring.h"
 
-enum ValueType {
-    ValueNull,
-    ValueError,
-    ValueFloat,
-    ValueString
-};
+struct Interpreter;
+struct Token;
 
-union Value {
-    float floatValue;
-    struct RCString *stringValue;
-    enum ErrorCode errorCode;
-};
+void LRC_nextData(struct Interpreter *interpreter);
+void LRC_restoreData(struct Interpreter *interpreter, struct Token *jumpToken);
 
-struct TypedValue {
-    enum ValueType type;
-    union Value v;
-};
-
-enum TypeClass {
-    TypeClassAny,
-    TypeClassNumeric,
-    TypeClassString
-};
-
-extern union Value ValueDummy;
-
-#endif /* value_h */
+#endif /* data_h */

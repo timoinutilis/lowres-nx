@@ -48,14 +48,14 @@
         enum ErrorCode errorCode = LRC_compileProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
         if (errorCode != ErrorNone)
         {
-            printf("Compiler error: %s\n", ErrorStrings[errorCode]);
+            printf("Compiler error at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[errorCode]);
         }
         else
         {
             printf("Compiler success\n");
             [self.rendererViewController setCore:_core];
             enum ErrorCode errorCode = LRC_runProgram(_core);
-            printf("Finished: %s\n", ErrorStrings[errorCode]);
+            printf("Finished at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[errorCode]);
         }
         LRC_freeProgram(_core);
     }
