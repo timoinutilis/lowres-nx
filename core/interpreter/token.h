@@ -52,6 +52,8 @@ enum TokenType {
     TokenPow,
     
     TokenAND,
+    TokenCLEAR,
+    TokenCOPY,
     TokenDATA,
     TokenDIM,
     TokenELSE,
@@ -71,6 +73,7 @@ enum TokenType {
     TokenPOKE,
     TokenPRINT,
     TokenRANDOMIZE,
+    TokenRDATA,
     TokenREAD,
     TokenREM,
     TokenRESTORE,

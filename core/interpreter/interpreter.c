@@ -115,11 +115,13 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
     const char *charSetDigits = "0123456789";
     const char *charSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
     const char *charSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
+    const char *charSetHex = "0123456789ABCDEF";
     
     struct Interpreter *interpreter = &core->interpreter;
     const char *character = sourceCode;
     
-//    uint8_t *currentRomByte = core->machine.cartridgeRom;
+    uint8_t *currentRomByte = core->machine.cartridgeRom;
+    uint8_t *endRomByte = &core->machine.cartridgeRom[0x8000];
     
     while (*character)
     {
@@ -205,6 +207,70 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
             token->type = TokenFloat;
             token->floatValue = number;
             interpreter->numTokens++;
+            continue;
+        }
+        
+        // rom data
+        if (*character == '#')
+        {
+            character++;
+            
+            // number
+            int number = 0;
+            while (*character)
+            {
+                if (strchr(charSetDigits, *character))
+                {
+                    int digit = (int)*character - (int)'0';
+                    number *= 10;
+                    number += digit;
+                    character++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (*character != ':') return ErrorUnexpectedCharacter;
+            
+            // skip until end of line
+            do
+            {
+                character++;
+            }
+            while (*character && *character != '\n');
+            
+            // binary data
+            bool shift = true;
+            int value = 0;
+            while (*character && *character != '#')
+            {
+                char *spos = strchr(charSetHex, *character);
+                if (spos)
+                {
+                    int digit = (int)(spos - charSetHex);
+                    if (shift)
+                    {
+                        value = digit << 4;
+                    }
+                    else
+                    {
+                        value |= digit;
+                        if (currentRomByte >= endRomByte) return ErrorRomIsFull;
+                        *currentRomByte = value;
+                        ++currentRomByte;
+                    }
+                    shift = !shift;
+                }
+                else if (*character != ' ' && *character == '\t' && *character == '\n')
+                {
+                    return ErrorUnexpectedCharacter;
+                }
+                character++;
+            }
+            if (!shift) return ErrorSyntax; // incomplete hex value
+            if (*character != '#') return ErrorUnexpectedCharacter;
+            character++;
             continue;
         }
         
@@ -963,8 +1029,11 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenON:
         case TokenPEEK:
         case TokenPOKE:
+        case TokenCLEAR:
+        case TokenCOPY:
         case TokenRANDOMIZE:
         case TokenREM:
+        case TokenRDATA:
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;

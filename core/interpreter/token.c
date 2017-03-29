@@ -48,6 +48,8 @@ const char *TokenStrings[] = {
     "^",
     
     "AND",
+    "CLEAR",
+    "COPY",
     "DATA",
     "DIM",
     "ELSE",
@@ -67,6 +69,7 @@ const char *TokenStrings[] = {
     "POKE",
     "PRINT",
     "RANDOMIZE",
+    "RDATA",
     "READ",
     "REM",
     "RESTORE",

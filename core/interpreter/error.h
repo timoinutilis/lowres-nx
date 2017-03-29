@@ -25,6 +25,7 @@
 enum ErrorCode {
     ErrorNone,
     ErrorTooManyTokens,
+    ErrorRomIsFull,
     ErrorExpectedEndOfString,
     ErrorUnexpectedCharacter,
     ErrorSyntax,

@@ -22,6 +22,7 @@
 const char *ErrorStrings[] = {
     "OK",
     "Too Many Tokens",
+    "ROM is full",
     "Expected End Of String",
     "Unexpected Character",
     "Syntax Error",
