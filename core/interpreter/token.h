@@ -52,12 +52,12 @@ enum TokenType {
     TokenPow,
     
     TokenAND,
-    TokenCLEAR,
     TokenCOPY,
     TokenDATA,
     TokenDIM,
     TokenELSE,
     TokenEND,
+    TokenFILL,
     TokenFOR,
     TokenGOSUB,
     TokenGOTO,

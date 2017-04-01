@@ -17,18 +17,15 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef config_h
-#define config_h
+#include "big_endian.h"
 
-#define MAX_TOKENS 1024
-#define MAX_SYMBOLS 128
-#define MAX_LABEL_STACK_ITEMS 128
-#define MAX_JUMP_LABEL_ITEMS 128
-#define MAX_SIMPLE_VARIABLES 128
-#define MAX_ARRAY_VARIABLES 128
-#define SYMBOL_NAME_SIZE 11
-#define MAX_ARRAY_DIMENSIONS 8
-#define MAX_ARRAY_SIZE 32768
-#define MAX_ROM_DATA_ENTRIES 16
+void BigEndianUInt16_set(BigEndianUInt16 *variable, int value)
+{
+    variable->hi = (value & 0xFF00) >> 8;
+    variable->lo = value & 0xFF;
+}
 
-#endif /* config_h */
+int BigEndianUInt16_get(BigEndianUInt16 *variable)
+{
+    return (variable->hi << 8) | variable->lo;
+}

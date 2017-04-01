@@ -26,6 +26,7 @@ enum ErrorCode {
     ErrorNone,
     ErrorTooManyTokens,
     ErrorRomIsFull,
+    ErrorIndexAlreadyDefined,
     ErrorExpectedEndOfString,
     ErrorUnexpectedCharacter,
     ErrorSyntax,
@@ -37,6 +38,7 @@ enum ErrorCode {
     ErrorExpectedVariableIdentifier,
     ErrorExpectedLeftParenthesis,
     ErrorExpectedRightParenthesis,
+    ErrorExpectedComma,
     ErrorSymbolNameTooLong,
     ErrorTooManySymbols,
     ErrorTypeMismatch,
@@ -59,7 +61,8 @@ enum ErrorCode {
     ErrorInvalidParameter,
     ErrorReturnWithoutGosub,
     ErrorStackOverflow,
-    ErrorOutOfData
+    ErrorOutOfData,
+    ErrorIllegalMemoryAccess
 };
 
 extern const char *ErrorStrings[];

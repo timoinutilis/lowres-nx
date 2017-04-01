@@ -17,18 +17,17 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef config_h
-#define config_h
+#ifndef big_endian_h
+#define big_endian_h
 
-#define MAX_TOKENS 1024
-#define MAX_SYMBOLS 128
-#define MAX_LABEL_STACK_ITEMS 128
-#define MAX_JUMP_LABEL_ITEMS 128
-#define MAX_SIMPLE_VARIABLES 128
-#define MAX_ARRAY_VARIABLES 128
-#define SYMBOL_NAME_SIZE 11
-#define MAX_ARRAY_DIMENSIONS 8
-#define MAX_ARRAY_SIZE 32768
-#define MAX_ROM_DATA_ENTRIES 16
+#include <stdio.h>
 
-#endif /* config_h */
+typedef struct {
+    uint8_t hi;
+    uint8_t lo;
+} BigEndianUInt16;
+
+void BigEndianUInt16_set(BigEndianUInt16 *variable, int value);
+int BigEndianUInt16_get(BigEndianUInt16 *variable);
+
+#endif /* big_endian_h */

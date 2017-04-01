@@ -29,6 +29,7 @@
 #include "labels.h"
 #include "variables.h"
 #include "data.h"
+#include "big_endian.h"
 #include "text_lib.h"
 
 struct LowResCore;
@@ -40,6 +41,11 @@ enum Pass {
 
 struct Symbol {
     char name[SYMBOL_NAME_SIZE];
+};
+
+struct RomDataEntry {
+    BigEndianUInt16 start;
+    BigEndianUInt16 length;
 };
 
 struct Interpreter {

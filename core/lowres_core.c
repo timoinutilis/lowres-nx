@@ -118,9 +118,9 @@ void LRC_init(struct LowResCore *core)
     textLib->charAttr.palette = 7;
     textLib->characterOffset = 128;
     
-    memcpy(&core->machine.videoRam.characterBank, DemoCharacters, sizeof(DemoCharacters));
-    memcpy(core->machine.videoRam.planeB.cells, DemoBackground, sizeof(DemoBackground));
-    memcpy(core->machine.videoRam.planeA.cells, DemoMap, sizeof(DemoMap));
+//    memcpy(&core->machine.videoRam.characterBank, DemoCharacters, sizeof(DemoCharacters));
+//    memcpy(core->machine.videoRam.planeB.cells, DemoBackground, sizeof(DemoBackground));
+//    memcpy(core->machine.videoRam.planeA.cells, DemoMap, sizeof(DemoMap));
     
     LRC_writeText(core, "SCORE", 0, 0);
     

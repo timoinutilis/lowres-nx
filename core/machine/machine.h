@@ -21,6 +21,7 @@
 #define machine_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "io_interface.h"
 #include "video_interface.h"
 #include "audio_interface.h"
@@ -66,5 +67,7 @@ struct Machine {
 };
 
 void LRC_initMachine(struct Machine *machine);
+int LRC_peek(struct Machine *machine, int address);
+bool LRC_poke(struct Machine *machine, int address, int value);
 
 #endif /* machine_h */

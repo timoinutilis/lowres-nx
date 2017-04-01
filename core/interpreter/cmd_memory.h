@@ -17,18 +17,17 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef config_h
-#define config_h
+#ifndef cmd_memory_h
+#define cmd_memory_h
 
-#define MAX_TOKENS 1024
-#define MAX_SYMBOLS 128
-#define MAX_LABEL_STACK_ITEMS 128
-#define MAX_JUMP_LABEL_ITEMS 128
-#define MAX_SIMPLE_VARIABLES 128
-#define MAX_ARRAY_VARIABLES 128
-#define SYMBOL_NAME_SIZE 11
-#define MAX_ARRAY_DIMENSIONS 8
-#define MAX_ARRAY_SIZE 32768
-#define MAX_ROM_DATA_ENTRIES 16
+#include <stdio.h>
+#include "error.h"
 
-#endif /* config_h */
+struct LowResCore;
+
+struct TypedValue fnc_PEEK(struct LowResCore *core);
+enum ErrorCode cmd_POKE(struct LowResCore *core);
+enum ErrorCode cmd_FILL(struct LowResCore *core);
+enum ErrorCode cmd_COPY(struct LowResCore *core);
+
+#endif /* cmd_memory_h */

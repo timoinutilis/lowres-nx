@@ -23,6 +23,7 @@ const char *ErrorStrings[] = {
     "OK",
     "Too Many Tokens",
     "ROM is full",
+    "Index Already Defined",
     "Expected End Of String",
     "Unexpected Character",
     "Syntax Error",
@@ -34,6 +35,7 @@ const char *ErrorStrings[] = {
     "Expected Variable Identifier",
     "Expected Left Parenthesis '('",
     "Expected Right Parenthesis ')'",
+    "Expected Comma ','",
     "Symbol Name Too Long",
     "Too Many Symbols",
     "Type Mismatch",
@@ -56,5 +58,6 @@ const char *ErrorStrings[] = {
     "Invalid Parameter",
     "RETURN Without GOSUB",
     "Stack Overflow",
-    "Out Of Data"
+    "Out Of Data",
+    "Illegal Memory Access"
 };

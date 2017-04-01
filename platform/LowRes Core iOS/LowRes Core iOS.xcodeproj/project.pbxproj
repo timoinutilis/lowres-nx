@@ -16,6 +16,7 @@
 		9219E1FA1E6E10F900C13BB3 /* cmd_variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 9219E1F81E6E10F900C13BB3 /* cmd_variables.c */; };
 		924DA4FF1E100F8A001B65EB /* RendererViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 924DA4FE1E100F8A001B65EB /* RendererViewController.m */; };
 		924DA5021E1095DC001B65EB /* lowres_core.c in Sources */ = {isa = PBXBuildFile; fileRef = 924DA5001E1095DC001B65EB /* lowres_core.c */; };
+		9272ADA41E8EE59300C4A7B6 /* cmd_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */; };
 		927838CD1DF5F50300035E0D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 927838CC1DF5F50300035E0D /* main.m */; };
 		927838D01DF5F50300035E0D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 927838CF1DF5F50300035E0D /* AppDelegate.m */; };
 		927838D31DF5F50300035E0D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927838D21DF5F50300035E0D /* ViewController.m */; };
@@ -34,6 +35,7 @@
 		92F00CBA1E226F110027C9F6 /* video_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CB71E226F110027C9F6 /* video_interface.c */; };
 		92F00CBC1E226F510027C9F6 /* audio_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CBB1E226F510027C9F6 /* audio_interface.c */; };
 		92F00CBF1E226FF40027C9F6 /* text_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CBD1E226FF40027C9F6 /* text_lib.c */; };
+		92F6A92D1E9003CD00A3F652 /* big_endian.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F6A92B1E9003CD00A3F652 /* big_endian.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +58,8 @@
 		924DA4FE1E100F8A001B65EB /* RendererViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RendererViewController.m; sourceTree = "<group>"; };
 		924DA5001E1095DC001B65EB /* lowres_core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lowres_core.c; sourceTree = "<group>"; };
 		924DA5011E1095DC001B65EB /* lowres_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lowres_core.h; sourceTree = "<group>"; };
+		9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_memory.c; sourceTree = "<group>"; };
+		9272ADA31E8EE59300C4A7B6 /* cmd_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_memory.h; sourceTree = "<group>"; };
 		927838C81DF5F50300035E0D /* LowRes Core.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes Core.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		927838CC1DF5F50300035E0D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		927838CE1DF5F50300035E0D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -91,6 +95,8 @@
 		92F00CBB1E226F510027C9F6 /* audio_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = audio_interface.c; sourceTree = "<group>"; };
 		92F00CBD1E226FF40027C9F6 /* text_lib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = text_lib.c; sourceTree = "<group>"; };
 		92F00CBE1E226FF40027C9F6 /* text_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = text_lib.h; sourceTree = "<group>"; };
+		92F6A92B1E9003CD00A3F652 /* big_endian.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = big_endian.c; sourceTree = "<group>"; };
+		92F6A92C1E9003CD00A3F652 /* big_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = big_endian.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +188,8 @@
 				92ECD9EE1E84636A00FABD33 /* data.c */,
 				92E9EACB1E7C5714009DA598 /* rcstring.h */,
 				92E9EACA1E7C5714009DA598 /* rcstring.c */,
+				92F6A92C1E9003CD00A3F652 /* big_endian.h */,
+				92F6A92B1E9003CD00A3F652 /* big_endian.c */,
 				9219E1F61E6E0C5600C13BB3 /* cmd_control.h */,
 				9219E1F51E6E0C5600C13BB3 /* cmd_control.c */,
 				9219E1F91E6E10F900C13BB3 /* cmd_variables.h */,
@@ -190,6 +198,8 @@
 				92DC7B6C1E81B88700BC9CBB /* cmd_data.c */,
 				92D6CA6F1E7EFF5A006F21C5 /* cmd_strings.h */,
 				92D6CA6E1E7EFF5A006F21C5 /* cmd_strings.c */,
+				9272ADA31E8EE59300C4A7B6 /* cmd_memory.h */,
+				9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */,
 				9219E1F31E6E0BF600C13BB3 /* cmd_text.h */,
 				9219E1F21E6E0BF600C13BB3 /* cmd_text.c */,
 			);
@@ -294,6 +304,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				929D20661E2B9961001FF319 /* interpreter.c in Sources */,
+				9272ADA41E8EE59300C4A7B6 /* cmd_memory.c in Sources */,
 				92F00CB91E226F110027C9F6 /* character_rom.c in Sources */,
 				9219E1F71E6E0C5600C13BB3 /* cmd_control.c in Sources */,
 				92F00CBA1E226F110027C9F6 /* video_interface.c in Sources */,
@@ -306,6 +317,7 @@
 				92DC7B6E1E81B88700BC9CBB /* cmd_data.c in Sources */,
 				92F00CBF1E226FF40027C9F6 /* text_lib.c in Sources */,
 				927838D31DF5F50300035E0D /* ViewController.m in Sources */,
+				92F6A92D1E9003CD00A3F652 /* big_endian.c in Sources */,
 				927838D01DF5F50300035E0D /* AppDelegate.m in Sources */,
 				92F00CBC1E226F510027C9F6 /* audio_interface.c in Sources */,
 				924DA5021E1095DC001B65EB /* lowres_core.c in Sources */,

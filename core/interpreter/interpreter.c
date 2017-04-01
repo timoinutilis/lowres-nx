@@ -27,6 +27,7 @@
 #include "cmd_variables.h"
 #include "cmd_data.h"
 #include "cmd_strings.h"
+#include "cmd_memory.h"
 #include "cmd_text.h"
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
@@ -120,10 +121,9 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
     struct Interpreter *interpreter = &core->interpreter;
     const char *character = sourceCode;
     
-    uint8_t *currentRomByte = core->machine.cartridgeRom;
-    uint8_t *endRomByte = &core->machine.cartridgeRom[0x8000];
+    // PROGRAM
     
-    while (*character)
+    while (*character && *character != '#')
     {
         if (interpreter->numTokens >= MAX_TOKENS)
         {
@@ -210,19 +210,18 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
             continue;
         }
         
-        // rom data
-        if (*character == '#')
+        // hex number
+        if (*character == '$')
         {
             character++;
-            
-            // number
             int number = 0;
             while (*character)
             {
-                if (strchr(charSetDigits, *character))
+                char *spos = strchr(charSetHex, *character);
+                if (spos)
                 {
-                    int digit = (int)*character - (int)'0';
-                    number *= 10;
+                    int digit = (int)(spos - charSetHex);
+                    number <<= 4;
                     number += digit;
                     character++;
                 }
@@ -231,46 +230,9 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
                     break;
                 }
             }
-            if (*character != ':') return ErrorUnexpectedCharacter;
-            
-            // skip until end of line
-            do
-            {
-                character++;
-            }
-            while (*character && *character != '\n');
-            
-            // binary data
-            bool shift = true;
-            int value = 0;
-            while (*character && *character != '#')
-            {
-                char *spos = strchr(charSetHex, *character);
-                if (spos)
-                {
-                    int digit = (int)(spos - charSetHex);
-                    if (shift)
-                    {
-                        value = digit << 4;
-                    }
-                    else
-                    {
-                        value |= digit;
-                        if (currentRomByte >= endRomByte) return ErrorRomIsFull;
-                        *currentRomByte = value;
-                        ++currentRomByte;
-                    }
-                    shift = !shift;
-                }
-                else if (*character != ' ' && *character == '\t' && *character == '\n')
-                {
-                    return ErrorUnexpectedCharacter;
-                }
-                character++;
-            }
-            if (!shift) return ErrorSyntax; // incomplete hex value
-            if (*character != '#') return ErrorUnexpectedCharacter;
-            character++;
+            token->type = TokenFloat;
+            token->floatValue = number;
+            interpreter->numTokens++;
             continue;
         }
         
@@ -410,6 +372,96 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
         // Unexpected character
         return ErrorUnexpectedCharacter;
     }
+    
+    // ROM DATA
+    
+    struct RomDataEntry *romDataEntries = (struct RomDataEntry *)core->machine.cartridgeRom;
+    
+    uint8_t *currentRomByte = (uint8_t *)&romDataEntries[MAX_ROM_DATA_ENTRIES]; // after entries
+    uint8_t *endRomByte = &core->machine.cartridgeRom[0x8000];
+    
+    while (*character)
+    {
+        if (*character == '#')
+        {
+            character++;
+            
+            // entry index
+            int entryIndex = 0;
+            while (*character)
+            {
+                if (strchr(charSetDigits, *character))
+                {
+                    int digit = (int)*character - (int)'0';
+                    entryIndex *= 10;
+                    entryIndex += digit;
+                    character++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (*character != ':') return ErrorUnexpectedCharacter;
+            
+            if (entryIndex >= MAX_ROM_DATA_ENTRIES) return ErrorIndexOutOfBounds;
+            if (BigEndianUInt16_get(&romDataEntries[entryIndex].length) > 0) return ErrorIndexAlreadyDefined;
+            
+            // skip until end of line
+            do
+            {
+                character++;
+            }
+            while (*character && *character != '\n');
+            
+            // binary data
+            uint8_t *startByte = currentRomByte;
+            bool shift = true;
+            int value = 0;
+            while (*character && *character != '#')
+            {
+                char *spos = strchr(charSetHex, *character);
+                if (spos)
+                {
+                    int digit = (int)(spos - charSetHex);
+                    if (shift)
+                    {
+                        value = digit << 4;
+                    }
+                    else
+                    {
+                        value |= digit;
+                        if (currentRomByte >= endRomByte) return ErrorRomIsFull;
+                        *currentRomByte = value;
+                        ++currentRomByte;
+                    }
+                    shift = !shift;
+                }
+                else if (*character != ' ' && *character == '\t' && *character == '\n')
+                {
+                    return ErrorUnexpectedCharacter;
+                }
+                character++;
+            }
+            if (!shift) return ErrorSyntax; // incomplete hex value
+            
+            int start = (int)(startByte - core->machine.cartridgeRom);
+            int length = (int)(currentRomByte - startByte);
+            struct RomDataEntry *entry = &romDataEntries[entryIndex];
+            BigEndianUInt16_set(&entry->start, start);
+            BigEndianUInt16_set(&entry->length, length);
+            printf("index %d: start=%d length=%d\n", entryIndex, start, length);
+        }
+        else if (*character == ' ' || *character == '\t' || *character == '\n')
+        {
+            character++;
+        }
+        else
+        {
+            return ErrorUnexpectedCharacter;
+        }
+    }
+    
     return ErrorNone;
 }
 
@@ -928,6 +980,9 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
         case TokenLEN:
             return fnc_LEN(core);
             
+        case TokenPEEK:
+            return fnc_PEEK(core);
+            
         case TokenABS:
         case TokenATN:
         case TokenCOS:
@@ -1025,12 +1080,17 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenRESTORE:
             return cmd_RESTORE(core);
 
+        case TokenPOKE:
+            return cmd_POKE(core);
+            
+        case TokenFILL:
+            return cmd_FILL(core);
+            
+        case TokenCOPY:
+            return cmd_COPY(core);
+            
         case TokenINPUT:
         case TokenON:
-        case TokenPEEK:
-        case TokenPOKE:
-        case TokenCLEAR:
-        case TokenCOPY:
         case TokenRANDOMIZE:
         case TokenREM:
         case TokenRDATA:

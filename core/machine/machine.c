@@ -20,6 +20,7 @@
 #include "machine.h"
 #include <assert.h>
 #include <string.h>
+#include <stdbool.h>
 #include "character_rom.h"
 
 void LRC_initMachine(struct Machine *machine)
@@ -28,4 +29,23 @@ void LRC_initMachine(struct Machine *machine)
     
     // Copy character ROM data to machine
     memcpy((struct CharacterBank *)&machine->characterRom, CharacterRom, sizeof(struct CharacterBank));
+}
+
+int LRC_peek(struct Machine *machine, int address)
+{
+    if (address < 0 || address > 0xFFFF)
+    {
+        return -1;
+    }
+    return *(uint8_t *)((uint8_t *)machine + address);
+}
+
+bool LRC_poke(struct Machine *machine, int address, int value)
+{
+    if (address < 0x8000 || address > 0xFFFF)
+    {
+        return false;
+    }
+    *(uint8_t *)((uint8_t *)machine + address) = value & 0xFF;
+    return true;
 }

@@ -48,12 +48,12 @@ const char *TokenStrings[] = {
     "^",
     
     "AND",
-    "CLEAR",
     "COPY",
     "DATA",
     "DIM",
     "ELSE",
     "END",
+    "FILL",
     "FOR",
     "GOSUB",
     "GOTO",
