@@ -22,6 +22,6 @@
 
 #include <stdio.h>
 
-extern uint16_t CharacterRom[][8];
+extern uint8_t CharacterRom[][16];
 
 #endif /* character_rom_h */

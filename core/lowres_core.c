@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "demo_data.h"
 #include "text_lib.h"
 
 int tick = 0;
@@ -117,10 +116,6 @@ void LRC_init(struct LowResCore *core)
     textLib->charAttr.priority = 1;
     textLib->charAttr.palette = 7;
     textLib->characterOffset = 128;
-    
-//    memcpy(&core->machine.videoRam.characterBank, DemoCharacters, sizeof(DemoCharacters));
-//    memcpy(core->machine.videoRam.planeB.cells, DemoBackground, sizeof(DemoBackground));
-//    memcpy(core->machine.videoRam.planeA.cells, DemoMap, sizeof(DemoMap));
     
     LRC_writeText(core, "SCORE", 0, 0);
     

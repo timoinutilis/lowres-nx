@@ -17,6 +17,6 @@ for row in range(16):
 			for charX in range(8):
 				pixel = im.getpixel((column*8+charX, y))[0] / 64
 				val |= (pixel << (7-charX)*2)
-			print val, ",",
+			print str((val >> 8) & 0xFF)+ ",", str(val & 0xFF)+ ",",
 		print "},"
 print "}"

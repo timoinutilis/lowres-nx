@@ -24,7 +24,14 @@
 
 int LRC_getCharacterPixel(struct Character *character, int x, int y)
 {
-    return (character->data[y] >> ((7 - x) << 1)) & 0x03;
+    if (x < 4)
+    {
+        return (character->data[y << 1] >> ((3 - x) << 1)) & 0x03;
+    }
+    else
+    {
+        return (character->data[(y << 1) + 1] >> ((7 - x) << 1)) & 0x03;
+    }
 }
 
 struct Character *LRC_getCharacter(struct VideoRam *ram, int bank, int characterIndex)

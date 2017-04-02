@@ -38,7 +38,7 @@ struct LowResCore;
 
 // 16 bytes
 struct Character {
-    uint16_t data[8];
+    uint8_t data[16];
 };
 
 // ================ Character Bank ================

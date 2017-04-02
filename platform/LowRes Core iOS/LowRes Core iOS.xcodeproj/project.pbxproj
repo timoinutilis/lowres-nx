@@ -40,7 +40,6 @@
 
 /* Begin PBXFileReference section */
 		9208F7541E2D5D8800C179D3 /* bas */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bas; sourceTree = "<group>"; };
-		920D88861E24332000B51F40 /* demo_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = demo_data.h; sourceTree = "<group>"; };
 		921393D51E296BD200940DBC /* io_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = io_interface.h; sourceTree = "<group>"; };
 		9219E1E61E6E038000C13BB3 /* token.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = token.c; sourceTree = "<group>"; };
 		9219E1E71E6E038000C13BB3 /* token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = token.h; sourceTree = "<group>"; };
@@ -162,7 +161,6 @@
 				92F00CB21E226F110027C9F6 /* libraries */,
 				924DA5011E1095DC001B65EB /* lowres_core.h */,
 				924DA5001E1095DC001B65EB /* lowres_core.c */,
-				920D88861E24332000B51F40 /* demo_data.h */,
 			);
 			name = core;
 			path = ../../core;
