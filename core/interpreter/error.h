@@ -24,13 +24,16 @@
 
 enum ErrorCode {
     ErrorNone,
+    ErrorNoneEndOfProgram,
+    ErrorNoneInterrupt,
+    ErrorNone_last,
+    
     ErrorTooManyTokens,
     ErrorRomIsFull,
     ErrorIndexAlreadyDefined,
     ErrorExpectedEndOfString,
     ErrorUnexpectedCharacter,
     ErrorSyntax,
-    ErrorEndOfProgram,
     ErrorUnexpectedToken,
     ErrorExpectedEndOfLine,
     ErrorExpectedThen,

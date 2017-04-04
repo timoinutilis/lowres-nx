@@ -73,6 +73,7 @@ enum TokenType {
     TokenPOKE,
     TokenPRINT,
     TokenRANDOMIZE,
+    TokenRASTER,
     TokenRDATA,
     TokenREAD,
     TokenREM,
@@ -81,6 +82,8 @@ enum TokenType {
     TokenSTEP,
     TokenTHEN,
     TokenTO,
+    TokenVBL,
+    TokenWAIT,
     TokenXOR,
     
     TokenABS,

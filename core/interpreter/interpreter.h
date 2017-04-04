@@ -74,10 +74,13 @@ struct Interpreter {
     struct Token *currentDataToken;
     struct Token *currentDataValueToken;
     
+    struct Token *currentOnRasterToken;
+    
     struct TextLib textLib;
 };
 
 enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode);
+void LRC_resetProgram(struct LowResCore *core);
 enum ErrorCode LRC_runProgram(struct LowResCore *core);
 void LRC_freeProgram(struct LowResCore *core);
 

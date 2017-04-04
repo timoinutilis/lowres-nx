@@ -21,13 +21,16 @@
 
 const char *ErrorStrings[] = {
     "OK",
+    "End Of Program",
+    "Interrupt",
+    NULL,
+    
     "Too Many Tokens",
     "ROM is full",
     "Index Already Defined",
     "Expected End Of String",
     "Unexpected Character",
     "Syntax Error",
-    "End Of Program",
     "Unexpected Token",
     "Expected End Of Line",
     "Expected THEN",

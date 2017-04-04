@@ -52,20 +52,24 @@ enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCod
     do
     {
         errorCode = LRC_evaluateCommand(core);
-    } while (errorCode == ErrorNone);
+    }
+    while (errorCode == ErrorNone);
     
-    if (errorCode != ErrorNone && errorCode != ErrorEndOfProgram) return errorCode;
+    if (errorCode > ErrorNone_last) return errorCode;
     assert(interpreter->numLabelStackItems == 0);
     
     // global null string
     interpreter->nullString = rcstring_new(NULL, 0);
     
+    LRC_resetProgram(core);
+    
     return ErrorNone;
 }
 
-enum ErrorCode LRC_runProgram(struct LowResCore *core)
+void LRC_resetProgram(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
+    
     interpreter->pc = interpreter->tokens;
     interpreter->pass = PassRun;
     interpreter->numLabelStackItems = 0;
@@ -74,13 +78,17 @@ enum ErrorCode LRC_runProgram(struct LowResCore *core)
     interpreter->numArrayVariables = 0;
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
-    
+}
+
+enum ErrorCode LRC_runProgram(struct LowResCore *core)
+{
     enum ErrorCode errorCode = ErrorNone;
     
     do
     {
         errorCode = LRC_evaluateCommand(core);
-    } while (errorCode == ErrorNone);
+    }
+    while (errorCode == ErrorNone);
     
     return errorCode;
 }
@@ -1019,7 +1027,7 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
     switch (interpreter->pc->type)
     {
         case TokenUndefined:
-            return ErrorEndOfProgram;
+            return ErrorNoneEndOfProgram;
             
         case TokenLabel:
             ++interpreter->pc;
@@ -1089,8 +1097,13 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenCOPY:
             return cmd_COPY(core);
             
-        case TokenINPUT:
+        case TokenWAIT:
+            return cmd_WAIT(core);
+            
         case TokenON:
+            return cmd_ON(core);
+            
+        case TokenINPUT:
         case TokenRANDOMIZE:
         case TokenREM:
         case TokenRDATA:

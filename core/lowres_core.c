@@ -117,8 +117,6 @@ void LRC_init(struct LowResCore *core)
     textLib->charAttr.palette = 7;
     textLib->characterOffset = 128;
     
-    LRC_writeText(core, "SCORE", 0, 0);
-    
     struct Sprite *sprite = &core->machine.spriteRegisters.sprites[0];
     sprite->character = 128;
     sprite->x = 64;
@@ -127,22 +125,31 @@ void LRC_init(struct LowResCore *core)
     sprite->attr1.priority = 0;
     sprite->attr2.width = 1;
     sprite->attr2.height = 1;
+    
+    normalPalette(core);
 }
 
 void LRC_update(struct LowResCore *core)
 {
-    core->machine.videoRegisters.scrollAX = tick * 2;
-    
-    struct Sprite *sprite = &core->machine.spriteRegisters.sprites[0];
-    sprite->character = 130 + ((tick/4)%3) * 2;
-    
+    LRC_writeText(core, "SCORE", 0, 0);
     LRC_writeNumber(core, tick/10, 5, 11, 0);
 
+    LRC_runProgram(core);
+    
     tick++;
 }
 
 void LRC_rasterUpdate(struct LowResCore *core)
 {
+    if (core->interpreter.currentOnRasterToken)
+    {
+        struct Token *pc = core->interpreter.pc;
+        core->interpreter.pc = core->interpreter.currentOnRasterToken;
+        LRC_runProgram(core);
+        core->interpreter.pc = pc;
+    }
+    
+    /*
     int y = core->machine.videoRegisters.rasterLine;
     int wy = 112+sin(tick*0.02)*16;
     if (y == 0)
@@ -198,4 +205,5 @@ void LRC_rasterUpdate(struct LowResCore *core)
         core->machine.videoRegisters.scrollAX += (tick/8 + y)%3;
         core->machine.videoRegisters.scrollBX += (tick/8 + y)%3;
     }
+    */
 }

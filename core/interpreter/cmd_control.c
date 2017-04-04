@@ -25,12 +25,16 @@ enum ErrorCode cmd_END(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
+    // END
     ++interpreter->pc;
+    
+    enum ErrorCode errorCode = LRC_endOfCommand(interpreter);
+    
     if (interpreter->pass == PassRun)
     {
-        return LRC_endOfCommand(interpreter) ?: ErrorEndOfProgram;
+        return ErrorNoneEndOfProgram;
     }
-    return LRC_endOfCommand(interpreter);
+    return errorCode;
 }
 
 enum ErrorCode cmd_IF(struct LowResCore *core)
@@ -400,13 +404,86 @@ enum ErrorCode cmd_RETURN(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
+    // RETURN
     ++interpreter->pc;
+    
     if (interpreter->pass == PassRun)
     {
         struct LabelStackItem *itemGOSUB = LRC_popLabelStackItem(interpreter);
-        if (!itemGOSUB || itemGOSUB->type != LabelTypeGOSUB) return ErrorReturnWithoutGosub;
+        if (!itemGOSUB) return ErrorReturnWithoutGosub;
         
-        interpreter->pc = itemGOSUB->token; // after GOSUB
+        if (itemGOSUB->type == LabelTypeONGOSUB)
+        {
+            // exit from interrupt
+            return ErrorNoneInterrupt;
+        }
+        else if (itemGOSUB->type == LabelTypeGOSUB)
+        {
+            // jump back
+            interpreter->pc = itemGOSUB->token; // after GOSUB
+        }
+        else
+        {
+            return ErrorReturnWithoutGosub;
+        }
+    }
+    
+    return LRC_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_WAIT(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // WAIT
+    ++interpreter->pc;
+    
+    // VBL
+    if (interpreter->pc->type != TokenVBL) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    enum ErrorCode errorCode = LRC_endOfCommand(interpreter);
+    
+    if (interpreter->pass == PassRun)
+    {
+        return ErrorNoneInterrupt;
+    }
+    return errorCode;
+}
+
+enum ErrorCode cmd_ON(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // ON
+    ++interpreter->pc;
+    
+    // RASTER
+    if (interpreter->pc->type != TokenRASTER) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    // GOSUB
+    if (interpreter->pc->type != TokenGOSUB) return ErrorUnexpectedToken;
+    struct Token *tokenGOSUB = interpreter->pc;
+    ++interpreter->pc;
+    
+    // Identifier
+    if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedLabel;
+    struct Token *tokenIdentifier = interpreter->pc;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        struct JumpLabelItem *item = LRC_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+        if (!item) return ErrorUndefinedLabel;
+        tokenGOSUB->jumpToken = item->token;
+    }
+    else if (interpreter->pass == PassRun)
+    {
+        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeONGOSUB, interpreter->pc);
+        if (errorCode != ErrorNone) return errorCode;
+        
+        interpreter->currentOnRasterToken = tokenGOSUB->jumpToken; // after label
     }
     
     return LRC_endOfCommand(interpreter);

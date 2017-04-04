@@ -31,7 +31,8 @@ enum LabelType {
     LabelTypeFOR,
     LabelTypeFORVar,
     LabelTypeFORLimit,
-    LabelTypeGOSUB
+    LabelTypeGOSUB,
+    LabelTypeONGOSUB
 };
 
 struct LabelStackItem {

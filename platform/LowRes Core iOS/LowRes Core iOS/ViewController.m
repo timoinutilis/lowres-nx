@@ -54,10 +54,7 @@
         {
             printf("Compiler success\n");
             [self.rendererViewController setCore:_core];
-            enum ErrorCode errorCode = LRC_runProgram(_core);
-            printf("Finished at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[errorCode]);
         }
-        LRC_freeProgram(_core);
     }
 }
 
@@ -66,6 +63,7 @@
     if (_core)
     {
         [self.rendererViewController setCore:NULL];
+        LRC_freeProgram(_core);
         free(_core);
     }
 }
