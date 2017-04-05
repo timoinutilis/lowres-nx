@@ -50,7 +50,7 @@ struct TypedValue fnc_STR(struct LowResCore *core)
         struct RCString *rcstring = rcstring_new(NULL, 20);
         if (!rcstring) return LRC_makeError(ErrorOutOfMemory);
         
-        sprintf(rcstring->chars, "%f", numericValue.v.floatValue);
+        snprintf(rcstring->chars, 20, "%d", (int)numericValue.v.floatValue);
         resultValue.v.stringValue = rcstring;
     }
     return resultValue;

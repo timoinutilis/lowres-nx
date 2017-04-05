@@ -17,16 +17,14 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef cmd_text_h
-#define cmd_text_h
+#ifndef cmd_maths_h
+#define cmd_maths_h
 
 #include <stdio.h>
-#include "error.h"
+#include "value.h"
 
 struct LowResCore;
 
-enum ErrorCode cmd_PRINT(struct LowResCore *core);
-enum ErrorCode cmd_TEXT(struct LowResCore *core);
-enum ErrorCode cmd_NUMBER(struct LowResCore *core);
+struct TypedValue fnc_math(struct LowResCore *core);
 
-#endif /* cmd_text_h */
+#endif /* cmd_maths_h */

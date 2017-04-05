@@ -21,6 +21,7 @@
 #define cmd_strings_h
 
 #include <stdio.h>
+#include "value.h"
 
 struct LowResCore;
 

@@ -29,6 +29,7 @@
 #include "cmd_strings.h"
 #include "cmd_memory.h"
 #include "cmd_text.h"
+#include "cmd_maths.h"
 
 enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
 struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level);
@@ -356,6 +357,7 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
                 // add new symbol
                 strcpy(interpreter->symbols[interpreter->numSymbols].name, symbolName);
                 symbolIndex = interpreter->numSymbols++;
+                printf("symbol %d: %s\n", symbolIndex, symbolName);
             }
             if (isString)
             {
@@ -991,13 +993,16 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
         case TokenPEEK:
             return fnc_PEEK(core);
             
+        case TokenSIN:
+        case TokenINT:
+            return fnc_math(core);
+        
         case TokenABS:
         case TokenATN:
         case TokenCOS:
         case TokenEXP:
         case TokenHEX:
         case TokenINSTR:
-        case TokenINT:
         case TokenLEFT:
         case TokenLOG:
         case TokenMAX:
@@ -1006,7 +1011,6 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
         case TokenRIGHT:
         case TokenRND:
         case TokenSGN:
-        case TokenSIN:
         case TokenSQR:
         case TokenTAN:
         case TokenVAL:
@@ -1102,7 +1106,13 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
             
         case TokenON:
             return cmd_ON(core);
-            
+        
+        case TokenTEXT:
+            return cmd_TEXT(core);
+
+        case TokenNUMBER:
+            return cmd_NUMBER(core);
+        
         case TokenINPUT:
         case TokenRANDOMIZE:
         case TokenREM:

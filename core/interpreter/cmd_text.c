@@ -18,18 +18,20 @@
 //
 
 #include "cmd_text.h"
+#include <stdbool.h>
 #include "lowres_core.h"
+#include "text_lib.h"
 
 enum ErrorCode cmd_PRINT(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    int newLine = 0;
+    bool newLine = true;
     
     // PRINT
     ++interpreter->pc;
     
-    do
+    while (!LRC_isEndOfCommand(interpreter))
     {
         struct TypedValue value = LRC_evaluateExpression(core, TypeClassAny);
         if (value.type == ValueError) return value.v.errorCode;
@@ -38,16 +40,14 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         {
             if (value.type == ValueString)
             {
-                printf("%s", value.v.stringValue->chars);
+                LRC_printText(core, value.v.stringValue->chars);
                 rcstring_release(value.v.stringValue);
             }
             else if (value.type == ValueFloat)
             {
-                printf("%f", value.v.floatValue);
-            }
-            else
-            {
-                printf("<unknown type>");
+                char buffer[20];
+                snprintf(buffer, 20, "%d", (int)value.v.floatValue);
+                LRC_printText(core, buffer);
             }
         }
         
@@ -55,23 +55,103 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         {
             if (interpreter->pass == PassRun)
             {
-                printf(" ");
+                LRC_printText(core, " ");
             }
             ++interpreter->pc;
+            newLine = false;
         }
         else if (interpreter->pc->type == TokenSemicolon)
         {
             ++interpreter->pc;
+            newLine = false;
         }
         else
         {
-            newLine = 1;
+            newLine = true;
         }
-    } while (!LRC_isEndOfCommand(interpreter));
+    }
     
     if (interpreter->pass == PassRun && newLine)
     {
-        printf("\n");
+        LRC_printText(core, "\n");
     }
+    return LRC_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_TEXT(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // TEXT
+    ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = LRC_evaluateExpression(core, TypeClassNumeric);
+    if (xValue.type == ValueError) return xValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+
+    // y value
+    struct TypedValue yValue = LRC_evaluateExpression(core, TypeClassNumeric);
+    if (yValue.type == ValueError) return yValue.v.errorCode;
+
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+
+    // string value
+    struct TypedValue stringValue = LRC_evaluateExpression(core, TypeClassString);
+    if (stringValue.type == ValueError) return stringValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        LRC_writeText(core, stringValue.v.stringValue->chars, xValue.v.floatValue, yValue.v.floatValue);
+    }
+    
+    return LRC_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_NUMBER(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // NUMBER
+    ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = LRC_evaluateExpression(core, TypeClassNumeric);
+    if (xValue.type == ValueError) return xValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // y value
+    struct TypedValue yValue = LRC_evaluateExpression(core, TypeClassNumeric);
+    if (yValue.type == ValueError) return yValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // number value
+    struct TypedValue numberValue = LRC_evaluateExpression(core, TypeClassNumeric);
+    if (numberValue.type == ValueError) return numberValue.v.errorCode;
+
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // digits value
+    struct TypedValue digitsValue = LRC_evaluateExpression(core, TypeClassNumeric);
+    if (digitsValue.type == ValueError) return digitsValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        LRC_writeNumber(core, numberValue.v.floatValue, digitsValue.v.floatValue, xValue.v.floatValue, yValue.v.floatValue);
+    }
+    
     return LRC_endOfCommand(interpreter);
 }

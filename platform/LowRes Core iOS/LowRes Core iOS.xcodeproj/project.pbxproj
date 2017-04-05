@@ -36,6 +36,7 @@
 		92F00CBC1E226F510027C9F6 /* audio_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CBB1E226F510027C9F6 /* audio_interface.c */; };
 		92F00CBF1E226FF40027C9F6 /* text_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F00CBD1E226FF40027C9F6 /* text_lib.c */; };
 		92F6A92D1E9003CD00A3F652 /* big_endian.c in Sources */ = {isa = PBXBuildFile; fileRef = 92F6A92B1E9003CD00A3F652 /* big_endian.c */; };
+		92FCE7301E9582D60099C80E /* cmd_maths.c in Sources */ = {isa = PBXBuildFile; fileRef = 92FCE72E1E9582D60099C80E /* cmd_maths.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +97,8 @@
 		92F00CBE1E226FF40027C9F6 /* text_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = text_lib.h; sourceTree = "<group>"; };
 		92F6A92B1E9003CD00A3F652 /* big_endian.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = big_endian.c; sourceTree = "<group>"; };
 		92F6A92C1E9003CD00A3F652 /* big_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = big_endian.h; sourceTree = "<group>"; };
+		92FCE72E1E9582D60099C80E /* cmd_maths.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_maths.c; sourceTree = "<group>"; };
+		92FCE72F1E9582D60099C80E /* cmd_maths.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_maths.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +203,8 @@
 				9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */,
 				9219E1F31E6E0BF600C13BB3 /* cmd_text.h */,
 				9219E1F21E6E0BF600C13BB3 /* cmd_text.c */,
+				92FCE72F1E9582D60099C80E /* cmd_maths.h */,
+				92FCE72E1E9582D60099C80E /* cmd_maths.c */,
 			);
 			path = interpreter;
 			sourceTree = "<group>";
@@ -303,6 +308,7 @@
 			files = (
 				929D20661E2B9961001FF319 /* interpreter.c in Sources */,
 				9272ADA41E8EE59300C4A7B6 /* cmd_memory.c in Sources */,
+				92FCE7301E9582D60099C80E /* cmd_maths.c in Sources */,
 				92F00CB91E226F110027C9F6 /* character_rom.c in Sources */,
 				9219E1F71E6E0C5600C13BB3 /* cmd_control.c in Sources */,
 				92F00CBA1E226F110027C9F6 /* video_interface.c in Sources */,
