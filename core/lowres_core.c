@@ -45,11 +45,5 @@ void LRC_update(struct LowResCore *core)
 
 void LRC_rasterUpdate(struct LowResCore *core)
 {
-    if (core->interpreter.currentOnRasterToken)
-    {
-        struct Token *pc = core->interpreter.pc;
-        core->interpreter.pc = core->interpreter.currentOnRasterToken;
-        LRC_runProgram(core);
-        core->interpreter.pc = pc;
-    }
+    LRC_runRasterProgram(core);
 }

@@ -46,10 +46,6 @@ enum ErrorCode cmd_DATA(struct LowResCore *core)
     }
     while (interpreter->pc->type == TokenComma);
     
-    if (interpreter->pass == PassRun)
-    {
-    }
-    
     // Eol
     if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
     ++interpreter->pc;

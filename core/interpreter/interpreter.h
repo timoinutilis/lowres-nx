@@ -39,6 +39,19 @@ enum Pass {
     PassRun
 };
 
+enum State {
+    StateEvaluate,
+    StateWait,
+    StateInput,
+    StateEnd
+};
+
+enum Mode {
+    ModeNone,
+    ModeMain,
+    ModeInterrupt
+};
+
 struct Symbol {
     char name[SYMBOL_NAME_SIZE];
 };
@@ -50,7 +63,10 @@ struct RomDataEntry {
 
 struct Interpreter {
     enum Pass pass;
+    enum State state;
+    enum Mode mode;
     struct Token *pc;
+    enum ErrorCode exitErrorCode;
     
     struct Token tokens[MAX_TOKENS];
     int numTokens;
@@ -76,12 +92,15 @@ struct Interpreter {
     
     struct Token *currentOnRasterToken;
     
+    int waitCount;
+    
     struct TextLib textLib;
 };
 
 enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode);
 void LRC_resetProgram(struct LowResCore *core);
-enum ErrorCode LRC_runProgram(struct LowResCore *core);
+void LRC_runProgram(struct LowResCore *core);
+void LRC_runRasterProgram(struct LowResCore *core);
 void LRC_freeProgram(struct LowResCore *core);
 
 union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode);

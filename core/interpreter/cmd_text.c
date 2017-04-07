@@ -26,6 +26,11 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
+    
     bool newLine = true;
     
     // PRINT

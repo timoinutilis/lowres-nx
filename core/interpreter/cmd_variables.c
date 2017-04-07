@@ -60,6 +60,11 @@ enum ErrorCode cmd_DIM(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
+    
     // DIM
     ++interpreter->pc;
     

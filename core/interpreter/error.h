@@ -65,7 +65,9 @@ enum ErrorCode {
     ErrorReturnWithoutGosub,
     ErrorStackOverflow,
     ErrorOutOfData,
-    ErrorIllegalMemoryAccess
+    ErrorIllegalMemoryAccess,
+    ErrorTooManyCommandCycles,
+    ErrorNotAllowedInInterrupt
 };
 
 extern const char *ErrorStrings[];

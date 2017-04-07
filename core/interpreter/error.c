@@ -62,5 +62,7 @@ const char *ErrorStrings[] = {
     "RETURN Without GOSUB",
     "Stack Overflow",
     "Out Of Data",
-    "Illegal Memory Access"
+    "Illegal Memory Access",
+    "Too Many Command Cycles",
+    "Not Allowed In Interrupt"
 };

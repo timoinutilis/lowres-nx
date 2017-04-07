@@ -30,5 +30,7 @@
 #define MAX_ARRAY_DIMENSIONS 8
 #define MAX_ARRAY_SIZE 32768
 #define MAX_ROM_DATA_ENTRIES 16
+#define MAX_CYCLES_PER_FRAME 100
+#define MAX_CYCLES_PER_VBL 100
 
 #endif /* config_h */

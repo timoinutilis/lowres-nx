@@ -25,6 +25,11 @@ enum ErrorCode cmd_END(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
+    
     // END
     ++interpreter->pc;
     
@@ -345,6 +350,11 @@ enum ErrorCode cmd_GOTO(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
+    
     // GOTO
     struct Token *tokenGOTO = interpreter->pc;
     ++interpreter->pc;
@@ -435,12 +445,31 @@ enum ErrorCode cmd_WAIT(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
+    
     // WAIT
     ++interpreter->pc;
     
-    // VBL
-    if (interpreter->pc->type != TokenVBL) return ErrorUnexpectedToken;
-    ++interpreter->pc;
+    if (interpreter->pc->type == TokenVBL)
+    {
+        // VBL
+        ++interpreter->pc;
+    }
+    else
+    {
+        // value
+        struct TypedValue value = LRC_evaluateExpression(core, TypeClassNumeric);
+        if (value.type == ValueError) return value.v.errorCode;
+        
+        if (interpreter->pass == PassRun)
+        {
+            interpreter->state = StateWait;
+            interpreter->waitCount = value.v.floatValue;
+        }
+    }
     
     enum ErrorCode errorCode = LRC_endOfCommand(interpreter);
     
@@ -480,9 +509,6 @@ enum ErrorCode cmd_ON(struct LowResCore *core)
     }
     else if (interpreter->pass == PassRun)
     {
-        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeONGOSUB, interpreter->pc);
-        if (errorCode != ErrorNone) return errorCode;
-        
         interpreter->currentOnRasterToken = tokenGOSUB->jumpToken; // after label
     }
     

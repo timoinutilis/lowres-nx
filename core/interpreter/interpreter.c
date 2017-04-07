@@ -73,6 +73,9 @@ void LRC_resetProgram(struct LowResCore *core)
     
     interpreter->pc = interpreter->tokens;
     interpreter->pass = PassRun;
+    interpreter->state = StateEvaluate;
+    interpreter->mode = ModeNone;
+    interpreter->exitErrorCode = ErrorNone;
     interpreter->numLabelStackItems = 0;
     interpreter->isSingleLineIf = false;
     interpreter->numSimpleVariables = 0;
@@ -81,17 +84,95 @@ void LRC_resetProgram(struct LowResCore *core)
     interpreter->currentDataValueToken = interpreter->firstData + 1;
 }
 
-enum ErrorCode LRC_runProgram(struct LowResCore *core)
+void LRC_runProgram(struct LowResCore *core)
 {
-    enum ErrorCode errorCode = ErrorNone;
+    struct Interpreter *interpreter = &core->interpreter;
     
-    do
+    switch (interpreter->state)
     {
-        errorCode = LRC_evaluateCommand(core);
+        case StateEvaluate:
+        {
+            interpreter->mode = ModeMain;
+            enum ErrorCode errorCode = ErrorNone;
+            int cycles = 0;
+            
+            do
+            {
+                errorCode = LRC_evaluateCommand(core);
+                cycles++;
+            }
+            while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_FRAME);
+            
+            interpreter->mode = ModeNone;
+            if (cycles == MAX_CYCLES_PER_FRAME)
+            {
+                printf("Warning: Max cycles per frame reached.");
+            }
+            if (errorCode > ErrorNone_last || errorCode == ErrorNoneEndOfProgram)
+            {
+                interpreter->exitErrorCode = errorCode;
+                interpreter->state = StateEnd;
+            }
+            break;
+        }
+            
+        case StateWait:
+        {
+            if (interpreter->waitCount > 0)
+            {
+                --interpreter->waitCount;
+            }
+            else
+            {
+                interpreter->state = StateEvaluate;
+            }
+            break;
+        }
+            
+        case StateInput:
+        {
+            break;
+        }
+            
+        case StateEnd:
+            break;
     }
-    while (errorCode == ErrorNone);
-    
-    return errorCode;
+}
+
+void LRC_runRasterProgram(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    if (interpreter->state != StateEnd && interpreter->currentOnRasterToken)
+    {
+        interpreter->mode = ModeInterrupt;
+        struct Token *pc = interpreter->pc;
+        interpreter->pc = core->interpreter.currentOnRasterToken;
+        
+        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
+        int cycles = 0;
+        
+        while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_VBL)
+        {
+            errorCode = LRC_evaluateCommand(core);
+            cycles++;
+        }
+        
+        interpreter->mode = ModeNone;
+        if (cycles == MAX_CYCLES_PER_VBL)
+        {
+            interpreter->exitErrorCode = ErrorTooManyCommandCycles;
+            interpreter->state = StateEnd;
+        }
+        else if (errorCode > ErrorNone_last)
+        {
+            interpreter->exitErrorCode = errorCode;
+            interpreter->state = StateEnd;
+        }
+        else
+        {
+            interpreter->pc = pc;
+        }
+    }
 }
 
 void LRC_freeProgram(struct LowResCore *core)
