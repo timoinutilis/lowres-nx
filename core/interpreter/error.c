@@ -21,9 +21,6 @@
 
 const char *ErrorStrings[] = {
     "OK",
-    "End Of Program",
-    "Interrupt",
-    NULL,
     
     "Too Many Tokens",
     "ROM is full",

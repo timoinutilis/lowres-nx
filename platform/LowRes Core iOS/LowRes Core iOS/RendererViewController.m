@@ -94,10 +94,13 @@ const GLushort Indices[] = {
         if (_core->interpreter.state != StateEnd)
         {
             LRC_update(_core);
-            LRC_renderScreen(_core, _textureData);
-            if (_core->interpreter.exitErrorCode != ErrorNone)
+            if (_core->interpreter.state == StateEnd)
             {
-                printf("Error at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[_core->interpreter.exitErrorCode]);
+                printf("Ended at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[_core->interpreter.exitErrorCode]);
+            }
+            else
+            {
+                LRC_renderScreen(_core, _textureData);
             }
         }
     }

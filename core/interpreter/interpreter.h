@@ -93,6 +93,7 @@ struct Interpreter {
     struct Token *currentOnRasterToken;
     
     int waitCount;
+    bool exitEvaluation;
     
     struct TextLib textLib;
 };

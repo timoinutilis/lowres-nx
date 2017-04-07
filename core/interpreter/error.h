@@ -24,9 +24,6 @@
 
 enum ErrorCode {
     ErrorNone,
-    ErrorNoneEndOfProgram,
-    ErrorNoneInterrupt,
-    ErrorNone_last,
     
     ErrorTooManyTokens,
     ErrorRomIsFull,

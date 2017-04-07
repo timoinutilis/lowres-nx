@@ -50,13 +50,14 @@ enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCod
     
     interpreter->pc = interpreter->tokens;
     interpreter->pass = PassPrepare;
+    
     do
     {
         errorCode = LRC_evaluateCommand(core);
     }
-    while (errorCode == ErrorNone);
+    while (errorCode == ErrorNone && interpreter->pc->type != TokenUndefined);
     
-    if (errorCode > ErrorNone_last) return errorCode;
+    if (errorCode != ErrorNone) return errorCode;
     assert(interpreter->numLabelStackItems == 0);
     
     // global null string
@@ -93,6 +94,7 @@ void LRC_runProgram(struct LowResCore *core)
         case StateEvaluate:
         {
             interpreter->mode = ModeMain;
+            interpreter->exitEvaluation = false;
             enum ErrorCode errorCode = ErrorNone;
             int cycles = 0;
             
@@ -101,14 +103,14 @@ void LRC_runProgram(struct LowResCore *core)
                 errorCode = LRC_evaluateCommand(core);
                 cycles++;
             }
-            while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_FRAME);
+            while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_FRAME && interpreter->state == StateEvaluate && !interpreter->exitEvaluation);
             
             interpreter->mode = ModeNone;
             if (cycles == MAX_CYCLES_PER_FRAME)
             {
                 printf("Warning: Max cycles per frame reached.");
             }
-            if (errorCode > ErrorNone_last || errorCode == ErrorNoneEndOfProgram)
+            if (errorCode != ErrorNone)
             {
                 interpreter->exitErrorCode = errorCode;
                 interpreter->state = StateEnd;
@@ -145,13 +147,14 @@ void LRC_runRasterProgram(struct LowResCore *core)
     if (interpreter->state != StateEnd && interpreter->currentOnRasterToken)
     {
         interpreter->mode = ModeInterrupt;
+        interpreter->exitEvaluation = false;
         struct Token *pc = interpreter->pc;
         interpreter->pc = core->interpreter.currentOnRasterToken;
         
         enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
         int cycles = 0;
         
-        while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_VBL)
+        while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_VBL && !interpreter->exitEvaluation)
         {
             errorCode = LRC_evaluateCommand(core);
             cycles++;
@@ -163,7 +166,7 @@ void LRC_runRasterProgram(struct LowResCore *core)
             interpreter->exitErrorCode = ErrorTooManyCommandCycles;
             interpreter->state = StateEnd;
         }
-        else if (errorCode > ErrorNone_last)
+        else if (errorCode != ErrorNone)
         {
             interpreter->exitErrorCode = errorCode;
             interpreter->state = StateEnd;
@@ -1112,7 +1115,7 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
     switch (interpreter->pc->type)
     {
         case TokenUndefined:
-            return ErrorNoneEndOfProgram;
+            break;
             
         case TokenLabel:
             ++interpreter->pc;

@@ -33,13 +33,12 @@ enum ErrorCode cmd_END(struct LowResCore *core)
     // END
     ++interpreter->pc;
     
-    enum ErrorCode errorCode = LRC_endOfCommand(interpreter);
-    
     if (interpreter->pass == PassRun)
     {
-        return ErrorNoneEndOfProgram;
+        interpreter->state = StateEnd;
     }
-    return errorCode;
+    
+    return LRC_endOfCommand(interpreter);
 }
 
 enum ErrorCode cmd_IF(struct LowResCore *core)
@@ -425,7 +424,7 @@ enum ErrorCode cmd_RETURN(struct LowResCore *core)
         if (itemGOSUB->type == LabelTypeONGOSUB)
         {
             // exit from interrupt
-            return ErrorNoneInterrupt;
+            interpreter->exitEvaluation = true;
         }
         else if (itemGOSUB->type == LabelTypeGOSUB)
         {
@@ -471,13 +470,11 @@ enum ErrorCode cmd_WAIT(struct LowResCore *core)
         }
     }
     
-    enum ErrorCode errorCode = LRC_endOfCommand(interpreter);
-    
     if (interpreter->pass == PassRun)
     {
-        return ErrorNoneInterrupt;
+        interpreter->exitEvaluation = true;
     }
-    return errorCode;
+    return LRC_endOfCommand(interpreter);
 }
 
 enum ErrorCode cmd_ON(struct LowResCore *core)
