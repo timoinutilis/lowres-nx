@@ -22,8 +22,8 @@
 
 #include <stdio.h>
 
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 128
+#define SCREEN_WIDTH 160
+#define SCREEN_HEIGHT 144
 #define NUM_CHARACTERS 256
 #define NUM_COLORS 64
 #define PLANE_COLUMNS 32
@@ -132,6 +132,6 @@ struct VideoRegisters {
 // ================ Functions ================
 // ===========================================
 
-void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB);
+void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB, int bytesPerLine);
 
 #endif /* video_interface_h */

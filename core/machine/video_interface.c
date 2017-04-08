@@ -144,7 +144,7 @@ void LRC_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int y,
     }
 }
 
-void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB)
+void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB, int bytesPerLine)
 {
     uint8_t scanlineBuffer[SCREEN_WIDTH];
     uint8_t scanlineSpriteBuffer[SCREEN_WIDTH];
@@ -173,5 +173,6 @@ void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB)
             *outputByte++ = g * 0x55;
             *outputByte++ = b * 0x55;
         }
+        outputByte += (bytesPerLine - SCREEN_WIDTH*3);
     }
 }

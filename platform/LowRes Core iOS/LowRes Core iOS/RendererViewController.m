@@ -20,16 +20,19 @@
 #import "RendererViewController.h"
 #import "lowres_core.h"
 
+#define TEXTURE_WIDTH 256
+#define TEXTURE_HEIGHT 256
+
 typedef struct {
     float Position[3];
     float TexCoord[2];
 } Vertex;
 
 const Vertex Vertices[] = {
-    {{1, -1, 0}, {1, 1}},
-    {{1, 1, 0}, {1, 0}},
+    {{1, -1, 0}, {(float)SCREEN_WIDTH / (float)TEXTURE_WIDTH, (float)SCREEN_HEIGHT / (float)TEXTURE_HEIGHT}},
+    {{1, 1, 0}, {(float)SCREEN_WIDTH / (float)TEXTURE_WIDTH, 0}},
     {{-1, 1, 0}, {0, 0}},
-    {{-1, -1, 0}, {0, 1}}
+    {{-1, -1, 0}, {0, (float)SCREEN_HEIGHT / (float)TEXTURE_HEIGHT}}
 };
 
 const GLushort Indices[] = {
@@ -59,7 +62,7 @@ const GLushort Indices[] = {
     ((GLKView *)self.view).context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     self.effect = [[GLKBaseEffect alloc] init];
     
-    _textureData = (GLubyte *)calloc(SCREEN_WIDTH * SCREEN_HEIGHT * 3, sizeof(GLubyte));
+    _textureData = (GLubyte *)calloc(TEXTURE_WIDTH * TEXTURE_HEIGHT * 3, sizeof(GLubyte));
 }
 
 - (void)dealloc
@@ -94,7 +97,7 @@ const GLushort Indices[] = {
         if (_core->interpreter.state != StateEnd)
         {
             LRC_update(_core);
-            LRC_renderScreen(_core, _textureData);
+            LRC_renderScreen(_core, _textureData, 256*3);
             if (_core->interpreter.state == StateEnd)
             {
                 printf("Ended at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[_core->interpreter.exitErrorCode]);
@@ -137,7 +140,7 @@ const GLushort Indices[] = {
     if (_textureData)
     {
         [self.effect prepareToDraw];
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, _textureData);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, _textureData);
         glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]), GL_UNSIGNED_SHORT, 0);
     }
 }
