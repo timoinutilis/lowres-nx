@@ -43,7 +43,7 @@
     {
         LRC_init(_core);
         
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"input" ofType:@"bas" inDirectory:@"bas"];
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"adv" ofType:@"bas" inDirectory:@"bas"];
         NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
         
         enum ErrorCode errorCode = LRC_compileProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);

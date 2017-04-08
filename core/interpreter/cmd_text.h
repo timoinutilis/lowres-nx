@@ -30,5 +30,6 @@ enum ErrorCode cmd_INPUT(struct LowResCore *core);
 enum ErrorCode cmd_endINPUT(struct LowResCore *core);
 enum ErrorCode cmd_TEXT(struct LowResCore *core);
 enum ErrorCode cmd_NUMBER(struct LowResCore *core);
+enum ErrorCode cmd_CLS(struct LowResCore *core);
 
 #endif /* cmd_text_h */

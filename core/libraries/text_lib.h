@@ -48,5 +48,6 @@ void LRC_writeText(struct LowResCore *core, const char *text, int x, int y);
 void LRC_writeNumber(struct LowResCore *core, int number, int digits, int x, int y);
 void LRC_inputTextBegin(struct LowResCore *core);
 bool LRC_inputTextUpdate(struct LowResCore *core);
+void LRC_clear(struct LowResCore *core);
 
 #endif /* text_lib_h */

@@ -47,6 +47,7 @@ void LRC_scrollIfNeeded(struct LowResCore *core)
         }
         
         lib->cursorY = lib->areaHeight - 1;
+        core->interpreter.exitEvaluation = true;
     }
 }
 
@@ -200,6 +201,8 @@ bool LRC_inputTextUpdate(struct LowResCore *core)
                 LRC_printText(core, text);
                 lib->inputBuffer[lib->inputLength++] = key;
                 lib->inputBuffer[lib->inputLength] = 0;
+                
+                LRC_scrollIfNeeded(core);
             }
         }
         lib->blink = 0;
@@ -217,4 +220,24 @@ bool LRC_inputTextUpdate(struct LowResCore *core)
         }
     }
     return done;
+}
+
+void LRC_clear(struct LowResCore *core)
+{
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct Plane *plane = &core->machine.videoRam.planeB;
+    
+    lib->cursorX = 0;
+    lib->cursorY = 0;
+    for (int y = 0; y < lib->areaHeight; y++)
+    {
+        int py = y + lib->areaY;
+        for (int x = 0; x < lib->areaWidth; x++)
+        {
+            int px = x + lib->areaX;
+            struct Cell *cell = &plane->cells[py][px];
+            cell->character = lib->characterOffset;
+            cell->attr = lib->charAttr;
+        }
+    }
 }

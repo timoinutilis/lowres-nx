@@ -1084,8 +1084,14 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
             
         case TokenSIN:
         case TokenINT:
-            return fnc_math(core);
-        
+            return fnc_math1(core);
+
+        case TokenRND:
+            return fnc_math0(core);
+            
+        case TokenINKEY:
+            return fnc_INKEY(core);
+
         case TokenABS:
         case TokenATN:
         case TokenCOS:
@@ -1098,7 +1104,6 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
         case TokenMID:
         case TokenMIN:
         case TokenRIGHT:
-        case TokenRND:
         case TokenSGN:
         case TokenSQR:
         case TokenTAN:
@@ -1155,6 +1160,9 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenPRINT:
             return cmd_PRINT(core);
             
+        case TokenCLS:
+            return cmd_CLS(core);
+            
         case TokenINPUT:
             return cmd_INPUT(core);
         
@@ -1208,10 +1216,18 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
 
         case TokenNUMBER:
             return cmd_NUMBER(core);
+            
+        case TokenDO:
+            return cmd_DO(core);
+            
+        case TokenLOOP:
+            return cmd_LOOP(core);
+            
+        case TokenEXIT:
+            return cmd_EXIT(core);
         
         case TokenRANDOMIZE:
         case TokenREM:
-        case TokenRDATA:
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;

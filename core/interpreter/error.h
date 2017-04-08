@@ -49,6 +49,7 @@ enum ErrorCode {
     ErrorExpectedCommand,
     ErrorExpectedTo,
     ErrorNextWithoutFor,
+    ErrorLoopWithoutDo,
     ErrorLabelAlreadyDefined,
     ErrorTooManyLabels,
     ErrorExpectedLabel,

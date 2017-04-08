@@ -153,3 +153,34 @@ struct TypedValue fnc_LEN(struct LowResCore *core)
     }
     return value;
 }
+
+struct TypedValue fnc_INKEY(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // INKEY$
+    interpreter->pc++;
+    
+    struct TypedValue resultValue;
+    resultValue.type = ValueString;
+    
+    if (interpreter->pass == PassRun)
+    {
+        char key = core->machine.ioRegisters.key;
+        if (key)
+        {
+            core->machine.ioRegisters.key = 0;
+            
+            struct RCString *rcstring = rcstring_new(&key, 1);
+            if (!rcstring) return LRC_makeError(ErrorOutOfMemory);
+            
+            resultValue.v.stringValue = rcstring;
+        }
+        else
+        {
+            resultValue.v.stringValue = interpreter->nullString;
+            rcstring_retain(resultValue.v.stringValue);
+        }
+    }
+    return resultValue;
+}

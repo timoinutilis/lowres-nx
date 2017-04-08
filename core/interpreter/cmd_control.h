@@ -36,5 +36,8 @@ enum ErrorCode cmd_GOSUB(struct LowResCore *core);
 enum ErrorCode cmd_RETURN(struct LowResCore *core);
 enum ErrorCode cmd_WAIT(struct LowResCore *core);
 enum ErrorCode cmd_ON(struct LowResCore *core);
+enum ErrorCode cmd_DO(struct LowResCore *core);
+enum ErrorCode cmd_LOOP(struct LowResCore *core);
+enum ErrorCode cmd_EXIT(struct LowResCore *core);
 
 #endif /* cmd_control_h */

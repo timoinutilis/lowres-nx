@@ -511,3 +511,65 @@ enum ErrorCode cmd_ON(struct LowResCore *core)
     
     return LRC_endOfCommand(interpreter);
 }
+
+enum ErrorCode cmd_DO(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // DO
+    ++interpreter->pc;
+
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeDO, interpreter->pc);
+        if (errorCode != ErrorNone) return errorCode;
+    }
+    
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_LOOP(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // LOOP
+    struct Token *tokenLOOP = interpreter->pc;
+    ++interpreter->pc;
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
+        if (!item || item->type != LabelTypeDO) return ErrorLoopWithoutDo;
+        
+        tokenLOOP->jumpToken = item->token;
+    }
+    else if (interpreter->pass == PassRun)
+    {
+        interpreter->pc = tokenLOOP->jumpToken; // after DO
+    }
+    
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_EXIT(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // EXIT
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        
+    }
+    
+    return LRC_endOfCommand(interpreter);
+}

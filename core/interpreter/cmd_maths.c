@@ -21,8 +21,9 @@
 #include "lowres_core.h"
 #include <math.h>
 #include <assert.h>
+#include <stdlib.h>
 
-struct TypedValue fnc_math(struct LowResCore *core)
+struct TypedValue fnc_math1(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -57,6 +58,33 @@ struct TypedValue fnc_math(struct LowResCore *core)
                 value.v.floatValue = floorf(xValue.v.floatValue);
                 break;
 
+            default:
+                assert(0);
+                break;
+        }
+    }
+    return value;
+}
+
+struct TypedValue fnc_math0(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // function
+    enum TokenType type = interpreter->pc->type;
+    interpreter->pc++;
+    
+    struct TypedValue value;
+    value.type = ValueFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        switch (type)
+        {
+            case TokenRND:
+                value.v.floatValue = random() / ((float)RAND_MAX + 1.0);
+                break;
+                
             default:
                 assert(0);
                 break;

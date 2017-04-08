@@ -25,6 +25,7 @@
 
 struct LowResCore;
 
-struct TypedValue fnc_math(struct LowResCore *core);
+struct TypedValue fnc_math1(struct LowResCore *core);
+struct TypedValue fnc_math0(struct LowResCore *core);
 
 #endif /* cmd_maths_h */

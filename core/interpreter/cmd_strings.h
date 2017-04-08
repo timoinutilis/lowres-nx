@@ -29,5 +29,6 @@ struct TypedValue fnc_STR(struct LowResCore *core);
 struct TypedValue fnc_ASC(struct LowResCore *core);
 struct TypedValue fnc_CHR(struct LowResCore *core);
 struct TypedValue fnc_LEN(struct LowResCore *core);
+struct TypedValue fnc_INKEY(struct LowResCore *core);
 
 #endif /* cmd_strings_h */

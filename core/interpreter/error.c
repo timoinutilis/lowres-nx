@@ -46,6 +46,7 @@ const char *ErrorStrings[] = {
     "Expected Command",
     "Expected TO",
     "NEXT Without FOR",
+    "LOOP Without DO",
     "Label Already Defined",
     "Too Many Labels",
     "ErrorExpectedLabel",

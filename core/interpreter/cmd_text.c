@@ -19,6 +19,7 @@
 
 #include "cmd_text.h"
 #include <stdbool.h>
+#include <stdlib.h>
 #include "lowres_core.h"
 #include "text_lib.h"
 
@@ -145,6 +146,10 @@ enum ErrorCode cmd_endINPUT(struct LowResCore *core)
             }
             varValue->stringValue = rcstring;
         }
+        else if (valueType == ValueFloat)
+        {
+            varValue->floatValue = atoi(interpreter->textLib.inputBuffer);
+        }
     }
     return LRC_endOfCommand(interpreter);
 }
@@ -232,6 +237,26 @@ enum ErrorCode cmd_NUMBER(struct LowResCore *core)
     if (interpreter->pass == PassRun)
     {
         LRC_writeNumber(core, numberValue.v.floatValue, digitsValue.v.floatValue, xValue.v.floatValue, yValue.v.floatValue);
+    }
+    
+    return LRC_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_CLS(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
+    
+    // CLS
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        LRC_clear(core);
     }
     
     return LRC_endOfCommand(interpreter);
