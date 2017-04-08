@@ -26,6 +26,8 @@
 struct LowResCore;
 
 enum ErrorCode cmd_PRINT(struct LowResCore *core);
+enum ErrorCode cmd_INPUT(struct LowResCore *core);
+enum ErrorCode cmd_endINPUT(struct LowResCore *core);
 enum ErrorCode cmd_TEXT(struct LowResCore *core);
 enum ErrorCode cmd_NUMBER(struct LowResCore *core);
 

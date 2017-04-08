@@ -22,7 +22,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jss-1y-PUI">
-                                <rect key="frame" x="128" y="256" width="512" height="512"/>
+                                <rect key="frame" x="128" y="20" width="512" height="512"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="256" id="4kv-Cs-jUX">
                                         <variation key="heightClass=regular-widthClass=regular" constant="512"/>
@@ -39,7 +39,7 @@
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="Jss-1y-PUI" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="1s9-46-GNu"/>
-                            <constraint firstItem="Jss-1y-PUI" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="lLy-C8-XoC"/>
+                            <constraint firstItem="Jss-1y-PUI" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="Rx3-ND-Jkv"/>
                         </constraints>
                     </view>
                 </viewController>

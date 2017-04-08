@@ -21,23 +21,32 @@
 #define text_lib_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "video_interface.h"
+
+#define INPUT_BUFFER_SIZE 256
 
 struct LowResCore;
 
 struct TextLib {
-    uint8_t characterOffset;
+    int characterOffset;
     union CharacterAttributes charAttr;
-    uint8_t areaX;
-    uint8_t areaY;
-    uint8_t areaWidth;
-    uint8_t areaHeight;
-    uint8_t cursorX;
-    uint8_t cursorY;
+    int areaX;
+    int areaY;
+    int areaWidth;
+    int areaHeight;
+    int cursorX;
+    int cursorY;
+    char inputBuffer[INPUT_BUFFER_SIZE];
+    int inputLength;
+    int blink;
 };
 
 void LRC_printText(struct LowResCore *core, const char *text);
+bool LRC_deleteBackward(struct LowResCore *core);
 void LRC_writeText(struct LowResCore *core, const char *text, int x, int y);
 void LRC_writeNumber(struct LowResCore *core, int number, int digits, int x, int y);
+void LRC_inputTextBegin(struct LowResCore *core);
+bool LRC_inputTextUpdate(struct LowResCore *core);
 
 #endif /* text_lib_h */

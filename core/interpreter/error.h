@@ -39,6 +39,7 @@ enum ErrorCode {
     ErrorExpectedLeftParenthesis,
     ErrorExpectedRightParenthesis,
     ErrorExpectedComma,
+    ErrorExpectedSemicolon,
     ErrorSymbolNameTooLong,
     ErrorTooManySymbols,
     ErrorTypeMismatch,

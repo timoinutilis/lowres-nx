@@ -83,9 +83,80 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
     return LRC_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_INPUT(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
+    
+    // INPUT
+    ++interpreter->pc;
+    
+    if (interpreter->pc->type == TokenString)
+    {
+        // prompt
+        if (interpreter->pass == PassRun)
+        {
+            LRC_printText(core, interpreter->pc->stringValue->chars);
+        }
+        ++interpreter->pc;
+        
+        // semicolon
+        if (interpreter->pc->type != TokenSemicolon) return ErrorExpectedSemicolon;
+        ++interpreter->pc;
+    }
+    
+    if (interpreter->pass == PassRun)
+    {
+        LRC_inputTextBegin(core);
+        interpreter->state = StateInput;
+    }
+    else
+    {
+        return cmd_endINPUT(core);
+    }
+    
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_endINPUT(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // identifier
+    enum ErrorCode errorCode = ErrorNone;
+    enum ValueType valueType = ValueNull;
+    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
+    if (!varValue) return errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (valueType == ValueString)
+        {
+            struct RCString *rcstring = rcstring_new(interpreter->textLib.inputBuffer, interpreter->textLib.inputLength);
+            if (!rcstring) return ErrorOutOfMemory;
+            
+            if (varValue->stringValue)
+            {
+                rcstring_release(varValue->stringValue);
+            }
+            varValue->stringValue = rcstring;
+        }
+    }
+    return LRC_endOfCommand(interpreter);
+}
+
 enum ErrorCode cmd_TEXT(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
+    
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
     
     // TEXT
     ++interpreter->pc;
@@ -121,6 +192,11 @@ enum ErrorCode cmd_TEXT(struct LowResCore *core)
 enum ErrorCode cmd_NUMBER(struct LowResCore *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
+    
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
+    {
+        return ErrorNotAllowedInInterrupt;
+    }
     
     // NUMBER
     ++interpreter->pc;

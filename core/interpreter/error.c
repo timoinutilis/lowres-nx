@@ -36,6 +36,7 @@ const char *ErrorStrings[] = {
     "Expected Left Parenthesis '('",
     "Expected Right Parenthesis ')'",
     "Expected Comma ','",
+    "Expected Semicolon ';'",
     "Symbol Name Too Long",
     "Too Many Symbols",
     "Type Mismatch",

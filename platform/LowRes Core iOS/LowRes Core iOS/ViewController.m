@@ -21,8 +21,9 @@
 #import "lowres_core.h"
 #import "RendererViewController.h"
 
-@interface ViewController ()
-@property RendererViewController *rendererViewController;
+@interface ViewController () <UIKeyInput>
+@property (nonatomic) RendererViewController *rendererViewController;
+@property (nonatomic) BOOL isKeyboardActive;
 @end
 
 @implementation ViewController {
@@ -42,7 +43,7 @@
     {
         LRC_init(_core);
         
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"bas" inDirectory:@"bas"];
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"input" ofType:@"bas" inDirectory:@"bas"];
         NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
         
         enum ErrorCode errorCode = LRC_compileProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
@@ -68,6 +69,12 @@
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    self.isKeyboardActive = YES;
+}
+
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
@@ -79,6 +86,67 @@
     {
         self.rendererViewController = segue.destinationViewController;
     }
+}
+
+- (void)setIsKeyboardActive:(BOOL)active
+{
+    _isKeyboardActive = active;
+    if (active)
+    {
+        [self becomeFirstResponder];
+    }
+    else
+    {
+        [self resignFirstResponder];
+    }
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+    return self.isKeyboardActive;
+}
+
+- (UITextAutocorrectionType)autocorrectionType
+{
+    return UITextAutocorrectionTypeNo;
+}
+
+- (UITextSpellCheckingType)spellCheckingType
+{
+    return UITextSpellCheckingTypeNo;
+}
+
+- (UIKeyboardAppearance)keyboardAppearance
+{
+    return UIKeyboardAppearanceDark;
+}
+
+- (BOOL)hasText
+{
+    return YES;
+}
+
+- (void)insertText:(NSString *)text
+{
+    if (text.length > 0)
+    {
+        unichar key = [text.uppercaseString characterAtIndex:0];
+        if (key < 127)
+        {
+            _core->machine.ioRegisters.key = key;
+        }
+    }
+}
+
+- (void)deleteBackward
+{
+    _core->machine.ioRegisters.key = '\b';
+}
+
+// this is from UITextInput, needed because of crash on iPhone 6 keyboard (left/right arrows)
+- (UITextRange *)selectedTextRange
+{
+    return nil;
 }
 
 @end

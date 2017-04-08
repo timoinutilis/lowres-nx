@@ -108,7 +108,7 @@ void LRC_runProgram(struct LowResCore *core)
             interpreter->mode = ModeNone;
             if (cycles == MAX_CYCLES_PER_FRAME)
             {
-                printf("Warning: Max cycles per frame reached.");
+                printf("Warning: Max cycles per frame reached.\n");
             }
             if (errorCode != ErrorNone)
             {
@@ -133,6 +133,11 @@ void LRC_runProgram(struct LowResCore *core)
             
         case StateInput:
         {
+            if (LRC_inputTextUpdate(core))
+            {
+                interpreter->state = StateEvaluate;
+                cmd_endINPUT(core);
+            }
             break;
         }
             
@@ -1115,6 +1120,10 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
     switch (interpreter->pc->type)
     {
         case TokenUndefined:
+            if (interpreter->pass == PassRun)
+            {
+                interpreter->state = StateEnd;
+            }
             break;
             
         case TokenLabel:
@@ -1145,6 +1154,9 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         
         case TokenPRINT:
             return cmd_PRINT(core);
+            
+        case TokenINPUT:
+            return cmd_INPUT(core);
         
         case TokenIF:
             return cmd_IF(core);
@@ -1197,7 +1209,6 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
         case TokenNUMBER:
             return cmd_NUMBER(core);
         
-        case TokenINPUT:
         case TokenRANDOMIZE:
         case TokenREM:
         case TokenRDATA:
