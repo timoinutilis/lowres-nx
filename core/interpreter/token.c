@@ -75,7 +75,6 @@ const char *TokenStrings[] = {
     "PRINT",
     "RANDOMIZE",
     "RASTER",
-    "RDATA",
     "READ",
     "REM",
     "RESTORE",
@@ -99,6 +98,7 @@ const char *TokenStrings[] = {
     "INSTR",
     "INT",
     "LEFT$",
+    "LENGTH",
     "LEN",
     "LOG",
     "MAX",
@@ -109,6 +109,7 @@ const char *TokenStrings[] = {
     "SGN",
     "SIN",
     "SQR",
+    "START",
     "STR$",
     "TAN",
     "VAL"

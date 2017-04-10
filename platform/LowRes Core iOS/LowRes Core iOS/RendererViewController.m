@@ -21,7 +21,7 @@
 #import "lowres_core.h"
 
 #define TEXTURE_WIDTH 256
-#define TEXTURE_HEIGHT 256
+#define TEXTURE_HEIGHT 128
 
 typedef struct {
     float Position[3];

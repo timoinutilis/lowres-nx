@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #define SCREEN_WIDTH 160
-#define SCREEN_HEIGHT 144
+#define SCREEN_HEIGHT 128
 #define NUM_CHARACTERS 256
 #define NUM_COLORS 64
 #define PLANE_COLUMNS 32

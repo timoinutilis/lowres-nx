@@ -162,3 +162,42 @@ enum ErrorCode cmd_COPY(struct LowResCore *core)
     
     return LRC_endOfCommand(interpreter);
 }
+
+struct TypedValue fnc_STARTLENGTH(struct LowResCore *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // START/LENGTH
+    enum TokenType type = interpreter->pc->type;
+    interpreter->pc++;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    interpreter->pc++;
+    
+    // index expression
+    struct TypedValue indexValue = LRC_evaluateExpression(core, TypeClassNumeric);
+    if (indexValue.type == ValueError) return indexValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    interpreter->pc++;
+    
+    struct TypedValue value;
+    value.type = ValueFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        struct RomDataEntry *entries = (struct RomDataEntry *)core->machine.cartridgeRom;
+        int index = indexValue.v.floatValue;
+        if (type == TokenLENGTH)
+        {
+            value.v.floatValue = BigEndianUInt16_get(&entries[index].length);
+        }
+        else
+        {
+            value.v.floatValue = BigEndianUInt16_get(&entries[index].start);
+        }
+    }
+    return value;
+}

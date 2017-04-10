@@ -1091,6 +1091,10 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
             
         case TokenINKEY:
             return fnc_INKEY(core);
+        
+        case TokenSTART:
+        case TokenLENGTH:
+            return fnc_STARTLENGTH(core);
 
         case TokenABS:
         case TokenATN:

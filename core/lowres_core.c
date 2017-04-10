@@ -35,7 +35,7 @@ void LRC_init(struct LowResCore *core)
     textLib->areaX = 0;
     textLib->areaY = 0;
     textLib->areaWidth = 20;
-    textLib->areaHeight = 18;
+    textLib->areaHeight = 16;
 }
 
 void LRC_update(struct LowResCore *core)

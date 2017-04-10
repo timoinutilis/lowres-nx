@@ -29,5 +29,6 @@ struct TypedValue fnc_PEEK(struct LowResCore *core);
 enum ErrorCode cmd_POKE(struct LowResCore *core);
 enum ErrorCode cmd_FILL(struct LowResCore *core);
 enum ErrorCode cmd_COPY(struct LowResCore *core);
+struct TypedValue fnc_STARTLENGTH(struct LowResCore *core);
 
 #endif /* cmd_memory_h */
