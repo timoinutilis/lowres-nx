@@ -14,16 +14,16 @@
 		9219E1F41E6E0BF600C13BB3 /* cmd_text.c in Sources */ = {isa = PBXBuildFile; fileRef = 9219E1F21E6E0BF600C13BB3 /* cmd_text.c */; };
 		9219E1F71E6E0C5600C13BB3 /* cmd_control.c in Sources */ = {isa = PBXBuildFile; fileRef = 9219E1F51E6E0C5600C13BB3 /* cmd_control.c */; };
 		9219E1FA1E6E10F900C13BB3 /* cmd_variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 9219E1F81E6E10F900C13BB3 /* cmd_variables.c */; };
-		924DA4FF1E100F8A001B65EB /* RendererViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 924DA4FE1E100F8A001B65EB /* RendererViewController.m */; };
 		924DA5021E1095DC001B65EB /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 924DA5001E1095DC001B65EB /* core.c */; };
 		9272ADA41E8EE59300C4A7B6 /* cmd_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */; };
-		927838CD1DF5F50300035E0D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 927838CC1DF5F50300035E0D /* main.m */; };
-		927838D01DF5F50300035E0D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 927838CF1DF5F50300035E0D /* AppDelegate.m */; };
-		927838D31DF5F50300035E0D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927838D21DF5F50300035E0D /* ViewController.m */; };
-		927838D61DF5F50300035E0D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 927838D41DF5F50300035E0D /* Main.storyboard */; };
-		927838D81DF5F50300035E0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 927838D71DF5F50300035E0D /* Assets.xcassets */; };
-		927838DB1DF5F50300035E0D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 927838D91DF5F50300035E0D /* LaunchScreen.storyboard */; };
 		929D20661E2B9961001FF319 /* interpreter.c in Sources */ = {isa = PBXBuildFile; fileRef = 929D20641E2B9961001FF319 /* interpreter.c */; };
+		92BA003B1E9C1E880076CE0E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 92BA002F1E9C1E880076CE0E /* AppDelegate.m */; };
+		92BA003C1E9C1E880076CE0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92BA00301E9C1E880076CE0E /* Assets.xcassets */; };
+		92BA003D1E9C1E880076CE0E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92BA00311E9C1E880076CE0E /* LaunchScreen.storyboard */; };
+		92BA003E1E9C1E880076CE0E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92BA00331E9C1E880076CE0E /* Main.storyboard */; };
+		92BA00401E9C1E880076CE0E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 92BA00361E9C1E880076CE0E /* main.m */; };
+		92BA00411E9C1E880076CE0E /* RendererViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92BA00381E9C1E880076CE0E /* RendererViewController.m */; };
+		92BA00421E9C1E880076CE0E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92BA003A1E9C1E880076CE0E /* ViewController.m */; };
 		92D4FD541E34F1CB0068321E /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D4FD521E34F1CB0068321E /* machine.c */; };
 		92D6CA701E7EFF5A006F21C5 /* cmd_strings.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D6CA6E1E7EFF5A006F21C5 /* cmd_strings.c */; };
 		92DC7B6E1E81B88700BC9CBB /* cmd_data.c in Sources */ = {isa = PBXBuildFile; fileRef = 92DC7B6C1E81B88700BC9CBB /* cmd_data.c */; };
@@ -54,24 +54,24 @@
 		9219E1F61E6E0C5600C13BB3 /* cmd_control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_control.h; sourceTree = "<group>"; };
 		9219E1F81E6E10F900C13BB3 /* cmd_variables.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_variables.c; sourceTree = "<group>"; };
 		9219E1F91E6E10F900C13BB3 /* cmd_variables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_variables.h; sourceTree = "<group>"; };
-		924DA4FD1E100F8A001B65EB /* RendererViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RendererViewController.h; sourceTree = "<group>"; };
-		924DA4FE1E100F8A001B65EB /* RendererViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RendererViewController.m; sourceTree = "<group>"; };
 		924DA5001E1095DC001B65EB /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core.c; sourceTree = "<group>"; };
 		924DA5011E1095DC001B65EB /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
 		9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_memory.c; sourceTree = "<group>"; };
 		9272ADA31E8EE59300C4A7B6 /* cmd_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_memory.h; sourceTree = "<group>"; };
-		927838C81DF5F50300035E0D /* LowRes Core.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes Core.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		927838CC1DF5F50300035E0D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		927838CE1DF5F50300035E0D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		927838CF1DF5F50300035E0D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		927838D11DF5F50300035E0D /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		927838D21DF5F50300035E0D /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		927838D71DF5F50300035E0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		927838DC1DF5F50300035E0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		927838E21DF5F51F00035E0D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		927838E31DF5F51F00035E0D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/Main.storyboard; sourceTree = "<group>"; };
+		927838C81DF5F50300035E0D /* LowRes NX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		929D20641E2B9961001FF319 /* interpreter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = interpreter.c; sourceTree = "<group>"; };
 		929D20651E2B9961001FF319 /* interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interpreter.h; sourceTree = "<group>"; };
+		92BA002E1E9C1E880076CE0E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		92BA002F1E9C1E880076CE0E /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		92BA00301E9C1E880076CE0E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		92BA00321E9C1E880076CE0E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		92BA00341E9C1E880076CE0E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/Main.storyboard; sourceTree = "<group>"; };
+		92BA00351E9C1E880076CE0E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		92BA00361E9C1E880076CE0E /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		92BA00371E9C1E880076CE0E /* RendererViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RendererViewController.h; sourceTree = "<group>"; };
+		92BA00381E9C1E880076CE0E /* RendererViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RendererViewController.m; sourceTree = "<group>"; };
+		92BA00391E9C1E880076CE0E /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		92BA003A1E9C1E880076CE0E /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		92D4FD521E34F1CB0068321E /* machine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = machine.c; sourceTree = "<group>"; };
 		92D4FD531E34F1CB0068321E /* machine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machine.h; sourceTree = "<group>"; };
 		92D6CA6E1E7EFF5A006F21C5 /* cmd_strings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_strings.c; sourceTree = "<group>"; };
@@ -116,7 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				927838E61DF5F58F00035E0D /* core */,
-				927838CA1DF5F50300035E0D /* LowRes Core iOS */,
+				92BA002D1E9C1E880076CE0E /* LowRes NX iOS */,
 				927838C91DF5F50300035E0D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -124,35 +124,9 @@
 		927838C91DF5F50300035E0D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				927838C81DF5F50300035E0D /* LowRes Core.app */,
+				927838C81DF5F50300035E0D /* LowRes NX.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		927838CA1DF5F50300035E0D /* LowRes Core iOS */ = {
-			isa = PBXGroup;
-			children = (
-				927838CE1DF5F50300035E0D /* AppDelegate.h */,
-				927838CF1DF5F50300035E0D /* AppDelegate.m */,
-				927838D41DF5F50300035E0D /* Main.storyboard */,
-				927838D11DF5F50300035E0D /* ViewController.h */,
-				927838D21DF5F50300035E0D /* ViewController.m */,
-				924DA4FD1E100F8A001B65EB /* RendererViewController.h */,
-				924DA4FE1E100F8A001B65EB /* RendererViewController.m */,
-				927838D71DF5F50300035E0D /* Assets.xcassets */,
-				927838D91DF5F50300035E0D /* LaunchScreen.storyboard */,
-				927838DC1DF5F50300035E0D /* Info.plist */,
-				927838CB1DF5F50300035E0D /* Supporting Files */,
-			);
-			path = "LowRes Core iOS";
-			sourceTree = "<group>";
-		};
-		927838CB1DF5F50300035E0D /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				927838CC1DF5F50300035E0D /* main.m */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		927838E61DF5F58F00035E0D /* core */ = {
@@ -209,6 +183,32 @@
 			path = interpreter;
 			sourceTree = "<group>";
 		};
+		92BA002D1E9C1E880076CE0E /* LowRes NX iOS */ = {
+			isa = PBXGroup;
+			children = (
+				92BA002E1E9C1E880076CE0E /* AppDelegate.h */,
+				92BA002F1E9C1E880076CE0E /* AppDelegate.m */,
+				92BA00331E9C1E880076CE0E /* Main.storyboard */,
+				92BA00391E9C1E880076CE0E /* ViewController.h */,
+				92BA003A1E9C1E880076CE0E /* ViewController.m */,
+				92BA00371E9C1E880076CE0E /* RendererViewController.h */,
+				92BA00381E9C1E880076CE0E /* RendererViewController.m */,
+				92BA00301E9C1E880076CE0E /* Assets.xcassets */,
+				92BA00311E9C1E880076CE0E /* LaunchScreen.storyboard */,
+				92BA00351E9C1E880076CE0E /* Info.plist */,
+				92BA00431E9C1EAC0076CE0E /* Supporting Files */,
+			);
+			path = "LowRes NX iOS";
+			sourceTree = "<group>";
+		};
+		92BA00431E9C1EAC0076CE0E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				92BA00361E9C1E880076CE0E /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		92F00CB21E226F110027C9F6 /* libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -237,9 +237,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		927838C71DF5F50200035E0D /* LowRes Core */ = {
+		927838C71DF5F50200035E0D /* LowRes NX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes Core" */;
+			buildConfigurationList = 927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes NX" */;
 			buildPhases = (
 				927838C41DF5F50200035E0D /* Sources */,
 				927838C51DF5F50200035E0D /* Frameworks */,
@@ -249,9 +249,9 @@
 			);
 			dependencies = (
 			);
-			name = "LowRes Core";
+			name = "LowRes NX";
 			productName = "LowRes Core iOS";
-			productReference = 927838C81DF5F50300035E0D /* LowRes Core.app */;
+			productReference = 927838C81DF5F50300035E0D /* LowRes NX.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -270,7 +270,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 927838C31DF5F50200035E0D /* Build configuration list for PBXProject "LowRes Core iOS" */;
+			buildConfigurationList = 927838C31DF5F50200035E0D /* Build configuration list for PBXProject "LowRes NX iOS" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -282,7 +282,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				927838C71DF5F50200035E0D /* LowRes Core */,
+				927838C71DF5F50200035E0D /* LowRes NX */,
 			);
 		};
 /* End PBXProject section */
@@ -292,10 +292,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				927838DB1DF5F50300035E0D /* LaunchScreen.storyboard in Resources */,
+				92BA003E1E9C1E880076CE0E /* Main.storyboard in Resources */,
 				9208F7551E2D5D8800C179D3 /* bas in Resources */,
-				927838D81DF5F50300035E0D /* Assets.xcassets in Resources */,
-				927838D61DF5F50300035E0D /* Main.storyboard in Resources */,
+				92BA003D1E9C1E880076CE0E /* LaunchScreen.storyboard in Resources */,
+				92BA003C1E9C1E880076CE0E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,6 +308,7 @@
 			files = (
 				929D20661E2B9961001FF319 /* interpreter.c in Sources */,
 				9272ADA41E8EE59300C4A7B6 /* cmd_memory.c in Sources */,
+				92BA003B1E9C1E880076CE0E /* AppDelegate.m in Sources */,
 				92FCE7301E9582D60099C80E /* cmd_maths.c in Sources */,
 				92F00CB91E226F110027C9F6 /* character_rom.c in Sources */,
 				9219E1F71E6E0C5600C13BB3 /* cmd_control.c in Sources */,
@@ -320,17 +321,16 @@
 				92D4FD541E34F1CB0068321E /* machine.c in Sources */,
 				92DC7B6E1E81B88700BC9CBB /* cmd_data.c in Sources */,
 				92F00CBF1E226FF40027C9F6 /* text_lib.c in Sources */,
-				927838D31DF5F50300035E0D /* ViewController.m in Sources */,
 				92F6A92D1E9003CD00A3F652 /* big_endian.c in Sources */,
-				927838D01DF5F50300035E0D /* AppDelegate.m in Sources */,
 				92F00CBC1E226F510027C9F6 /* audio_chip.c in Sources */,
 				924DA5021E1095DC001B65EB /* core.c in Sources */,
+				92BA00411E9C1E880076CE0E /* RendererViewController.m in Sources */,
 				92ECD9F01E84636A00FABD33 /* data.c in Sources */,
 				92D6CA701E7EFF5A006F21C5 /* cmd_strings.c in Sources */,
 				9219E1E81E6E038000C13BB3 /* token.c in Sources */,
-				924DA4FF1E100F8A001B65EB /* RendererViewController.m in Sources */,
-				927838CD1DF5F50300035E0D /* main.m in Sources */,
+				92BA00421E9C1E880076CE0E /* ViewController.m in Sources */,
 				9219E1EE1E6E04F600C13BB3 /* value.c in Sources */,
+				92BA00401E9C1E880076CE0E /* main.m in Sources */,
 				9219E1FA1E6E10F900C13BB3 /* cmd_variables.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -338,20 +338,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		927838D41DF5F50300035E0D /* Main.storyboard */ = {
+		92BA00311E9C1E880076CE0E /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				927838E31DF5F51F00035E0D /* en */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		927838D91DF5F50300035E0D /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				927838E21DF5F51F00035E0D /* en */,
+				92BA00321E9C1E880076CE0E /* en */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		92BA00331E9C1E880076CE0E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				92BA00341E9C1E880076CE0E /* en */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -452,9 +452,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = BZ4VC623NH;
-				INFOPLIST_FILE = "LowRes Core iOS/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/LowRes NX iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.ios.LowRes-Core-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.ios.LowRes-NX-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -464,9 +464,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = BZ4VC623NH;
-				INFOPLIST_FILE = "LowRes Core iOS/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/LowRes NX iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.ios.LowRes-Core-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.ios.LowRes-NX-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -474,7 +474,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		927838C31DF5F50200035E0D /* Build configuration list for PBXProject "LowRes Core iOS" */ = {
+		927838C31DF5F50200035E0D /* Build configuration list for PBXProject "LowRes NX iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				927838DD1DF5F50300035E0D /* Debug */,
@@ -483,7 +483,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes Core" */ = {
+		927838DF1DF5F50300035E0D /* Build configuration list for PBXNativeTarget "LowRes NX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				927838E01DF5F50300035E0D /* Debug */,
