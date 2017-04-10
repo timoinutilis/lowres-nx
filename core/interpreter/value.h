@@ -25,10 +25,10 @@
 #include "rcstring.h"
 
 enum ValueType {
-    ValueNull,
-    ValueError,
-    ValueFloat,
-    ValueString
+    ValueTypeNull,
+    ValueTypeError,
+    ValueTypeFloat,
+    ValueTypeString
 };
 
 union Value {
@@ -49,5 +49,7 @@ enum TypeClass {
 };
 
 extern union Value ValueDummy;
+
+struct TypedValue val_makeError(enum ErrorCode errorCode);
 
 #endif /* value_h */

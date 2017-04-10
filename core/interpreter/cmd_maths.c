@@ -18,12 +18,12 @@
 //
 
 #include "cmd_maths.h"
-#include "lowres_core.h"
+#include "core.h"
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
 
-struct TypedValue fnc_math1(struct LowResCore *core)
+struct TypedValue fnc_math1(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -32,19 +32,19 @@ struct TypedValue fnc_math1(struct LowResCore *core)
     interpreter->pc++;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     interpreter->pc++;
     
     // expression
-    struct TypedValue xValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (xValue.type == ValueError) return xValue;
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (xValue.type == ValueTypeError) return xValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     interpreter->pc++;
     
     struct TypedValue value;
-    value.type = ValueFloat;
+    value.type = ValueTypeFloat;
     
     if (interpreter->pass == PassRun)
     {
@@ -66,7 +66,7 @@ struct TypedValue fnc_math1(struct LowResCore *core)
     return value;
 }
 
-struct TypedValue fnc_math0(struct LowResCore *core)
+struct TypedValue fnc_math0(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -75,7 +75,7 @@ struct TypedValue fnc_math0(struct LowResCore *core)
     interpreter->pc++;
     
     struct TypedValue value;
-    value.type = ValueFloat;
+    value.type = ValueTypeFloat;
     
     if (interpreter->pass == PassRun)
     {

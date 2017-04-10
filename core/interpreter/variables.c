@@ -18,11 +18,11 @@
 //
 
 #include "variables.h"
-#include "lowres_core.h"
+#include "core.h"
 #include <stdlib.h>
 #include <string.h>
 
-struct SimpleVariable *LRC_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type)
+struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type)
 {
     struct SimpleVariable *variable = NULL;
     for (int i = 0; i < interpreter->numSimpleVariables; i++)
@@ -46,7 +46,7 @@ struct SimpleVariable *LRC_getSimpleVariable(struct Interpreter *interpreter, en
     memset(variable, 0, sizeof(struct SimpleVariable));
     variable->symbolIndex = symbolIndex;
     variable->type = type;
-    if (type == ValueString)
+    if (type == ValueTypeString)
     {
         // assign global NullString
         variable->v.stringValue = interpreter->nullString;
@@ -55,19 +55,19 @@ struct SimpleVariable *LRC_getSimpleVariable(struct Interpreter *interpreter, en
     return variable;
 }
 
-void LRC_freeSimpleVariables(struct Interpreter *interpreter)
+void var_freeSimpleVariables(struct Interpreter *interpreter)
 {
     for (int i = 0; i < interpreter->numSimpleVariables; i++)
     {
         struct SimpleVariable *variable = &interpreter->simpleVariables[i];
-        if (variable->type == ValueString)
+        if (variable->type == ValueTypeString)
         {
             rcstring_release(variable->v.stringValue);
         }
     }
 }
 
-struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int symbolIndex)
+struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int symbolIndex)
 {
     struct ArrayVariable *variable = NULL;
     for (int i = 0; i < interpreter->numArrayVariables; i++)
@@ -82,7 +82,7 @@ struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int 
     return NULL;
 }
 
-union Value *LRC_getArrayValue(struct Interpreter *interpreter, struct ArrayVariable *variable, int *indices)
+union Value *var_getArrayValue(struct Interpreter *interpreter, struct ArrayVariable *variable, int *indices)
 {
     int offset = 0;
     int factor = 1;
@@ -92,7 +92,7 @@ union Value *LRC_getArrayValue(struct Interpreter *interpreter, struct ArrayVari
         factor *= variable->dimensionSizes[i];
     }
     union Value *value = &variable->values[offset];
-    if (variable->type == ValueString && !value->stringValue)
+    if (variable->type == ValueTypeString && !value->stringValue)
     {
         // string variable was still uninitialized, assign global NullString
         value->stringValue = interpreter->nullString;
@@ -101,9 +101,9 @@ union Value *LRC_getArrayValue(struct Interpreter *interpreter, struct ArrayVari
     return value;
 }
 
-struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes)
+struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes)
 {
-    if (LRC_getArrayVariable(interpreter, symbolIndex))
+    if (var_getArrayVariable(interpreter, symbolIndex))
     {
         *errorCode = ErrorArrayAlreadyDimensionized;
         return NULL;
@@ -133,12 +133,12 @@ struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum Erro
     return variable;
 }
 
-void LRC_freeArrayVariables(struct Interpreter *interpreter)
+void var_freeArrayVariables(struct Interpreter *interpreter)
 {
     for (int i = 0; i < interpreter->numArrayVariables; i++)
     {
         struct ArrayVariable *variable = &interpreter->arrayVariables[i];
-        if (variable->type == ValueString)
+        if (variable->type == ValueTypeString)
         {
             int numElements = 1;
             for (int di = 0; di < variable->numDimensions; di++)

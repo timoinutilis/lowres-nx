@@ -22,11 +22,11 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "video_interface.h"
+#include "video_chip.h"
 
 #define INPUT_BUFFER_SIZE 256
 
-struct LowResCore;
+struct Core;
 
 struct TextLib {
     int characterOffset;
@@ -42,12 +42,12 @@ struct TextLib {
     int blink;
 };
 
-void LRC_printText(struct LowResCore *core, const char *text);
-bool LRC_deleteBackward(struct LowResCore *core);
-void LRC_writeText(struct LowResCore *core, const char *text, int x, int y);
-void LRC_writeNumber(struct LowResCore *core, int number, int digits, int x, int y);
-void LRC_inputTextBegin(struct LowResCore *core);
-bool LRC_inputTextUpdate(struct LowResCore *core);
-void LRC_clear(struct LowResCore *core);
+void txtlib_printText(struct Core *core, const char *text);
+bool txtlib_deleteBackward(struct Core *core);
+void txtlib_writeText(struct Core *core, const char *text, int x, int y);
+void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y);
+void txtlib_inputBegin(struct Core *core);
+bool txtlib_inputUpdate(struct Core *core);
+void txtlib_clear(struct Core *core);
 
 #endif /* text_lib_h */

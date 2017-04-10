@@ -17,8 +17,8 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef video_interface_h
-#define video_interface_h
+#ifndef video_chip_h
+#define video_chip_h
 
 #include <stdio.h>
 
@@ -32,7 +32,7 @@
 #define SPRITE_OFFSET_X 32
 #define SPRITE_OFFSET_Y 32
 
-struct LowResCore;
+struct Core;
 
 // ================ Character ================
 
@@ -132,6 +132,6 @@ struct VideoRegisters {
 // ================ Functions ================
 // ===========================================
 
-void LRC_renderScreen(struct LowResCore *core, uint8_t *outputRGB, int bytesPerLine);
+void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine);
 
-#endif /* video_interface_h */
+#endif /* video_chip_h */

@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include "character_rom.h"
 
-void LRC_initMachine(struct Machine *machine)
+void machine_init(struct Machine *machine)
 {
     assert(sizeof(struct Machine) == 0x10000);
     
@@ -31,7 +31,7 @@ void LRC_initMachine(struct Machine *machine)
     memcpy((struct CharacterBank *)&machine->characterRom, CharacterRom, sizeof(struct CharacterBank));
 }
 
-int LRC_peek(struct Machine *machine, int address)
+int machine_peek(struct Machine *machine, int address)
 {
     if (address < 0 || address > 0xFFFF)
     {
@@ -40,7 +40,7 @@ int LRC_peek(struct Machine *machine, int address)
     return *(uint8_t *)((uint8_t *)machine + address);
 }
 
-bool LRC_poke(struct Machine *machine, int address, int value)
+bool machine_poke(struct Machine *machine, int address, int value)
 {
     if (address < 0x8000 || address > 0xFFFF)
     {

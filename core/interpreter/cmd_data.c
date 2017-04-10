@@ -18,9 +18,9 @@
 //
 
 #include "cmd_data.h"
-#include "lowres_core.h"
+#include "core.h"
 
-enum ErrorCode cmd_DATA(struct LowResCore *core)
+enum ErrorCode cmd_DATA(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -53,7 +53,7 @@ enum ErrorCode cmd_DATA(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_READ(struct LowResCore *core)
+enum ErrorCode cmd_READ(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -63,9 +63,9 @@ enum ErrorCode cmd_READ(struct LowResCore *core)
         ++interpreter->pc;
         
         // variable
-        enum ValueType varType = ValueNull;
+        enum ValueType varType = ValueTypeNull;
         enum ErrorCode errorCode = ErrorNone;
-        union Value *varValue = LRC_readVariable(core, &varType, &errorCode);
+        union Value *varValue = itp_readVariable(core, &varType, &errorCode);
         if (!varValue) return errorCode;
             
         if (interpreter->pass == PassRun)
@@ -75,12 +75,12 @@ enum ErrorCode cmd_READ(struct LowResCore *core)
             struct Token *dataValueToken = interpreter->currentDataValueToken;
             if (dataValueToken->type == TokenFloat)
             {
-                if (varType != ValueFloat) return ErrorTypeMismatch;
+                if (varType != ValueTypeFloat) return ErrorTypeMismatch;
                 varValue->floatValue = dataValueToken->floatValue;
             }
             else if (dataValueToken->type == TokenString)
             {
-                if (varType != ValueString) return ErrorTypeMismatch;
+                if (varType != ValueTypeString) return ErrorTypeMismatch;
                 if (varValue->stringValue)
                 {
                     rcstring_release(varValue->stringValue);
@@ -89,15 +89,15 @@ enum ErrorCode cmd_READ(struct LowResCore *core)
                 rcstring_retain(varValue->stringValue);
             }
             
-            LRC_nextData(interpreter);
+            dat_nextData(interpreter);
         }
     }
     while (interpreter->pc->type == TokenComma);
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_RESTORE(struct LowResCore *core)
+enum ErrorCode cmd_RESTORE(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -110,22 +110,22 @@ enum ErrorCode cmd_RESTORE(struct LowResCore *core)
     {
         if (interpreter->pass == PassPrepare)
         {
-            struct JumpLabelItem *item = LRC_getJumpLabel(interpreter, interpreter->pc->symbolIndex);
+            struct JumpLabelItem *item = lab_getJumpLabel(interpreter, interpreter->pc->symbolIndex);
             if (!item) return ErrorUndefinedLabel;
             tokenRESTORE->jumpToken = item->token;
         }
         else if (interpreter->pass == PassRun)
         {
             // find DATA after label
-            LRC_restoreData(interpreter, tokenRESTORE->jumpToken);
+            dat_restoreData(interpreter, tokenRESTORE->jumpToken);
         }
         ++interpreter->pc;
     }
     else if (interpreter->pass == PassRun)
     {
         // restore to first DATA
-        LRC_restoreData(interpreter, NULL);
+        dat_restoreData(interpreter, NULL);
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }

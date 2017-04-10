@@ -18,7 +18,7 @@
 //
 
 #import "ViewController.h"
-#import "lowres_core.h"
+#import "core.h"
 #import "RendererViewController.h"
 
 @interface ViewController () <UIKeyInput>
@@ -27,26 +27,26 @@
 @end
 
 @implementation ViewController {
-    struct LowResCore *_core;
+    struct Core *_core;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    _core = calloc(1, sizeof(struct LowResCore));
+    _core = calloc(1, sizeof(struct Core));
     if (!_core)
     {
         printf("Alloc failed\n");
     }
     else
     {
-        LRC_init(_core);
+        core_init(_core);
         
         NSString *filePath = [[NSBundle mainBundle] pathForResource:@"menu" ofType:@"bas" inDirectory:@"bas"];
         NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
         
-        enum ErrorCode errorCode = LRC_compileProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
+        enum ErrorCode errorCode = itp_compileProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
         if (errorCode != ErrorNone)
         {
             printf("Compiler error at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[errorCode]);
@@ -64,7 +64,7 @@
     if (_core)
     {
         [self.rendererViewController setCore:NULL];
-        LRC_freeProgram(_core);
+        itp_freeProgram(_core);
         free(_core);
     }
 }

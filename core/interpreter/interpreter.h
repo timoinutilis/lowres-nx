@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "config.h"
+#include "interpreter_config.h"
 #include "token.h"
 #include "error.h"
 #include "value.h"
@@ -32,7 +32,7 @@
 #include "big_endian.h"
 #include "text_lib.h"
 
-struct LowResCore;
+struct Core;
 
 enum Pass {
     PassPrepare,
@@ -98,16 +98,15 @@ struct Interpreter {
     struct TextLib textLib;
 };
 
-enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode);
-void LRC_resetProgram(struct LowResCore *core);
-void LRC_runProgram(struct LowResCore *core);
-void LRC_runRasterProgram(struct LowResCore *core);
-void LRC_freeProgram(struct LowResCore *core);
+enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode);
+void itp_resetProgram(struct Core *core);
+void itp_runProgram(struct Core *core);
+void itp_runRasterProgram(struct Core *core);
+void itp_freeProgram(struct Core *core);
 
-union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode);
-struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass typeClass);
-int LRC_isEndOfCommand(struct Interpreter *interpreter);
-enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter);
-struct TypedValue LRC_makeError(enum ErrorCode errorCode);
+union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode);
+struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass);
+int itp_isEndOfCommand(struct Interpreter *interpreter);
+enum ErrorCode itp_endOfCommand(struct Interpreter *interpreter);
 
 #endif /* interpreter_h */

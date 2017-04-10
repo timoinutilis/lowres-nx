@@ -18,10 +18,10 @@
 //
 
 #include "cmd_control.h"
-#include "lowres_core.h"
+#include "core.h"
 #include <assert.h>
 
-enum ErrorCode cmd_END(struct LowResCore *core)
+enum ErrorCode cmd_END(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -38,10 +38,10 @@ enum ErrorCode cmd_END(struct LowResCore *core)
         interpreter->state = StateEnd;
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_IF(struct LowResCore *core)
+enum ErrorCode cmd_IF(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -50,9 +50,9 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
     ++interpreter->pc;
     
     // Expression
-    struct TypedValue value = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (value.type == ValueError) return value.v.errorCode;
-    if (value.type != ValueFloat) return ErrorTypeMismatch;
+    struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
+    if (value.type == ValueTypeError) return value.v.errorCode;
+    if (value.type != ValueTypeFloat) return ErrorTypeMismatch;
     
     // THEN
     if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
@@ -64,7 +64,7 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
         {
             // IF block
             if (interpreter->isSingleLineIf) return ErrorExpectedCommand;
-            enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeIF, tokenIF);
+            enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeIF, tokenIF);
             if (errorCode != ErrorNone) return errorCode;
             
             // Eol
@@ -93,7 +93,7 @@ enum ErrorCode cmd_IF(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_ELSE(struct LowResCore *core)
+enum ErrorCode cmd_ELSE(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -115,11 +115,11 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core)
         }
         else
         {
-            struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
+            struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
             if (!item || item->type != LabelTypeIF) return ErrorElseWithoutIf;
             item->token->jumpToken = interpreter->pc;
         
-            enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeELSE, tokenELSE);
+            enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeELSE, tokenELSE);
             if (errorCode != ErrorNone) return errorCode;
             
             if (interpreter->pc->type != TokenIF)
@@ -137,7 +137,7 @@ enum ErrorCode cmd_ELSE(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_ENDIF(struct LowResCore *core)
+enum ErrorCode cmd_ENDIF(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -151,7 +151,7 @@ enum ErrorCode cmd_ENDIF(struct LowResCore *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
+        struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
         if (!item)
         {
             return ErrorEndIfWithoutIf;
@@ -166,10 +166,10 @@ enum ErrorCode cmd_ENDIF(struct LowResCore *core)
             {
                 item->token->jumpToken = interpreter->pc;
                 
-                item = LRC_peekLabelStackItem(interpreter);
+                item = lab_peekLabelStackItem(interpreter);
                 if (item && item->type == LabelTypeELSE)
                 {
-                    item = LRC_popLabelStackItem(interpreter);
+                    item = lab_popLabelStackItem(interpreter);
                 }
                 else
                 {
@@ -185,7 +185,7 @@ enum ErrorCode cmd_ENDIF(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_FOR(struct LowResCore *core)
+enum ErrorCode cmd_FOR(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -196,18 +196,18 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
     // Variable
     struct Token *tokenFORVar = interpreter->pc;
     enum ErrorCode errorCode = ErrorNone;
-    enum ValueType valueType = ValueNull;
-    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
     if (!varValue) return errorCode;
-    if (valueType != ValueFloat) return ErrorTypeMismatch;
+    if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
     
     // Eq
     if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
     ++interpreter->pc;
     
     // start value
-    struct TypedValue startValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (startValue.type == ValueError) return startValue.v.errorCode;
+    struct TypedValue startValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (startValue.type == ValueTypeError) return startValue.v.errorCode;
     
     // TO
     if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
@@ -215,8 +215,8 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
 
     // limit value
     struct Token *tokenFORLimit = interpreter->pc;
-    struct TypedValue limitValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (limitValue.type == ValueError) return limitValue.v.errorCode;
+    struct TypedValue limitValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (limitValue.type == ValueTypeError) return limitValue.v.errorCode;
     
     // STEP
     struct TypedValue stepValue;
@@ -225,12 +225,12 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
         ++interpreter->pc;
         
         // step value
-        stepValue = LRC_evaluateExpression(core, TypeClassNumeric);
-        if (stepValue.type == ValueError) return stepValue.v.errorCode;
+        stepValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (stepValue.type == ValueTypeError) return stepValue.v.errorCode;
     }
     else
     {
-        stepValue.type = ValueFloat;
+        stepValue.type = ValueTypeFloat;
         stepValue.v.floatValue = 1.0f;
     }
     
@@ -240,9 +240,9 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        LRC_pushLabelStackItem(interpreter, LabelTypeFORLimit, tokenFORLimit);
-        LRC_pushLabelStackItem(interpreter, LabelTypeFORVar, tokenFORVar);
-        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeFOR, tokenFOR);
+        lab_pushLabelStackItem(interpreter, LabelTypeFORLimit, tokenFORLimit);
+        lab_pushLabelStackItem(interpreter, LabelTypeFORVar, tokenFORVar);
+        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeFOR, tokenFOR);
         if (errorCode != ErrorNone) return errorCode;
     }
     else if (interpreter->pass == PassRun)
@@ -259,7 +259,7 @@ enum ErrorCode cmd_FOR(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_NEXT(struct LowResCore *core)
+enum ErrorCode cmd_NEXT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     struct LabelStackItem *itemFORLimit = NULL;
@@ -268,13 +268,13 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        itemFOR = LRC_popLabelStackItem(interpreter);
+        itemFOR = lab_popLabelStackItem(interpreter);
         if (!itemFOR || itemFOR->type != LabelTypeFOR) return ErrorNextWithoutFor;
         
-        itemFORVar = LRC_popLabelStackItem(interpreter);
+        itemFORVar = lab_popLabelStackItem(interpreter);
         assert(itemFORVar && itemFORVar->type == LabelTypeFORVar);
         
-        itemFORLimit = LRC_popLabelStackItem(interpreter);
+        itemFORLimit = lab_popLabelStackItem(interpreter);
         assert(itemFORLimit && itemFORLimit->type == LabelTypeFORLimit);
     }
     
@@ -285,10 +285,10 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     // Variable
     enum ErrorCode errorCode = ErrorNone;
     struct Token *tokenVar = interpreter->pc;
-    enum ValueType valueType = ValueNull;
-    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
     if (!varValue) return errorCode;
-    if (valueType != ValueFloat) return ErrorTypeMismatch;
+    if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
     
     if (interpreter->pass == PassPrepare)
     {
@@ -310,8 +310,8 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
         interpreter->pc = tokenNEXT->jumpToken;
         
         // limit value
-        struct TypedValue limitValue = LRC_evaluateExpression(core, TypeClassNumeric);
-        if (limitValue.type == ValueError) return limitValue.v.errorCode;
+        struct TypedValue limitValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (limitValue.type == ValueTypeError) return limitValue.v.errorCode;
         
         // STEP
         struct TypedValue stepValue;
@@ -320,12 +320,12 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
             ++interpreter->pc;
             
             // step value
-            stepValue = LRC_evaluateExpression(core, TypeClassNumeric);
-            if (stepValue.type == ValueError) return stepValue.v.errorCode;
+            stepValue = itp_evaluateExpression(core, TypeClassNumeric);
+            if (stepValue.type == ValueTypeError) return stepValue.v.errorCode;
         }
         else
         {
-            stepValue.type = ValueFloat;
+            stepValue.type = ValueTypeFloat;
             stepValue.v.floatValue = 1.0f;
         }
         
@@ -345,7 +345,7 @@ enum ErrorCode cmd_NEXT(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_GOTO(struct LowResCore *core)
+enum ErrorCode cmd_GOTO(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -365,11 +365,11 @@ enum ErrorCode cmd_GOTO(struct LowResCore *core)
 
     if (interpreter->pass == PassPrepare)
     {
-        struct JumpLabelItem *item = LRC_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+        struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedLabel;
         tokenGOTO->jumpToken = item->token;
         
-        return LRC_endOfCommand(interpreter);
+        return itp_endOfCommand(interpreter);
     }
     else if (interpreter->pass == PassRun)
     {
@@ -378,7 +378,7 @@ enum ErrorCode cmd_GOTO(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_GOSUB(struct LowResCore *core)
+enum ErrorCode cmd_GOSUB(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -393,15 +393,15 @@ enum ErrorCode cmd_GOSUB(struct LowResCore *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        struct JumpLabelItem *item = LRC_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+        struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedLabel;
         tokenGOSUB->jumpToken = item->token;
         
-        return LRC_endOfCommand(interpreter);
+        return itp_endOfCommand(interpreter);
     }
     else if (interpreter->pass == PassRun)
     {
-        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeGOSUB, interpreter->pc);
+        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeGOSUB, interpreter->pc);
         if (errorCode != ErrorNone) return errorCode;
         
         interpreter->pc = tokenGOSUB->jumpToken; // after label
@@ -409,7 +409,7 @@ enum ErrorCode cmd_GOSUB(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_RETURN(struct LowResCore *core)
+enum ErrorCode cmd_RETURN(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -418,7 +418,7 @@ enum ErrorCode cmd_RETURN(struct LowResCore *core)
     
     if (interpreter->pass == PassRun)
     {
-        struct LabelStackItem *itemGOSUB = LRC_popLabelStackItem(interpreter);
+        struct LabelStackItem *itemGOSUB = lab_popLabelStackItem(interpreter);
         if (!itemGOSUB) return ErrorReturnWithoutGosub;
         
         if (itemGOSUB->type == LabelTypeONGOSUB)
@@ -437,10 +437,10 @@ enum ErrorCode cmd_RETURN(struct LowResCore *core)
         }
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_WAIT(struct LowResCore *core)
+enum ErrorCode cmd_WAIT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -460,8 +460,8 @@ enum ErrorCode cmd_WAIT(struct LowResCore *core)
     else
     {
         // value
-        struct TypedValue value = LRC_evaluateExpression(core, TypeClassNumeric);
-        if (value.type == ValueError) return value.v.errorCode;
+        struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
+        if (value.type == ValueTypeError) return value.v.errorCode;
         
         if (interpreter->pass == PassRun)
         {
@@ -474,10 +474,10 @@ enum ErrorCode cmd_WAIT(struct LowResCore *core)
     {
         interpreter->exitEvaluation = true;
     }
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_ON(struct LowResCore *core)
+enum ErrorCode cmd_ON(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -500,7 +500,7 @@ enum ErrorCode cmd_ON(struct LowResCore *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        struct JumpLabelItem *item = LRC_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+        struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedLabel;
         tokenGOSUB->jumpToken = item->token;
     }
@@ -509,10 +509,10 @@ enum ErrorCode cmd_ON(struct LowResCore *core)
         interpreter->currentOnRasterToken = tokenGOSUB->jumpToken; // after label
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_DO(struct LowResCore *core)
+enum ErrorCode cmd_DO(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -525,14 +525,14 @@ enum ErrorCode cmd_DO(struct LowResCore *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeDO, interpreter->pc);
+        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeDO, interpreter->pc);
         if (errorCode != ErrorNone) return errorCode;
     }
     
     return ErrorNone;
 }
 
-enum ErrorCode cmd_LOOP(struct LowResCore *core)
+enum ErrorCode cmd_LOOP(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -546,7 +546,7 @@ enum ErrorCode cmd_LOOP(struct LowResCore *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        struct LabelStackItem *item = LRC_popLabelStackItem(interpreter);
+        struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
         if (!item || item->type != LabelTypeDO) return ErrorLoopWithoutDo;
         
         tokenLOOP->jumpToken = item->token;
@@ -559,7 +559,7 @@ enum ErrorCode cmd_LOOP(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_EXIT(struct LowResCore *core)
+enum ErrorCode cmd_EXIT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -571,5 +571,5 @@ enum ErrorCode cmd_EXIT(struct LowResCore *core)
         
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }

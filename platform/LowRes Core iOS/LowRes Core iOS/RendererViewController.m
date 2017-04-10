@@ -18,7 +18,7 @@
 //
 
 #import "RendererViewController.h"
-#import "lowres_core.h"
+#import "core.h"
 
 #define TEXTURE_WIDTH 256
 #define TEXTURE_HEIGHT 128
@@ -46,7 +46,7 @@ const GLushort Indices[] = {
 @end
 
 @implementation RendererViewController {
-    struct LowResCore *_core;
+    struct Core *_core;
     GLuint _vertexBuffer;
     GLuint _indexBuffer;
     GLuint _texName;
@@ -85,7 +85,7 @@ const GLushort Indices[] = {
     }
 }
 
-- (void)setCore:(struct LowResCore *)core
+- (void)setCore:(struct Core *)core
 {
     _core = core;
 }
@@ -96,8 +96,8 @@ const GLushort Indices[] = {
     {
         if (_core->interpreter.state != StateEnd)
         {
-            LRC_update(_core);
-            LRC_renderScreen(_core, _textureData, 256*3);
+            core_update(_core);
+            video_renderScreen(_core, _textureData, 256*3);
             if (_core->interpreter.state == StateEnd)
             {
                 printf("Ended at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[_core->interpreter.exitErrorCode]);

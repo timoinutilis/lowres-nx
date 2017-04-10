@@ -21,10 +21,10 @@
 #define variables_h
 
 #include <stdio.h>
-#include "config.h"
+#include "interpreter_config.h"
 #include "value.h"
 
-struct LowResCore;
+struct Core;
 struct Interpreter;
 
 struct SimpleVariable {
@@ -41,12 +41,12 @@ struct ArrayVariable {
     union Value *values;
 };
 
-struct SimpleVariable *LRC_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type);
-void LRC_freeSimpleVariables(struct Interpreter *interpreter);
+struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type);
+void var_freeSimpleVariables(struct Interpreter *interpreter);
 
-struct ArrayVariable *LRC_getArrayVariable(struct Interpreter *interpreter, int symbolIndex);
-union Value *LRC_getArrayValue(struct Interpreter *interpreter, struct ArrayVariable *variable, int *indices);
-struct ArrayVariable *LRC_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes);
-void LRC_freeArrayVariables(struct Interpreter *interpreter);
+struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int symbolIndex);
+union Value *var_getArrayValue(struct Interpreter *interpreter, struct ArrayVariable *variable, int *indices);
+struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes);
+void var_freeArrayVariables(struct Interpreter *interpreter);
 
 #endif /* variables_h */

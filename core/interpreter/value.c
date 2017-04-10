@@ -20,3 +20,11 @@
 #include "value.h"
 
 union Value ValueDummy = {0};
+
+struct TypedValue val_makeError(enum ErrorCode errorCode)
+{
+    struct TypedValue value;
+    value.type = ValueTypeError;
+    value.v.errorCode = errorCode;
+    return value;
+}

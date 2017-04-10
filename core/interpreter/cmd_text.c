@@ -20,10 +20,10 @@
 #include "cmd_text.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include "lowres_core.h"
+#include "core.h"
 #include "text_lib.h"
 
-enum ErrorCode cmd_PRINT(struct LowResCore *core)
+enum ErrorCode cmd_PRINT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -37,23 +37,23 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
     // PRINT
     ++interpreter->pc;
     
-    while (!LRC_isEndOfCommand(interpreter))
+    while (!itp_isEndOfCommand(interpreter))
     {
-        struct TypedValue value = LRC_evaluateExpression(core, TypeClassAny);
-        if (value.type == ValueError) return value.v.errorCode;
+        struct TypedValue value = itp_evaluateExpression(core, TypeClassAny);
+        if (value.type == ValueTypeError) return value.v.errorCode;
         
         if (interpreter->pass == PassRun)
         {
-            if (value.type == ValueString)
+            if (value.type == ValueTypeString)
             {
-                LRC_printText(core, value.v.stringValue->chars);
+                txtlib_printText(core, value.v.stringValue->chars);
                 rcstring_release(value.v.stringValue);
             }
-            else if (value.type == ValueFloat)
+            else if (value.type == ValueTypeFloat)
             {
                 char buffer[20];
                 snprintf(buffer, 20, "%d", (int)value.v.floatValue);
-                LRC_printText(core, buffer);
+                txtlib_printText(core, buffer);
             }
         }
         
@@ -61,7 +61,7 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
         {
             if (interpreter->pass == PassRun)
             {
-                LRC_printText(core, " ");
+                txtlib_printText(core, " ");
             }
             ++interpreter->pc;
             newLine = false;
@@ -79,12 +79,12 @@ enum ErrorCode cmd_PRINT(struct LowResCore *core)
     
     if (interpreter->pass == PassRun && newLine)
     {
-        LRC_printText(core, "\n");
+        txtlib_printText(core, "\n");
     }
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_INPUT(struct LowResCore *core)
+enum ErrorCode cmd_INPUT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -101,7 +101,7 @@ enum ErrorCode cmd_INPUT(struct LowResCore *core)
         // prompt
         if (interpreter->pass == PassRun)
         {
-            LRC_printText(core, interpreter->pc->stringValue->chars);
+            txtlib_printText(core, interpreter->pc->stringValue->chars);
         }
         ++interpreter->pc;
         
@@ -112,7 +112,7 @@ enum ErrorCode cmd_INPUT(struct LowResCore *core)
     
     if (interpreter->pass == PassRun)
     {
-        LRC_inputTextBegin(core);
+        txtlib_inputBegin(core);
         interpreter->state = StateInput;
     }
     else
@@ -123,19 +123,19 @@ enum ErrorCode cmd_INPUT(struct LowResCore *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_endINPUT(struct LowResCore *core)
+enum ErrorCode cmd_endINPUT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
     // identifier
     enum ErrorCode errorCode = ErrorNone;
-    enum ValueType valueType = ValueNull;
-    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
     if (!varValue) return errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        if (valueType == ValueString)
+        if (valueType == ValueTypeString)
         {
             struct RCString *rcstring = rcstring_new(interpreter->textLib.inputBuffer, interpreter->textLib.inputLength);
             if (!rcstring) return ErrorOutOfMemory;
@@ -146,15 +146,15 @@ enum ErrorCode cmd_endINPUT(struct LowResCore *core)
             }
             varValue->stringValue = rcstring;
         }
-        else if (valueType == ValueFloat)
+        else if (valueType == ValueTypeFloat)
         {
             varValue->floatValue = atoi(interpreter->textLib.inputBuffer);
         }
     }
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_TEXT(struct LowResCore *core)
+enum ErrorCode cmd_TEXT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -167,34 +167,34 @@ enum ErrorCode cmd_TEXT(struct LowResCore *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (xValue.type == ValueError) return xValue.v.errorCode;
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
 
     // y value
-    struct TypedValue yValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (yValue.type == ValueError) return yValue.v.errorCode;
+    struct TypedValue yValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
 
     // string value
-    struct TypedValue stringValue = LRC_evaluateExpression(core, TypeClassString);
-    if (stringValue.type == ValueError) return stringValue.v.errorCode;
+    struct TypedValue stringValue = itp_evaluateExpression(core, TypeClassString);
+    if (stringValue.type == ValueTypeError) return stringValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        LRC_writeText(core, stringValue.v.stringValue->chars, xValue.v.floatValue, yValue.v.floatValue);
+        txtlib_writeText(core, stringValue.v.stringValue->chars, xValue.v.floatValue, yValue.v.floatValue);
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_NUMBER(struct LowResCore *core)
+enum ErrorCode cmd_NUMBER(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -207,42 +207,42 @@ enum ErrorCode cmd_NUMBER(struct LowResCore *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (xValue.type == ValueError) return xValue.v.errorCode;
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (yValue.type == ValueError) return yValue.v.errorCode;
+    struct TypedValue yValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (yValue.type == ValueTypeError) return yValue.v.errorCode;
     
     // comma
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
     
     // number value
-    struct TypedValue numberValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (numberValue.type == ValueError) return numberValue.v.errorCode;
+    struct TypedValue numberValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (numberValue.type == ValueTypeError) return numberValue.v.errorCode;
 
     // comma
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
     
     // digits value
-    struct TypedValue digitsValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (digitsValue.type == ValueError) return digitsValue.v.errorCode;
+    struct TypedValue digitsValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (digitsValue.type == ValueTypeError) return digitsValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        LRC_writeNumber(core, numberValue.v.floatValue, digitsValue.v.floatValue, xValue.v.floatValue, yValue.v.floatValue);
+        txtlib_writeNumber(core, numberValue.v.floatValue, digitsValue.v.floatValue, xValue.v.floatValue, yValue.v.floatValue);
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_CLS(struct LowResCore *core)
+enum ErrorCode cmd_CLS(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -256,8 +256,8 @@ enum ErrorCode cmd_CLS(struct LowResCore *core)
     
     if (interpreter->pass == PassRun)
     {
-        LRC_clear(core);
+        txtlib_clear(core);
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }

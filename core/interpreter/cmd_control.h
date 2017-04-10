@@ -23,21 +23,21 @@
 #include <stdio.h>
 #include "error.h"
 
-struct LowResCore;
+struct Core;
 
-enum ErrorCode cmd_END(struct LowResCore *core);
-enum ErrorCode cmd_IF(struct LowResCore *core);
-enum ErrorCode cmd_ELSE(struct LowResCore *core);
-enum ErrorCode cmd_ENDIF(struct LowResCore *core);
-enum ErrorCode cmd_FOR(struct LowResCore *core);
-enum ErrorCode cmd_NEXT(struct LowResCore *core);
-enum ErrorCode cmd_GOTO(struct LowResCore *core);
-enum ErrorCode cmd_GOSUB(struct LowResCore *core);
-enum ErrorCode cmd_RETURN(struct LowResCore *core);
-enum ErrorCode cmd_WAIT(struct LowResCore *core);
-enum ErrorCode cmd_ON(struct LowResCore *core);
-enum ErrorCode cmd_DO(struct LowResCore *core);
-enum ErrorCode cmd_LOOP(struct LowResCore *core);
-enum ErrorCode cmd_EXIT(struct LowResCore *core);
+enum ErrorCode cmd_END(struct Core *core);
+enum ErrorCode cmd_IF(struct Core *core);
+enum ErrorCode cmd_ELSE(struct Core *core);
+enum ErrorCode cmd_ENDIF(struct Core *core);
+enum ErrorCode cmd_FOR(struct Core *core);
+enum ErrorCode cmd_NEXT(struct Core *core);
+enum ErrorCode cmd_GOTO(struct Core *core);
+enum ErrorCode cmd_GOSUB(struct Core *core);
+enum ErrorCode cmd_RETURN(struct Core *core);
+enum ErrorCode cmd_WAIT(struct Core *core);
+enum ErrorCode cmd_ON(struct Core *core);
+enum ErrorCode cmd_DO(struct Core *core);
+enum ErrorCode cmd_LOOP(struct Core *core);
+enum ErrorCode cmd_EXIT(struct Core *core);
 
 #endif /* cmd_control_h */

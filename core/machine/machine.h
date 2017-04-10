@@ -22,9 +22,9 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "io_interface.h"
-#include "video_interface.h"
-#include "audio_interface.h"
+#include "io_chip.h"
+#include "video_chip.h"
+#include "audio_chip.h"
 
 // 64 KB
 struct Machine {
@@ -66,8 +66,8 @@ struct Machine {
     uint8_t reserved5[0x40 - sizeof(struct IORegisters)];
 };
 
-void LRC_initMachine(struct Machine *machine);
-int LRC_peek(struct Machine *machine, int address);
-bool LRC_poke(struct Machine *machine, int address, int value);
+void machine_init(struct Machine *machine);
+int machine_peek(struct Machine *machine, int address);
+bool machine_poke(struct Machine *machine, int address, int value);
 
 #endif /* machine_h */

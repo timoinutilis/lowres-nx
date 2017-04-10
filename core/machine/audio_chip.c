@@ -17,5 +17,5 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "video_interface.h"
+#include "audio_chip.h"
 

@@ -18,9 +18,9 @@
 //
 
 #include "text_lib.h"
-#include "lowres_core.h"
+#include "core.h"
 
-void LRC_scrollIfNeeded(struct LowResCore *core)
+void txtlib_scrollIfNeeded(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     struct Plane *plane = &core->machine.videoRam.planeB;
@@ -51,14 +51,14 @@ void LRC_scrollIfNeeded(struct LowResCore *core)
     }
 }
 
-void LRC_printText(struct LowResCore *core, const char *text)
+void txtlib_printText(struct Core *core, const char *text)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     struct Plane *plane = &core->machine.videoRam.planeB;
     const char *letter = text;
     while (*letter)
     {
-        LRC_scrollIfNeeded(core);
+        txtlib_scrollIfNeeded(core);
         
         if (*letter >= 32)
         {
@@ -84,7 +84,7 @@ void LRC_printText(struct LowResCore *core, const char *text)
     }
 }
 
-bool LRC_deleteBackward(struct LowResCore *core)
+bool txtlib_deleteBackward(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     struct Plane *plane = &core->machine.videoRam.planeB;
@@ -117,7 +117,7 @@ bool LRC_deleteBackward(struct LowResCore *core)
     return true;
 }
 
-void LRC_writeText(struct LowResCore *core, const char *text, int x, int y)
+void txtlib_writeText(struct Core *core, const char *text, int x, int y)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     struct Plane *plane = &core->machine.videoRam.planeB;
@@ -136,7 +136,7 @@ void LRC_writeText(struct LowResCore *core, const char *text, int x, int y)
     }
 }
 
-void LRC_writeNumber(struct LowResCore *core, int number, int digits, int x, int y)
+void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     struct Plane *plane = &core->machine.videoRam.planeB;
@@ -153,7 +153,7 @@ void LRC_writeNumber(struct LowResCore *core, int number, int digits, int x, int
     }
 }
 
-void LRC_inputTextBegin(struct LowResCore *core)
+void txtlib_inputBegin(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     lib->inputBuffer[0] = 0;
@@ -161,10 +161,10 @@ void LRC_inputTextBegin(struct LowResCore *core)
     lib->blink = 0;
     core->machine.ioRegisters.key = 0;
     
-    LRC_scrollIfNeeded(core);
+    txtlib_scrollIfNeeded(core);
 }
 
-bool LRC_inputTextUpdate(struct LowResCore *core)
+bool txtlib_inputUpdate(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     struct Plane *plane = &core->machine.videoRam.planeB;
@@ -177,7 +177,7 @@ bool LRC_inputTextUpdate(struct LowResCore *core)
         {
             if (lib->inputLength > 0)
             {
-                if (LRC_deleteBackward(core))
+                if (txtlib_deleteBackward(core))
                 {
                     lib->inputBuffer[--lib->inputLength] = 0;
                 }
@@ -190,7 +190,7 @@ bool LRC_inputTextUpdate(struct LowResCore *core)
             cell->attr.value = lib->charAttr.value;
             cell->character = lib->characterOffset;
             
-            LRC_printText(core, "\n");
+            txtlib_printText(core, "\n");
             done = true;
         }
         else
@@ -198,11 +198,11 @@ bool LRC_inputTextUpdate(struct LowResCore *core)
             if (lib->inputLength < INPUT_BUFFER_SIZE - 2)
             {
                 char text[2] = {key, 0};
-                LRC_printText(core, text);
+                txtlib_printText(core, text);
                 lib->inputBuffer[lib->inputLength++] = key;
                 lib->inputBuffer[lib->inputLength] = 0;
                 
-                LRC_scrollIfNeeded(core);
+                txtlib_scrollIfNeeded(core);
             }
         }
         lib->blink = 0;
@@ -222,7 +222,7 @@ bool LRC_inputTextUpdate(struct LowResCore *core)
     return done;
 }
 
-void LRC_clear(struct LowResCore *core)
+void txtlib_clear(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
     struct Plane *plane = &core->machine.videoRam.planeB;

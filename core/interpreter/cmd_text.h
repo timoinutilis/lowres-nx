@@ -23,13 +23,13 @@
 #include <stdio.h>
 #include "error.h"
 
-struct LowResCore;
+struct Core;
 
-enum ErrorCode cmd_PRINT(struct LowResCore *core);
-enum ErrorCode cmd_INPUT(struct LowResCore *core);
-enum ErrorCode cmd_endINPUT(struct LowResCore *core);
-enum ErrorCode cmd_TEXT(struct LowResCore *core);
-enum ErrorCode cmd_NUMBER(struct LowResCore *core);
-enum ErrorCode cmd_CLS(struct LowResCore *core);
+enum ErrorCode cmd_PRINT(struct Core *core);
+enum ErrorCode cmd_INPUT(struct Core *core);
+enum ErrorCode cmd_endINPUT(struct Core *core);
+enum ErrorCode cmd_TEXT(struct Core *core);
+enum ErrorCode cmd_NUMBER(struct Core *core);
+enum ErrorCode cmd_CLS(struct Core *core);
 
 #endif /* cmd_text_h */

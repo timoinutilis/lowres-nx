@@ -17,12 +17,20 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef audio_interface_h
-#define audio_interface_h
+#ifndef core_h
+#define core_h
 
 #include <stdio.h>
+#include "machine.h"
+#include "interpreter.h"
 
-struct AudioRegisters {
+struct Core {
+    struct Machine machine;
+    struct Interpreter interpreter;
 };
 
-#endif /* audio_interface_h */
+void core_init(struct Core *core);
+void core_update(struct Core *core);
+void core_rasterUpdate(struct Core *core);
+
+#endif /* core_h */

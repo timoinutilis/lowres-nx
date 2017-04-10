@@ -23,12 +23,12 @@
 #include <stdio.h>
 #include "error.h"
 
-struct LowResCore;
+struct Core;
 
-struct TypedValue fnc_PEEK(struct LowResCore *core);
-enum ErrorCode cmd_POKE(struct LowResCore *core);
-enum ErrorCode cmd_FILL(struct LowResCore *core);
-enum ErrorCode cmd_COPY(struct LowResCore *core);
-struct TypedValue fnc_STARTLENGTH(struct LowResCore *core);
+struct TypedValue fnc_PEEK(struct Core *core);
+enum ErrorCode cmd_POKE(struct Core *core);
+enum ErrorCode cmd_FILL(struct Core *core);
+enum ErrorCode cmd_COPY(struct Core *core);
+struct TypedValue fnc_STARTLENGTH(struct Core *core);
 
 #endif /* cmd_memory_h */

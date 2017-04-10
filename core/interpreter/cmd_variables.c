@@ -18,9 +18,9 @@
 //
 
 #include "cmd_variables.h"
-#include "lowres_core.h"
+#include "core.h"
 
-enum ErrorCode cmd_LET(struct LowResCore *core)
+enum ErrorCode cmd_LET(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -33,30 +33,30 @@ enum ErrorCode cmd_LET(struct LowResCore *core)
     
     // identifier
     enum ErrorCode errorCode = ErrorNone;
-    enum ValueType valueType = ValueNull;
-    union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
     if (!varValue) return errorCode;
     if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
     ++interpreter->pc;
     
     // value
-    struct TypedValue value = LRC_evaluateExpression(core, TypeClassAny);
-    if (value.type == ValueError) return value.v.errorCode;
+    struct TypedValue value = itp_evaluateExpression(core, TypeClassAny);
+    if (value.type == ValueTypeError) return value.v.errorCode;
     if (value.type != valueType) return ErrorTypeMismatch;
     
     if (interpreter->pass == PassRun)
     {
-        if (valueType == ValueString && varValue->stringValue)
+        if (valueType == ValueTypeString && varValue->stringValue)
         {
             rcstring_release(varValue->stringValue);
         }
         *varValue = value.v;
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_DIM(struct LowResCore *core)
+enum ErrorCode cmd_DIM(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -84,8 +84,8 @@ enum ErrorCode cmd_DIM(struct LowResCore *core)
     
     for (int i = 0; i < MAX_ARRAY_DIMENSIONS; i++)
     {
-        struct TypedValue value = LRC_evaluateExpression(core, TypeClassNumeric);
-        if (value.type == ValueError) return value.v.errorCode;
+        struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
+        if (value.type == ValueTypeError) return value.v.errorCode;
         
         dimensionSizes[i] = value.v.floatValue + 1; // value is max index, so size is +1
         numDimensions++;
@@ -106,10 +106,10 @@ enum ErrorCode cmd_DIM(struct LowResCore *core)
     if (interpreter->pass == PassRun)
     {
         enum ErrorCode errorCode = ErrorNone;
-        struct ArrayVariable *variable = LRC_dimVariable(interpreter, &errorCode, tokenIdentifier->symbolIndex, numDimensions, dimensionSizes);
+        struct ArrayVariable *variable = var_dimVariable(interpreter, &errorCode, tokenIdentifier->symbolIndex, numDimensions, dimensionSizes);
         if (!variable) return errorCode;
-        variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueString : ValueFloat;
+        variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueTypeString : ValueTypeFloat;
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }

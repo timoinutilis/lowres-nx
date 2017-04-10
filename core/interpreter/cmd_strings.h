@@ -23,12 +23,12 @@
 #include <stdio.h>
 #include "value.h"
 
-struct LowResCore;
+struct Core;
 
-struct TypedValue fnc_STR(struct LowResCore *core);
-struct TypedValue fnc_ASC(struct LowResCore *core);
-struct TypedValue fnc_CHR(struct LowResCore *core);
-struct TypedValue fnc_LEN(struct LowResCore *core);
-struct TypedValue fnc_INKEY(struct LowResCore *core);
+struct TypedValue fnc_STR(struct Core *core);
+struct TypedValue fnc_ASC(struct Core *core);
+struct TypedValue fnc_CHR(struct Core *core);
+struct TypedValue fnc_LEN(struct Core *core);
+struct TypedValue fnc_INKEY(struct Core *core);
 
 #endif /* cmd_strings_h */

@@ -20,7 +20,7 @@
 #include "data.h"
 #include "interpreter.h"
 
-void LRC_nextData(struct Interpreter *interpreter)
+void dat_nextData(struct Interpreter *interpreter)
 {
     interpreter->currentDataValueToken++;
     if (interpreter->currentDataValueToken->type == TokenComma)
@@ -43,7 +43,7 @@ void LRC_nextData(struct Interpreter *interpreter)
     }
 }
 
-void LRC_restoreData(struct Interpreter *interpreter, struct Token *jumpToken)
+void dat_restoreData(struct Interpreter *interpreter, struct Token *jumpToken)
 {
     if (jumpToken)
     {

@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2016 Timo Kloss
 //
 // This file is part of LowRes Core.
 //
@@ -17,20 +17,33 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef config_h
-#define config_h
+#include "core.h"
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include "text_lib.h"
 
-#define MAX_TOKENS 2048
-#define MAX_SYMBOLS 128
-#define MAX_LABEL_STACK_ITEMS 128
-#define MAX_JUMP_LABEL_ITEMS 128
-#define MAX_SIMPLE_VARIABLES 128
-#define MAX_ARRAY_VARIABLES 128
-#define SYMBOL_NAME_SIZE 21
-#define MAX_ARRAY_DIMENSIONS 8
-#define MAX_ARRAY_SIZE 32768
-#define MAX_ROM_DATA_ENTRIES 16
-#define MAX_CYCLES_PER_FRAME 100
-#define MAX_CYCLES_PER_VBL 100
+void core_init(struct Core *core)
+{
+    machine_init(&core->machine);
+    
+    struct TextLib *textLib = &core->interpreter.textLib;
+    textLib->charAttr.bank = 1;
+    textLib->charAttr.priority = 1;
+    textLib->charAttr.palette = 7;
+    textLib->characterOffset = 128;
+    textLib->areaX = 0;
+    textLib->areaY = 0;
+    textLib->areaWidth = 20;
+    textLib->areaHeight = 16;
+}
 
-#endif /* config_h */
+void core_update(struct Core *core)
+{
+    itp_runProgram(core);
+}
+
+void core_rasterUpdate(struct Core *core)
+{
+    itp_runRasterProgram(core);
+}

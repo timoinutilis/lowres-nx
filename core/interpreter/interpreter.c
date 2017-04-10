@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
-#include "lowres_core.h"
+#include "core.h"
 #include "cmd_control.h"
 #include "cmd_variables.h"
 #include "cmd_data.h"
@@ -31,17 +31,17 @@
 #include "cmd_text.h"
 #include "cmd_maths.h"
 
-enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode);
-struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level);
-struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core);
-struct TypedValue LRC_evaluateFunction(struct LowResCore *core);
-enum ErrorCode LRC_evaluateCommand(struct LowResCore *core);
+enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
+struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
+struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
+struct TypedValue itp_evaluateFunction(struct Core *core);
+enum ErrorCode itp_evaluateCommand(struct Core *core);
 
-enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCode)
+enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
 {
     // Tokenize
     
-    enum ErrorCode errorCode = LRC_tokenizeProgram(core, sourceCode);
+    enum ErrorCode errorCode = itp_tokenizeProgram(core, sourceCode);
     if (errorCode != ErrorNone) return errorCode;
     
     struct Interpreter *interpreter = &core->interpreter;
@@ -53,7 +53,7 @@ enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCod
     
     do
     {
-        errorCode = LRC_evaluateCommand(core);
+        errorCode = itp_evaluateCommand(core);
     }
     while (errorCode == ErrorNone && interpreter->pc->type != TokenUndefined);
     
@@ -63,12 +63,12 @@ enum ErrorCode LRC_compileProgram(struct LowResCore *core, const char *sourceCod
     // global null string
     interpreter->nullString = rcstring_new(NULL, 0);
     
-    LRC_resetProgram(core);
+    itp_resetProgram(core);
     
     return ErrorNone;
 }
 
-void LRC_resetProgram(struct LowResCore *core)
+void itp_resetProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -85,7 +85,7 @@ void LRC_resetProgram(struct LowResCore *core)
     interpreter->currentDataValueToken = interpreter->firstData + 1;
 }
 
-void LRC_runProgram(struct LowResCore *core)
+void itp_runProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -100,7 +100,7 @@ void LRC_runProgram(struct LowResCore *core)
             
             do
             {
-                errorCode = LRC_evaluateCommand(core);
+                errorCode = itp_evaluateCommand(core);
                 cycles++;
             }
             while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_FRAME && interpreter->state == StateEvaluate && !interpreter->exitEvaluation);
@@ -133,7 +133,7 @@ void LRC_runProgram(struct LowResCore *core)
             
         case StateInput:
         {
-            if (LRC_inputTextUpdate(core))
+            if (txtlib_inputUpdate(core))
             {
                 interpreter->state = StateEvaluate;
                 cmd_endINPUT(core);
@@ -146,7 +146,7 @@ void LRC_runProgram(struct LowResCore *core)
     }
 }
 
-void LRC_runRasterProgram(struct LowResCore *core)
+void itp_runRasterProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     if (interpreter->state != StateEnd && interpreter->currentOnRasterToken)
@@ -156,12 +156,12 @@ void LRC_runRasterProgram(struct LowResCore *core)
         struct Token *pc = interpreter->pc;
         interpreter->pc = core->interpreter.currentOnRasterToken;
         
-        enum ErrorCode errorCode = LRC_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
+        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
         int cycles = 0;
         
         while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_VBL && !interpreter->exitEvaluation)
         {
-            errorCode = LRC_evaluateCommand(core);
+            errorCode = itp_evaluateCommand(core);
             cycles++;
         }
         
@@ -183,12 +183,12 @@ void LRC_runRasterProgram(struct LowResCore *core)
     }
 }
 
-void LRC_freeProgram(struct LowResCore *core)
+void itp_freeProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    LRC_freeSimpleVariables(interpreter);
-    LRC_freeArrayVariables(interpreter);
+    var_freeSimpleVariables(interpreter);
+    var_freeArrayVariables(interpreter);
     
     // Free string tokens
     for (int i = 0; i < interpreter->numTokens; i++)
@@ -209,7 +209,7 @@ void LRC_freeProgram(struct LowResCore *core)
     assert(rcstring_count == 0);
 }
 
-enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCode)
+enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
 {
     const char *charSetDigits = "0123456789";
     const char *charSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
@@ -456,7 +456,7 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
             {
                 token->type = TokenLabel;
                 character++;
-                enum ErrorCode errorCode = LRC_setJumpLabel(interpreter, symbolIndex, token + 1);
+                enum ErrorCode errorCode = lab_setJumpLabel(interpreter, symbolIndex, token + 1);
                 if (errorCode != ErrorNone) return errorCode;
             }
             else
@@ -564,7 +564,7 @@ enum ErrorCode LRC_tokenizeProgram(struct LowResCore *core, const char *sourceCo
     return ErrorNone;
 }
 
-union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enum ErrorCode *errorCode)
+union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -576,14 +576,14 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
         return NULL;
     }
     
-    enum ValueType varType = ValueNull;
+    enum ValueType varType = ValueTypeNull;
     if (tokenIdentifier->type == TokenIdentifier)
     {
-        varType = ValueFloat;
+        varType = ValueTypeFloat;
     }
     else if (tokenIdentifier->type == TokenStringIdentifier)
     {
-        varType = ValueString;
+        varType = ValueTypeString;
     }
     if (type)
     {
@@ -601,7 +601,7 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
         struct ArrayVariable *variable = NULL;
         if (interpreter->pass == PassRun)
         {
-            variable = LRC_getArrayVariable(interpreter, symbolIndex);
+            variable = var_getArrayVariable(interpreter, symbolIndex);
             if (!variable)
             {
                 *errorCode = ErrorArrayNotDimensionized;
@@ -614,8 +614,8 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
         
         for (int i = 0; i < MAX_ARRAY_DIMENSIONS; i++)
         {
-            struct TypedValue indexValue = LRC_evaluateExpression(core, TypeClassNumeric);
-            if (indexValue.type == ValueError)
+            struct TypedValue indexValue = itp_evaluateExpression(core, TypeClassNumeric);
+            if (indexValue.type == ValueTypeError)
             {
                 *errorCode = indexValue.v.errorCode;
                 return NULL;
@@ -658,7 +658,7 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
                 *errorCode = ErrorWrongNumberOfDimensions;
                 return NULL;
             }
-            return LRC_getArrayValue(interpreter, variable, indices);
+            return var_getArrayValue(interpreter, variable, indices);
         }
     }
     else
@@ -666,7 +666,7 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
         // simple variable
         if (interpreter->pass == PassRun)
         {
-            struct SimpleVariable *variable = LRC_getSimpleVariable(interpreter, errorCode, symbolIndex, varType);
+            struct SimpleVariable *variable = var_getSimpleVariable(interpreter, errorCode, symbolIndex, varType);
             if (!variable) return NULL;
             return &variable->v;
         }
@@ -674,15 +674,15 @@ union Value *LRC_readVariable(struct LowResCore *core, enum ValueType *type, enu
     return &ValueDummy;
 }
 
-enum ErrorCode LRC_checkTypeClass(struct Interpreter *interpreter, enum ValueType valueType, enum TypeClass typeClass)
+enum ErrorCode itp_checkTypeClass(struct Interpreter *interpreter, enum ValueType valueType, enum TypeClass typeClass)
 {
-    if (interpreter->pass == PassPrepare && valueType != ValueError)
+    if (interpreter->pass == PassPrepare && valueType != ValueTypeError)
     {
-        if (typeClass == TypeClassString && valueType != ValueString)
+        if (typeClass == TypeClassString && valueType != ValueTypeString)
         {
             return ErrorExpectedStringExpression;
         }
-        else if (typeClass == TypeClassNumeric && valueType != ValueFloat)
+        else if (typeClass == TypeClassNumeric && valueType != ValueTypeFloat)
         {
             return ErrorExpectedNumericExpression;
         }
@@ -690,19 +690,19 @@ enum ErrorCode LRC_checkTypeClass(struct Interpreter *interpreter, enum ValueTyp
     return ErrorNone;
 }
 
-struct TypedValue LRC_evaluateExpression(struct LowResCore *core, enum TypeClass typeClass)
+struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass)
 {
-    struct TypedValue value = LRC_evaluateExpressionLevel(core, 0);
-    enum ErrorCode errorCode = LRC_checkTypeClass(&core->interpreter, value.type, typeClass);
+    struct TypedValue value = itp_evaluateExpressionLevel(core, 0);
+    enum ErrorCode errorCode = itp_checkTypeClass(&core->interpreter, value.type, typeClass);
     if (errorCode != ErrorNone)
     {
-        value.type = ValueError;
+        value.type = ValueTypeError;
         value.v.errorCode = errorCode;
     }
     return value;
 }
 
-bool LRC_isTokenLevel(enum TokenType token, int level)
+bool itp_isTokenLevel(enum TokenType token, int level)
 {
     switch (level)
     {
@@ -728,7 +728,7 @@ bool LRC_isTokenLevel(enum TokenType token, int level)
     return false;
 }
 
-struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level)
+struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
 {
     struct Interpreter *interpreter = &core->interpreter;
     enum TokenType type = interpreter->pc->type;
@@ -736,12 +736,12 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
     if (level == 2 && type == TokenNOT)
     {
         ++interpreter->pc;
-        struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
-        if (value.type == ValueError) return value;
-        enum ErrorCode errorCode = LRC_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
+        if (value.type == ValueTypeError) return value;
+        enum ErrorCode errorCode = itp_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
         if (errorCode != ErrorNone)
         {
-            value.type = ValueError;
+            value.type = ValueTypeError;
             value.v.errorCode = errorCode;
         }
         else
@@ -753,12 +753,12 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
     if (level == 7 && (type == TokenPlus || type == TokenMinus)) // unary
     {
         ++interpreter->pc;
-        struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
-        if (value.type == ValueError) return value;
-        enum ErrorCode errorCode = LRC_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
+        if (value.type == ValueTypeError) return value;
+        enum ErrorCode errorCode = itp_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
         if (errorCode != ErrorNone)
         {
-            value.type = ValueError;
+            value.type = ValueTypeError;
             value.v.errorCode = errorCode;
         }
         else if (type == TokenMinus)
@@ -769,30 +769,30 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
     }
     if (level == 9)
     {
-        return LRC_evaluatePrimaryExpression(core);
+        return itp_evaluatePrimaryExpression(core);
     }
     
-    struct TypedValue value = LRC_evaluateExpressionLevel(core, level + 1);
-    if (value.type == ValueError) return value;
+    struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
+    if (value.type == ValueTypeError) return value;
     
-    while (LRC_isTokenLevel(interpreter->pc->type, level))
+    while (itp_isTokenLevel(interpreter->pc->type, level))
     {
         enum TokenType type = interpreter->pc->type;
         ++interpreter->pc;
-        struct TypedValue rightValue = LRC_evaluateExpressionLevel(core, level + 1);
-        if (rightValue.type == ValueError) return rightValue;
+        struct TypedValue rightValue = itp_evaluateExpressionLevel(core, level + 1);
+        if (rightValue.type == ValueTypeError) return rightValue;
         
         struct TypedValue newValue;
         if (value.type != rightValue.type)
         {
-            newValue.type = ValueError;
+            newValue.type = ValueTypeError;
             newValue.v.errorCode = ErrorTypeMismatch;
             return newValue;
         }
         
-        if (value.type == ValueFloat)
+        if (value.type == ValueTypeFloat)
         {
-            newValue.type = ValueFloat;
+            newValue.type = ValueTypeFloat;
             switch (type)
             {
                 case TokenXOR: {
@@ -862,17 +862,17 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                     break;
                 }
                 default: {
-                    newValue.type = ValueError;
+                    newValue.type = ValueTypeError;
                     newValue.v.errorCode = ErrorSyntax;
                 }
             }
         }
-        else if (value.type == ValueString)
+        else if (value.type == ValueTypeString)
         {
             switch (type)
             {
                 case TokenEq: {
-                    newValue.type = ValueFloat;
+                    newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
                         newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) == 0) ? -1.0f : 0.0f;
@@ -880,7 +880,7 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                     break;
                 }
                 case TokenUneq: {
-                    newValue.type = ValueFloat;
+                    newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
                         newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) != 0) ? -1.0f : 0.0f;
@@ -888,7 +888,7 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                     break;
                 }
                 case TokenGr: {
-                    newValue.type = ValueFloat;
+                    newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
                         newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) > 0) ? -1.0f : 0.0f;
@@ -896,7 +896,7 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                     break;
                 }
                 case TokenLe: {
-                    newValue.type = ValueFloat;
+                    newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
                         newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) < 0) ? -1.0f : 0.0f;
@@ -904,7 +904,7 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                     break;
                 }
                 case TokenGrEq: {
-                    newValue.type = ValueFloat;
+                    newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
                         newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) >= 0) ? -1.0f : 0.0f;
@@ -912,7 +912,7 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                     break;
                 }
                 case TokenLeEq: {
-                    newValue.type = ValueFloat;
+                    newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
                         newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) <= 0) ? -1.0f : 0.0f;
@@ -920,7 +920,7 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                     break;
                 }
                 case TokenPlus: {
-                    newValue.type = ValueString;
+                    newValue.type = ValueTypeString;
                     if (interpreter->pass == PassRun)
                     {
                         size_t len1 = strlen(value.v.stringValue->chars);
@@ -939,12 +939,12 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
                 case TokenMul:
                 case TokenDiv:
                 case TokenPow: {
-                    newValue.type = ValueError;
+                    newValue.type = ValueTypeError;
                     newValue.v.errorCode = ErrorTypeMismatch;
                     break;
                 }
                 default: {
-                    newValue.type = ValueError;
+                    newValue.type = ValueTypeError;
                     newValue.v.errorCode = ErrorSyntax;
                 }
             }
@@ -956,30 +956,30 @@ struct TypedValue LRC_evaluateExpressionLevel(struct LowResCore *core, int level
         }
         
         value = newValue;
-        if (value.type == ValueError) break;
+        if (value.type == ValueTypeError) break;
     }
     return value;
 }
 
-struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
+struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
     // check for function
-    struct TypedValue value = LRC_evaluateFunction(core);
-    if (value.type != ValueNull) return value;
+    struct TypedValue value = itp_evaluateFunction(core);
+    if (value.type != ValueTypeNull) return value;
     
     // native types
     switch (interpreter->pc->type)
     {
         case TokenFloat: {
-            value.type = ValueFloat;
+            value.type = ValueTypeFloat;
             value.v.floatValue = interpreter->pc->floatValue;
             ++interpreter->pc;
             break;
         }
         case TokenString: {
-            value.type = ValueString;
+            value.type = ValueTypeString;
             value.v.stringValue = interpreter->pc->stringValue;
             if (interpreter->pass == PassRun)
             {
@@ -991,30 +991,30 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
         case TokenIdentifier:
         case TokenStringIdentifier: {
             enum ErrorCode errorCode = ErrorNone;
-            enum ValueType valueType = ValueNull;
-            union Value *varValue = LRC_readVariable(core, &valueType, &errorCode);
+            enum ValueType valueType = ValueTypeNull;
+            union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
             if (varValue)
             {
                 value.type = valueType;
                 value.v = *varValue;
-                if (interpreter->pass == PassRun && valueType == ValueString)
+                if (interpreter->pass == PassRun && valueType == ValueTypeString)
                 {
                     rcstring_retain(varValue->stringValue);
                 }
             }
             else
             {
-                value.type = ValueError;
+                value.type = ValueTypeError;
                 value.v.errorCode = errorCode;
             }
             break;
         }
         case TokenBracketOpen: {
             ++interpreter->pc;
-            value = LRC_evaluateExpression(core, TypeClassAny);
+            value = itp_evaluateExpression(core, TypeClassAny);
             if (interpreter->pc->type != TokenBracketClose)
             {
-                value.type = ValueError;
+                value.type = ValueTypeError;
                 value.v.errorCode = ErrorExpectedRightParenthesis;
             }
             else
@@ -1024,20 +1024,20 @@ struct TypedValue LRC_evaluatePrimaryExpression(struct LowResCore *core)
             break;
         }
         default: {
-            value.type = ValueError;
+            value.type = ValueTypeError;
             value.v.errorCode = ErrorSyntax;
         }
     }
     return value;
 }
 
-int LRC_isEndOfCommand(struct Interpreter *interpreter)
+int itp_isEndOfCommand(struct Interpreter *interpreter)
 {
     enum TokenType type = interpreter->pc->type;
     return (type == TokenEol || type == TokenELSE);
 }
 
-enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
+enum ErrorCode itp_endOfCommand(struct Interpreter *interpreter)
 {
     enum TokenType type = interpreter->pc->type;
     if (type == TokenEol)
@@ -1049,20 +1049,12 @@ enum ErrorCode LRC_endOfCommand(struct Interpreter *interpreter)
     return (type == TokenELSE) ? ErrorNone : ErrorUnexpectedToken;
 }
 
-struct TypedValue LRC_makeError(enum ErrorCode errorCode)
-{
-    struct TypedValue value;
-    value.type = ValueError;
-    value.v.errorCode = errorCode;
-    return value;
-}
-
-enum TokenType LRC_getNextTokenType(struct Interpreter *interpreter)
+enum TokenType itp_getNextTokenType(struct Interpreter *interpreter)
 {
     return (interpreter->pc + 1)->type;
 }
 
-struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
+struct TypedValue itp_evaluateFunction(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     switch (interpreter->pc->type)
@@ -1113,17 +1105,17 @@ struct TypedValue LRC_evaluateFunction(struct LowResCore *core)
         case TokenTAN:
         case TokenVAL:
             printf("Function not implemented: %s\n", TokenStrings[interpreter->pc->type]);
-            return LRC_makeError(ErrorUnexpectedToken);
+            return val_makeError(ErrorUnexpectedToken);
             
         default:
             break;
     }
     struct TypedValue value;
-    value.type = ValueNull;
+    value.type = ValueTypeNull;
     return value;
 }
 
-enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
+enum ErrorCode itp_evaluateCommand(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     switch (interpreter->pc->type)
@@ -1147,7 +1139,7 @@ enum ErrorCode LRC_evaluateCommand(struct LowResCore *core)
             break;
             
         case TokenEND:
-            if (LRC_getNextTokenType(interpreter) == TokenIF)
+            if (itp_getNextTokenType(interpreter) == TokenIF)
             {
                 return cmd_ENDIF(core);
             }

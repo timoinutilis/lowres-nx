@@ -20,7 +20,7 @@
 #include "labels.h"
 #include "interpreter.h"
 
-enum ErrorCode LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token)
+enum ErrorCode lab_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token)
 {
     if (interpreter->numLabelStackItems >= MAX_LABEL_STACK_ITEMS) return ErrorStackOverflow;
     struct LabelStackItem *item = &interpreter->labelStackItems[interpreter->numLabelStackItems];
@@ -30,7 +30,7 @@ enum ErrorCode LRC_pushLabelStackItem(struct Interpreter *interpreter, enum Labe
     return ErrorNone;
 }
 
-struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter)
+struct LabelStackItem *lab_popLabelStackItem(struct Interpreter *interpreter)
 {
     if (interpreter->numLabelStackItems > 0)
     {
@@ -40,7 +40,7 @@ struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter)
     return NULL;
 }
 
-struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter)
+struct LabelStackItem *lab_peekLabelStackItem(struct Interpreter *interpreter)
 {
     if (interpreter->numLabelStackItems > 0)
     {
@@ -49,7 +49,7 @@ struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter)
     return NULL;
 }
 
-struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex)
+struct JumpLabelItem *lab_getJumpLabel(struct Interpreter *interpreter, int symbolIndex)
 {
     struct JumpLabelItem *item;
     for (int i = 0; i < interpreter->numJumpLabelItems; i++)
@@ -63,9 +63,9 @@ struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symb
     return NULL;
 }
 
-enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token)
+enum ErrorCode lab_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token)
 {
-    if (LRC_getJumpLabel(interpreter, symbolIndex) != NULL)
+    if (lab_getJumpLabel(interpreter, symbolIndex) != NULL)
     {
         return ErrorLabelAlreadyDefined;
     }

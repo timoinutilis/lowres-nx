@@ -23,10 +23,10 @@
 #include <stdio.h>
 #include "error.h"
 
-struct LowResCore;
+struct Core;
 
-enum ErrorCode cmd_DATA(struct LowResCore *core);
-enum ErrorCode cmd_READ(struct LowResCore *core);
-enum ErrorCode cmd_RESTORE(struct LowResCore *core);
+enum ErrorCode cmd_DATA(struct Core *core);
+enum ErrorCode cmd_READ(struct Core *core);
+enum ErrorCode cmd_RESTORE(struct Core *core);
 
 #endif /* cmd_data_h */

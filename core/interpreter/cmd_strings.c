@@ -18,12 +18,12 @@
 //
 
 #include "cmd_strings.h"
-#include "lowres_core.h"
+#include "core.h"
 #include <string.h>
 #include <stdio.h>
 #include "rcstring.h"
 
-struct TypedValue fnc_STR(struct LowResCore *core)
+struct TypedValue fnc_STR(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -31,24 +31,24 @@ struct TypedValue fnc_STR(struct LowResCore *core)
     interpreter->pc++;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     interpreter->pc++;
     
     // expression
-    struct TypedValue numericValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (numericValue.type == ValueError) return numericValue;
+    struct TypedValue numericValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (numericValue.type == ValueTypeError) return numericValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     interpreter->pc++;
     
     struct TypedValue resultValue;
-    resultValue.type = ValueString;
+    resultValue.type = ValueTypeString;
     
     if (interpreter->pass == PassRun)
     {
         struct RCString *rcstring = rcstring_new(NULL, 20);
-        if (!rcstring) return LRC_makeError(ErrorOutOfMemory);
+        if (!rcstring) return val_makeError(ErrorOutOfMemory);
         
         snprintf(rcstring->chars, 20, "%d", (int)numericValue.v.floatValue);
         resultValue.v.stringValue = rcstring;
@@ -56,7 +56,7 @@ struct TypedValue fnc_STR(struct LowResCore *core)
     return resultValue;
 }
 
-struct TypedValue fnc_ASC(struct LowResCore *core)
+struct TypedValue fnc_ASC(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -64,32 +64,32 @@ struct TypedValue fnc_ASC(struct LowResCore *core)
     interpreter->pc++;
 
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     interpreter->pc++;
     
     // expression
-    struct TypedValue stringValue = LRC_evaluateExpression(core, TypeClassString);
-    if (stringValue.type == ValueError) return stringValue;
+    struct TypedValue stringValue = itp_evaluateExpression(core, TypeClassString);
+    if (stringValue.type == ValueTypeError) return stringValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     interpreter->pc++;
 
     struct TypedValue value;
-    value.type = ValueFloat;
+    value.type = ValueTypeFloat;
     
     if (interpreter->pass == PassRun)
     {
         char ch = stringValue.v.stringValue->chars[0];
         rcstring_release(stringValue.v.stringValue);
         
-        if (ch == 0) return LRC_makeError(ErrorInvalidParameter);
+        if (ch == 0) return val_makeError(ErrorInvalidParameter);
         value.v.floatValue = ch;
     }
     return value;
 }
 
-struct TypedValue fnc_CHR(struct LowResCore *core)
+struct TypedValue fnc_CHR(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -97,34 +97,34 @@ struct TypedValue fnc_CHR(struct LowResCore *core)
     interpreter->pc++;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     interpreter->pc++;
     
     // expression
-    struct TypedValue numericValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (numericValue.type == ValueError) return numericValue;
+    struct TypedValue numericValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (numericValue.type == ValueTypeError) return numericValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     interpreter->pc++;
     
     struct TypedValue resultValue;
-    resultValue.type = ValueString;
+    resultValue.type = ValueTypeString;
     
     if (interpreter->pass == PassRun)
     {
-        if (numericValue.v.floatValue < 0 || numericValue.v.floatValue > 255) return LRC_makeError(ErrorInvalidParameter);
+        if (numericValue.v.floatValue < 0 || numericValue.v.floatValue > 255) return val_makeError(ErrorInvalidParameter);
         
         char ch = numericValue.v.floatValue;
         struct RCString *rcstring = rcstring_new(&ch, 1);
-        if (!rcstring) return LRC_makeError(ErrorOutOfMemory);
+        if (!rcstring) return val_makeError(ErrorOutOfMemory);
         
         resultValue.v.stringValue = rcstring;
     }
     return resultValue;
 }
 
-struct TypedValue fnc_LEN(struct LowResCore *core)
+struct TypedValue fnc_LEN(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -132,19 +132,19 @@ struct TypedValue fnc_LEN(struct LowResCore *core)
     interpreter->pc++;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     interpreter->pc++;
     
     // expression
-    struct TypedValue stringValue = LRC_evaluateExpression(core, TypeClassString);
-    if (stringValue.type == ValueError) return stringValue;
+    struct TypedValue stringValue = itp_evaluateExpression(core, TypeClassString);
+    if (stringValue.type == ValueTypeError) return stringValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     interpreter->pc++;
     
     struct TypedValue value;
-    value.type = ValueFloat;
+    value.type = ValueTypeFloat;
     
     if (interpreter->pass == PassRun)
     {
@@ -154,7 +154,7 @@ struct TypedValue fnc_LEN(struct LowResCore *core)
     return value;
 }
 
-struct TypedValue fnc_INKEY(struct LowResCore *core)
+struct TypedValue fnc_INKEY(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -162,7 +162,7 @@ struct TypedValue fnc_INKEY(struct LowResCore *core)
     interpreter->pc++;
     
     struct TypedValue resultValue;
-    resultValue.type = ValueString;
+    resultValue.type = ValueTypeString;
     
     if (interpreter->pass == PassRun)
     {
@@ -172,7 +172,7 @@ struct TypedValue fnc_INKEY(struct LowResCore *core)
             core->machine.ioRegisters.key = 0;
             
             struct RCString *rcstring = rcstring_new(&key, 1);
-            if (!rcstring) return LRC_makeError(ErrorOutOfMemory);
+            if (!rcstring) return val_makeError(ErrorOutOfMemory);
             
             resultValue.v.stringValue = rcstring;
         }

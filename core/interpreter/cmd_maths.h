@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include "value.h"
 
-struct LowResCore;
+struct Core;
 
-struct TypedValue fnc_math1(struct LowResCore *core);
-struct TypedValue fnc_math0(struct LowResCore *core);
+struct TypedValue fnc_math1(struct Core *core);
+struct TypedValue fnc_math0(struct Core *core);
 
 #endif /* cmd_maths_h */

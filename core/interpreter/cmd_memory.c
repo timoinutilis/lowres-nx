@@ -18,9 +18,9 @@
 //
 
 #include "cmd_memory.h"
-#include "lowres_core.h"
+#include "core.h"
 
-struct TypedValue fnc_PEEK(struct LowResCore *core)
+struct TypedValue fnc_PEEK(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -28,30 +28,30 @@ struct TypedValue fnc_PEEK(struct LowResCore *core)
     interpreter->pc++;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     interpreter->pc++;
     
     // expression
-    struct TypedValue addressValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (addressValue.type == ValueError) return addressValue;
+    struct TypedValue addressValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (addressValue.type == ValueTypeError) return addressValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     interpreter->pc++;
     
     struct TypedValue resultValue;
-    resultValue.type = ValueFloat;
+    resultValue.type = ValueTypeFloat;
     
     if (interpreter->pass == PassRun)
     {
-        int peek = LRC_peek(&core->machine, addressValue.v.floatValue);
-        if (peek == -1) return LRC_makeError(ErrorIllegalMemoryAccess);
+        int peek = machine_peek(&core->machine, addressValue.v.floatValue);
+        if (peek == -1) return val_makeError(ErrorIllegalMemoryAccess);
         resultValue.v.floatValue = peek;
     }
     return resultValue;
 }
 
-enum ErrorCode cmd_POKE(struct LowResCore *core)
+enum ErrorCode cmd_POKE(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -59,26 +59,26 @@ enum ErrorCode cmd_POKE(struct LowResCore *core)
     ++interpreter->pc;
     
     // address value
-    struct TypedValue addressValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (addressValue.type == ValueError) return addressValue.v.errorCode;
+    struct TypedValue addressValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (addressValue.type == ValueTypeError) return addressValue.v.errorCode;
     
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
     
     // poke vale
-    struct TypedValue pokeValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (pokeValue.type == ValueError) return pokeValue.v.errorCode;
+    struct TypedValue pokeValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (pokeValue.type == ValueTypeError) return pokeValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        bool poke = LRC_poke(&core->machine, addressValue.v.floatValue, pokeValue.v.floatValue);
+        bool poke = machine_poke(&core->machine, addressValue.v.floatValue, pokeValue.v.floatValue);
         if (!poke) return ErrorIllegalMemoryAccess;
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_FILL(struct LowResCore *core)
+enum ErrorCode cmd_FILL(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -86,15 +86,15 @@ enum ErrorCode cmd_FILL(struct LowResCore *core)
     ++interpreter->pc;
 
     // start value
-    struct TypedValue startValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (startValue.type == ValueError) return startValue.v.errorCode;
+    struct TypedValue startValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (startValue.type == ValueTypeError) return startValue.v.errorCode;
 
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
 
     // length value
-    struct TypedValue lengthValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (lengthValue.type == ValueError) return lengthValue.v.errorCode;
+    struct TypedValue lengthValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (lengthValue.type == ValueTypeError) return lengthValue.v.errorCode;
     
     int fill = 0;
     if (interpreter->pc->type == TokenComma)
@@ -102,8 +102,8 @@ enum ErrorCode cmd_FILL(struct LowResCore *core)
         ++interpreter->pc;
     
         // fill value
-        struct TypedValue fillValue = LRC_evaluateExpression(core, TypeClassNumeric);
-        if (fillValue.type == ValueError) return fillValue.v.errorCode;
+        struct TypedValue fillValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (fillValue.type == ValueTypeError) return fillValue.v.errorCode;
         fill = fillValue.v.floatValue;
     }
     
@@ -113,15 +113,15 @@ enum ErrorCode cmd_FILL(struct LowResCore *core)
         int length = lengthValue.v.floatValue;
         for (int i = 0; i < length; i++)
         {
-            bool poke = LRC_poke(&core->machine, start + i, fill);
+            bool poke = machine_poke(&core->machine, start + i, fill);
             if (!poke) return ErrorIllegalMemoryAccess;
         }
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_COPY(struct LowResCore *core)
+enum ErrorCode cmd_COPY(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -129,22 +129,22 @@ enum ErrorCode cmd_COPY(struct LowResCore *core)
     ++interpreter->pc;
     
     // source value
-    struct TypedValue sourceValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (sourceValue.type == ValueError) return sourceValue.v.errorCode;
+    struct TypedValue sourceValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (sourceValue.type == ValueTypeError) return sourceValue.v.errorCode;
     
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
     
     // length value
-    struct TypedValue lengthValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (lengthValue.type == ValueError) return lengthValue.v.errorCode;
+    struct TypedValue lengthValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (lengthValue.type == ValueTypeError) return lengthValue.v.errorCode;
 
     if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
     ++interpreter->pc;
     
     // destination value
-    struct TypedValue destinationValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (destinationValue.type == ValueError) return destinationValue.v.errorCode;
+    struct TypedValue destinationValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (destinationValue.type == ValueTypeError) return destinationValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
@@ -153,17 +153,17 @@ enum ErrorCode cmd_COPY(struct LowResCore *core)
         int destination = destinationValue.v.floatValue;
         for (int i = 0; i < length; i++)
         {
-            int peek = LRC_peek(&core->machine, source + i);
+            int peek = machine_peek(&core->machine, source + i);
             if (peek == -1) return ErrorIllegalMemoryAccess;
-            bool poke = LRC_poke(&core->machine, destination + i, peek);
+            bool poke = machine_poke(&core->machine, destination + i, peek);
             if (!poke) return ErrorIllegalMemoryAccess;
         }
     }
     
-    return LRC_endOfCommand(interpreter);
+    return itp_endOfCommand(interpreter);
 }
 
-struct TypedValue fnc_STARTLENGTH(struct LowResCore *core)
+struct TypedValue fnc_STARTLENGTH(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -172,19 +172,19 @@ struct TypedValue fnc_STARTLENGTH(struct LowResCore *core)
     interpreter->pc++;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return LRC_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     interpreter->pc++;
     
     // index expression
-    struct TypedValue indexValue = LRC_evaluateExpression(core, TypeClassNumeric);
-    if (indexValue.type == ValueError) return indexValue;
+    struct TypedValue indexValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (indexValue.type == ValueTypeError) return indexValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return LRC_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     interpreter->pc++;
     
     struct TypedValue value;
-    value.type = ValueFloat;
+    value.type = ValueTypeFloat;
     
     if (interpreter->pass == PassRun)
     {

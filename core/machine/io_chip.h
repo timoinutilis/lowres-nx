@@ -17,8 +17,8 @@
 // along with LowRes Core.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef io_interface_h
-#define io_interface_h
+#ifndef io_chip_h
+#define io_chip_h
 
 #define NUM_GAMEPADS 2
 
@@ -54,4 +54,4 @@ struct IORegisters {
     };
 };
 
-#endif /* io_interface_h */
+#endif /* io_chip_h */

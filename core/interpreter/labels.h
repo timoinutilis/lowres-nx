@@ -46,10 +46,10 @@ struct JumpLabelItem {
     struct Token *token;
 };
 
-enum ErrorCode LRC_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
-struct LabelStackItem *LRC_popLabelStackItem(struct Interpreter *interpreter);
-struct LabelStackItem *LRC_peekLabelStackItem(struct Interpreter *interpreter);
-struct JumpLabelItem *LRC_getJumpLabel(struct Interpreter *interpreter, int symbolIndex);
-enum ErrorCode LRC_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token);
+enum ErrorCode lab_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
+struct LabelStackItem *lab_popLabelStackItem(struct Interpreter *interpreter);
+struct LabelStackItem *lab_peekLabelStackItem(struct Interpreter *interpreter);
+struct JumpLabelItem *lab_getJumpLabel(struct Interpreter *interpreter, int symbolIndex);
+enum ErrorCode lab_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token);
 
 #endif /* labels_h */

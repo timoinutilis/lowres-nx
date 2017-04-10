@@ -25,7 +25,7 @@
 struct Interpreter;
 struct Token;
 
-void LRC_nextData(struct Interpreter *interpreter);
-void LRC_restoreData(struct Interpreter *interpreter, struct Token *jumpToken);
+void dat_nextData(struct Interpreter *interpreter);
+void dat_restoreData(struct Interpreter *interpreter, struct Token *jumpToken);
 
 #endif /* data_h */
