@@ -44,6 +44,17 @@ bool machine_poke(struct Machine *machine, int address, int value)
 {
     if (address < 0x8000 || address > 0xFFFF)
     {
+        // cartridge ROM or outside RAM
+        return false;
+    }
+    if (address >= 0xE000 && address < 0xF000)
+    {
+        // character ROM
+        return false;
+    }
+    if (address >= 0xF240 && address < 0xFF40)
+    {
+        // reserved registers
         return false;
     }
     *(uint8_t *)((uint8_t *)machine + address) = value & 0xFF;

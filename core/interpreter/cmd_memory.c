@@ -176,7 +176,7 @@ struct TypedValue fnc_STARTLENGTH(struct Core *core)
     interpreter->pc++;
     
     // index expression
-    struct TypedValue indexValue = itp_evaluateExpression(core, TypeClassNumeric);
+    struct TypedValue indexValue = itp_evaluateNumericExpression(core, 0, MAX_ROM_DATA_ENTRIES);
     if (indexValue.type == ValueTypeError) return indexValue;
     
     // bracket close

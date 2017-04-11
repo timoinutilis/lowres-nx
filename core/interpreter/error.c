@@ -25,7 +25,7 @@ const char *ErrorStrings[] = {
     "Too Many Tokens",
     "ROM is full",
     "Index Already Defined",
-    "Expected End Of String",
+    "Unterminated String",
     "Unexpected Character",
     "Syntax Error",
     "Unexpected Token",

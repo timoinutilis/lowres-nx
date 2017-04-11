@@ -16,6 +16,7 @@
 		9219E1FA1E6E10F900C13BB3 /* cmd_variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 9219E1F81E6E10F900C13BB3 /* cmd_variables.c */; };
 		924DA5021E1095DC001B65EB /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 924DA5001E1095DC001B65EB /* core.c */; };
 		9272ADA41E8EE59300C4A7B6 /* cmd_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */; };
+		928BCDE31E9D681900883995 /* NSString+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 928BCDE21E9D681900883995 /* NSString+Utils.m */; };
 		929D20661E2B9961001FF319 /* interpreter.c in Sources */ = {isa = PBXBuildFile; fileRef = 929D20641E2B9961001FF319 /* interpreter.c */; };
 		92BA003B1E9C1E880076CE0E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 92BA002F1E9C1E880076CE0E /* AppDelegate.m */; };
 		92BA003C1E9C1E880076CE0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92BA00301E9C1E880076CE0E /* Assets.xcassets */; };
@@ -59,6 +60,8 @@
 		9272ADA21E8EE59300C4A7B6 /* cmd_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_memory.c; sourceTree = "<group>"; };
 		9272ADA31E8EE59300C4A7B6 /* cmd_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_memory.h; sourceTree = "<group>"; };
 		927838C81DF5F50300035E0D /* LowRes NX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		928BCDE11E9D681900883995 /* NSString+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Utils.h"; sourceTree = "<group>"; };
+		928BCDE21E9D681900883995 /* NSString+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Utils.m"; sourceTree = "<group>"; };
 		929D20641E2B9961001FF319 /* interpreter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = interpreter.c; sourceTree = "<group>"; };
 		929D20651E2B9961001FF319 /* interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interpreter.h; sourceTree = "<group>"; };
 		92BA002E1E9C1E880076CE0E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -143,6 +146,15 @@
 			path = ../../core;
 			sourceTree = "<group>";
 		};
+		928BCDE41E9D681E00883995 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				928BCDE11E9D681900883995 /* NSString+Utils.h */,
+				928BCDE21E9D681900883995 /* NSString+Utils.m */,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
 		929D20631E2B89F2001FF319 /* interpreter */ = {
 			isa = PBXGroup;
 			children = (
@@ -186,6 +198,7 @@
 		92BA002D1E9C1E880076CE0E /* LowRes NX iOS */ = {
 			isa = PBXGroup;
 			children = (
+				928BCDE41E9D681E00883995 /* Utils */,
 				92BA002E1E9C1E880076CE0E /* AppDelegate.h */,
 				92BA002F1E9C1E880076CE0E /* AppDelegate.m */,
 				92BA00331E9C1E880076CE0E /* Main.storyboard */,
@@ -310,6 +323,7 @@
 				9272ADA41E8EE59300C4A7B6 /* cmd_memory.c in Sources */,
 				92BA003B1E9C1E880076CE0E /* AppDelegate.m in Sources */,
 				92FCE7301E9582D60099C80E /* cmd_maths.c in Sources */,
+				928BCDE31E9D681900883995 /* NSString+Utils.m in Sources */,
 				92F00CB91E226F110027C9F6 /* character_rom.c in Sources */,
 				9219E1F71E6E0C5600C13BB3 /* cmd_control.c in Sources */,
 				92F00CBA1E226F110027C9F6 /* video_chip.c in Sources */,

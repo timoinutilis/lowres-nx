@@ -40,6 +40,7 @@ enum Pass {
 };
 
 enum State {
+    StateNoProgram,
     StateEvaluate,
     StateWait,
     StateInput,
@@ -106,6 +107,7 @@ void itp_freeProgram(struct Core *core);
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode);
 struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass);
+struct TypedValue itp_evaluateNumericExpression(struct Core *core, float min, float max);
 int itp_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode itp_endOfCommand(struct Interpreter *interpreter);
 

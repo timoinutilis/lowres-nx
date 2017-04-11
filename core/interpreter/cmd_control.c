@@ -36,6 +36,7 @@ enum ErrorCode cmd_END(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         interpreter->state = StateEnd;
+        return ErrorNone;
     }
     
     return itp_endOfCommand(interpreter);
@@ -52,7 +53,6 @@ enum ErrorCode cmd_IF(struct Core *core)
     // Expression
     struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
     if (value.type == ValueTypeError) return value.v.errorCode;
-    if (value.type != ValueTypeFloat) return ErrorTypeMismatch;
     
     // THEN
     if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;

@@ -20,6 +20,7 @@
 #import "ViewController.h"
 #import "core.h"
 #import "RendererViewController.h"
+#import "AppDelegate.h"
 
 @interface ViewController () <UIKeyInput>
 @property (nonatomic) RendererViewController *rendererViewController;
@@ -32,41 +33,10 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-    
-    _core = calloc(1, sizeof(struct Core));
-    if (!_core)
-    {
-        printf("Alloc failed\n");
-    }
-    else
-    {
-        core_init(_core);
-        
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"menu" ofType:@"bas" inDirectory:@"bas"];
-        NSString *demoProgram = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
-        
-        enum ErrorCode errorCode = itp_compileProgram(_core, [demoProgram cStringUsingEncoding:NSASCIIStringEncoding]);
-        if (errorCode != ErrorNone)
-        {
-            printf("Compiler error at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[errorCode]);
-        }
-        else
-        {
-            printf("Compiler success\n");
-            [self.rendererViewController setCore:_core];
-        }
-    }
-}
-
-- (void)dealloc
-{
-    if (_core)
-    {
-        [self.rendererViewController setCore:NULL];
-        itp_freeProgram(_core);
-        free(_core);
-    }
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    struct Core *core = [delegate getCore];
+    _core = core;
+    [self.rendererViewController setCore:core];
 }
 
 - (void)viewDidAppear:(BOOL)animated

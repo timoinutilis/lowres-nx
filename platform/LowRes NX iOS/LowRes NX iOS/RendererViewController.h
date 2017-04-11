@@ -18,7 +18,8 @@
 //
 
 #import <GLKit/GLKit.h>
-#import "core.h"
+
+struct Core;
 
 @interface RendererViewController : GLKViewController
 

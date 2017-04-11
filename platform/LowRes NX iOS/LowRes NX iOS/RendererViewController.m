@@ -19,6 +19,7 @@
 
 #import "RendererViewController.h"
 #import "core.h"
+#import "AppDelegate.h"
 
 #define TEXTURE_WIDTH 256
 #define TEXTURE_HEIGHT 128
@@ -98,9 +99,10 @@ const GLushort Indices[] = {
         {
             core_update(_core);
             video_renderScreen(_core, _textureData, 256*3);
-            if (_core->interpreter.state == StateEnd)
+            if (_core->interpreter.state == StateEnd && _core->interpreter.exitErrorCode != ErrorNone)
             {
-                printf("Ended at position %d: %s\n", _core->interpreter.pc->sourcePosition, ErrorStrings[_core->interpreter.exitErrorCode]);
+                AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+                [delegate showErrorWithCode:_core->interpreter.exitErrorCode];
             }
         }
     }

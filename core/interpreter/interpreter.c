@@ -141,6 +141,7 @@ void itp_runProgram(struct Core *core)
             break;
         }
             
+        case StateNoProgram:
         case StateEnd:
             break;
     }
@@ -149,43 +150,60 @@ void itp_runProgram(struct Core *core)
 void itp_runRasterProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    if (interpreter->state != StateEnd && interpreter->currentOnRasterToken)
+    
+    switch (interpreter->state)
     {
-        interpreter->mode = ModeInterrupt;
-        interpreter->exitEvaluation = false;
-        struct Token *pc = interpreter->pc;
-        interpreter->pc = core->interpreter.currentOnRasterToken;
-        
-        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
-        int cycles = 0;
-        
-        while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_VBL && !interpreter->exitEvaluation)
+        case StateEvaluate:
+        case StateWait:
+        case StateInput:
         {
-            errorCode = itp_evaluateCommand(core);
-            cycles++;
+            if (interpreter->currentOnRasterToken)
+            {
+                interpreter->mode = ModeInterrupt;
+                interpreter->exitEvaluation = false;
+                struct Token *pc = interpreter->pc;
+                interpreter->pc = core->interpreter.currentOnRasterToken;
+                
+                enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
+                int cycles = 0;
+                
+                while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_VBL && !interpreter->exitEvaluation)
+                {
+                    errorCode = itp_evaluateCommand(core);
+                    cycles++;
+                }
+                
+                interpreter->mode = ModeNone;
+                if (cycles == MAX_CYCLES_PER_VBL)
+                {
+                    interpreter->exitErrorCode = ErrorTooManyCommandCycles;
+                    interpreter->state = StateEnd;
+                }
+                else if (errorCode != ErrorNone)
+                {
+                    interpreter->exitErrorCode = errorCode;
+                    interpreter->state = StateEnd;
+                }
+                else
+                {
+                    interpreter->pc = pc;
+                }
+            }
+            break;
         }
-        
-        interpreter->mode = ModeNone;
-        if (cycles == MAX_CYCLES_PER_VBL)
-        {
-            interpreter->exitErrorCode = ErrorTooManyCommandCycles;
-            interpreter->state = StateEnd;
-        }
-        else if (errorCode != ErrorNone)
-        {
-            interpreter->exitErrorCode = errorCode;
-            interpreter->state = StateEnd;
-        }
-        else
-        {
-            interpreter->pc = pc;
-        }
+            
+        case StateNoProgram:
+        case StateEnd:
+            break;
     }
+
 }
 
 void itp_freeProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
+    
+    interpreter->state = StateNoProgram;
     
     var_freeSimpleVariables(interpreter);
     var_freeArrayVariables(interpreter);
@@ -257,7 +275,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                 character++;
                 if (*character == '\n')
                 {
-                    return ErrorExpectedEndOfString;
+                    return ErrorUnterminatedString;
                 }
             }
             int len = (int)(character - firstCharacter);
@@ -390,11 +408,8 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                     }
                 }
             }
-            else
-            {
-                token->type = foundKeywordToken;
-                interpreter->numTokens++;
-            }
+            token->type = foundKeywordToken;
+            interpreter->numTokens++;
             continue;
         }
         
@@ -698,6 +713,35 @@ struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeC
     {
         value.type = ValueTypeError;
         value.v.errorCode = errorCode;
+    }
+    return value;
+}
+
+struct TypedValue itp_evaluateNumericExpression(struct Core *core, float min, float max)
+{
+    struct TypedValue value = itp_evaluateExpressionLevel(core, 0);
+    if (value.type != ValueTypeError)
+    {
+        enum ErrorCode errorCode = ErrorNone; // itp_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        if (core->interpreter.pass == PassPrepare)
+        {
+            if (value.type != ValueTypeFloat)
+            {
+                errorCode = ErrorExpectedNumericExpression;
+            }
+        }
+        else if (core->interpreter.pass == PassRun)
+        {
+            if (value.v.floatValue < min || value.v.floatValue >= max)
+            {
+                errorCode = ErrorInvalidParameter;
+            }
+        }
+        if (errorCode != ErrorNone)
+        {
+            value.type = ValueTypeError;
+            value.v.errorCode = errorCode;
+        }
     }
     return value;
 }
@@ -1127,6 +1171,10 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             }
             break;
             
+        case TokenREM:
+            ++interpreter->pc;
+            break;
+            
         case TokenLabel:
             ++interpreter->pc;
             if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
@@ -1223,7 +1271,6 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_EXIT(core);
         
         case TokenRANDOMIZE:
-        case TokenREM:
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;

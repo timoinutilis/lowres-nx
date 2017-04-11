@@ -28,7 +28,7 @@ enum ErrorCode {
     ErrorTooManyTokens,
     ErrorRomIsFull,
     ErrorIndexAlreadyDefined,
-    ErrorExpectedEndOfString,
+    ErrorUnterminatedString,
     ErrorUnexpectedCharacter,
     ErrorSyntax,
     ErrorUnexpectedToken,

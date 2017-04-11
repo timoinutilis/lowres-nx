@@ -18,11 +18,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "error.h"
+
+struct Core;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
+- (struct Core*)getCore;
+- (void)showErrorWithCode:(enum ErrorCode)errorCode;
 
 @end
 
