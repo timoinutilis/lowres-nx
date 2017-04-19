@@ -65,50 +65,89 @@ enum ErrorCode cmd_DIM(struct Core *core)
         return ErrorNotAllowedInInterrupt;
     }
     
-    // DIM
-    ++interpreter->pc;
-    
-    // identifier
-    struct Token *tokenIdentifier = interpreter->pc;
-    ++interpreter->pc;
-    if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier)
+    do
     {
-        return ErrorExpectedVariableIdentifier;
+        // DIM or comma
+        ++interpreter->pc;
+        
+        // identifier
+        struct Token *tokenIdentifier = interpreter->pc;
+        ++interpreter->pc;
+        if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier)
+        {
+            return ErrorExpectedVariableIdentifier;
+        }
+        
+        int numDimensions = 0;
+        int dimensionSizes[MAX_ARRAY_DIMENSIONS];
+        
+        if (interpreter->pc->type != TokenBracketOpen) return ErrorExpectedLeftParenthesis;
+        ++interpreter->pc;
+        
+        for (int i = 0; i < MAX_ARRAY_DIMENSIONS; i++)
+        {
+            struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
+            if (value.type == ValueTypeError) return value.v.errorCode;
+            
+            dimensionSizes[i] = value.v.floatValue + 1; // value is max index, so size is +1
+            numDimensions++;
+            
+            if (interpreter->pc->type == TokenComma)
+            {
+                ++interpreter->pc;
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+        if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+        ++interpreter->pc;
+        
+        if (interpreter->pass == PassRun)
+        {
+            enum ErrorCode errorCode = ErrorNone;
+            struct ArrayVariable *variable = var_dimVariable(interpreter, &errorCode, tokenIdentifier->symbolIndex, numDimensions, dimensionSizes);
+            if (!variable) return errorCode;
+            variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueTypeString : ValueTypeFloat;
+        }
     }
+    while (interpreter->pc->type == TokenComma);
     
-    int numDimensions = 0;
-    int dimensionSizes[MAX_ARRAY_DIMENSIONS];
-    
-    if (interpreter->pc->type != TokenBracketOpen) return ErrorExpectedLeftParenthesis;
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_SWAP(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+
+    // SWAP
     ++interpreter->pc;
     
-    for (int i = 0; i < MAX_ARRAY_DIMENSIONS; i++)
-    {
-        struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
-        if (value.type == ValueTypeError) return value.v.errorCode;
-        
-        dimensionSizes[i] = value.v.floatValue + 1; // value is max index, so size is +1
-        numDimensions++;
-        
-        if (interpreter->pc->type == TokenComma)
-        {
-            ++interpreter->pc;
-        }
-        else
-        {
-            break;
-        }
-    }
+    enum ErrorCode errorCode = ErrorNone;
     
-    if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+    // x identifier
+    enum ValueType xValueType = ValueTypeNull;
+    union Value *xVarValue = itp_readVariable(core, &xValueType, &errorCode);
+    if (!xVarValue) return errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
+    
+    // y identifier
+    enum ValueType yValueType = ValueTypeNull;
+    union Value *yVarValue = itp_readVariable(core, &yValueType, &errorCode);
+    if (!yVarValue) return errorCode;
+    
+    if (xValueType != yValueType) return ErrorTypeMismatch;
     
     if (interpreter->pass == PassRun)
     {
-        enum ErrorCode errorCode = ErrorNone;
-        struct ArrayVariable *variable = var_dimVariable(interpreter, &errorCode, tokenIdentifier->symbolIndex, numDimensions, dimensionSizes);
-        if (!variable) return errorCode;
-        variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueTypeString : ValueTypeFloat;
+        union Value spareValue = *xVarValue;
+        *xVarValue = *yVarValue;
+        *yVarValue = spareValue;
     }
     
     return itp_endOfCommand(interpreter);

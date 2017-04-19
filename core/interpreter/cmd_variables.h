@@ -27,5 +27,6 @@ struct Core;
 
 enum ErrorCode cmd_LET(struct Core *core);
 enum ErrorCode cmd_DIM(struct Core *core);
+enum ErrorCode cmd_SWAP(struct Core *core);
 
 #endif /* cmd_variables_h */

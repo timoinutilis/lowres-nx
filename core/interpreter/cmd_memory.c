@@ -25,11 +25,11 @@ struct TypedValue fnc_PEEK(struct Core *core)
     struct Interpreter *interpreter = &core->interpreter;
     
     // PEEK
-    interpreter->pc++;
+    ++interpreter->pc;
     
     // bracket open
     if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
-    interpreter->pc++;
+    ++interpreter->pc;
     
     // expression
     struct TypedValue addressValue = itp_evaluateExpression(core, TypeClassNumeric);
@@ -37,7 +37,7 @@ struct TypedValue fnc_PEEK(struct Core *core)
     
     // bracket close
     if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
-    interpreter->pc++;
+    ++interpreter->pc;
     
     struct TypedValue resultValue;
     resultValue.type = ValueTypeFloat;
@@ -169,19 +169,19 @@ struct TypedValue fnc_STARTLENGTH(struct Core *core)
     
     // START/LENGTH
     enum TokenType type = interpreter->pc->type;
-    interpreter->pc++;
+    ++interpreter->pc;
     
     // bracket open
     if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
-    interpreter->pc++;
+    ++interpreter->pc;
     
     // index expression
-    struct TypedValue indexValue = itp_evaluateNumericExpression(core, 0, MAX_ROM_DATA_ENTRIES);
+    struct TypedValue indexValue = itp_evaluateNumericExpression(core, 0, MAX_ROM_DATA_ENTRIES - 1);
     if (indexValue.type == ValueTypeError) return indexValue;
     
     // bracket close
     if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
-    interpreter->pc++;
+    ++interpreter->pc;
     
     struct TypedValue value;
     value.type = ValueTypeFloat;

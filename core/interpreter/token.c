@@ -28,11 +28,13 @@ const char *TokenStrings[] = {
     NULL,
     NULL,
     
+    // Signs
     ":",
     ",",
     ";",
     NULL,
     
+    // Operators
     "=",
     ">=",
     "<=",
@@ -46,8 +48,12 @@ const char *TokenStrings[] = {
     "*",
     "/",
     "^",
-    
     "AND",
+    "NOT",
+    "OR",
+    "XOR",
+    
+    // Commands
     "CLS",
     "COPY",
     "DATA",
@@ -55,7 +61,6 @@ const char *TokenStrings[] = {
     "DO",
     "ELSE",
     "END",
-    "EXIT",
     "FILL",
     "FOR",
     "GOSUB",
@@ -66,10 +71,8 @@ const char *TokenStrings[] = {
     "LOOP",
     "MOD",
     "NEXT",
-    "NOT",
     "NUMBER",
     "ON",
-    "OR",
     "PEEK",
     "POKE",
     "PRINT",
@@ -77,19 +80,25 @@ const char *TokenStrings[] = {
     "RASTER",
     "READ",
     "REM",
+    "REPEAT",
     "RESTORE",
     "RETURN",
     "STEP",
+    "SWAP",
     "TEXT",
     "THEN",
     "TO",
+    "UNTIL",
     "VBL",
     "WAIT",
-    "XOR",
+    "WEND",
+    "WHILE",
     
+    // Functions
     "ABS",
     "ASC",
     "ATN",
+    "BIN$",
     "CHR$",
     "COS",
     "EXP",
@@ -104,6 +113,7 @@ const char *TokenStrings[] = {
     "MAX",
     "MID$",
     "MIN",
+    "PI",
     "RIGHT$",
     "RND",
     "SGN",
@@ -112,5 +122,16 @@ const char *TokenStrings[] = {
     "START",
     "STR$",
     "TAN",
-    "VAL"
+    "TIMER",
+    "VAL",
+    
+    // Reserved Keywords
+    NULL,
+    "CALL",
+    "DEF",
+    "SHARED",
+    "SUB",
+    "UBOUND",
+    
+    NULL
 };

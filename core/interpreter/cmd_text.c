@@ -167,7 +167,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 32);
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 31);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -175,7 +175,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     ++interpreter->pc;
 
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 32);
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 31);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
@@ -207,7 +207,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 32);
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 31);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -215,7 +215,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 32);
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 31);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
     
     // comma

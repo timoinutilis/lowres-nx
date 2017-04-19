@@ -32,11 +32,13 @@ enum TokenType {
     TokenFloat,
     TokenString,
     
+    // Signs
     TokenColon,
     TokenComma,
     TokenSemicolon,
     TokenEol,
     
+    // Operators
     TokenEq,
     TokenGrEq,
     TokenLeEq,
@@ -50,8 +52,12 @@ enum TokenType {
     TokenMul,
     TokenDiv,
     TokenPow,
-    
     TokenAND,
+    TokenNOT,
+    TokenOR,
+    TokenXOR,
+    
+    // Commands
     TokenCLS,
     TokenCOPY,
     TokenDATA,
@@ -59,7 +65,6 @@ enum TokenType {
     TokenDO,
     TokenELSE,
     TokenEND,
-    TokenEXIT,
     TokenFILL,
     TokenFOR,
     TokenGOSUB,
@@ -70,10 +75,8 @@ enum TokenType {
     TokenLOOP,
     TokenMOD,
     TokenNEXT,
-    TokenNOT,
     TokenNUMBER,
     TokenON,
-    TokenOR,
     TokenPEEK,
     TokenPOKE,
     TokenPRINT,
@@ -81,19 +84,25 @@ enum TokenType {
     TokenRASTER,
     TokenREAD,
     TokenREM,
+    TokenREPEAT,
     TokenRESTORE,
     TokenRETURN,
     TokenSTEP,
+    TokenSWAP,
     TokenTEXT,
     TokenTHEN,
     TokenTO,
+    TokenUNTIL,
     TokenVBL,
     TokenWAIT,
-    TokenXOR,
+    TokenWEND,
+    TokenWHILE,
     
+    // Functions
     TokenABS,
     TokenASC,
     TokenATN,
+    TokenBIN,
     TokenCHR,
     TokenCOS,
     TokenEXP,
@@ -108,6 +117,7 @@ enum TokenType {
     TokenMAX,
     TokenMID,
     TokenMIN,
+    TokenPI,
     TokenRIGHT,
     TokenRND,
     TokenSGN,
@@ -116,7 +126,16 @@ enum TokenType {
     TokenSTART,
     TokenSTR,
     TokenTAN,
+    TokenTIMER,
     TokenVAL,
+    
+    // Reserved Keywords
+    Token_reserved,
+    TokenCALL,
+    TokenDEF,
+    TokenSHARED,
+    TokenSUB,
+    TokenUBOUND,
     
     Token_count
 };

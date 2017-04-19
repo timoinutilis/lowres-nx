@@ -408,6 +408,10 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                     }
                 }
             }
+            else if (foundKeywordToken > Token_reserved)
+            {
+                return ErrorReservedKeyword;
+            }
             token->type = foundKeywordToken;
             interpreter->numTokens++;
             continue;
@@ -651,7 +655,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
             
             if (interpreter->pc->type == TokenComma)
             {
-                interpreter->pc++;
+                ++interpreter->pc;
             }
             else
             {
@@ -717,12 +721,12 @@ struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeC
     return value;
 }
 
-struct TypedValue itp_evaluateNumericExpression(struct Core *core, float min, float max)
+struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int max)
 {
     struct TypedValue value = itp_evaluateExpressionLevel(core, 0);
     if (value.type != ValueTypeError)
     {
-        enum ErrorCode errorCode = ErrorNone; // itp_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        enum ErrorCode errorCode = ErrorNone;
         if (core->interpreter.pass == PassPrepare)
         {
             if (value.type != ValueTypeFloat)
@@ -732,7 +736,7 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, float min, fl
         }
         else if (core->interpreter.pass == PassRun)
         {
-            if (value.v.floatValue < min || value.v.floatValue >= max)
+            if ((int)value.v.floatValue < min || (int)value.v.floatValue > max)
             {
                 errorCode = ErrorInvalidParameter;
             }
@@ -1103,27 +1107,60 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
     struct Interpreter *interpreter = &core->interpreter;
     switch (interpreter->pc->type)
     {
-        case TokenSTR:
-            return fnc_STR(core);
-            
         case TokenASC:
             return fnc_ASC(core);
+            
+        case TokenBIN:
+        case TokenHEX:
+            return fnc_BINHEX(core);
             
         case TokenCHR:
             return fnc_CHR(core);
             
+        case TokenINSTR:
+            return fnc_INSTR(core);
+            
+        case TokenLEFT:
+            return fnc_LEFT(core);
+            
         case TokenLEN:
             return fnc_LEN(core);
             
+        case TokenMID:
+            return fnc_MID(core);
+            
+        case TokenRIGHT:
+            return fnc_RIGHT(core);
+            
+        case TokenSTR:
+            return fnc_STR(core);
+            
+        case TokenVAL:
+            return fnc_VAL(core);
+
         case TokenPEEK:
             return fnc_PEEK(core);
             
-        case TokenSIN:
+        case TokenPI:
+        case TokenRND:
+        case TokenTIMER:
+            return fnc_math0(core);
+            
+        case TokenABS:
+        case TokenATN:
+        case TokenCOS:
+        case TokenEXP:
         case TokenINT:
+        case TokenLOG:
+        case TokenSGN:
+        case TokenSIN:
+        case TokenSQR:
+        case TokenTAN:
             return fnc_math1(core);
 
-        case TokenRND:
-            return fnc_math0(core);
+        case TokenMAX:
+        case TokenMIN:
+            return fnc_math2(core);
             
         case TokenINKEY:
             return fnc_INKEY(core);
@@ -1132,25 +1169,6 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenLENGTH:
             return fnc_STARTLENGTH(core);
 
-        case TokenABS:
-        case TokenATN:
-        case TokenCOS:
-        case TokenEXP:
-        case TokenHEX:
-        case TokenINSTR:
-        case TokenLEFT:
-        case TokenLOG:
-        case TokenMAX:
-        case TokenMID:
-        case TokenMIN:
-        case TokenRIGHT:
-        case TokenSGN:
-        case TokenSQR:
-        case TokenTAN:
-        case TokenVAL:
-            printf("Function not implemented: %s\n", TokenStrings[interpreter->pc->type]);
-            return val_makeError(ErrorUnexpectedToken);
-            
         default:
             break;
     }
@@ -1254,6 +1272,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenON:
             return cmd_ON(core);
+            
+        case TokenSWAP:
+            return cmd_SWAP(core);
         
         case TokenTEXT:
             return cmd_TEXT(core);
@@ -1266,11 +1287,22 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenLOOP:
             return cmd_LOOP(core);
-            
-        case TokenEXIT:
-            return cmd_EXIT(core);
         
+        case TokenREPEAT:
+            return cmd_REPEAT(core);
+            
+        case TokenUNTIL:
+            return cmd_UNTIL(core);
+            
+        case TokenWHILE:
+            return cmd_WHILE(core);
+            
+        case TokenWEND:
+            return cmd_WEND(core);
+
         case TokenRANDOMIZE:
+            return cmd_RANDOMIZE(core);
+            
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;

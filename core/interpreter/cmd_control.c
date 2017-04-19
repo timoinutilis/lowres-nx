@@ -559,17 +559,116 @@ enum ErrorCode cmd_LOOP(struct Core *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_EXIT(struct Core *core)
+enum ErrorCode cmd_REPEAT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    // EXIT
+    // REPEAT
+    ++interpreter->pc;
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
     {
-        
+        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeREPEAT, interpreter->pc);
+        if (errorCode != ErrorNone) return errorCode;
     }
     
-    return itp_endOfCommand(interpreter);
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_UNTIL(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // UNTIL
+    struct Token *tokenUNTIL = interpreter->pc;
+    ++interpreter->pc;
+    
+    // Expression
+    struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
+    if (value.type == ValueTypeError) return value.v.errorCode;
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
+        if (!item || item->type != LabelTypeREPEAT) return ErrorUntilWithoutRepeat;
+        
+        tokenUNTIL->jumpToken = item->token;
+    }
+    else if (interpreter->pass == PassRun)
+    {
+        if (value.v.floatValue == 0)
+        {
+            interpreter->pc = tokenUNTIL->jumpToken; // after REPEAT
+        }
+    }
+    
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_WHILE(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // WHILE
+    struct Token *tokenWHILE = interpreter->pc;
+    if (interpreter->pass == PassPrepare)
+    {
+        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeWHILE, tokenWHILE);
+        if (errorCode != ErrorNone) return errorCode;
+    }
+    ++interpreter->pc;
+    
+    // Expression
+    struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
+    if (value.type == ValueTypeError) return value.v.errorCode;
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (value.v.floatValue == 0)
+        {
+            interpreter->pc = tokenWHILE->jumpToken; // after WEND
+        }
+    }
+    
+    return ErrorNone;
+}
+
+enum ErrorCode cmd_WEND(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // WEND
+    struct Token *tokenWEND = interpreter->pc;
+    ++interpreter->pc;
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
+        if (!item || item->type != LabelTypeWHILE) return ErrorWendWithoutWhile;
+        
+        tokenWEND->jumpToken = item->token;
+        item->token->jumpToken = interpreter->pc;
+    }
+    else if (interpreter->pass == PassRun)
+    {
+        interpreter->pc = tokenWEND->jumpToken; // on WHILE
+    }
+    
+    return ErrorNone;
 }
