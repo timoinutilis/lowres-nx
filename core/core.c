@@ -31,7 +31,7 @@ void core_init(struct Core *core)
     textLib->charAttr.bank = 1;
     textLib->charAttr.priority = 1;
     textLib->charAttr.palette = 7;
-    textLib->characterOffset = 128;
+    textLib->characterOffset = 192;
     textLib->areaX = 0;
     textLib->areaY = 0;
     textLib->areaWidth = 20;
