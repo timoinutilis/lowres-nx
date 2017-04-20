@@ -148,7 +148,7 @@ enum ErrorCode cmd_endINPUT(struct Core *core)
         }
         else if (valueType == ValueTypeFloat)
         {
-            varValue->floatValue = atoi(interpreter->textLib.inputBuffer);
+            varValue->floatValue = atof(interpreter->textLib.inputBuffer);
         }
     }
     return itp_endOfCommand(interpreter);

@@ -1121,16 +1121,14 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             return fnc_INSTR(core);
             
         case TokenLEFT:
-            return fnc_LEFT(core);
+        case TokenRIGHT:
+            return fnc_LEFTRIGHT(core);
             
         case TokenLEN:
             return fnc_LEN(core);
             
         case TokenMID:
             return fnc_MID(core);
-            
-        case TokenRIGHT:
-            return fnc_RIGHT(core);
             
         case TokenSTR:
             return fnc_STR(core);
