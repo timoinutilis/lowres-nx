@@ -50,4 +50,6 @@ void txtlib_inputBegin(struct Core *core);
 bool txtlib_inputUpdate(struct Core *core);
 void txtlib_clear(struct Core *core);
 
+void txtlib_itobin(char *buffer, size_t buffersize, size_t width, int value);
+
 #endif /* text_lib_h */

@@ -74,16 +74,17 @@ struct TypedValue fnc_BINHEX(struct Core *core)
     struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (xValue.type == ValueTypeError) return xValue;
     
-    // optional len expression
-    int len = 0;
-    int maxLen = (type == TokenBIN) ? 32 : 8;
+    int maxLen = (type == TokenBIN) ? 16 : 8;
+    int width = 0;
     if (interpreter->pc->type == TokenComma)
     {
+        // comma
         ++interpreter->pc;
         
-        struct TypedValue lenValue = itp_evaluateNumericExpression(core, 0, maxLen);
-        if (lenValue.type == ValueTypeError) return lenValue;
-        len = lenValue.v.floatValue;
+        // width expression
+        struct TypedValue widthValue = itp_evaluateNumericExpression(core, 0, maxLen);
+        if (widthValue.type == ValueTypeError) return widthValue;
+        width = widthValue.v.floatValue;
     }
     
     // bracket close
@@ -102,18 +103,11 @@ struct TypedValue fnc_BINHEX(struct Core *core)
         
         if (type == TokenBIN)
         {
-            //TODO
+            txtlib_itobin(rcstring->chars, maxLen + 1, width, x);
         }
         else if (type == TokenHEX)
         {
-            if (len > 0)
-            {
-                snprintf(rcstring->chars, maxLen + 1, "%0*X", len, x);
-            }
-            else
-            {
-                snprintf(rcstring->chars, maxLen + 1, "%X", x);
-            }
+            snprintf(rcstring->chars, maxLen + 1, "%0*X", width, x);
         }
         else
         {
@@ -446,7 +440,7 @@ struct TypedValue fnc_STR(struct Core *core)
         struct RCString *rcstring = rcstring_new(NULL, 20);
         if (!rcstring) return val_makeError(ErrorOutOfMemory);
         
-        snprintf(rcstring->chars, 20, "%d", (int)numericValue.v.floatValue); //TODO float values
+        snprintf(rcstring->chars, 20, "%0.7g", numericValue.v.floatValue);
         resultValue.v.stringValue = rcstring;
     }
     return resultValue;

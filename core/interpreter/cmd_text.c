@@ -52,7 +52,7 @@ enum ErrorCode cmd_PRINT(struct Core *core)
             else if (value.type == ValueTypeFloat)
             {
                 char buffer[20];
-                snprintf(buffer, 20, "%d", (int)value.v.floatValue);
+                snprintf(buffer, 20, "%0.7g", value.v.floatValue);
                 txtlib_printText(core, buffer);
             }
         }

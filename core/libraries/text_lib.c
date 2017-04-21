@@ -241,3 +241,24 @@ void txtlib_clear(struct Core *core)
         }
     }
 }
+
+void txtlib_itobin(char *buffer, size_t buffersize, size_t width, int value)
+{
+    if (width < 1)
+    {
+        width = 1;
+    }
+    unsigned int mask = 1 << 15;
+    int p = 0;
+    bool active = false;
+    while (mask && p < buffersize - 1)
+    {
+        if (active || (value & mask) || mask < (1 << width))
+        {
+            buffer[p++] = (value & mask) ? '1' : '0';
+            active = true;
+        }
+        mask = (mask >> 1) & 0x7FFF;
+    }
+    buffer[p] = 0;
+}
