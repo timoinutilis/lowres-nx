@@ -1112,7 +1112,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenBIN:
         case TokenHEX:
-            return fnc_BINHEX(core);
+            return fnc_BIN_HEX(core);
             
         case TokenCHR:
             return fnc_CHR(core);
@@ -1122,7 +1122,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenLEFT:
         case TokenRIGHT:
-            return fnc_LEFTRIGHT(core);
+            return fnc_LEFT_RIGHT(core);
             
         case TokenLEN:
             return fnc_LEN(core);
@@ -1300,6 +1300,10 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
 
         case TokenRANDOMIZE:
             return cmd_RANDOMIZE(core);
+            
+        case TokenLEFT:
+        case TokenRIGHT:
+            return cmd_LEFT_RIGHT(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

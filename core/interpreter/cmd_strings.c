@@ -58,11 +58,11 @@ struct TypedValue fnc_ASC(struct Core *core)
     return value;
 }
 
-struct TypedValue fnc_BINHEX(struct Core *core)
+struct TypedValue fnc_BIN_HEX(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    // BIN/HEX
+    // BIN$/HEX$
     enum TokenType type = interpreter->pc->type;
     ++interpreter->pc;
     
@@ -74,7 +74,7 @@ struct TypedValue fnc_BINHEX(struct Core *core)
     struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (xValue.type == ValueTypeError) return xValue;
     
-    int maxLen = (type == TokenBIN) ? 16 : 8;
+    int maxLen = (type == TokenHEX) ? 8 : 16;
     int width = 0;
     if (interpreter->pc->type == TokenComma)
     {
@@ -108,10 +108,6 @@ struct TypedValue fnc_BINHEX(struct Core *core)
         else if (type == TokenHEX)
         {
             snprintf(rcstring->chars, maxLen + 1, "%0*X", width, x);
-        }
-        else
-        {
-            assert(0);
         }
         resultValue.v.stringValue = rcstring;
     }
@@ -253,7 +249,7 @@ struct TypedValue fnc_INSTR(struct Core *core)
     return resultValue;
 }
 
-struct TypedValue fnc_LEFTRIGHT(struct Core *core)
+struct TypedValue fnc_LEFT_RIGHT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -422,7 +418,7 @@ struct TypedValue fnc_STR(struct Core *core)
     
     // bracket open
     if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
-        ++interpreter->pc;
+    ++interpreter->pc;
     
     // expression
     struct TypedValue numericValue = itp_evaluateExpression(core, TypeClassNumeric);
@@ -430,7 +426,7 @@ struct TypedValue fnc_STR(struct Core *core)
     
     // bracket close
     if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
-        ++interpreter->pc;
+    ++interpreter->pc;
     
     struct TypedValue resultValue;
     resultValue.type = ValueTypeString;
@@ -474,4 +470,93 @@ struct TypedValue fnc_VAL(struct Core *core)
         rcstring_release(stringValue.v.stringValue);
     }
     return value;
+}
+
+enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // LEFT$/RIGHT$
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return ErrorExpectedLeftParenthesis;
+    ++interpreter->pc;
+    
+    // variable
+    enum ErrorCode errorCode = ErrorNone;
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    if (!varValue) return errorCode;
+    if (valueType != ValueTypeString) return ErrorTypeMismatch;
+    
+    size_t number = SIZE_MAX;
+    if (interpreter->pc->type == TokenComma)
+    {
+        // comma
+        ++interpreter->pc;
+        
+        // number expression
+        struct TypedValue numberValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (numberValue.type == ValueTypeError) return numberValue.v.errorCode;
+        number = numberValue.v.floatValue;
+    }
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+    ++interpreter->pc;
+    
+    // equal sign
+    if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
+    ++interpreter->pc;
+    
+    // replace expression
+    struct TypedValue replaceValue = itp_evaluateExpression(core, TypeClassString);
+    if (replaceValue.type == ValueTypeError) return replaceValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        size_t resultLen = strlen(varValue->stringValue->chars);
+        
+        struct RCString *resultRCString = varValue->stringValue;
+        if (resultRCString->refCount > 1)
+        {
+            // copy string if shared
+            resultRCString = rcstring_new(varValue->stringValue->chars, resultLen);
+            rcstring_release(varValue->stringValue);
+            varValue->stringValue = resultRCString;
+        }
+        
+        char *resultString = resultRCString->chars;
+        char *replaceString = replaceValue.v.stringValue->chars;
+        size_t replaceLen = strlen(replaceString);
+        if (number > replaceLen)
+        {
+            number = replaceLen;
+        }
+        if (number > resultLen)
+        {
+            number = resultLen;
+        }
+        
+        if (type == TokenLEFT)
+        {
+            for (size_t i = 0; i < number; i++)
+            {
+                resultString[i] = replaceString[i];
+            }
+        }
+        else if (type == TokenRIGHT)
+        {
+            for (size_t i = 0; i < number; i++)
+            {
+                resultString[resultLen - 1 - i] = replaceString[replaceLen - 1 - i];
+            }
+        }
+        
+        rcstring_release(replaceValue.v.stringValue);
+    }
+    
+    return itp_endOfCommand(interpreter);
 }
