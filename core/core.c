@@ -41,9 +41,10 @@ void core_init(struct Core *core)
 void core_update(struct Core *core)
 {
     itp_runProgram(core);
+    itp_runInterrupt(core, InterruptTypeVBL);
 }
 
 void core_rasterUpdate(struct Core *core)
 {
-    itp_runRasterProgram(core);
+    itp_runInterrupt(core, InterruptTypeRaster);
 }

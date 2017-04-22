@@ -31,6 +31,7 @@
 #define MAX_ARRAY_SIZE 32768
 #define MAX_ROM_DATA_ENTRIES 16
 #define MAX_CYCLES_PER_FRAME 100
+#define MAX_CYCLES_PER_RASTER 100
 #define MAX_CYCLES_PER_VBL 100
 
 #endif /* interpreter_config_h */

@@ -62,6 +62,11 @@ struct RomDataEntry {
     BigEndianUInt16 length;
 };
 
+enum InterruptType {
+    InterruptTypeRaster,
+    InterruptTypeVBL
+};
+
 struct Interpreter {
     enum Pass pass;
     enum State state;
@@ -92,6 +97,7 @@ struct Interpreter {
     struct Token *currentDataValueToken;
     
     struct Token *currentOnRasterToken;
+    struct Token *currentOnVBLToken;
     
     int waitCount;
     bool exitEvaluation;
@@ -102,7 +108,7 @@ struct Interpreter {
 enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode);
 void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);
-void itp_runRasterProgram(struct Core *core);
+void itp_runInterrupt(struct Core *core, enum InterruptType type);
 void itp_freeProgram(struct Core *core);
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode);

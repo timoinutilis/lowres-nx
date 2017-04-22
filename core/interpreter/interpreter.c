@@ -147,7 +147,7 @@ void itp_runProgram(struct Core *core)
     }
 }
 
-void itp_runRasterProgram(struct Core *core)
+void itp_runInterrupt(struct Core *core, enum InterruptType type)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -157,24 +157,39 @@ void itp_runRasterProgram(struct Core *core)
         case StateWait:
         case StateInput:
         {
-            if (interpreter->currentOnRasterToken)
+            struct Token *startToken;
+            int maxCycles;
+            switch (type)
+            {
+                case InterruptTypeRaster:
+                    startToken = interpreter->currentOnRasterToken;
+                    maxCycles = MAX_CYCLES_PER_RASTER;
+                    break;
+                    
+                case InterruptTypeVBL:
+                    startToken = interpreter->currentOnVBLToken;
+                    maxCycles = MAX_CYCLES_PER_VBL;
+                    break;
+            }
+            
+            if (startToken)
             {
                 interpreter->mode = ModeInterrupt;
                 interpreter->exitEvaluation = false;
                 struct Token *pc = interpreter->pc;
-                interpreter->pc = core->interpreter.currentOnRasterToken;
+                interpreter->pc = startToken;
                 
                 enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
                 int cycles = 0;
                 
-                while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_VBL && !interpreter->exitEvaluation)
+                while (errorCode == ErrorNone && cycles < maxCycles && !interpreter->exitEvaluation)
                 {
                     errorCode = itp_evaluateCommand(core);
                     cycles++;
                 }
                 
                 interpreter->mode = ModeNone;
-                if (cycles == MAX_CYCLES_PER_VBL)
+                if (cycles == maxCycles)
                 {
                     interpreter->exitErrorCode = ErrorTooManyCommandCycles;
                     interpreter->state = StateEnd;

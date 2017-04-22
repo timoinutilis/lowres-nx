@@ -484,29 +484,55 @@ enum ErrorCode cmd_ON(struct Core *core)
     // ON
     ++interpreter->pc;
     
-    // RASTER
-    if (interpreter->pc->type != TokenRASTER) return ErrorUnexpectedToken;
+    // RASTER/VBL
+    enum TokenType type = interpreter->pc->type;
+    if (type != TokenRASTER && type != TokenVBL) return ErrorUnexpectedToken;
     ++interpreter->pc;
     
-    // GOSUB
-    if (interpreter->pc->type != TokenGOSUB) return ErrorUnexpectedToken;
-    struct Token *tokenGOSUB = interpreter->pc;
-    ++interpreter->pc;
-    
-    // Identifier
-    if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedLabel;
-    struct Token *tokenIdentifier = interpreter->pc;
-    ++interpreter->pc;
-    
-    if (interpreter->pass == PassPrepare)
+    if (itp_isEndOfCommand(interpreter))
     {
-        struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
-        if (!item) return ErrorUndefinedLabel;
-        tokenGOSUB->jumpToken = item->token;
+        // reset
+        if (interpreter->pass == PassRun)
+        {
+            if (type == TokenRASTER)
+            {
+                interpreter->currentOnRasterToken = NULL;
+            }
+            else if (type == TokenVBL)
+            {
+                interpreter->currentOnVBLToken = NULL;
+            }
+        }
     }
-    else if (interpreter->pass == PassRun)
+    else
     {
-        interpreter->currentOnRasterToken = tokenGOSUB->jumpToken; // after label
+        // GOSUB
+        if (interpreter->pc->type != TokenGOSUB) return ErrorUnexpectedToken;
+        struct Token *tokenGOSUB = interpreter->pc;
+        ++interpreter->pc;
+        
+        // Identifier
+        if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedLabel;
+        struct Token *tokenIdentifier = interpreter->pc;
+        ++interpreter->pc;
+        
+        if (interpreter->pass == PassPrepare)
+        {
+            struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+            if (!item) return ErrorUndefinedLabel;
+            tokenGOSUB->jumpToken = item->token;
+        }
+        else if (interpreter->pass == PassRun)
+        {
+            if (type == TokenRASTER)
+            {
+                interpreter->currentOnRasterToken = tokenGOSUB->jumpToken; // after label
+            }
+            else if (type == TokenVBL)
+            {
+                interpreter->currentOnVBLToken = tokenGOSUB->jumpToken; // after label
+            }
+        }
     }
     
     return itp_endOfCommand(interpreter);

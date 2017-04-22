@@ -2,6 +2,8 @@ MENU:
 
 GOSUB NORMALPAL
 CLS
+ON RASTER
+ON VBL
 
 PRINT "====================";
 PRINT "     LOWRES NX"
@@ -128,6 +130,8 @@ REM ===============================
 
 
 LOWRESADV:
+
+ON VBL GOSUB ADVVBLFX
 
 HEALTH=10
 NAME$=""
@@ -471,6 +475,9 @@ IF I$="N" THEN GOTO MENU
 WAIT VBL
 LOOP
 
+ADVVBLFX:
+POKE $F200,RND*255
+RETURN
 
 
 #0: CHARACTERS
