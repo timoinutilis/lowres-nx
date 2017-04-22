@@ -560,3 +560,90 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
     
     return itp_endOfCommand(interpreter);
 }
+
+enum ErrorCode cmd_MID(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // MID$
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return ErrorExpectedLeftParenthesis;
+    ++interpreter->pc;
+    
+    // variable
+    enum ErrorCode errorCode = ErrorNone;
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    if (!varValue) return errorCode;
+    if (valueType != ValueTypeString) return ErrorTypeMismatch;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // position expression
+    struct TypedValue posValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (posValue.type == ValueTypeError) return posValue.v.errorCode;
+    
+    size_t number = SIZE_MAX;
+    if (interpreter->pc->type == TokenComma)
+    {
+        // comma
+        ++interpreter->pc;
+        
+        // number expression
+        struct TypedValue numberValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (numberValue.type == ValueTypeError) return numberValue.v.errorCode;
+        number = numberValue.v.floatValue;
+    }
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+    ++interpreter->pc;
+    
+    // equal sign
+    if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
+    ++interpreter->pc;
+    
+    // replace expression
+    struct TypedValue replaceValue = itp_evaluateExpression(core, TypeClassString);
+    if (replaceValue.type == ValueTypeError) return replaceValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        size_t index = posValue.v.floatValue - 1;
+        size_t resultLen = strlen(varValue->stringValue->chars);
+        
+        struct RCString *resultRCString = varValue->stringValue;
+        if (resultRCString->refCount > 1)
+        {
+            // copy string if shared
+            resultRCString = rcstring_new(varValue->stringValue->chars, resultLen);
+            rcstring_release(varValue->stringValue);
+            varValue->stringValue = resultRCString;
+        }
+        
+        char *resultString = resultRCString->chars;
+        char *replaceString = replaceValue.v.stringValue->chars;
+        size_t replaceLen = strlen(replaceString);
+        if (number > replaceLen)
+        {
+            number = replaceLen;
+        }
+        if (index + number > resultLen)
+        {
+            number = resultLen - index;
+        }
+        
+        for (size_t i = 0; i < number; i++)
+        {
+            resultString[index + i] = replaceString[i];
+        }
+        
+        rcstring_release(replaceValue.v.stringValue);
+    }
+    
+    return itp_endOfCommand(interpreter);
+}

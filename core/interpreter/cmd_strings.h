@@ -37,5 +37,6 @@ struct TypedValue fnc_STR(struct Core *core);
 struct TypedValue fnc_VAL(struct Core *core);
 
 enum ErrorCode cmd_LEFT_RIGHT(struct Core *core);
+enum ErrorCode cmd_MID(struct Core *core);
 
 #endif /* cmd_strings_h */

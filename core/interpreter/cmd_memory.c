@@ -163,7 +163,7 @@ enum ErrorCode cmd_COPY(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-struct TypedValue fnc_STARTLENGTH(struct Core *core)
+struct TypedValue fnc_START_LENGTH(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     

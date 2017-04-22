@@ -1165,7 +1165,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         
         case TokenSTART:
         case TokenLENGTH:
-            return fnc_STARTLENGTH(core);
+            return fnc_START_LENGTH(core);
 
         default:
             break;
@@ -1304,6 +1304,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenLEFT:
         case TokenRIGHT:
             return cmd_LEFT_RIGHT(core);
+            
+        case TokenMID:
+            return cmd_MID(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
