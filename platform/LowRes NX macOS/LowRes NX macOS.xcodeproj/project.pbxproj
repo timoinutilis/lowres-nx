@@ -9,8 +9,7 @@
 /* Begin PBXBuildFile section */
 		924D0B9B1EB51317005CDA17 /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924D0B9A1EB51317005CDA17 /* LowResNXView.swift */; };
 		92624B991EAD1B8800EB3A3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B981EAD1B8800EB3A3C /* AppDelegate.swift */; };
-		92624B9B1EAD1B8800EB3A3C /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B9A1EAD1B8800EB3A3C /* Document.swift */; };
-		92624B9E1EAD1B8800EB3A3C /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92624B9C1EAD1B8800EB3A3C /* Document.xib */; };
+		92624B9B1EAD1B8800EB3A3C /* LowResNXDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B9A1EAD1B8800EB3A3C /* LowResNXDocument.swift */; };
 		92624BA01EAD1B8800EB3A3C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92624B9F1EAD1B8800EB3A3C /* Assets.xcassets */; };
 		92624BA31EAD1B8800EB3A3C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92624BA11EAD1B8800EB3A3C /* MainMenu.xib */; };
 		92624BE31EAD1CFC00EB3A3C /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BAF1EAD1CFB00EB3A3C /* core.c */; };
@@ -35,6 +34,8 @@
 		92624BF61EAD1CFC00EB3A3C /* character_rom.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BD91EAD1CFC00EB3A3C /* character_rom.c */; };
 		92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDC1EAD1CFC00EB3A3C /* machine.c */; };
 		92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDE1EAD1CFC00EB3A3C /* video_chip.c */; };
+		928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */; };
+		928C1FEF1EB638A5002AE5C9 /* LowResNXWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,8 +43,7 @@
 		924D0B9A1EB51317005CDA17 /* LowResNXView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXView.swift; sourceTree = "<group>"; };
 		92624B951EAD1B8800EB3A3C /* LowRes NX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92624B981EAD1B8800EB3A3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		92624B9A1EAD1B8800EB3A3C /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
-		92624B9D1EAD1B8800EB3A3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Document.xib; sourceTree = "<group>"; };
+		92624B9A1EAD1B8800EB3A3C /* LowResNXDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowResNXDocument.swift; sourceTree = "<group>"; };
 		92624B9F1EAD1B8800EB3A3C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		92624BA21EAD1B8800EB3A3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		92624BA41EAD1B8800EB3A3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -95,6 +95,8 @@
 		92624BDF1EAD1CFC00EB3A3C /* video_chip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = video_chip.h; sourceTree = "<group>"; };
 		92624C011EAD20E200EB3A3C /* LowResNX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LowResNX-Bridging-Header.h"; sourceTree = "<group>"; };
 		92624C031EAD35C600EB3A3C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXWindowController.swift; sourceTree = "<group>"; };
+		928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LowResNXWindowController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,8 +133,9 @@
 			children = (
 				92624C011EAD20E200EB3A3C /* LowResNX-Bridging-Header.h */,
 				92624B981EAD1B8800EB3A3C /* AppDelegate.swift */,
-				92624B9A1EAD1B8800EB3A3C /* Document.swift */,
-				92624B9C1EAD1B8800EB3A3C /* Document.xib */,
+				92624B9A1EAD1B8800EB3A3C /* LowResNXDocument.swift */,
+				928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */,
+				928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */,
 				924D0B9A1EB51317005CDA17 /* LowResNXView.swift */,
 				92624B9F1EAD1B8800EB3A3C /* Assets.xcassets */,
 				92624BA11EAD1B8800EB3A3C /* MainMenu.xib */,
@@ -289,8 +292,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				92624BA01EAD1B8800EB3A3C /* Assets.xcassets in Resources */,
-				92624B9E1EAD1B8800EB3A3C /* Document.xib in Resources */,
 				92624BA31EAD1B8800EB3A3C /* MainMenu.xib in Resources */,
+				928C1FEF1EB638A5002AE5C9 /* LowResNXWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,7 +312,8 @@
 				92624BF31EAD1CFC00EB3A3C /* variables.c in Sources */,
 				92624BED1EAD1CFC00EB3A3C /* error.c in Sources */,
 				92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */,
-				92624B9B1EAD1B8800EB3A3C /* Document.swift in Sources */,
+				92624B9B1EAD1B8800EB3A3C /* LowResNXDocument.swift in Sources */,
+				928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */,
 				92624BEA1EAD1CFC00EB3A3C /* cmd_text.c in Sources */,
 				92624BEC1EAD1CFC00EB3A3C /* data.c in Sources */,
 				92624BF01EAD1CFC00EB3A3C /* rcstring.c in Sources */,
@@ -332,14 +336,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		92624B9C1EAD1B8800EB3A3C /* Document.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				92624B9D1EAD1B8800EB3A3C /* Base */,
-			);
-			name = Document.xib;
-			sourceTree = "<group>";
-		};
 		92624BA11EAD1B8800EB3A3C /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

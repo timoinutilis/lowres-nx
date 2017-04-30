@@ -131,7 +131,7 @@ REM ===============================
 
 LOWRESADV:
 
-ON VBL GOSUB ADVVBLFX
+REM ON VBL GOSUB ADVVBLFX
 
 HEALTH=10
 NAME$=""

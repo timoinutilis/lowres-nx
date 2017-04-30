@@ -50,3 +50,21 @@ void core_rasterUpdate(struct Core *core)
 {
     itp_runInterrupt(core, InterruptTypeRaster);
 }
+
+void core_keyPressed(struct Core *core, char key)
+{
+    if (key >= 32 && key < 127)
+    {
+        core->machine.ioRegisters.key = key;
+    }
+}
+
+void core_backspacePressed(struct Core *core)
+{
+    core->machine.ioRegisters.key = '\b';
+}
+
+void core_returnPressed(struct Core *core)
+{
+    core->machine.ioRegisters.key = '\n';
+}

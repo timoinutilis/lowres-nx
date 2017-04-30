@@ -14,7 +14,6 @@ func getBytePointerCallback(_ data: UnsafeMutableRawPointer?) -> UnsafeRawPointe
 
 class LowResNXView: NSView {
     
-    var core: UnsafeMutablePointer<Core>? = nil
     var data: UnsafeMutablePointer<UInt8>?
     var dataProvider: CGDataProvider?
     
@@ -27,11 +26,9 @@ class LowResNXView: NSView {
         dataProvider = CGDataProvider(directInfo: data, size: off_t(dataLength), callbacks: &callbacks)
     }
     
-    func render() {
+    func render(core: UnsafeMutablePointer<Core>) {
         if let dataProvider = dataProvider {
-            if core != nil {
-                video_renderScreen(core, data, SCREEN_WIDTH*4)
-            }
+            video_renderScreen(core, data, SCREEN_WIDTH*4)
             let image = CGImage(width: Int(SCREEN_WIDTH), height: Int(SCREEN_HEIGHT), bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: Int(SCREEN_WIDTH)*4, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue), provider: dataProvider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)
             
             layer?.contents = image

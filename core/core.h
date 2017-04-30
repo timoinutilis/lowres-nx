@@ -33,4 +33,8 @@ void core_init(struct Core *core);
 void core_update(struct Core *core);
 void core_rasterUpdate(struct Core *core);
 
+void core_keyPressed(struct Core *core, char key);
+void core_backspacePressed(struct Core *core);
+void core_returnPressed(struct Core *core);
+
 #endif /* core_h */

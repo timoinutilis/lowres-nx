@@ -22,12 +22,9 @@ class ProgramError: NSError {
     
 }
 
-class Document: NSDocument {
+class LowResNXDocument: NSDocument {
     var sourceCode = ""
     var core = Core()
-    var timer: Timer? = nil
-    
-    @IBOutlet weak var lowResNXView: LowResNXView!
     
     override init() {
         super.init()
@@ -37,11 +34,7 @@ class Document: NSDocument {
     override class func autosavesInPlace() -> Bool {
         return false
     }
-
-    override var windowNibName: String? {
-        return "Document"
-    }
-
+    
     override func data(ofType typeName: String) throws -> Data {
         return sourceCode.data(using: .utf8)!
     }
@@ -51,21 +44,12 @@ class Document: NSDocument {
         let errorCode = itp_compileProgram(&core, sourceCode.cString(using: .utf8))
         if errorCode != ErrorNone {
             throw ProgramError(errorCode: errorCode, lineNumber: 0, line: "TODO")
-        } else {
-            
         }
     }
     
-    override func windowControllerDidLoadNib(_ windowController: NSWindowController) {
-        super.windowControllerDidLoadNib(windowController);
-
-        lowResNXView.core = UnsafeMutablePointer<Core>(&core)
-        timer = Timer.scheduledTimer(timeInterval: 1.0/30.0, target: self, selector: #selector(Document.update), userInfo: nil, repeats: true)
-    }
-    
-    func update() {
-        core_update(&core)
-        lowResNXView?.render()
+    override func makeWindowControllers() {
+        let windowController = LowResNXWindowController(windowNibName: "LowResNXWindowController")
+        addWindowController(windowController)
     }
     
 }
