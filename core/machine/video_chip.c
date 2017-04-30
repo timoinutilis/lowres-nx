@@ -172,7 +172,8 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
             *outputByte++ = r * 0x55;
             *outputByte++ = g * 0x55;
             *outputByte++ = b * 0x55;
+            *outputByte++ = 0;
         }
-        outputByte += (bytesPerLine - SCREEN_WIDTH*3);
+        outputByte += (bytesPerLine - SCREEN_WIDTH*4);
     }
 }

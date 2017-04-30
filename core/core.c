@@ -25,6 +25,8 @@
 
 void core_init(struct Core *core)
 {
+    memset(core, 0, sizeof(struct Core));
+    
     machine_init(&core->machine);
     
     struct TextLib *textLib = &core->interpreter.textLib;

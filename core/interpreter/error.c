@@ -68,3 +68,8 @@ const char *ErrorStrings[] = {
     "Too Many Command Cycles",
     "Not Allowed In Interrupt"
 };
+
+const char *err_getString(enum ErrorCode errorCode)
+{
+    return ErrorStrings[errorCode];
+}
