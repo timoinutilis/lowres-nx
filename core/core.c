@@ -77,12 +77,62 @@ void core_mouseMoved(struct Core *core, int x, int y)
     core->machine.ioRegisters.mouseY = y;
 }
 
-void core_mouseDown(struct Core *core)
+void core_mousePressed(struct Core *core)
 {
     core->machine.ioRegisters.status_mouseButton = 1;
 }
 
-void core_mouseUp(struct Core *core)
+void core_mouseReleased(struct Core *core)
 {
     core->machine.ioRegisters.status_mouseButton = 0;
+}
+
+void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button)
+{
+    switch (button)
+    {
+        case GamepadButtonUp:
+            core->machine.ioRegisters.gamepads[player].status_up = 1;
+            break;
+        case GamepadButtonDown:
+            core->machine.ioRegisters.gamepads[player].status_down = 1;
+            break;
+        case GamepadButtonLeft:
+            core->machine.ioRegisters.gamepads[player].status_left = 1;
+            break;
+        case GamepadButtonRight:
+            core->machine.ioRegisters.gamepads[player].status_right = 1;
+            break;
+        case GamepadButtonA:
+            core->machine.ioRegisters.gamepads[player].status_buttonA = 1;
+            break;
+        case GamepadButtonB:
+            core->machine.ioRegisters.gamepads[player].status_buttonB = 1;
+            break;
+    }
+}
+
+void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button)
+{
+    switch (button)
+    {
+        case GamepadButtonUp:
+            core->machine.ioRegisters.gamepads[player].status_up = 0;
+            break;
+        case GamepadButtonDown:
+            core->machine.ioRegisters.gamepads[player].status_down = 0;
+            break;
+        case GamepadButtonLeft:
+            core->machine.ioRegisters.gamepads[player].status_left = 0;
+            break;
+        case GamepadButtonRight:
+            core->machine.ioRegisters.gamepads[player].status_right = 0;
+            break;
+        case GamepadButtonA:
+            core->machine.ioRegisters.gamepads[player].status_buttonA = 0;
+            break;
+        case GamepadButtonB:
+            core->machine.ioRegisters.gamepads[player].status_buttonB = 0;
+            break;
+    }
 }

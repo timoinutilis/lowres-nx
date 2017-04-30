@@ -36,6 +36,34 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     }
     
     override func keyDown(with event: NSEvent) {
+        switch event.keyCode {
+        case 123:
+            core_gamepadPressed(core, 0, GamepadButtonLeft)
+        case 124:
+            core_gamepadPressed(core, 0, GamepadButtonRight)
+        case 125:
+            core_gamepadPressed(core, 0, GamepadButtonDown)
+        case 126:
+            core_gamepadPressed(core, 0, GamepadButtonUp)
+        case 47:
+            core_gamepadPressed(core, 0, GamepadButtonA)
+        case 44:
+            core_gamepadPressed(core, 0, GamepadButtonB)
+        case 2:
+            core_gamepadPressed(core, 1, GamepadButtonLeft)
+        case 5:
+            core_gamepadPressed(core, 1, GamepadButtonRight)
+        case 3:
+            core_gamepadPressed(core, 1, GamepadButtonDown)
+        case 15:
+            core_gamepadPressed(core, 1, GamepadButtonUp)
+        case 0:
+            core_gamepadPressed(core, 1, GamepadButtonA)
+        case 1:
+            core_gamepadPressed(core, 1, GamepadButtonB)
+        default:
+            break
+        }
         let characters = event.charactersIgnoringModifiers!
         if !characters.isEmpty {
             if characters == "\r" {
@@ -53,6 +81,37 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         }
     }
     
+    override func keyUp(with event: NSEvent) {
+        switch event.keyCode {
+        case 123:
+            core_gamepadReleased(core, 0, GamepadButtonLeft)
+        case 124:
+            core_gamepadReleased(core, 0, GamepadButtonRight)
+        case 125:
+            core_gamepadReleased(core, 0, GamepadButtonDown)
+        case 126:
+            core_gamepadReleased(core, 0, GamepadButtonUp)
+        case 47:
+            core_gamepadReleased(core, 0, GamepadButtonA)
+        case 44:
+            core_gamepadReleased(core, 0, GamepadButtonB)
+        case 2:
+            core_gamepadReleased(core, 1, GamepadButtonLeft)
+        case 5:
+            core_gamepadReleased(core, 1, GamepadButtonRight)
+        case 3:
+            core_gamepadReleased(core, 1, GamepadButtonDown)
+        case 15:
+            core_gamepadReleased(core, 1, GamepadButtonUp)
+        case 0:
+            core_gamepadReleased(core, 1, GamepadButtonA)
+        case 1:
+            core_gamepadReleased(core, 1, GamepadButtonB)
+        default:
+            break
+        }
+    }
+    
     override func mouseMoved(with event: NSEvent) {
         let point = event.locationInWindow
         let viewPoint = lowResNXView.convert(point, to: nil)
@@ -66,11 +125,11 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     }
     
     override func mouseDown(with event: NSEvent) {
-        core_mouseDown(core)
+        core_mousePressed(core)
     }
     
     override func mouseUp(with event: NSEvent) {
-        core_mouseUp(core)
+        core_mouseReleased(core)
     }
 
 }
