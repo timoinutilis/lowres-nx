@@ -46,21 +46,31 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
                 let text = characters.uppercased()
                 let codes = text.unicodeScalars
                 let key = codes[codes.startIndex]
-                core_keyPressed(core, Int8(key.value))
+                if key.value < 127 {
+                    core_keyPressed(core, Int8(key.value))
+                }
             }
         }
     }
     
     override func mouseMoved(with event: NSEvent) {
+        let point = event.locationInWindow
+        let viewPoint = lowResNXView.convert(point, to: nil)
+        let x = viewPoint.x * CGFloat(SCREEN_WIDTH) / lowResNXView.bounds.size.width;
+        let y = CGFloat(SCREEN_HEIGHT) - viewPoint.y * CGFloat(SCREEN_HEIGHT) / lowResNXView.bounds.size.height;
+        core_mouseMoved(core, Int32(x), Int32(y))
     }
     
     override func mouseDragged(with event: NSEvent) {
+        mouseMoved(with: event)
     }
     
     override func mouseDown(with event: NSEvent) {
+        core_mouseDown(core)
     }
     
     override func mouseUp(with event: NSEvent) {
+        core_mouseUp(core)
     }
 
 }

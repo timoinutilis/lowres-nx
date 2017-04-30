@@ -68,3 +68,21 @@ void core_returnPressed(struct Core *core)
 {
     core->machine.ioRegisters.key = '\n';
 }
+
+void core_mouseMoved(struct Core *core, int x, int y)
+{
+    if (x < 0) x = 0; else if (x >= SCREEN_WIDTH) x = SCREEN_WIDTH - 1;
+    if (y < 0) y = 0; else if (y >= SCREEN_HEIGHT) y = SCREEN_HEIGHT - 1;
+    core->machine.ioRegisters.mouseX = x;
+    core->machine.ioRegisters.mouseY = y;
+}
+
+void core_mouseDown(struct Core *core)
+{
+    core->machine.ioRegisters.status_mouseButton = 1;
+}
+
+void core_mouseUp(struct Core *core)
+{
+    core->machine.ioRegisters.status_mouseButton = 0;
+}
