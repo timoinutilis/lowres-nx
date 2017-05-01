@@ -110,6 +110,7 @@ void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);
 void itp_runInterrupt(struct Core *core, enum InterruptType type);
 void itp_freeProgram(struct Core *core);
+int itp_pcPositionInSourceCode(struct Core *core);
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode);
 struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass);

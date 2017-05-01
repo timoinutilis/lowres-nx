@@ -242,6 +242,11 @@ void itp_freeProgram(struct Core *core)
     assert(rcstring_count == 0);
 }
 
+int itp_pcPositionInSourceCode(struct Core *core)
+{
+    return core->interpreter.pc->sourcePosition;
+}
+
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
 {
     const char *charSetDigits = "0123456789";

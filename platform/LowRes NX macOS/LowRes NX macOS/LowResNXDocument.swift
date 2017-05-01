@@ -40,10 +40,16 @@ class LowResNXDocument: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        sourceCode = String(data: data, encoding: .utf8)!
-        let errorCode = itp_compileProgram(&core, sourceCode.cString(using: .utf8))
+        sourceCode = String(data: data, encoding: .ascii)!
+        let errorCode = itp_compileProgram(&core, sourceCode.cString(using: .ascii))
         if errorCode != ErrorNone {
-            throw ProgramError(errorCode: errorCode, lineNumber: 0, line: "TODO")
+            let cIndex = itp_pcPositionInSourceCode(&core)
+            let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(cIndex))
+            let lineRange = sourceCode.lineRange(for: index ..< index)
+            let lineString = sourceCode.substring(with: lineRange)
+            let lineNumber = sourceCode.countLines(index: index)
+            
+            throw ProgramError(errorCode: errorCode, lineNumber: lineNumber, line: lineString)
         }
     }
     
@@ -54,3 +60,15 @@ class LowResNXDocument: NSDocument {
     
 }
 
+extension String {
+    func countLines(index: String.Index) -> Int {
+        var count = 1
+        var searchRange = startIndex ..< endIndex
+        while let foundRange = rangeOfCharacter(from: CharacterSet.newlines, options: .literal, range: searchRange), index >= foundRange.upperBound {
+            searchRange = characters.index(after: foundRange.lowerBound) ..< endIndex
+            count += 1
+        }
+        return count;
+    }
+    
+}
