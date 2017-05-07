@@ -31,24 +31,29 @@ struct Core;
 struct TextLib {
     int characterOffset;
     union CharacterAttributes charAttr;
-    int areaX;
-    int areaY;
-    int areaWidth;
-    int areaHeight;
+    int windowX;
+    int windowY;
+    int windowWidth;
+    int windowHeight;
+    int windowBg;
     int cursorX;
     int cursorY;
+    int bg;
     char inputBuffer[INPUT_BUFFER_SIZE];
     int inputLength;
     int blink;
 };
 
+void txtlib_init(struct Core *core);
 void txtlib_printText(struct Core *core, const char *text);
 bool txtlib_deleteBackward(struct Core *core);
 void txtlib_writeText(struct Core *core, const char *text, int x, int y);
 void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y);
 void txtlib_inputBegin(struct Core *core);
 bool txtlib_inputUpdate(struct Core *core);
-void txtlib_clear(struct Core *core);
+void txtlib_clearWindow(struct Core *core);
+void txtlib_clearScreen(struct Core *core);
+void txtlib_clearBackground(struct Core *core, int bg);
 
 void txtlib_itobin(char *buffer, size_t buffersize, size_t width, int value);
 

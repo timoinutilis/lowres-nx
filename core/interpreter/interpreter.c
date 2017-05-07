@@ -372,6 +372,31 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             continue;
         }
         
+        // bin number
+        if (*character == '%')
+        {
+            character++;
+            int number = 0;
+            while (*character)
+            {
+                if (*character == '0' || *character == '1')
+                {
+                    int digit = *character - '0';
+                    number <<= 1;
+                    number += digit;
+                    character++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            token->type = TokenFloat;
+            token->floatValue = number;
+            interpreter->numTokens++;
+            continue;
+        }
+        
         // Keyword
         enum TokenType foundKeywordToken = TokenUndefined;
         for (int i = 0; i < Token_count; i++)
@@ -770,6 +795,17 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int 
     return value;
 }
 
+struct TypedValue itp_evaluateOptionalNumericExpression(struct Core *core, int min, int max)
+{
+    if (core->interpreter.pc->type == TokenComma || core->interpreter.pc->type == TokenBracketClose || itp_isEndOfCommand(&core->interpreter))
+    {
+        struct TypedValue value;
+        value.type = ValueTypeNull;
+        return value;
+    }
+    return itp_evaluateNumericExpression(core, min, max);
+}
+
 bool itp_isTokenLevel(enum TokenType token, int level)
 {
     switch (level)
@@ -1140,8 +1176,8 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenINSTR:
             return fnc_INSTR(core);
             
-        case TokenLEFT:
-        case TokenRIGHT:
+        case TokenLEFTStr:
+        case TokenRIGHTStr:
             return fnc_LEFT_RIGHT(core);
             
         case TokenLEN:
@@ -1225,7 +1261,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenEND:
             if (itp_getNextTokenType(interpreter) == TokenIF)
             {
-                return cmd_ENDIF(core);
+                return cmd_END_IF(core);
             }
             return cmd_END(core);
             
@@ -1321,12 +1357,24 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenRANDOMIZE:
             return cmd_RANDOMIZE(core);
             
-        case TokenLEFT:
-        case TokenRIGHT:
+        case TokenLEFTStr:
+        case TokenRIGHTStr:
             return cmd_LEFT_RIGHT(core);
             
         case TokenMID:
             return cmd_MID(core);
+            
+        case TokenWINDOW:
+            return cmd_WINDOW(core);
+            
+        case TokenFONT:
+            return cmd_FONT(core);
+            
+        case TokenLOCATE:
+            return cmd_LOCATE(core);
+            
+        case TokenCLW:
+            return cmd_CLW(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

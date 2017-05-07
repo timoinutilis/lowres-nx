@@ -26,11 +26,7 @@
 enum ErrorCode cmd_PRINT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     bool newLine = true;
     
@@ -87,11 +83,7 @@ enum ErrorCode cmd_PRINT(struct Core *core)
 enum ErrorCode cmd_INPUT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // INPUT
     ++interpreter->pc;
@@ -157,11 +149,7 @@ enum ErrorCode cmd_endINPUT(struct Core *core)
 enum ErrorCode cmd_TEXT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // TEXT
     ++interpreter->pc;
@@ -197,11 +185,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
 enum ErrorCode cmd_NUMBER(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // NUMBER
     ++interpreter->pc;
@@ -245,19 +229,231 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
 enum ErrorCode cmd_CLS(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // CLS
     ++interpreter->pc;
     
-    if (interpreter->pass == PassRun)
+    if (itp_isEndOfCommand(interpreter))
     {
-        txtlib_clear(core);
+        if (interpreter->pass == PassRun)
+        {
+            // clear all
+            txtlib_clearScreen(core);
+        }
+    }
+    else
+    {
+        // bg value
+        struct TypedValue bgValue = itp_evaluateNumericExpression(core, 0, 1);
+        if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
+        
+        if (interpreter->pass == PassRun)
+        {
+            // clear bg
+            txtlib_clearBackground(core, bgValue.v.floatValue);
+        }
     }
     
     return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_WINDOW(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
+    
+    // WINDOW
+    ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 31);
+    if (xValue.type == ValueTypeError) return xValue.v.errorCode;
+
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // y value
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 31);
+    if (yValue.type == ValueTypeError) return yValue.v.errorCode;
+
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // w value
+    struct TypedValue wValue = itp_evaluateNumericExpression(core, 1, 32);
+    if (wValue.type == ValueTypeError) return wValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // h value
+    struct TypedValue hValue = itp_evaluateNumericExpression(core, 1, 32);
+    if (hValue.type == ValueTypeError) return hValue.v.errorCode;
+
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // bg value
+    struct TypedValue bgValue = itp_evaluateNumericExpression(core, 0, 1);
+    if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        core->interpreter.textLib.windowX = xValue.v.floatValue;
+        core->interpreter.textLib.windowY = yValue.v.floatValue;
+        core->interpreter.textLib.windowWidth = wValue.v.floatValue;
+        core->interpreter.textLib.windowHeight = hValue.v.floatValue;
+        core->interpreter.textLib.bg = bgValue.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_FONT(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
+    
+    // FONT
+    ++interpreter->pc;
+    
+    // attributes value
+    struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.charAttr);
+    if (aValue.type == ValueTypeError) return aValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // char value
+    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, 255);
+    if (cValue.type == ValueTypeError) return cValue.v.errorCode;
+
+    if (interpreter->pass == PassRun)
+    {
+        interpreter->textLib.charAttr.value = aValue.v.floatValue;
+        interpreter->textLib.characterOffset = cValue.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_LOCATE(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
+    
+    // LOCATE
+    ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, core->interpreter.textLib.windowWidth - 1);
+    if (xValue.type == ValueTypeError) return xValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // y value
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, core->interpreter.textLib.windowHeight - 1);
+    if (yValue.type == ValueTypeError) return yValue.v.errorCode;
+
+    if (interpreter->pass == PassRun)
+    {
+        core->interpreter.textLib.cursorX = xValue.v.floatValue;
+        core->interpreter.textLib.cursorY = yValue.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_CLW(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
+    
+    // CLW
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        txtlib_clearWindow(core);
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    if (interpreter->pc->type == TokenBracketOpen)
+    {
+        // bracket open
+        interpreter->pc++;
+        
+        union CharacterAttributes resultAttr = oldAttr;
+        
+        // palette value
+        struct TypedValue palValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+        if (palValue.type == ValueTypeError) return palValue;
+        
+        // comma
+        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+        ++interpreter->pc;
+
+        // bank value
+        struct TypedValue bValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        if (bValue.type == ValueTypeError) return bValue;
+        
+        // comma
+        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+        ++interpreter->pc;
+
+        // flip x value
+        struct TypedValue fxValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        if (fxValue.type == ValueTypeError) return fxValue;
+
+        // comma
+        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+        ++interpreter->pc;
+        
+        // flip y value
+        struct TypedValue fyValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        if (fyValue.type == ValueTypeError) return fyValue;
+
+        // comma
+        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+        ++interpreter->pc;
+        
+        // priority value
+        struct TypedValue priValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        if (priValue.type == ValueTypeError) return priValue;
+        
+        // bracket close
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        interpreter->pc++;
+        
+        if (interpreter->pass == PassRun)
+        {
+            if (palValue.type != ValueTypeNull) resultAttr.palette = palValue.v.floatValue;
+            if (bValue.type != ValueTypeNull) resultAttr.bank = bValue.v.floatValue;
+            if (fxValue.type != ValueTypeNull) resultAttr.flipX = fxValue.v.floatValue;
+            if (fyValue.type != ValueTypeNull) resultAttr.flipY = fyValue.v.floatValue;
+            if (priValue.type != ValueTypeNull) resultAttr.priority = priValue.v.floatValue;
+        }
+        
+        struct TypedValue resultValue;
+        resultValue.type = ValueTypeFloat;
+        resultValue.v.floatValue = resultAttr.value;
+        return resultValue;
+    }
+    else
+    {
+        return itp_evaluateNumericExpression(core, 0, 255);
+    }
 }

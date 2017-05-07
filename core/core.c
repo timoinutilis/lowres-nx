@@ -28,16 +28,7 @@ void core_init(struct Core *core)
     memset(core, 0, sizeof(struct Core));
     
     machine_init(&core->machine);
-    
-    struct TextLib *textLib = &core->interpreter.textLib;
-    textLib->charAttr.bank = 1;
-    textLib->charAttr.priority = 1;
-    textLib->charAttr.palette = 7;
-    textLib->characterOffset = 192;
-    textLib->areaX = 0;
-    textLib->areaY = 0;
-    textLib->areaWidth = 20;
-    textLib->areaHeight = 16;
+    txtlib_init(core);
 }
 
 void core_update(struct Core *core)

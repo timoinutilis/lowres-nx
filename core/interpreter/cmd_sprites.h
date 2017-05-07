@@ -17,26 +17,16 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef cmd_text_h
-#define cmd_text_h
+#ifndef cmd_sprites_h
+#define cmd_sprites_h
 
 #include <stdio.h>
 #include "error.h"
-#include "video_chip.h"
 
 struct Core;
 
-enum ErrorCode cmd_PRINT(struct Core *core);
-enum ErrorCode cmd_INPUT(struct Core *core);
-enum ErrorCode cmd_endINPUT(struct Core *core);
-enum ErrorCode cmd_TEXT(struct Core *core);
-enum ErrorCode cmd_NUMBER(struct Core *core);
-enum ErrorCode cmd_CLS(struct Core *core);
-enum ErrorCode cmd_WINDOW(struct Core *core);
-enum ErrorCode cmd_FONT(struct Core *core);
-enum ErrorCode cmd_LOCATE(struct Core *core);
-enum ErrorCode cmd_CLW(struct Core *core);
+enum ErrorCode cmd_SPRITE(struct Core *core);
+enum ErrorCode cmd_SPRITE_ATTR(struct Core *core);
+enum ErrorCode cmd_SPRITE_SIZE(struct Core *core);
 
-struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr);
-
-#endif /* cmd_text_h */
+#endif /* cmd_sprites_h */

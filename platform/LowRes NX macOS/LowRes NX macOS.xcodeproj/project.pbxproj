@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9229C3731EBF8AFF009CF378 /* cmd_sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 9229C3711EBF8AFF009CF378 /* cmd_sprites.c */; };
 		924D0B9B1EB51317005CDA17 /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924D0B9A1EB51317005CDA17 /* LowResNXView.swift */; };
 		92624B991EAD1B8800EB3A3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B981EAD1B8800EB3A3C /* AppDelegate.swift */; };
 		92624B9B1EAD1B8800EB3A3C /* LowResNXDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B9A1EAD1B8800EB3A3C /* LowResNXDocument.swift */; };
@@ -39,6 +40,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9229C3711EBF8AFF009CF378 /* cmd_sprites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_sprites.c; sourceTree = "<group>"; };
+		9229C3721EBF8AFF009CF378 /* cmd_sprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_sprites.h; sourceTree = "<group>"; };
 		924D0B981EB4FEB1005CDA17 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		924D0B9A1EB51317005CDA17 /* LowResNXView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXView.swift; sourceTree = "<group>"; };
 		92624B951EAD1B8800EB3A3C /* LowRes NX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -176,6 +179,8 @@
 				92624BBF1EAD1CFC00EB3A3C /* cmd_text.h */,
 				92624BC01EAD1CFC00EB3A3C /* cmd_variables.c */,
 				92624BC11EAD1CFC00EB3A3C /* cmd_variables.h */,
+				9229C3711EBF8AFF009CF378 /* cmd_sprites.c */,
+				9229C3721EBF8AFF009CF378 /* cmd_sprites.h */,
 				92624BC21EAD1CFC00EB3A3C /* data.c */,
 				92624BC31EAD1CFC00EB3A3C /* data.h */,
 				92624BC41EAD1CFC00EB3A3C /* error.c */,
@@ -330,6 +335,7 @@
 				92624BF51EAD1CFC00EB3A3C /* audio_chip.c in Sources */,
 				92624BF41EAD1CFC00EB3A3C /* text_lib.c in Sources */,
 				92624BE31EAD1CFC00EB3A3C /* core.c in Sources */,
+				9229C3731EBF8AFF009CF378 /* cmd_sprites.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

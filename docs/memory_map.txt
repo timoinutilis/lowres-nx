@@ -1,0 +1,32 @@
+$0000
+cartridgeRom 32 KB
+
+$8000
+videoRam 8 KB
+
+$A000
+workingRam 8 KB
+
+$C000
+persistentRam 8 KB
+
+$E000
+characterRom 4 KB
+
+$F000
+spriteRegisters 512 B
+
+$F200
+colorRegisters 64 B
+
+$F240
+reserved
+
+$FF40
+videoRegisters
+
+$FF80
+audioRegisters
+
+$FFC0
+ioRegisters

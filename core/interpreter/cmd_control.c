@@ -25,10 +25,7 @@ enum ErrorCode cmd_END(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // END
     ++interpreter->pc;
@@ -137,7 +134,7 @@ enum ErrorCode cmd_ELSE(struct Core *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_ENDIF(struct Core *core)
+enum ErrorCode cmd_END_IF(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -349,10 +346,7 @@ enum ErrorCode cmd_GOTO(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // GOTO
     struct Token *tokenGOTO = interpreter->pc;
@@ -444,10 +438,7 @@ enum ErrorCode cmd_WAIT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // WAIT
     ++interpreter->pc;

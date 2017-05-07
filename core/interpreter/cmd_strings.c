@@ -288,7 +288,7 @@ struct TypedValue fnc_LEFT_RIGHT(struct Core *core)
         
         if (number < len)
         {
-            size_t start = (type == TokenLEFT) ? 0 : len - number;
+            size_t start = (type == TokenLEFTStr) ? 0 : len - number;
             
             struct RCString *rcstring = rcstring_new(&stringValue.v.stringValue->chars[start], number);
             if (!rcstring) return val_makeError(ErrorOutOfMemory);
@@ -540,14 +540,14 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
             number = resultLen;
         }
         
-        if (type == TokenLEFT)
+        if (type == TokenLEFTStr)
         {
             for (size_t i = 0; i < number; i++)
             {
                 resultString[i] = replaceString[i];
             }
         }
-        else if (type == TokenRIGHT)
+        else if (type == TokenRIGHTStr)
         {
             for (size_t i = 0; i < number; i++)
             {
