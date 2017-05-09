@@ -30,6 +30,7 @@
 #include "cmd_memory.h"
 #include "cmd_text.h"
 #include "cmd_maths.h"
+#include "cmd_background.h"
 
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
@@ -1375,6 +1376,32 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenCLW:
             return cmd_CLW(core);
+            
+        case TokenBG:
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenSOURCE:
+                    return cmd_BG_SOURCE(core);
+                    
+                case TokenCOPY:
+                    return cmd_BG_COPY(core);
+                    
+                case TokenSCROLL:
+                    return cmd_BG_SCROLL(core);
+                    
+                case TokenFILL:
+                    return cmd_BG_FILL(core);
+                    
+                default:
+                    return cmd_BG(core);
+            }
+            break;
+            
+        case TokenCHAR:
+            return cmd_CHAR(core);
+            
+        case TokenCELL:
+            return cmd_CELL(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

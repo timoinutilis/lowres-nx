@@ -25,10 +25,9 @@ BG n
 BG SOURCE a,w
 BG COPY x,y,w,h TO x,y
 BG SCROLL x,y TO x,y,dx,dy
-CHAR n
-ATRB (p,b,f,f,p)
+CHAR n,(p,b,f,f,p)
 BG FILL x,y TO x,y
-CELL x,y [,c,(p,b,f,f,p)]
+CELL x,y
 =CELL(x,y)
 =CELL ATRB(x,y)
 
@@ -51,6 +50,7 @@ DISPLAY n,x,y
 =RIGHT(p)
 =BUTTON(p,b)
 =BUTTON(p,b)
+--> TOUCH? (mouse move isn't compatible with mobile)
 =MOUSE X
 =MOUSE Y
 =MOUSE KEY/TAP

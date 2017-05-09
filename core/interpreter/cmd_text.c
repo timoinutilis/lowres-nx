@@ -149,13 +149,12 @@ enum ErrorCode cmd_endINPUT(struct Core *core)
 enum ErrorCode cmd_TEXT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // TEXT
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 31);
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -163,7 +162,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     ++interpreter->pc;
 
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 31);
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
@@ -185,13 +184,12 @@ enum ErrorCode cmd_TEXT(struct Core *core)
 enum ErrorCode cmd_NUMBER(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // NUMBER
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 31);
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -199,7 +197,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 31);
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
     
     // comma
@@ -267,7 +265,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, 31);
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
 
     // comma
@@ -275,7 +273,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, 31);
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
@@ -283,7 +281,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     ++interpreter->pc;
     
     // w value
-    struct TypedValue wValue = itp_evaluateNumericExpression(core, 1, 32);
+    struct TypedValue wValue = itp_evaluateNumericExpression(core, 1, PLANE_COLUMNS);
     if (wValue.type == ValueTypeError) return wValue.v.errorCode;
     
     // comma
@@ -291,7 +289,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     ++interpreter->pc;
     
     // h value
-    struct TypedValue hValue = itp_evaluateNumericExpression(core, 1, 32);
+    struct TypedValue hValue = itp_evaluateNumericExpression(core, 1, PLANE_ROWS);
     if (hValue.type == ValueTypeError) return hValue.v.errorCode;
 
     // comma
@@ -317,13 +315,12 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
 enum ErrorCode cmd_FONT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // FONT
     ++interpreter->pc;
     
     // attributes value
-    struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.charAttr);
+    struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.fontCharAttr, true);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
     // comma
@@ -331,13 +328,13 @@ enum ErrorCode cmd_FONT(struct Core *core)
     ++interpreter->pc;
     
     // char value
-    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, 255);
+    struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
     if (cValue.type == ValueTypeError) return cValue.v.errorCode;
 
     if (interpreter->pass == PassRun)
     {
-        interpreter->textLib.charAttr.value = aValue.v.floatValue;
-        interpreter->textLib.characterOffset = cValue.v.floatValue;
+        if (aValue.type != ValueTypeNull) interpreter->textLib.fontCharAttr.value = aValue.v.floatValue;
+        if (cValue.type != ValueTypeNull) interpreter->textLib.fontCharOffset = cValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -388,7 +385,7 @@ enum ErrorCode cmd_CLW(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr)
+struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr, bool isOptional)
 {
     struct Interpreter *interpreter = &core->interpreter;
     if (interpreter->pc->type == TokenBracketOpen)
@@ -451,6 +448,10 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         resultValue.type = ValueTypeFloat;
         resultValue.v.floatValue = resultAttr.value;
         return resultValue;
+    }
+    else if (isOptional)
+    {
+        return itp_evaluateOptionalNumericExpression(core, 0, 255);
     }
     else
     {

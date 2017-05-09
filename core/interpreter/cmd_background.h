@@ -17,27 +17,20 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef cmd_text_h
-#define cmd_text_h
+#ifndef cmd_background_h
+#define cmd_background_h
 
 #include <stdio.h>
-#include <stdbool.h>
 #include "error.h"
-#include "video_chip.h"
 
 struct Core;
 
-enum ErrorCode cmd_PRINT(struct Core *core);
-enum ErrorCode cmd_INPUT(struct Core *core);
-enum ErrorCode cmd_endINPUT(struct Core *core);
-enum ErrorCode cmd_TEXT(struct Core *core);
-enum ErrorCode cmd_NUMBER(struct Core *core);
-enum ErrorCode cmd_CLS(struct Core *core);
-enum ErrorCode cmd_WINDOW(struct Core *core);
-enum ErrorCode cmd_FONT(struct Core *core);
-enum ErrorCode cmd_LOCATE(struct Core *core);
-enum ErrorCode cmd_CLW(struct Core *core);
+enum ErrorCode cmd_BG(struct Core *core);
+enum ErrorCode cmd_BG_SOURCE(struct Core *core);
+enum ErrorCode cmd_BG_COPY(struct Core *core);
+enum ErrorCode cmd_BG_SCROLL(struct Core *core);
+enum ErrorCode cmd_CHAR(struct Core *core);
+enum ErrorCode cmd_BG_FILL(struct Core *core);
+enum ErrorCode cmd_CELL(struct Core *core);
 
-struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr, bool isOptional);
-
-#endif /* cmd_text_h */
+#endif /* cmd_background_h */

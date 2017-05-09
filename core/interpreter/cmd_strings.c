@@ -126,7 +126,7 @@ struct TypedValue fnc_CHR(struct Core *core)
     ++interpreter->pc;
     
     // expression
-    struct TypedValue numericValue = itp_evaluateExpression(core, TypeClassNumeric);
+    struct TypedValue numericValue = itp_evaluateNumericExpression(core, 0, 255);
     if (numericValue.type == ValueTypeError) return numericValue;
     
     // bracket close
@@ -138,8 +138,6 @@ struct TypedValue fnc_CHR(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        if (numericValue.v.floatValue < 0 || numericValue.v.floatValue > 255) return val_makeError(ErrorInvalidParameter);
-        
         char ch = numericValue.v.floatValue;
         struct RCString *rcstring = rcstring_new(&ch, 1);
         if (!rcstring) return val_makeError(ErrorOutOfMemory);

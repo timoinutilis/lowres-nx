@@ -59,7 +59,6 @@ enum ErrorCode cmd_LET(struct Core *core)
 enum ErrorCode cmd_DIM(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
-    
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     do

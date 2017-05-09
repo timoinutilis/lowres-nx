@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		921607441EC0E97B008B702C /* cmd_background.c in Sources */ = {isa = PBXBuildFile; fileRef = 921607421EC0E97B008B702C /* cmd_background.c */; };
 		9229C3731EBF8AFF009CF378 /* cmd_sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 9229C3711EBF8AFF009CF378 /* cmd_sprites.c */; };
 		924D0B9B1EB51317005CDA17 /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924D0B9A1EB51317005CDA17 /* LowResNXView.swift */; };
 		92624B991EAD1B8800EB3A3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B981EAD1B8800EB3A3C /* AppDelegate.swift */; };
@@ -40,6 +41,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		921607421EC0E97B008B702C /* cmd_background.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_background.c; sourceTree = "<group>"; };
+		921607431EC0E97B008B702C /* cmd_background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_background.h; sourceTree = "<group>"; };
 		9229C3711EBF8AFF009CF378 /* cmd_sprites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_sprites.c; sourceTree = "<group>"; };
 		9229C3721EBF8AFF009CF378 /* cmd_sprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_sprites.h; sourceTree = "<group>"; };
 		924D0B981EB4FEB1005CDA17 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -181,6 +184,8 @@
 				92624BC11EAD1CFC00EB3A3C /* cmd_variables.h */,
 				9229C3711EBF8AFF009CF378 /* cmd_sprites.c */,
 				9229C3721EBF8AFF009CF378 /* cmd_sprites.h */,
+				921607421EC0E97B008B702C /* cmd_background.c */,
+				921607431EC0E97B008B702C /* cmd_background.h */,
 				92624BC21EAD1CFC00EB3A3C /* data.c */,
 				92624BC31EAD1CFC00EB3A3C /* data.h */,
 				92624BC41EAD1CFC00EB3A3C /* error.c */,
@@ -321,6 +326,7 @@
 				928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */,
 				92624BEA1EAD1CFC00EB3A3C /* cmd_text.c in Sources */,
 				92624BEC1EAD1CFC00EB3A3C /* data.c in Sources */,
+				921607441EC0E97B008B702C /* cmd_background.c in Sources */,
 				92624BF01EAD1CFC00EB3A3C /* rcstring.c in Sources */,
 				92624BE51EAD1CFC00EB3A3C /* cmd_control.c in Sources */,
 				92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */,
