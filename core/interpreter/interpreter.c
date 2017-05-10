@@ -32,6 +32,11 @@
 #include "cmd_maths.h"
 #include "cmd_background.h"
 
+const int RuntimeSignalFlagNone = 0;
+const int RuntimeSignalFlagError = 1 << 0;
+const int RuntimeSignalFlagKeyboard = 1 << 1;
+const int RuntimeSignalFlagGamepad = 1 << 2;
+
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
@@ -78,6 +83,7 @@ void itp_resetProgram(struct Core *core)
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
     interpreter->exitErrorCode = ErrorNone;
+    interpreter->runtimeSignalFlags = RuntimeSignalFlagNone;
     interpreter->numLabelStackItems = 0;
     interpreter->isSingleLineIf = false;
     interpreter->numSimpleVariables = 0;
@@ -114,6 +120,7 @@ void itp_runProgram(struct Core *core)
             if (errorCode != ErrorNone)
             {
                 interpreter->exitErrorCode = errorCode;
+                interpreter->runtimeSignalFlags |= RuntimeSignalFlagError;
                 interpreter->state = StateEnd;
             }
             break;
@@ -193,11 +200,13 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 if (cycles == maxCycles)
                 {
                     interpreter->exitErrorCode = ErrorTooManyCommandCycles;
+                    interpreter->runtimeSignalFlags |= RuntimeSignalFlagError;
                     interpreter->state = StateEnd;
                 }
                 else if (errorCode != ErrorNone)
                 {
                     interpreter->exitErrorCode = errorCode;
+                    interpreter->runtimeSignalFlags |= RuntimeSignalFlagError;
                     interpreter->state = StateEnd;
                 }
                 else
@@ -243,7 +252,19 @@ void itp_freeProgram(struct Core *core)
     assert(rcstring_count == 0);
 }
 
-int itp_pcPositionInSourceCode(struct Core *core)
+int itp_readRuntimeSignals(struct Core *core)
+{
+    int flags = core->interpreter.runtimeSignalFlags;
+    core->interpreter.runtimeSignalFlags = 0;
+    return flags;
+}
+
+enum ErrorCode itp_getExitErrorCode(struct Core *core)
+{
+    return core->interpreter.exitErrorCode;
+}
+
+int itp_getPcPositionInSourceCode(struct Core *core)
 {
     return core->interpreter.pc->sourcePosition;
 }
@@ -1058,6 +1079,11 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                 rcstring_release(value.v.stringValue);
                 rcstring_release(rightValue.v.stringValue);
             }
+        }
+        else
+        {
+            assert(0);
+            newValue.v.floatValue = 0;
         }
         
         value = newValue;

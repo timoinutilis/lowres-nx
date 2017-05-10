@@ -33,6 +33,11 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     func update() {
         core_update(core)
         lowResNXView.render(core: core!)
+        let signals = itp_readRuntimeSignals(core)
+        if (signals & RuntimeSignalFlagError) != 0 {
+            let lowResNXDocument = document as! LowResNXDocument
+            presentError(lowResNXDocument.getProgramError(errorCode: itp_getExitErrorCode(core)))
+        }
     }
     
     override func keyDown(with event: NSEvent) {

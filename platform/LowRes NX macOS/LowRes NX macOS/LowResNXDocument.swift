@@ -43,14 +43,17 @@ class LowResNXDocument: NSDocument {
         sourceCode = String(data: data, encoding: .ascii)!
         let errorCode = itp_compileProgram(&core, sourceCode.cString(using: .ascii))
         if errorCode != ErrorNone {
-            let cIndex = itp_pcPositionInSourceCode(&core)
-            let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(cIndex))
-            let lineRange = sourceCode.lineRange(for: index ..< index)
-            let lineString = sourceCode.substring(with: lineRange)
-            let lineNumber = sourceCode.countLines(index: index)
-            
-            throw ProgramError(errorCode: errorCode, lineNumber: lineNumber, line: lineString)
+            throw getProgramError(errorCode: errorCode)
         }
+    }
+    
+    func getProgramError(errorCode: ErrorCode) -> ProgramError {
+        let cIndex = itp_getPcPositionInSourceCode(&core)
+        let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(cIndex))
+        let lineRange = sourceCode.lineRange(for: index ..< index)
+        let lineString = sourceCode.substring(with: lineRange)
+        let lineNumber = sourceCode.countLines(index: index)
+        return ProgramError(errorCode: errorCode, lineNumber: lineNumber, line: lineString)
     }
     
     override func makeWindowControllers() {
