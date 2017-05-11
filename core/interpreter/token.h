@@ -92,7 +92,6 @@ enum TokenType {
     TokenINPUT,
     TokenINSTR,
     TokenINT,
-    TokenKEY,
     TokenLEFTStr,
     TokenLEFT,
     TokenLENGTH,

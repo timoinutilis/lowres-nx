@@ -17,24 +17,16 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef cmd_text_h
-#define cmd_text_h
+#ifndef cmd_screen_h
+#define cmd_screen_h
 
 #include <stdio.h>
-#include <stdbool.h>
 #include "error.h"
 
 struct Core;
 
-enum ErrorCode cmd_PRINT(struct Core *core);
-enum ErrorCode cmd_INPUT(struct Core *core);
-enum ErrorCode cmd_endINPUT(struct Core *core);
-enum ErrorCode cmd_TEXT(struct Core *core);
-enum ErrorCode cmd_NUMBER(struct Core *core);
-enum ErrorCode cmd_CLS(struct Core *core);
-enum ErrorCode cmd_WINDOW(struct Core *core);
-enum ErrorCode cmd_FONT(struct Core *core);
-enum ErrorCode cmd_LOCATE(struct Core *core);
-enum ErrorCode cmd_CLW(struct Core *core);
+enum ErrorCode cmd_PALETTE(struct Core *core);
+enum ErrorCode cmd_COLOR(struct Core *core);
+enum ErrorCode cmd_DISPLAY(struct Core *core);
 
-#endif /* cmd_text_h */
+#endif /* cmd_screen_h */

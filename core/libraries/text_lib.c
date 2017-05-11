@@ -45,7 +45,7 @@ void txtlib_scroll(struct Plane *plane, int fromX, int fromY, int toX, int toY, 
     {
         for (int x = fromX; x <= toX; x++)
         {
-            plane->cells[y][x] = plane->cells[(y - deltaX) & 0x1F][(x - deltaY) & 0x1F];
+            plane->cells[y][x] = plane->cells[(y - deltaY) & 0x1F][(x - deltaX) & 0x1F];
         }
     }
 }

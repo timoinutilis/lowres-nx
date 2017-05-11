@@ -61,7 +61,13 @@ union CharacterAttributes {
     uint8_t value;
 };
 
-// ================ Sprite ================
+union SpriteSizeAttributes {
+    struct {
+        uint8_t width:2; // 1-4 characters
+        uint8_t height:2; // 1-4 characters
+    };
+    uint8_t value;
+};
 
 // 8 bytes
 struct Sprite {
@@ -69,13 +75,7 @@ struct Sprite {
     uint8_t y;
     uint8_t character;
     union CharacterAttributes attr1;
-    union {
-        struct {
-            uint8_t width:2; // 1-4 characters
-            uint8_t height:2; // 1-4 characters
-        };
-        uint8_t value;
-    } attr2;
+    union SpriteSizeAttributes attr2;
     uint8_t reserved[3];
 };
 

@@ -21,6 +21,7 @@
 #include "core.h"
 #include "text_lib.h"
 #include "cmd_text.h"
+#include "interpreter_utils.h"
 
 enum ErrorCode cmd_BG(struct Core *core)
 {

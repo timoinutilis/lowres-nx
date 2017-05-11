@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		921607441EC0E97B008B702C /* cmd_background.c in Sources */ = {isa = PBXBuildFile; fileRef = 921607421EC0E97B008B702C /* cmd_background.c */; };
 		9229C3731EBF8AFF009CF378 /* cmd_sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 9229C3711EBF8AFF009CF378 /* cmd_sprites.c */; };
+		924C85FD1EC4D40A00734368 /* cmd_screen.c in Sources */ = {isa = PBXBuildFile; fileRef = 924C85FB1EC4D40A00734368 /* cmd_screen.c */; };
+		924C86001EC4E2B800734368 /* interpreter_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 924C85FE1EC4E2B800734368 /* interpreter_utils.c */; };
 		924D0B9B1EB51317005CDA17 /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924D0B9A1EB51317005CDA17 /* LowResNXView.swift */; };
 		92624B991EAD1B8800EB3A3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B981EAD1B8800EB3A3C /* AppDelegate.swift */; };
 		92624B9B1EAD1B8800EB3A3C /* LowResNXDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92624B9A1EAD1B8800EB3A3C /* LowResNXDocument.swift */; };
@@ -45,6 +47,10 @@
 		921607431EC0E97B008B702C /* cmd_background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_background.h; sourceTree = "<group>"; };
 		9229C3711EBF8AFF009CF378 /* cmd_sprites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_sprites.c; sourceTree = "<group>"; };
 		9229C3721EBF8AFF009CF378 /* cmd_sprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_sprites.h; sourceTree = "<group>"; };
+		924C85FB1EC4D40A00734368 /* cmd_screen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_screen.c; sourceTree = "<group>"; };
+		924C85FC1EC4D40A00734368 /* cmd_screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_screen.h; sourceTree = "<group>"; };
+		924C85FE1EC4E2B800734368 /* interpreter_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = interpreter_utils.c; sourceTree = "<group>"; };
+		924C85FF1EC4E2B800734368 /* interpreter_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interpreter_utils.h; sourceTree = "<group>"; };
 		924D0B981EB4FEB1005CDA17 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		924D0B9A1EB51317005CDA17 /* LowResNXView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXView.swift; sourceTree = "<group>"; };
 		92624B951EAD1B8800EB3A3C /* LowRes NX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -186,12 +192,16 @@
 				9229C3721EBF8AFF009CF378 /* cmd_sprites.h */,
 				921607421EC0E97B008B702C /* cmd_background.c */,
 				921607431EC0E97B008B702C /* cmd_background.h */,
+				924C85FB1EC4D40A00734368 /* cmd_screen.c */,
+				924C85FC1EC4D40A00734368 /* cmd_screen.h */,
 				92624BC21EAD1CFC00EB3A3C /* data.c */,
 				92624BC31EAD1CFC00EB3A3C /* data.h */,
 				92624BC41EAD1CFC00EB3A3C /* error.c */,
 				92624BC51EAD1CFC00EB3A3C /* error.h */,
 				92624BC61EAD1CFC00EB3A3C /* interpreter.c */,
 				92624BC71EAD1CFC00EB3A3C /* interpreter.h */,
+				924C85FE1EC4E2B800734368 /* interpreter_utils.c */,
+				924C85FF1EC4E2B800734368 /* interpreter_utils.h */,
 				92624BC81EAD1CFC00EB3A3C /* interpreter_config.h */,
 				92624BC91EAD1CFC00EB3A3C /* labels.c */,
 				92624BCA1EAD1CFC00EB3A3C /* labels.h */,
@@ -314,9 +324,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				924C86001EC4E2B800734368 /* interpreter_utils.c in Sources */,
 				92624BEB1EAD1CFC00EB3A3C /* cmd_variables.c in Sources */,
 				92624BE71EAD1CFC00EB3A3C /* cmd_maths.c in Sources */,
 				92624BF11EAD1CFC00EB3A3C /* token.c in Sources */,
+				924C85FD1EC4D40A00734368 /* cmd_screen.c in Sources */,
 				92624BF21EAD1CFC00EB3A3C /* value.c in Sources */,
 				92624BE81EAD1CFC00EB3A3C /* cmd_memory.c in Sources */,
 				92624BF31EAD1CFC00EB3A3C /* variables.c in Sources */,

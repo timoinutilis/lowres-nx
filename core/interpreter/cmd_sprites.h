@@ -26,7 +26,7 @@
 struct Core;
 
 enum ErrorCode cmd_SPRITE(struct Core *core);
-enum ErrorCode cmd_SPRITE_ATTR(struct Core *core);
+enum ErrorCode cmd_SPRITE_ATRB(struct Core *core);
 enum ErrorCode cmd_SPRITE_SIZE(struct Core *core);
 
 #endif /* cmd_sprites_h */

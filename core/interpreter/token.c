@@ -88,7 +88,6 @@ const char *TokenStrings[] = {
     "INPUT",
     "INSTR",
     "INT",
-    "KEY",
     "LEFT$",
     "LEFT",
     "LENGTH",

@@ -50,8 +50,7 @@ DISPLAY n,x,y
 =RIGHT(p)
 =BUTTON(p,b)
 =BUTTON(p,b)
---> TOUCH? (mouse move isn't compatible with mobile)
-=MOUSE X
-=MOUSE Y
-=MOUSE KEY/TAP
+=TOUCH X
+=TOUCH Y
+=TOUCH
 + TAP

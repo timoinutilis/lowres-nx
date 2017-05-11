@@ -31,6 +31,8 @@
 #include "cmd_text.h"
 #include "cmd_maths.h"
 #include "cmd_background.h"
+#include "cmd_screen.h"
+#include "cmd_sprites.h"
 
 const int RuntimeSignalFlagNone = 0;
 const int RuntimeSignalFlagError = 1 << 0;
@@ -817,6 +819,17 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int 
     return value;
 }
 
+struct TypedValue itp_evaluateOptionalExpression(struct Core *core, enum TypeClass typeClass)
+{
+    if (core->interpreter.pc->type == TokenComma || core->interpreter.pc->type == TokenBracketClose || itp_isEndOfCommand(&core->interpreter))
+    {
+        struct TypedValue value;
+        value.type = ValueTypeNull;
+        return value;
+    }
+    return itp_evaluateExpression(core, typeClass);
+}
+
 struct TypedValue itp_evaluateOptionalNumericExpression(struct Core *core, int min, int max)
 {
     if (core->interpreter.pc->type == TokenComma || core->interpreter.pc->type == TokenBracketClose || itp_isEndOfCommand(&core->interpreter))
@@ -1428,6 +1441,29 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenCELL:
             return cmd_CELL(core);
+            
+        case TokenPALETTE:
+            return cmd_PALETTE(core);
+            
+        case TokenCOLOR:
+            return cmd_COLOR(core);
+            
+        case TokenDISPLAY:
+            return cmd_DISPLAY(core);
+            
+        case TokenSPRITE:
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenATRB:
+                    return cmd_SPRITE_ATRB(core);
+                
+                case TokenSIZE:
+                    return cmd_SPRITE_SIZE(core);
+                
+                default:
+                    return cmd_SPRITE(core);
+            }
+            break;
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
