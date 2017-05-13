@@ -33,6 +33,7 @@
 #include "cmd_background.h"
 #include "cmd_screen.h"
 #include "cmd_sprites.h"
+#include "cmd_io.h"
 
 const int RuntimeSignalFlagNone = 0;
 const int RuntimeSignalFlagError = 1 << 0;
@@ -953,27 +954,27 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     break;
                 }
                 case TokenEq: {
-                    newValue.v.floatValue = (value.v.floatValue == rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue == rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenUneq: {
-                    newValue.v.floatValue = (value.v.floatValue != rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue != rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenGr: {
-                    newValue.v.floatValue = (value.v.floatValue > rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue > rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenLe: {
-                    newValue.v.floatValue = (value.v.floatValue < rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue < rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenGrEq: {
-                    newValue.v.floatValue = (value.v.floatValue >= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue >= rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenLeEq: {
-                    newValue.v.floatValue = (value.v.floatValue <= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue <= rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenPlus: {
@@ -1014,7 +1015,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) == 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) == 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -1022,7 +1023,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) != 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) != 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -1030,7 +1031,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) > 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) > 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -1038,7 +1039,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) < 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) < 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -1046,7 +1047,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) >= 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) >= 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -1054,7 +1055,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) <= 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) <= 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -1218,7 +1219,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenLEFTStr:
         case TokenRIGHTStr:
-            return fnc_LEFT_RIGHT(core);
+            return fnc_LEFTStr_RIGHTStr(core);
             
         case TokenLEN:
             return fnc_LEN(core);
@@ -1238,6 +1239,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenPI:
         case TokenRND:
         case TokenTIMER:
+        case TokenRASTER:
             return fnc_math0(core);
             
         case TokenABS:
@@ -1262,7 +1264,35 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenSTART:
         case TokenLENGTH:
             return fnc_START_LENGTH(core);
-
+            
+        case TokenCOLOR:
+            return fnc_COLOR(core);
+            
+        case TokenCELLA:
+        case TokenCELLC:
+            return fnc_CELL(core);
+            
+        case TokenUP:
+        case TokenDOWN:
+        case TokenLEFT:
+        case TokenRIGHT:
+            return fnc_UP_DOWN_LEFT_RIGHT(core);
+            
+        case TokenBUTTON:
+            return fnc_BUTTON(core);
+            
+        case TokenSPRITEX:
+        case TokenSPRITEY:
+        case TokenSPRITEC:
+        case TokenSPRITEA:
+        case TokenSPRITES:
+            return fnc_SPRITE(core);
+            
+        case TokenTOUCH:
+        case TokenTOUCHX:
+        case TokenTOUCHY:
+            return fnc_TOUCH(core);
+            
         default:
             break;
     }
@@ -1451,19 +1481,14 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenDISPLAY:
             return cmd_DISPLAY(core);
             
+        case TokenSPRITEA:
+            return cmd_SPRITE_A(core);
+            
+        case TokenSPRITES:
+            return cmd_SPRITE_S(core);
+            
         case TokenSPRITE:
-            switch (itp_getNextTokenType(interpreter))
-            {
-                case TokenATRB:
-                    return cmd_SPRITE_ATRB(core);
-                
-                case TokenSIZE:
-                    return cmd_SPRITE_SIZE(core);
-                
-                default:
-                    return cmd_SPRITE(core);
-            }
-            break;
+            return cmd_SPRITE(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

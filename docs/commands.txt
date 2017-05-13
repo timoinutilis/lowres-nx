@@ -11,14 +11,14 @@ CLS bgn (fill BG with char 0)
 :::GFX:::
 
 SPRITE n,x,y,c
-SPRITE ATRB n,(p,b,f,f,p)
-SPRITE ATRB n,%10101010
-SPRITE SIZE n,(w,h)
-=SPRITE X(n)
-=SPRITE Y(n)
-=SPRITE C(n)
-=SPRITE ATRB(n)
-=SPRITE SIZE(n)
+SPRITE.A n,(p,b,f,f,p)
+SPRITE.A n,%10101010
+SPRITE.S n,(w,h)
+=SPRITE.X(n)
+=SPRITE.Y(n)
+=SPRITE.C(n)
+=SPRITE.A(n)
+=SPRITE.S(n)
 
 BG n
 
@@ -28,8 +28,8 @@ BG SCROLL x,y TO x,y,dx,dy
 CHAR n,(p,b,f,f,p)
 BG FILL x,y TO x,y
 CELL x,y
-=CELL(x,y)
-=CELL ATRB(x,y)
+=CELL.C(x,y)
+=CELL.A(x,y)
 
 PALETTE n,c0,c1,c2,c3
 COLOR n,c
@@ -50,7 +50,7 @@ DISPLAY n,x,y
 =RIGHT(p)
 =BUTTON(p,b)
 =BUTTON(p,b)
-=TOUCH X
-=TOUCH Y
+=TOUCH.X
+=TOUCH.Y
 =TOUCH
 + TAP

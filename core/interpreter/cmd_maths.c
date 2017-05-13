@@ -50,6 +50,10 @@ struct TypedValue fnc_math0(struct Core *core)
                 value.v.floatValue = 0; //TODO
                 break;
                 
+            case TokenRASTER:
+                value.v.floatValue = core->machine.videoRegisters.rasterLine;
+                break;
+                
             default:
                 assert(0);
                 break;
@@ -111,7 +115,7 @@ struct TypedValue fnc_math1(struct Core *core)
                 break;
                 
             case TokenSGN:
-                value.v.floatValue = (xValue.v.floatValue > 0) ? 1 : (xValue.v.floatValue < 0) ? -1 : 0;
+                value.v.floatValue = (xValue.v.floatValue > 0) ? 1 : (xValue.v.floatValue < 0) ? BAS_TRUE : BAS_FALSE;
                 break;
                 
             case TokenSIN:

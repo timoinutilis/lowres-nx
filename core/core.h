@@ -45,9 +45,9 @@ void core_rasterUpdate(struct Core *core);
 void core_keyPressed(struct Core *core, char key);
 void core_backspacePressed(struct Core *core);
 void core_returnPressed(struct Core *core);
-void core_mouseMoved(struct Core *core, int x, int y);
-void core_mousePressed(struct Core *core);
-void core_mouseReleased(struct Core *core);
+void core_touchPressed(struct Core *core, int x, int y);
+void core_touchDragged(struct Core *core, int x, int y);
+void core_touchReleased(struct Core *core);
 void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button);
 void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button);
 

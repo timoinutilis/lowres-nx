@@ -60,22 +60,23 @@ void core_returnPressed(struct Core *core)
     core->machine.ioRegisters.key = '\n';
 }
 
-void core_mouseMoved(struct Core *core, int x, int y)
+void core_touchPressed(struct Core *core, int x, int y)
+{
+    core_touchDragged(core, x, y);
+    core->machine.ioRegisters.status_touch = 1;
+}
+
+void core_touchDragged(struct Core *core, int x, int y)
 {
     if (x < 0) x = 0; else if (x >= SCREEN_WIDTH) x = SCREEN_WIDTH - 1;
     if (y < 0) y = 0; else if (y >= SCREEN_HEIGHT) y = SCREEN_HEIGHT - 1;
-    core->machine.ioRegisters.mouseX = x;
-    core->machine.ioRegisters.mouseY = y;
+    core->machine.ioRegisters.touchX = x;
+    core->machine.ioRegisters.touchY = y;
 }
 
-void core_mousePressed(struct Core *core)
+void core_touchReleased(struct Core *core)
 {
-    core->machine.ioRegisters.status_mouseButton = 1;
-}
-
-void core_mouseReleased(struct Core *core)
-{
-    core->machine.ioRegisters.status_mouseButton = 0;
+    core->machine.ioRegisters.status_touch = 0;
 }
 
 void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button)

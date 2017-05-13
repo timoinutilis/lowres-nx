@@ -22,6 +22,7 @@
 #include "text_lib.h"
 #include "cmd_text.h"
 #include "interpreter_utils.h"
+#include <assert.h>
 
 enum ErrorCode cmd_BG(struct Core *core)
 {
@@ -288,4 +289,54 @@ enum ErrorCode cmd_CELL(struct Core *core)
     }
     
     return itp_endOfCommand(interpreter);
+}
+
+struct TypedValue fnc_CELL(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // CELL.?
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    if (xValue.type == ValueTypeError) return xValue;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    ++interpreter->pc;
+    
+    // y value
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    if (yValue.type == ValueTypeError) return yValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        struct Cell *cell = txtlib_getCell(core, xValue.v.floatValue, yValue.v.floatValue);
+        if (type == TokenCELLA)
+        {
+            value.v.floatValue = cell->attr.value;
+        }
+        else if (type == TokenCELLC)
+        {
+            value.v.floatValue = cell->character;
+        }
+        else
+        {
+            assert(0);
+        }
+    }
+    return value;
 }

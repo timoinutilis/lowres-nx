@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include "error.h"
+#include "value.h"
 
 struct Core;
 
@@ -32,5 +33,6 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core);
 enum ErrorCode cmd_CHAR(struct Core *core);
 enum ErrorCode cmd_BG_FILL(struct Core *core);
 enum ErrorCode cmd_CELL(struct Core *core);
+struct TypedValue fnc_CELL(struct Core *core);
 
 #endif /* cmd_background_h */

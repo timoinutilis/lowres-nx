@@ -247,7 +247,7 @@ struct TypedValue fnc_INSTR(struct Core *core)
     return resultValue;
 }
 
-struct TypedValue fnc_LEFT_RIGHT(struct Core *core)
+struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     

@@ -40,6 +40,7 @@
 		92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDE1EAD1CFC00EB3A3C /* video_chip.c */; };
 		928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */; };
 		928C1FEF1EB638A5002AE5C9 /* LowResNXWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */; };
+		92FA567C1EC62F6000C9DBB3 /* cmd_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 92FA567A1EC62F6000C9DBB3 /* cmd_io.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +110,8 @@
 		92624C031EAD35C600EB3A3C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXWindowController.swift; sourceTree = "<group>"; };
 		928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LowResNXWindowController.xib; sourceTree = "<group>"; };
+		92FA567A1EC62F6000C9DBB3 /* cmd_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_io.c; sourceTree = "<group>"; };
+		92FA567B1EC62F6000C9DBB3 /* cmd_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_io.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,6 +197,8 @@
 				921607431EC0E97B008B702C /* cmd_background.h */,
 				924C85FB1EC4D40A00734368 /* cmd_screen.c */,
 				924C85FC1EC4D40A00734368 /* cmd_screen.h */,
+				92FA567A1EC62F6000C9DBB3 /* cmd_io.c */,
+				92FA567B1EC62F6000C9DBB3 /* cmd_io.h */,
 				92624BC21EAD1CFC00EB3A3C /* data.c */,
 				92624BC31EAD1CFC00EB3A3C /* data.h */,
 				92624BC41EAD1CFC00EB3A3C /* error.c */,
@@ -340,6 +345,7 @@
 				92624BEC1EAD1CFC00EB3A3C /* data.c in Sources */,
 				921607441EC0E97B008B702C /* cmd_background.c in Sources */,
 				92624BF01EAD1CFC00EB3A3C /* rcstring.c in Sources */,
+				92FA567C1EC62F6000C9DBB3 /* cmd_io.c in Sources */,
 				92624BE51EAD1CFC00EB3A3C /* cmd_control.c in Sources */,
 				92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */,
 				92624BE61EAD1CFC00EB3A3C /* cmd_data.c in Sources */,

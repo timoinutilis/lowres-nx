@@ -17,8 +17,8 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef cmd_screen_h
-#define cmd_screen_h
+#ifndef cmd_io_h
+#define cmd_io_h
 
 #include <stdio.h>
 #include "error.h"
@@ -26,9 +26,8 @@
 
 struct Core;
 
-enum ErrorCode cmd_PALETTE(struct Core *core);
-enum ErrorCode cmd_COLOR(struct Core *core);
-enum ErrorCode cmd_DISPLAY(struct Core *core);
-struct TypedValue fnc_COLOR(struct Core *core);
+struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core);
+struct TypedValue fnc_BUTTON(struct Core *core);
+struct TypedValue fnc_TOUCH(struct Core *core);
 
-#endif /* cmd_screen_h */
+#endif /* cmd_io_h */

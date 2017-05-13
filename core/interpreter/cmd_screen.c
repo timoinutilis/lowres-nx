@@ -19,7 +19,6 @@
 
 #include "cmd_screen.h"
 #include "core.h"
-#include "value.h"
 
 enum ErrorCode cmd_PALETTE(struct Core *core)
 {
@@ -151,3 +150,34 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
     
     return itp_endOfCommand(interpreter);
 }
+
+struct TypedValue fnc_COLOR(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // COLOR
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    ++interpreter->pc;
+    
+    // expression
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_COLORS - 1);
+    if (nValue.type == ValueTypeError) return nValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int n = nValue.v.floatValue;
+        value.v.floatValue = core->machine.colorRegisters.colors[n];
+    }
+    return value;
+}
+

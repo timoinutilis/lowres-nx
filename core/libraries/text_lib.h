@@ -58,6 +58,7 @@ bool txtlib_inputUpdate(struct Core *core);
 void txtlib_clearWindow(struct Core *core);
 void txtlib_clearScreen(struct Core *core);
 void txtlib_clearBackground(struct Core *core, int bg);
+struct Cell *txtlib_getCell(struct Core *core, int x, int y);
 void txtlib_setCell(struct Core *core, int x, int y);
 void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY);
 void txtlib_scrollBackground(struct Core *core, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY);

@@ -32,6 +32,9 @@
 #include "big_endian.h"
 #include "text_lib.h"
 
+#define BAS_TRUE -1.0f
+#define BAS_FALSE 0.0f
+
 struct Core;
 
 extern const int RuntimeSignalFlagNone;

@@ -22,6 +22,7 @@
 #include "value.h"
 #include "cmd_text.h"
 #include "interpreter_utils.h"
+#include <assert.h>
 
 enum ErrorCode cmd_SPRITE(struct Core *core)
 {
@@ -70,12 +71,11 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_SPRITE_ATRB(struct Core *core)
+enum ErrorCode cmd_SPRITE_A(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    // SPRITE ATRB
-    ++interpreter->pc;
+    // SPRITE.A
     ++interpreter->pc;
     
     // n value
@@ -115,12 +115,11 @@ enum ErrorCode cmd_SPRITE_ATRB(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_SPRITE_SIZE(struct Core *core)
+enum ErrorCode cmd_SPRITE_S(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    // SPRITE SIZE
-    ++interpreter->pc;
+    // SPRITE.S
     ++interpreter->pc;
     
     // n value
@@ -158,4 +157,61 @@ enum ErrorCode cmd_SPRITE_SIZE(struct Core *core)
     }
     
     return itp_endOfCommand(interpreter);
+}
+
+struct TypedValue fnc_SPRITE(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // SPRITE.?
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    ++interpreter->pc;
+    
+    // expression
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
+    if (nValue.type == ValueTypeError) return nValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int n = nValue.v.floatValue;
+        struct Sprite *sprite = &core->machine.spriteRegisters.sprites[n];
+        switch (type)
+        {
+            case TokenSPRITEX:
+                value.v.floatValue = sprite->x;
+                break;
+                
+            case TokenSPRITEY:
+                value.v.floatValue = sprite->y;
+                break;
+                
+            case TokenSPRITEC:
+                value.v.floatValue = sprite->character;
+                break;
+                
+            case TokenSPRITEA:
+                value.v.floatValue = sprite->attr1.value;
+                break;
+
+            case TokenSPRITES:
+                value.v.floatValue = sprite->attr2.value;
+                break;
+                
+            default:
+                assert(0);
+                break;
+        }
+    }
+    return value;
 }

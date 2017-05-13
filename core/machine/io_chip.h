@@ -42,13 +42,13 @@ union Gamepad {
 
 struct IORegisters {
     union Gamepad gamepads[NUM_GAMEPADS]; // 2 bytes
-    uint8_t mouseX;
-    uint8_t mouseY;
+    uint8_t touchX;
+    uint8_t touchY;
     char key;
     union {
         struct {
             uint8_t status_pause:1;
-            uint8_t status_mouseButton:1;
+            uint8_t status_touch:1;
         };
         uint8_t status;
     };

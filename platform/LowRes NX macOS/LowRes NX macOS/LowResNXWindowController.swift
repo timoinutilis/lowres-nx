@@ -17,7 +17,6 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     override func windowDidLoad() {
         super.windowDidLoad()
         window!.delegate = self
-        window!.acceptsMouseMovedEvents = true
         
         let lowResNXDocument = document as! LowResNXDocument
         core = UnsafeMutablePointer<Core>(&lowResNXDocument.core)
@@ -117,24 +116,26 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         }
     }
     
-    override func mouseMoved(with event: NSEvent) {
+    override func mouseDragged(with event: NSEvent) {
+        let point = screenPoint(event: event)
+        core_touchDragged(core, Int32(point.x), Int32(point.y))
+    }
+    
+    override func mouseDown(with event: NSEvent) {
+        let point = screenPoint(event: event)
+        core_touchPressed(core, Int32(point.x), Int32(point.y))
+    }
+    
+    override func mouseUp(with event: NSEvent) {
+        core_touchReleased(core)
+    }
+    
+    func screenPoint(event: NSEvent) -> CGPoint {
         let point = event.locationInWindow
         let viewPoint = lowResNXView.convert(point, to: nil)
         let x = viewPoint.x * CGFloat(SCREEN_WIDTH) / lowResNXView.bounds.size.width;
         let y = CGFloat(SCREEN_HEIGHT) - viewPoint.y * CGFloat(SCREEN_HEIGHT) / lowResNXView.bounds.size.height;
-        core_mouseMoved(core, Int32(x), Int32(y))
-    }
-    
-    override func mouseDragged(with event: NSEvent) {
-        mouseMoved(with: event)
-    }
-    
-    override func mouseDown(with event: NSEvent) {
-        core_mousePressed(core)
-    }
-    
-    override func mouseUp(with event: NSEvent) {
-        core_mouseReleased(core)
+        return CGPoint(x: x, y: y);
     }
 
 }

@@ -297,10 +297,16 @@ void txtlib_clearBackground(struct Core *core, int bg)
     }
 }
 
+struct Cell *txtlib_getCell(struct Core *core, int x, int y)
+{
+    struct Plane *plane = txtlib_getCurrentBackground(core);
+    return &plane->cells[y][x];
+}
+
 void txtlib_setCell(struct Core *core, int x, int y)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = txtlib_getWindowBackground(core);
+    struct Plane *plane = txtlib_getCurrentBackground(core);
     struct Cell *cell = &plane->cells[y][x];
     cell->character = lib->cellChar;
     cell->attr = lib->cellCharAttr;
@@ -309,7 +315,7 @@ void txtlib_setCell(struct Core *core, int x, int y)
 void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = txtlib_getWindowBackground(core);
+    struct Plane *plane = txtlib_getCurrentBackground(core);
     for (int y = fromY; y <= toY; y++)
     {
         for (int x = fromX; x <= toX; x++)
