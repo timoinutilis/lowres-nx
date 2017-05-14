@@ -21,14 +21,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "text_lib.h"
 
 void core_init(struct Core *core)
 {
     memset(core, 0, sizeof(struct Core));
     
     machine_init(&core->machine);
-    txtlib_init(core);
 }
 
 void core_update(struct Core *core)

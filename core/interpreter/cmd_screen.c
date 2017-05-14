@@ -19,6 +19,8 @@
 
 #include "cmd_screen.h"
 #include "core.h"
+#include <assert.h>
+#include "interpreter_utils.h"
 
 enum ErrorCode cmd_PALETTE(struct Core *core)
 {
@@ -151,6 +153,25 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_DISPLAY_A(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // DISPLAY.A
+    ++interpreter->pc;
+    
+    // atrb value
+    struct TypedValue aValue = itp_evaluateDisplayAttributes(core, core->machine.videoRegisters.attr);
+    if (aValue.type == ValueTypeError) return aValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+         core->machine.videoRegisters.attr.value = aValue.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
 struct TypedValue fnc_COLOR(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
@@ -181,3 +202,81 @@ struct TypedValue fnc_COLOR(struct Core *core)
     return value;
 }
 
+struct TypedValue fnc_screen0(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // function
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        switch (type)
+        {
+            case TokenTIMER:
+                value.v.floatValue = 0; //TODO
+                break;
+                
+            case TokenRASTER:
+                value.v.floatValue = core->machine.videoRegisters.rasterLine;
+                break;
+                
+            case TokenDISPLAYA:
+                value.v.floatValue = core->machine.videoRegisters.attr.value;
+                break;
+                
+            default:
+                assert(0);
+                break;
+        }
+    }
+    return value;
+}
+
+struct TypedValue fnc_DISPLAY_X_Y(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // DISPLAY.?
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    ++interpreter->pc;
+    
+    // bg value
+    struct TypedValue bgValue = itp_evaluateNumericExpression(core, 0, 1);
+    if (bgValue.type == ValueTypeError) return bgValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int bg = bgValue.v.floatValue;
+        switch (type)
+        {
+            case TokenDISPLAYX:
+                value.v.floatValue = (bg == 0) ? core->machine.videoRegisters.scrollAX : core->machine.videoRegisters.scrollBX;
+                break;
+                
+            case TokenDISPLAYY:
+                value.v.floatValue = (bg == 0) ? core->machine.videoRegisters.scrollAY : core->machine.videoRegisters.scrollBY;
+                break;
+                
+            default:
+                assert(0);
+                break;
+        }
+    }
+    return value;
+}

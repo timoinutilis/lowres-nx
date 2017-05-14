@@ -52,6 +52,7 @@ const char *TokenStrings[] = {
     "NOT",
     "OR",
     "XOR",
+    "MOD",
     
     // Commands/Functions
     "ABS",
@@ -72,6 +73,9 @@ const char *TokenStrings[] = {
     "COS",
     "DATA",
     "DIM",
+    "DISPLAY.X",
+    "DISPLAY.Y",
+    "DISPLAY.A",
     "DISPLAY",
     "DOWN",
     "DO",
@@ -100,7 +104,6 @@ const char *TokenStrings[] = {
     "MAX",
     "MID$",
     "MIN",
-    "MOD",
     "NEXT",
     "NUMBER",
     "ON",
@@ -122,7 +125,6 @@ const char *TokenStrings[] = {
     "SCROLL",
     "SGN",
     "SIN",
-    "SIZE",
     "SOURCE",
     "SPRITE.A",
     "SPRITE.C",

@@ -27,6 +27,11 @@ void txtlib_init(struct Core *core)
     
     txtlib_clearScreen(core);
     lib->fontCharAttr.bank = 1;
+    
+    core->machine.colorRegisters.colors[0] = (0 << 4) | (0 << 2) | 0;
+    core->machine.colorRegisters.colors[1] = (0 << 4) | (0 << 2) | 0;
+    core->machine.colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
+    core->machine.colorRegisters.colors[3] = (3 << 4) | (3 << 2) | 3;
 }
 
 struct Plane *txtlib_getCurrentBackground(struct Core *core)
@@ -269,13 +274,19 @@ void txtlib_clearWindow(struct Core *core)
 void txtlib_clearScreen(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
+    struct VideoRegisters *reg = &core->machine.videoRegisters;
     
     memset(&core->machine.videoRam.planeA, 0, sizeof(struct Plane));
     memset(&core->machine.videoRam.planeB, 0, sizeof(struct Plane));
-    core->machine.videoRegisters.scrollAX = 0;
-    core->machine.videoRegisters.scrollAY = 0;
-    core->machine.videoRegisters.scrollBX = 0;
-    core->machine.videoRegisters.scrollBY = 0;
+    
+    reg->scrollAX = 0;
+    reg->scrollAY = 0;
+    reg->scrollBX = 0;
+    reg->scrollBY = 0;
+    reg->attr.spritesEnabled = 1;
+    reg->attr.planeAEnabled = 1;
+    reg->attr.planeBEnabled = 1;
+    
     lib->windowX = 0;
     lib->windowY = 0;
     lib->windowWidth = 20;

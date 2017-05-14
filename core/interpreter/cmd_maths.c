@@ -46,14 +46,6 @@ struct TypedValue fnc_math0(struct Core *core)
                 value.v.floatValue = random() / ((float)RAND_MAX + 1.0);
                 break;
                 
-            case TokenTIMER:
-                value.v.floatValue = 0; //TODO
-                break;
-                
-            case TokenRASTER:
-                value.v.floatValue = core->machine.videoRegisters.rasterLine;
-                break;
-                
             default:
                 assert(0);
                 break;

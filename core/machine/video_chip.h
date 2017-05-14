@@ -117,10 +117,17 @@ struct ColorRegisters {
     uint8_t colors[NUM_COLORS]; // 64 bytes
 };
 
-struct VideoRegisters {
-    union {
-        uint8_t attributes;
+union DisplayAttributes {
+    struct {
+        uint8_t planeAEnabled:1;
+        uint8_t planeBEnabled:1;
+        uint8_t spritesEnabled:1;
     };
+    uint8_t value;
+};
+
+struct VideoRegisters {
+    union DisplayAttributes attr;
     uint8_t scrollAX;
     uint8_t scrollAY;
     uint8_t scrollBX;

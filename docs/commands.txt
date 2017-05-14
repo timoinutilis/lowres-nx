@@ -1,56 +1,173 @@
-:::TEXT:::
+*************
+* Operators *
+*************
 
-WINDOW x,y,w,h,bgn
-FONT (p,b,f,f,p),c
+=
+>=
+<=
+<>
+>
+<
+(
+)
++
+-
+*
+/
+^
+AND
+NOT
+OR
+XOR
+MOD
+
+*******************
+* Program Control *
+*******************
+
+REM
+DO / LOOP
+FOR var=a TO b [STEP s] / NEXT var
+GOSUB label
+RETURN
+GOTO label
+IF expression THEN command [ELSE command] / END IF
+REPEAT / UNTIL expression
+WHILE expression / WEND
+END
+
+**********
+* Values *
+**********
+
+[LET ]var=v
+DIM ...
+SWAP var1,var2
+DATA ...
+READ ...
+RESTORE [label]
+
+*********
+* Maths *
+*********
+
+=ABS(x)
+=ATN(x)
+=COS(x)
+=EXP(x)
+=INT(x)
+=LOG(x)
+=MAX(x)
+=MIN(x)
+=PI
+=SGN(x)
+=SIN(x)
+=SQR(x)
+=TAN(x)
+=RND
+RANDOMIZE x
+
+***********
+* Strings *
+***********
+
+=ASC(a$)
+=BIN$(n)
+=CHR$(n)
+=HEX$(n)
+=INSTR(d$,s$,p)
+=LEFT$(s$,n)
+LEFT$(s$,n)=
+=LEN(a$)
+=MID$(s$,p,n)
+MID$(s$,p,n)=
+=RIGHT$(s$,n)
+RIGHT$(s$,n)=
+=STR$(n)
+=VAL(a$)
+
+********
+* Text *
+********
+
+WINDOW x,y,w,h,b
+CLW
 LOCATE x,y
-CLW (fill window with spaces and reset cursor)
+PRINT ...
+INPUT ["prompt";]var
 
-CLS (reset window, fill both BGs with char 0, reset scroll)
-CLS bgn (fill BG with char 0)
+***************
+* Backgrounds *
+***************
 
-:::GFX:::
+BG n
+BG SOURCE a,w
+BG COPY x1,y1,w,h TO x2,y2
+BG SCROLL x1,y1 TO x2,y2,dx,dy
+BG FILL x1,y1 TO x2,y2
+CELL x,y
+=CELL.C(x,y)
+=CELL.A(x,y)
+CHAR n,(pal,b,fx,fy,pri)
+CLS [b]
+NUMBER x,y,n,d
+TEXT x,y,s$
+FONT (pal,b,fx,fy,pri),c
+
+*******
+* I/O *
+*******
+
+=UP(p)
+=DOWN(p)
+=LEFT(p)
+=RIGHT(p)
+=BUTTON(p,n)
+=BUTTON(p,n)
+=TOUCH.X
+=TOUCH.Y
+=TOUCH
+=INKEY$
+
+**********
+* Screen *
+**********
+
+COLOR n,c
+=COLOR(n)
+DISPLAY b,x,y
+DISPLAY.A (s,b0,b1)
+=DISPLAY.X(b)
+=DISPLAY.Y(b)
+=DISPLAY.A
+PALETTE n,c0,c1,c2,c3
+=RASTER
+WAIT VBL
+WAIT n
+ON RASTER [GOSUB label]
+ON VBL [GOSUB label]
+=TIMER
+
+**********
+* Memory *
+**********
+
+=PEEK(a)
+POKE a,v
+COPY a,n TO d
+FILL a,n[,v]
+=START(n)
+=LENGTH(n)
+
+***********
+* Sprites *
+***********
 
 SPRITE n,x,y,c
-SPRITE.A n,(p,b,f,f,p)
-SPRITE.A n,%10101010
+SPRITE.A n,(pal,b,fx,fy,pri)
 SPRITE.S n,(w,h)
 =SPRITE.X(n)
 =SPRITE.Y(n)
 =SPRITE.C(n)
 =SPRITE.A(n)
 =SPRITE.S(n)
-
-BG n
-
-BG SOURCE a,w
-BG COPY x,y,w,h TO x,y
-BG SCROLL x,y TO x,y,dx,dy
-CHAR n,(p,b,f,f,p)
-BG FILL x,y TO x,y
-CELL x,y
-=CELL.C(x,y)
-=CELL.A(x,y)
-
-PALETTE n,c0,c1,c2,c3
-COLOR n,c
-=COLOR(n)
-
-DISPLAY n,x,y
-
-=RASTER
-
-=BG0
-=BG1
-=CHAR
-=PAL
-
-=UP(p)
-=DOWN(p)
-=LEFT(p)
-=RIGHT(p)
-=BUTTON(p,b)
-=BUTTON(p,b)
-=TOUCH.X
-=TOUCH.Y
-=TOUCH
-+ TAP

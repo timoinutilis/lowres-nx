@@ -93,6 +93,8 @@ void itp_resetProgram(struct Core *core)
     interpreter->numArrayVariables = 0;
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
+    
+    txtlib_init(core);
 }
 
 void itp_runProgram(struct Core *core)
@@ -1238,8 +1240,6 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenPI:
         case TokenRND:
-        case TokenTIMER:
-        case TokenRASTER:
             return fnc_math0(core);
             
         case TokenABS:
@@ -1267,6 +1267,15 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenCOLOR:
             return fnc_COLOR(core);
+            
+        case TokenTIMER:
+        case TokenRASTER:
+        case TokenDISPLAYA:
+            return fnc_screen0(core);
+            
+        case TokenDISPLAYX:
+        case TokenDISPLAYY:
+            return fnc_DISPLAY_X_Y(core);
             
         case TokenCELLA:
         case TokenCELLC:

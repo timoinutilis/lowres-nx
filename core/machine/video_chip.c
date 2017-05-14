@@ -24,14 +24,9 @@
 
 int video_getCharacterPixel(struct Character *character, int x, int y)
 {
-    if (x < 4)
-    {
-        return (character->data[y << 1] >> ((3 - x) << 1)) & 0x03;
-    }
-    else
-    {
-        return (character->data[(y << 1) + 1] >> ((7 - x) << 1)) & 0x03;
-    }
+    int b0 = (character->data[y] >> (7 - x)) & 0x01;
+    int b1 = (character->data[y | 8] >> (7 - x)) & 0x01;
+    return b0 | (b1 << 1);
 }
 
 struct Character *video_getCharacter(struct VideoRam *ram, int bank, int characterIndex)
@@ -159,10 +154,19 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
         reg->rasterLine = y;
         core_rasterUpdate(core);
         memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
-        memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
-        video_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
-        video_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
-        video_renderSprites(sreg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
+        if (reg->attr.planeBEnabled)
+        {
+            video_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
+        }
+        if (reg->attr.planeAEnabled)
+        {
+            video_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
+        }
+        if (reg->attr.spritesEnabled)
+        {
+            memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
+            video_renderSprites(sreg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
+        }
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
             int color = creg->colors[scanlineBuffer[x] & 0x7F];
@@ -172,7 +176,7 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
             *outputByte++ = r * 0x55;
             *outputByte++ = g * 0x55;
             *outputByte++ = b * 0x55;
-            *outputByte++ = 0;
+            outputByte++;
         }
         outputByte += (bytesPerLine - SCREEN_WIDTH*4);
     }

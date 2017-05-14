@@ -56,6 +56,7 @@ enum TokenType {
     TokenNOT,
     TokenOR,
     TokenXOR,
+    TokenMOD,
     
     // Commands/Functions
     TokenABS,
@@ -76,6 +77,9 @@ enum TokenType {
     TokenCOS,
     TokenDATA,
     TokenDIM,
+    TokenDISPLAYX,
+    TokenDISPLAYY,
+    TokenDISPLAYA,
     TokenDISPLAY,
     TokenDOWN,
     TokenDO,
@@ -104,7 +108,6 @@ enum TokenType {
     TokenMAX,
     TokenMID,
     TokenMIN,
-    TokenMOD,
     TokenNEXT,
     TokenNUMBER,
     TokenON,
@@ -126,7 +129,6 @@ enum TokenType {
     TokenSCROLL,
     TokenSGN,
     TokenSIN,
-    TokenSIZE,
     TokenSOURCE,
     TokenSPRITEA,
     TokenSPRITEC,
