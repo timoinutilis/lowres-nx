@@ -28,10 +28,8 @@ void txtlib_init(struct Core *core)
     txtlib_clearScreen(core);
     lib->fontCharAttr.bank = 1;
     
-    core->machine.colorRegisters.colors[0] = (0 << 4) | (0 << 2) | 0;
-    core->machine.colorRegisters.colors[1] = (0 << 4) | (0 << 2) | 0;
-    core->machine.colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
-    core->machine.colorRegisters.colors[3] = (3 << 4) | (3 << 2) | 3;
+    // white for standard font
+    core->machine.colorRegisters.colors[3] = 63;
 }
 
 struct Plane *txtlib_getCurrentBackground(struct Core *core)
