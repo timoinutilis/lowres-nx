@@ -140,6 +140,14 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
         
         union DisplayAttributes resultAttr = oldAttr;
         
+        // sprites value
+        struct TypedValue sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        if (sValue.type == ValueTypeError) return sValue;
+
+        // comma
+        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+        ++interpreter->pc;
+        
         // bg0 value
         struct TypedValue bg0Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
         if (bg0Value.type == ValueTypeError) return bg0Value;
@@ -152,23 +160,15 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
         struct TypedValue bg1Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
         if (bg1Value.type == ValueTypeError) return bg1Value;
         
-        // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // sprites value
-        struct TypedValue sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-        if (sValue.type == ValueTypeError) return sValue;
-        
         // bracket close
         if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
         interpreter->pc++;
         
         if (interpreter->pass == PassRun)
         {
+            if (sValue.type != ValueTypeNull) resultAttr.spritesEnabled = sValue.v.floatValue;
             if (bg0Value.type != ValueTypeNull) resultAttr.planeAEnabled = bg0Value.v.floatValue;
             if (bg1Value.type != ValueTypeNull) resultAttr.planeBEnabled = bg1Value.v.floatValue;
-            if (sValue.type != ValueTypeNull) resultAttr.spritesEnabled = sValue.v.floatValue;
         }
         
         struct TypedValue resultValue;

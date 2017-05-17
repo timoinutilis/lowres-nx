@@ -15,7 +15,10 @@ for row in range(16):
 				val = 0
 				for charX in range(8):
 					pixel = im.getpixel((column*8+charX, y))[0] / 64
-					pbit = (pixel >> bit) & 0x01
+					pcolor = 0
+					if pixel > 0:
+						pcolor = 4 - pixel
+					pbit = (pcolor >> bit) & 0x01
 					val |= (pbit << (7-charX))
 				print "%0.2X" % (val & 0xFF),
 		print ""

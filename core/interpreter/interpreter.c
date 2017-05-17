@@ -288,7 +288,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
     
     while (*character && *character != '#')
     {
-        if (interpreter->numTokens >= MAX_TOKENS)
+        if (interpreter->numTokens >= MAX_TOKENS - 1)
         {
             return ErrorTooManyTokens;
         }
@@ -562,6 +562,13 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         // Unexpected character
         return ErrorUnexpectedCharacter;
     }
+    
+    // add EOL to the end
+    struct Token *token = &interpreter->tokens[interpreter->numTokens];
+    token->sourcePosition = (int)(character - sourceCode);
+    token->type = TokenEol;
+    interpreter->numTokens++;
+
     
     // ROM DATA
     
@@ -1489,6 +1496,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenDISPLAY:
             return cmd_DISPLAY(core);
+
+        case TokenDISPLAYA:
+            return cmd_DISPLAY_A(core);
             
         case TokenSPRITEA:
             return cmd_SPRITE_A(core);

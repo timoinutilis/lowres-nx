@@ -119,9 +119,9 @@ struct ColorRegisters {
 
 union DisplayAttributes {
     struct {
+        uint8_t spritesEnabled:1;
         uint8_t planeAEnabled:1;
         uint8_t planeBEnabled:1;
-        uint8_t spritesEnabled:1;
     };
     uint8_t value;
 };

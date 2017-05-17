@@ -1,32 +1,24 @@
-$0000
-cartridgeRom 32 KB
+$0000 - cartridgeRom 32 KB
 
-$8000
-videoRam 8 KB
+$8000 - videoRam 8 KB
+  $8000 - Characters
+  $9000 - BG0
+  $9800 - BG1
 
-$A000
-workingRam 8 KB
+$A000 - workingRam 8 KB
 
-$C000
-persistentRam 8 KB
+$C000 - persistentRam 8 KB
 
-$E000
-characterRom 4 KB
+$E000 - characterRom 4 KB
 
-$F000
-spriteRegisters 512 B
+$F000 - spriteRegisters 512 B
 
-$F200
-colorRegisters 64 B
+$F200 - colorRegisters 64 B
 
-$F240
-reserved
+$F240 - reserved
 
-$FF40
-videoRegisters
+$FF40 - videoRegisters
 
-$FF80
-audioRegisters
+$FF80 - audioRegisters
 
-$FFC0
-ioRegisters
+$FFC0 - ioRegisters
