@@ -20,7 +20,7 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         union CharacterAttributes resultAttr = oldAttr;
         
         // palette value
-        struct TypedValue palValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+        struct TypedValue palValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_PALETTES - 1);
         if (palValue.type == ValueTypeError) return palValue;
         
         // comma

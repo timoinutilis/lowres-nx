@@ -52,7 +52,7 @@ bool machine_poke(struct Machine *machine, int address, int value)
         // character ROM
         return false;
     }
-    if (address >= 0xF240 && address < 0xFF40)
+    if (address >= 0xF220 && address < 0xFF40)
     {
         // reserved registers
         return false;

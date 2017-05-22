@@ -30,7 +30,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     ++interpreter->pc;
     
     // n value
-    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_COLORS / 4 - 1);
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_PALETTES - 1);
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
@@ -73,34 +73,6 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
         if (c1Value.type != ValueTypeNull) palColors[1] = c1Value.v.floatValue;
         if (c2Value.type != ValueTypeNull) palColors[2] = c2Value.v.floatValue;
         if (c3Value.type != ValueTypeNull) palColors[3] = c3Value.v.floatValue;
-    }
-    
-    return itp_endOfCommand(interpreter);
-}
-
-enum ErrorCode cmd_COLOR(struct Core *core)
-{
-    struct Interpreter *interpreter = &core->interpreter;
-    
-    // COLOR
-    ++interpreter->pc;
-    
-    // n value
-    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_COLORS - 1);
-    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
-    
-    // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-    ++interpreter->pc;
-    
-    // c value
-    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, 63);
-    if (cValue.type == ValueTypeError) return cValue.v.errorCode;
-
-    if (interpreter->pass == PassRun)
-    {
-        int n = nValue.v.floatValue;
-        core->machine.colorRegisters.colors[n] = cValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -183,8 +155,16 @@ struct TypedValue fnc_COLOR(struct Core *core)
     if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     ++interpreter->pc;
     
-    // expression
-    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_COLORS - 1);
+    // pal expression
+    struct TypedValue pValue = itp_evaluateNumericExpression(core, 0, NUM_PALETTES - 1);
+    if (pValue.type == ValueTypeError) return pValue;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    ++interpreter->pc;
+
+    // pal expression
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, 3);
     if (nValue.type == ValueTypeError) return nValue;
     
     // bracket close
@@ -196,8 +176,9 @@ struct TypedValue fnc_COLOR(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
+        int p = pValue.v.floatValue;
         int n = nValue.v.floatValue;
-        value.v.floatValue = core->machine.colorRegisters.colors[n];
+        value.v.floatValue = core->machine.colorRegisters.colors[p * 4 + n];
     }
     return value;
 }

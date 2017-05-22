@@ -1491,9 +1491,6 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenPALETTE:
             return cmd_PALETTE(core);
             
-        case TokenCOLOR:
-            return cmd_COLOR(core);
-            
         case TokenDISPLAY:
             return cmd_DISPLAY(core);
 

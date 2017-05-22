@@ -36,10 +36,10 @@ struct Machine {
     struct VideoRam videoRam; // 8 KB
 
     // 0xA000
-    uint8_t workingRam[0x2000]; // 8 KB
+    uint8_t workingRam[0x3C00]; // 15 KB
     
-    // 0xC000
-    uint8_t persistentRam[0x2000]; // 8 KB
+    // 0xDC00
+    uint8_t persistentRam[0x400]; // 1 KB
 
     // 0xE000
     struct CharacterBank characterRom; // 4 KB
@@ -48,10 +48,10 @@ struct Machine {
     struct SpriteRegisters spriteRegisters; // 512 B
     
     // 0xF200
-    struct ColorRegisters colorRegisters; // 64 B
+    struct ColorRegisters colorRegisters; // 32 B
     
-    // 0xF240
-    uint8_t reserved2[0xFF40 - 0xF240];
+    // 0xF220
+    uint8_t reserved[0xFF40 - 0xF220];
     
     // 0xFF40
     struct VideoRegisters videoRegisters;
@@ -59,11 +59,11 @@ struct Machine {
     
     // 0xFF80
     struct AudioRegisters audioRegisters;
-    uint8_t reserved4[0x40 - sizeof(struct AudioRegisters)];
+    uint8_t reserved2[0x40 - sizeof(struct AudioRegisters)];
 
     // 0xFFC0
     struct IORegisters ioRegisters;
-    uint8_t reserved5[0x40 - sizeof(struct IORegisters)];
+    uint8_t reserved1[0x40 - sizeof(struct IORegisters)];
 };
 
 void machine_init(struct Machine *machine);

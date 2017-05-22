@@ -27,7 +27,6 @@
 struct Core;
 
 enum ErrorCode cmd_PALETTE(struct Core *core);
-enum ErrorCode cmd_COLOR(struct Core *core);
 enum ErrorCode cmd_DISPLAY(struct Core *core);
 enum ErrorCode cmd_DISPLAY_A(struct Core *core);
 struct TypedValue fnc_COLOR(struct Core *core);

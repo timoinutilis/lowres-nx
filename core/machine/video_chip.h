@@ -25,7 +25,7 @@
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 128
 #define NUM_CHARACTERS 256
-#define NUM_COLORS 64
+#define NUM_PALETTES 8
 #define PLANE_COLUMNS 32
 #define PLANE_ROWS 32
 #define NUM_SPRITES 64
@@ -52,7 +52,8 @@ struct CharacterBank {
 
 union CharacterAttributes {
     struct {
-        uint8_t palette:4;
+        uint8_t palette:3;
+        uint8_t reserved:1;
         uint8_t bank:1;
         uint8_t flipX:1;
         uint8_t flipY:1;
@@ -114,7 +115,7 @@ struct SpriteRegisters {
 };
 
 struct ColorRegisters {
-    uint8_t colors[NUM_COLORS]; // 64 bytes
+    uint8_t colors[NUM_PALETTES * 4]; // 32 bytes
 };
 
 union DisplayAttributes {

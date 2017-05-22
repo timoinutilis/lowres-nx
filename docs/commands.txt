@@ -133,14 +133,13 @@ FONT (pal,b,fx,fy,pri),c
 * Screen *
 **********
 
-COLOR n,c
-=COLOR(n)
 DISPLAY b,x,y
 DISPLAY.A (s,b0,b1)
 =DISPLAY.X(b)
 =DISPLAY.Y(b)
 =DISPLAY.A
 PALETTE n,c0,c1,c2,c3
+=COLOR(p,n)
 =RASTER
 WAIT VBL
 WAIT n
