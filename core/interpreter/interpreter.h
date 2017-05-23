@@ -37,11 +37,6 @@
 
 struct Core;
 
-extern const int RuntimeSignalFlagNone;
-extern const int RuntimeSignalFlagError;
-extern const int RuntimeSignalFlagKeyboard;
-extern const int RuntimeSignalFlagGamepad;
-
 enum Pass {
     PassPrepare,
     PassRun
@@ -80,7 +75,6 @@ struct Interpreter {
     enum State state;
     enum Mode mode;
     struct Token *pc;
-    int runtimeSignalFlags;
     enum ErrorCode exitErrorCode;
     
     struct Token tokens[MAX_TOKENS];
@@ -119,7 +113,6 @@ void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);
 void itp_runInterrupt(struct Core *core, enum InterruptType type);
 void itp_freeProgram(struct Core *core);
-int itp_readRuntimeSignals(struct Core *core);
 enum ErrorCode itp_getExitErrorCode(struct Core *core);
 int itp_getPcPositionInSourceCode(struct Core *core);
 

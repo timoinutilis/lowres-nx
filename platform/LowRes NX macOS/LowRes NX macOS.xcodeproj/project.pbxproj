@@ -108,6 +108,7 @@
 		92624BDF1EAD1CFC00EB3A3C /* video_chip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = video_chip.h; sourceTree = "<group>"; };
 		92624C011EAD20E200EB3A3C /* LowResNX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LowResNX-Bridging-Header.h"; sourceTree = "<group>"; };
 		92624C031EAD35C600EB3A3C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		9282B4781ED4CE6A007B0F79 /* core_delegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_delegate.h; sourceTree = "<group>"; };
 		928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXWindowController.swift; sourceTree = "<group>"; };
 		928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LowResNXWindowController.xib; sourceTree = "<group>"; };
 		92FA567A1EC62F6000C9DBB3 /* cmd_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_io.c; sourceTree = "<group>"; };
@@ -164,6 +165,7 @@
 			children = (
 				92624BAF1EAD1CFB00EB3A3C /* core.c */,
 				92624BB01EAD1CFB00EB3A3C /* core.h */,
+				9282B4781ED4CE6A007B0F79 /* core_delegate.h */,
 				92624BB11EAD1CFB00EB3A3C /* interpreter */,
 				92624BD31EAD1CFC00EB3A3C /* libraries */,
 				92624BD61EAD1CFC00EB3A3C /* machine */,

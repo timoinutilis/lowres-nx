@@ -13,6 +13,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     
     var timer: Timer? = nil
     var core: UnsafeMutablePointer<Core>? = nil
+    var coreDelegate = CoreDelegate()
 
     override func windowDidLoad() {
         super.windowDidLoad()
@@ -20,6 +21,10 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         
         let lowResNXDocument = document as! LowResNXDocument
         core = UnsafeMutablePointer<Core>(&lowResNXDocument.core)
+        
+        coreDelegate.context = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+        coreDelegate.interpreterDidFail = interpreterDidFail;
+        core_setDelegate(core, &coreDelegate)
         
         timer = Timer.scheduledTimer(timeInterval: 1.0/30.0, target: self, selector: #selector(LowResNXWindowController.update), userInfo: nil, repeats: true)
 
@@ -32,11 +37,6 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     func update() {
         core_update(core)
         lowResNXView.render(core: core!)
-        let signals = itp_readRuntimeSignals(core)
-        if (signals & RuntimeSignalFlagError) != 0 {
-            let lowResNXDocument = document as! LowResNXDocument
-            presentError(lowResNXDocument.getProgramError(errorCode: itp_getExitErrorCode(core)))
-        }
     }
     
     override func keyDown(with event: NSEvent) {
@@ -138,4 +138,11 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         return CGPoint(x: x, y: y);
     }
 
+}
+
+func interpreterDidFail(context: UnsafeMutableRawPointer?) -> Void {
+    let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
+    
+    let lowResNXDocument = windowController.document as! LowResNXDocument
+    windowController.presentError(lowResNXDocument.getProgramError(errorCode: itp_getExitErrorCode(windowController.core)))
 }

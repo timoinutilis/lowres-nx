@@ -29,6 +29,11 @@ void core_init(struct Core *core)
     machine_init(&core->machine);
 }
 
+void core_setDelegate(struct Core *core, struct CoreDelegate *delegate)
+{
+    core->delegate = delegate;
+}
+
 void core_update(struct Core *core)
 {
     itp_runProgram(core);

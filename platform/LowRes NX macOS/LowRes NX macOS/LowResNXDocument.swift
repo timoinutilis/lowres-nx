@@ -13,7 +13,10 @@ class ProgramError: NSError {
     init(errorCode: ErrorCode, lineNumber: Int, line: String) {
         let errorString = String(cString:err_getString(errorCode))
         let errorText = "Error in line \(lineNumber): \(errorString)\n\(line)"
-        super.init(domain: "LowResNX", code: Int(errorCode.rawValue), userInfo: [NSLocalizedRecoverySuggestionErrorKey: errorText])
+        super.init(domain: "LowResNX", code: Int(errorCode.rawValue), userInfo: [
+            NSLocalizedFailureReasonErrorKey: "There was a program error.",
+            NSLocalizedRecoverySuggestionErrorKey: errorText
+            ])
     }
     
     required init?(coder aDecoder: NSCoder) {
