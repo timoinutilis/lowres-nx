@@ -27,6 +27,12 @@ void core_init(struct Core *core)
     memset(core, 0, sizeof(struct Core));
     
     machine_init(&core->machine);
+    disk_init(core);
+}
+
+void core_deinit(struct Core *core)
+{
+    disk_deinit(core);
 }
 
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate)

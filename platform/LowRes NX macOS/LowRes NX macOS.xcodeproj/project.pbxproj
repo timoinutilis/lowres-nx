@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		921607441EC0E97B008B702C /* cmd_background.c in Sources */ = {isa = PBXBuildFile; fileRef = 921607421EC0E97B008B702C /* cmd_background.c */; };
 		9229C3731EBF8AFF009CF378 /* cmd_sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 9229C3711EBF8AFF009CF378 /* cmd_sprites.c */; };
+		922AFF991ED5FFAB00002BFA /* disk_drive.c in Sources */ = {isa = PBXBuildFile; fileRef = 922AFF971ED5FFAB00002BFA /* disk_drive.c */; };
 		924C85FD1EC4D40A00734368 /* cmd_screen.c in Sources */ = {isa = PBXBuildFile; fileRef = 924C85FB1EC4D40A00734368 /* cmd_screen.c */; };
 		924C86001EC4E2B800734368 /* interpreter_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 924C85FE1EC4E2B800734368 /* interpreter_utils.c */; };
 		924D0B9B1EB51317005CDA17 /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924D0B9A1EB51317005CDA17 /* LowResNXView.swift */; };
@@ -38,6 +39,7 @@
 		92624BF61EAD1CFC00EB3A3C /* character_rom.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BD91EAD1CFC00EB3A3C /* character_rom.c */; };
 		92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDC1EAD1CFC00EB3A3C /* machine.c */; };
 		92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDE1EAD1CFC00EB3A3C /* video_chip.c */; };
+		9284CE4C1ED1EE1600891E7D /* cmd_files.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284CE4A1ED1EE1600891E7D /* cmd_files.c */; };
 		928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */; };
 		928C1FEF1EB638A5002AE5C9 /* LowResNXWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */; };
 		92FA567C1EC62F6000C9DBB3 /* cmd_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 92FA567A1EC62F6000C9DBB3 /* cmd_io.c */; };
@@ -48,6 +50,8 @@
 		921607431EC0E97B008B702C /* cmd_background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_background.h; sourceTree = "<group>"; };
 		9229C3711EBF8AFF009CF378 /* cmd_sprites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_sprites.c; sourceTree = "<group>"; };
 		9229C3721EBF8AFF009CF378 /* cmd_sprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_sprites.h; sourceTree = "<group>"; };
+		922AFF971ED5FFAB00002BFA /* disk_drive.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = disk_drive.c; sourceTree = "<group>"; };
+		922AFF981ED5FFAB00002BFA /* disk_drive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disk_drive.h; sourceTree = "<group>"; };
 		924C85FB1EC4D40A00734368 /* cmd_screen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_screen.c; sourceTree = "<group>"; };
 		924C85FC1EC4D40A00734368 /* cmd_screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_screen.h; sourceTree = "<group>"; };
 		924C85FE1EC4E2B800734368 /* interpreter_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = interpreter_utils.c; sourceTree = "<group>"; };
@@ -109,6 +113,8 @@
 		92624C011EAD20E200EB3A3C /* LowResNX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LowResNX-Bridging-Header.h"; sourceTree = "<group>"; };
 		92624C031EAD35C600EB3A3C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9282B4781ED4CE6A007B0F79 /* core_delegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_delegate.h; sourceTree = "<group>"; };
+		9284CE4A1ED1EE1600891E7D /* cmd_files.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_files.c; sourceTree = "<group>"; };
+		9284CE4B1ED1EE1600891E7D /* cmd_files.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_files.h; sourceTree = "<group>"; };
 		928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXWindowController.swift; sourceTree = "<group>"; };
 		928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LowResNXWindowController.xib; sourceTree = "<group>"; };
 		92FA567A1EC62F6000C9DBB3 /* cmd_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_io.c; sourceTree = "<group>"; };
@@ -126,6 +132,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		922AFF961ED5FF7D00002BFA /* accessories */ = {
+			isa = PBXGroup;
+			children = (
+				922AFF971ED5FFAB00002BFA /* disk_drive.c */,
+				922AFF981ED5FFAB00002BFA /* disk_drive.h */,
+			);
+			path = accessories;
+			sourceTree = "<group>";
+		};
 		92624B8C1EAD1B8800EB3A3C = {
 			isa = PBXGroup;
 			children = (
@@ -169,6 +184,7 @@
 				92624BB11EAD1CFB00EB3A3C /* interpreter */,
 				92624BD31EAD1CFC00EB3A3C /* libraries */,
 				92624BD61EAD1CFC00EB3A3C /* machine */,
+				922AFF961ED5FF7D00002BFA /* accessories */,
 			);
 			name = core;
 			path = ../../core;
@@ -199,6 +215,8 @@
 				921607431EC0E97B008B702C /* cmd_background.h */,
 				924C85FB1EC4D40A00734368 /* cmd_screen.c */,
 				924C85FC1EC4D40A00734368 /* cmd_screen.h */,
+				9284CE4A1ED1EE1600891E7D /* cmd_files.c */,
+				9284CE4B1ED1EE1600891E7D /* cmd_files.h */,
 				92FA567A1EC62F6000C9DBB3 /* cmd_io.c */,
 				92FA567B1EC62F6000C9DBB3 /* cmd_io.h */,
 				92624BC21EAD1CFC00EB3A3C /* data.c */,
@@ -333,6 +351,7 @@
 			files = (
 				924C86001EC4E2B800734368 /* interpreter_utils.c in Sources */,
 				92624BEB1EAD1CFC00EB3A3C /* cmd_variables.c in Sources */,
+				9284CE4C1ED1EE1600891E7D /* cmd_files.c in Sources */,
 				92624BE71EAD1CFC00EB3A3C /* cmd_maths.c in Sources */,
 				92624BF11EAD1CFC00EB3A3C /* token.c in Sources */,
 				924C85FD1EC4D40A00734368 /* cmd_screen.c in Sources */,
@@ -347,6 +366,7 @@
 				92624BEC1EAD1CFC00EB3A3C /* data.c in Sources */,
 				921607441EC0E97B008B702C /* cmd_background.c in Sources */,
 				92624BF01EAD1CFC00EB3A3C /* rcstring.c in Sources */,
+				922AFF991ED5FFAB00002BFA /* disk_drive.c in Sources */,
 				92FA567C1EC62F6000C9DBB3 /* cmd_io.c in Sources */,
 				92624BE51EAD1CFC00EB3A3C /* cmd_control.c in Sources */,
 				92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */,

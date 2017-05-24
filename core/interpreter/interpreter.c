@@ -34,6 +34,7 @@
 #include "cmd_screen.h"
 #include "cmd_sprites.h"
 #include "cmd_io.h"
+#include "cmd_files.h"
 
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
@@ -1492,6 +1493,12 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenSPRITE:
             return cmd_SPRITE(core);
+            
+        case TokenSAVE:
+            return cmd_SAVE(core);
+            
+        case TokenLOAD:
+            return cmd_LOAD(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

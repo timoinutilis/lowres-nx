@@ -34,6 +34,10 @@ class LowResNXDocument: NSDocument {
         core_init(&core)
     }
     
+    deinit {
+        core_deinit(&core)
+    }
+    
     override class func autosavesInPlace() -> Bool {
         return false
     }

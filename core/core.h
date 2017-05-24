@@ -23,11 +23,13 @@
 #include <stdio.h>
 #include "machine.h"
 #include "interpreter.h"
+#include "disk_drive.h"
 #include "core_delegate.h"
 
 struct Core {
     struct Machine machine;
     struct Interpreter interpreter;
+    struct DiskDrive diskDrive;
     struct CoreDelegate *delegate;
 };
 
@@ -41,6 +43,7 @@ enum GamepadButton {
 };
 
 void core_init(struct Core *core);
+void core_deinit(struct Core *core);
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);
 void core_update(struct Core *core);
 void core_rasterUpdate(struct Core *core);

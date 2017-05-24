@@ -170,3 +170,11 @@ SPRITE.S n,(w,h)
 =SPRITE.C(n)
 =SPRITE.A(n)
 =SPRITE.S(n)
+
+*********
+* FILES *
+*********
+=FIRST$(f$)
+=NEXT$
+LOAD f$,a
+SAVE f$,a,n
