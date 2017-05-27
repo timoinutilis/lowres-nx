@@ -36,6 +36,11 @@
 #include "cmd_io.h"
 #include "cmd_files.h"
 
+const char *CharSetDigits = "0123456789";
+const char *CharSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+const char *CharSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
+const char *CharSetHex = "0123456789ABCDEF";
+
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
@@ -264,11 +269,6 @@ int itp_getPcPositionInSourceCode(struct Core *core)
 
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
 {
-    const char *charSetDigits = "0123456789";
-    const char *charSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    const char *charSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
-    const char *charSetHex = "0123456789ABCDEF";
-    
     struct Interpreter *interpreter = &core->interpreter;
     const char *character = sourceCode;
     
@@ -324,13 +324,13 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         }
         
         // number
-        if (strchr(charSetDigits, *character))
+        if (strchr(CharSetDigits, *character))
         {
             float number = 0;
             int afterDot = 0;
             while (*character)
             {
-                if (strchr(charSetDigits, *character))
+                if (strchr(CharSetDigits, *character))
                 {
                     int digit = (int)*character - (int)'0';
                     if (afterDot == 0)
@@ -368,10 +368,10 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             int number = 0;
             while (*character)
             {
-                char *spos = strchr(charSetHex, *character);
+                char *spos = strchr(CharSetHex, *character);
                 if (spos)
                 {
-                    int digit = (int)(spos - charSetHex);
+                    int digit = (int)(spos - CharSetHex);
                     number <<= 4;
                     number += digit;
                     character++;
@@ -420,7 +420,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             if (keyword)
             {
                 size_t keywordLen = strlen(keyword);
-                int keywordIsAlphaNum = strchr(charSetAlphaNum, keyword[0]) != NULL;
+                int keywordIsAlphaNum = strchr(CharSetAlphaNum, keyword[0]) != NULL;
                 for (int pos = 0; pos <= keywordLen && character[pos]; pos++)
                 {
                     char textCharacter = character[pos];
@@ -434,7 +434,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                             break;
                         }
                     }
-                    else if (keywordIsAlphaNum && strchr(charSetAlphaNum, textCharacter))
+                    else if (keywordIsAlphaNum && strchr(CharSetAlphaNum, textCharacter))
                     {
                         // matching, but word is longer, so seems to be an identifier
                         break;
@@ -478,13 +478,13 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         }
         
         // Symbol
-        if (strchr(charSetLetters, *character))
+        if (strchr(CharSetLetters, *character))
         {
             const char *firstCharacter = character;
             char isString = 0;
             while (*character)
             {
-                if (strchr(charSetAlphaNum, *character))
+                if (strchr(CharSetAlphaNum, *character))
                 {
                     character++;
                 }
@@ -575,7 +575,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             int entryIndex = 0;
             while (*character)
             {
-                if (strchr(charSetDigits, *character))
+                if (strchr(CharSetDigits, *character))
                 {
                     int digit = (int)*character - (int)'0';
                     entryIndex *= 10;
@@ -605,10 +605,10 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             int value = 0;
             while (*character && *character != '#')
             {
-                char *spos = strchr(charSetHex, *character);
+                char *spos = strchr(CharSetHex, *character);
                 if (spos)
                 {
-                    int digit = (int)(spos - charSetHex);
+                    int digit = (int)(spos - CharSetHex);
                     if (shift)
                     {
                         value = digit << 4;

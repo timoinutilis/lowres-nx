@@ -23,7 +23,9 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         core = UnsafeMutablePointer<Core>(&lowResNXDocument.core)
         
         coreDelegate.context = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-        coreDelegate.interpreterDidFail = interpreterDidFail;
+        coreDelegate.interpreterDidFail = interpreterDidFail
+        coreDelegate.diskDriveWillAccess = diskDriveWillAccess
+        coreDelegate.diskDriveDidSave = diskDriveDidSave
         core_setDelegate(core, &coreDelegate)
         
         timer = Timer.scheduledTimer(timeInterval: 1.0/30.0, target: self, selector: #selector(LowResNXWindowController.update), userInfo: nil, repeats: true)
@@ -142,7 +144,45 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
 
 func interpreterDidFail(context: UnsafeMutableRawPointer?) -> Void {
     let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
+    let nxDocument = windowController.document as! LowResNXDocument
     
-    let lowResNXDocument = windowController.document as! LowResNXDocument
-    windowController.presentError(lowResNXDocument.getProgramError(errorCode: itp_getExitErrorCode(windowController.core)))
+    windowController.presentError(nxDocument.getProgramError(errorCode: itp_getExitErrorCode(windowController.core)))
+}
+
+func diskDriveWillAccess(context: UnsafeMutableRawPointer?) -> Void {
+    let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
+    let nxDocument = windowController.document as! LowResNXDocument
+    
+    do {
+        let diskURL = nxDocument.nxDiskURL()
+        let data = try Data(contentsOf: diskURL)
+        let success = data.withUnsafeBytes({ (chars: UnsafePointer<Int8>) -> Bool in
+            disk_importDisk(windowController.core, chars)
+        })
+        if !success {
+            //TODO
+        }
+    } catch {
+        
+    }
+}
+
+func diskDriveDidSave(context: UnsafeMutableRawPointer?) -> Void {
+    let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
+    let nxDocument = windowController.document as! LowResNXDocument
+    
+    let output = disk_exportDisk(windowController.core)
+    if let output = output {
+        let diskURL = nxDocument.nxDiskURL()
+        let data = Data(bytes: output, count: Int(strlen(output)))
+        do {
+            try data.write(to: diskURL)
+        } catch let error as NSError {
+            windowController.presentError(error)
+        }
+        free(output);
+    } else {
+        //TODO
+    }
+    
 }

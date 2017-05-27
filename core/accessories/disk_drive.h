@@ -21,12 +21,11 @@
 #define disk_drive_h
 
 #include <stdio.h>
+#include <stdbool.h>
 
-#define NUM_FILES 4
-//16
-#define DISK_SIZE 32
-//65536
-#define FILE_COMMENT_SIZE 64
+#define NUM_FILES 16
+#define DISK_SIZE 32768
+#define FILE_COMMENT_SIZE 32
 
 struct Core;
 
@@ -39,10 +38,14 @@ struct FileEntry {
 struct DiskDrive {
     struct FileEntry entries[NUM_FILES];
     uint8_t *data;
+    bool hasChanges;
 };
 
 void disk_init(struct Core *core);
 void disk_deinit(struct Core *core);
+bool disk_importDisk(struct Core *core, const char *input);
+char *disk_exportDisk(struct Core *core);
+
 void disk_saveFile(struct Core *core, char *name, int address, int length);
 void disk_loadFile(struct Core *core, char *name, int address);
 

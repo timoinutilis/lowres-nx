@@ -23,6 +23,8 @@
 struct CoreDelegate {
     void *context;
     void (*interpreterDidFail)(void *context);
+    void (*diskDriveWillAccess)(void *context);
+    void (*diskDriveDidSave)(void *context);
 };
 
 #endif /* core_delegate_h */

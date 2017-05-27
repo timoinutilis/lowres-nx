@@ -37,6 +37,11 @@
 
 struct Core;
 
+extern const char *CharSetDigits;
+extern const char *CharSetLetters;
+extern const char *CharSetAlphaNum;
+extern const char *CharSetHex;
+
 enum Pass {
     PassPrepare,
     PassRun
