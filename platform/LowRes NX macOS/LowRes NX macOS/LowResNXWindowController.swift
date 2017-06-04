@@ -10,6 +10,7 @@ import Cocoa
 
 class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var lowResNXView: LowResNXView!
+    @IBOutlet weak var backgroundView: NSView!
     
     var timer: Timer? = nil
     var core: UnsafeMutablePointer<Core>? = nil
@@ -18,6 +19,8 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     override func windowDidLoad() {
         super.windowDidLoad()
         window!.delegate = self
+        
+        backgroundView.layer!.backgroundColor = CGColor(gray: 0, alpha: 1)
         
         let lowResNXDocument = document as! LowResNXDocument
         core = UnsafeMutablePointer<Core>(&lowResNXDocument.core)
@@ -134,7 +137,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     
     func screenPoint(event: NSEvent) -> CGPoint {
         let point = event.locationInWindow
-        let viewPoint = lowResNXView.convert(point, to: nil)
+        let viewPoint = window!.contentView!.convert(point, to: lowResNXView)
         let x = viewPoint.x * CGFloat(SCREEN_WIDTH) / lowResNXView.bounds.size.width;
         let y = CGFloat(SCREEN_HEIGHT) - viewPoint.y * CGFloat(SCREEN_HEIGHT) / lowResNXView.bounds.size.height;
         return CGPoint(x: x, y: y);

@@ -3,11 +3,13 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="LowResNXWindowController" customModule="LowRes_NX" customModuleProvider="target">
             <connections>
+                <outlet property="backgroundView" destination="ZuJ-Uu-0gr" id="Syj-cB-zoZ"/>
                 <outlet property="lowResNXView" destination="Xyp-2x-tAP" id="gAw-MQ-5nD"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
@@ -24,15 +26,27 @@
                 <rect key="frame" x="0.0" y="0.0" width="640" height="512"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="ZuJ-Uu-0gr">
+                        <rect key="frame" x="0.0" y="0.0" width="640" height="512"/>
+                    </customView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Xyp-2x-tAP" customClass="LowResNXView" customModule="LowRes_NX" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="640" height="512"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="Xyp-2x-tAP" secondAttribute="height" multiplier="5:4" id="cAP-gu-BNC"/>
+                        </constraints>
                     </customView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="Xyp-2x-tAP" secondAttribute="trailing" id="6Vb-0g-ZLW"/>
-                    <constraint firstAttribute="bottom" secondItem="Xyp-2x-tAP" secondAttribute="bottom" id="A5e-9w-Jm5"/>
-                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="HP2-Ie-D2Y"/>
-                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="clw-ME-yrc"/>
+                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="8z6-2t-38S"/>
+                    <constraint firstAttribute="trailing" secondItem="ZuJ-Uu-0gr" secondAttribute="trailing" id="GYl-j3-BeQ"/>
+                    <constraint firstItem="ZuJ-Uu-0gr" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="Pxs-he-NvT"/>
+                    <constraint firstAttribute="bottom" secondItem="Xyp-2x-tAP" secondAttribute="bottom" id="Uyc-9p-SqG"/>
+                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="centerY" secondItem="se5-gp-TjO" secondAttribute="centerY" id="XXS-DW-oGg"/>
+                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="f6e-ru-NH3"/>
+                    <constraint firstAttribute="bottom" secondItem="ZuJ-Uu-0gr" secondAttribute="bottom" id="gzm-K8-WwI"/>
+                    <constraint firstItem="ZuJ-Uu-0gr" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="h35-fy-n4X"/>
+                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="se5-gp-TjO" secondAttribute="leading" id="owc-Ch-O76"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Xyp-2x-tAP" secondAttribute="trailing" id="z4e-RH-8ak"/>
                 </constraints>
             </view>
             <connections>
