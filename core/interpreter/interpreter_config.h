@@ -20,7 +20,7 @@
 #ifndef interpreter_config_h
 #define interpreter_config_h
 
-#define MAX_TOKENS 2048
+#define MAX_TOKENS 8192
 #define MAX_SYMBOLS 128
 #define MAX_LABEL_STACK_ITEMS 128
 #define MAX_JUMP_LABEL_ITEMS 128
