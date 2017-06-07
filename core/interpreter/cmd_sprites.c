@@ -96,7 +96,7 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     union CharacterAttributes atrb;
     if (sprite)
     {
-        atrb = sprite->attr1;
+        atrb = sprite->attr;
     }
     else
     {
@@ -109,7 +109,7 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
 
     if (interpreter->pass == PassRun)
     {
-        sprite->attr1.value = aValue.v.floatValue;
+        sprite->attr.value = aValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -126,34 +126,29 @@ enum ErrorCode cmd_SPRITE_S(struct Core *core)
     struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
-    struct Sprite *sprite = NULL;
+    union SpriteSize size;
+    int n = 0;
     if (interpreter->pass == PassRun)
     {
-        int n = nValue.v.floatValue;
-        sprite = &core->machine.spriteRegisters.sprites[n];
+        n = nValue.v.floatValue;
+        size = core->machine.spriteRegisters.sizes[n];
+    }
+    else
+    {
+        size.value = 0;
     }
     
     // comma
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
     
-    union SpriteSizeAttributes atrb;
-    if (sprite)
-    {
-        atrb = sprite->attr2;
-    }
-    else
-    {
-        atrb.value = 0;
-    }
-    
     // atrb value
-    struct TypedValue aValue = itp_evaluateSpriteSizeAttributes(core, atrb, false);
+    struct TypedValue aValue = itp_evaluateSpriteSizeAttributes(core, size, false);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        sprite->attr2.value = aValue.v.floatValue;
+        core->machine.spriteRegisters.sizes[n].value = aValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -201,11 +196,11 @@ struct TypedValue fnc_SPRITE(struct Core *core)
                 break;
                 
             case TokenSPRITEA:
-                value.v.floatValue = sprite->attr1.value;
+                value.v.floatValue = sprite->attr.value;
                 break;
 
             case TokenSPRITES:
-                value.v.floatValue = sprite->attr2.value;
+                value.v.floatValue = core->machine.spriteRegisters.sizes[n].value;
                 break;
                 
             default:

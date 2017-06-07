@@ -62,7 +62,7 @@ union CharacterAttributes {
     uint8_t value;
 };
 
-union SpriteSizeAttributes {
+union SpriteSize {
     struct {
         uint8_t width:2; // 1-4 characters
         uint8_t height:2; // 1-4 characters
@@ -70,14 +70,12 @@ union SpriteSizeAttributes {
     uint8_t value;
 };
 
-// 8 bytes
+// 4 bytes
 struct Sprite {
     uint8_t x;
     uint8_t y;
     uint8_t character;
-    union CharacterAttributes attr1;
-    union SpriteSizeAttributes attr2;
-    uint8_t reserved[3];
+    union CharacterAttributes attr;
 };
 
 // ================ Cell ================
@@ -111,7 +109,8 @@ struct VideoRam {
 // =================================================
 
 struct SpriteRegisters {
-    struct Sprite sprites[NUM_SPRITES]; // 512 bytes
+    struct Sprite sprites[NUM_SPRITES]; // 256 bytes
+    union SpriteSize sizes[NUM_SPRITES]; // 64 bytes
 };
 
 struct ColorRegisters {

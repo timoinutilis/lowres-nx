@@ -45,7 +45,8 @@ struct Machine {
     struct CharacterBank characterRom; // 4 KB
 
     // 0xF000
-    struct SpriteRegisters spriteRegisters; // 512 B
+    struct SpriteRegisters spriteRegisters; // 320 B
+    uint8_t reserved4[0x200 - sizeof(struct SpriteRegisters)];
     
     // 0xF200
     struct ColorRegisters colorRegisters; // 32 B

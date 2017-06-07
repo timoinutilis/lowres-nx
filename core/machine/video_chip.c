@@ -72,30 +72,31 @@ void video_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int 
     for (int i = NUM_SPRITES - 1; i >= 0; i--)
     {
         struct Sprite *sprite = &reg->sprites[i];
+        union SpriteSize size = reg->sizes[i];
         if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
-            int height = (sprite->attr2.height + 1) << 3;
+            int height = (size.height + 1) << 3;
             if (spriteY >= 0 && spriteY < height)
             {
-                if (sprite->attr1.flipY)
+                if (sprite->attr.flipY)
                 {
                     spriteY = height - spriteY - 1;
                 }
                 int charIndex = sprite->character + ((spriteY >> 3) << 4);
-                if (sprite->attr1.flipX)
+                if (sprite->attr.flipX)
                 {
-                    charIndex += sprite->attr2.width;
+                    charIndex += size.width;
                 }
-                struct Character *character = video_getCharacter(ram, sprite->attr1.bank, charIndex);
-                int width = (sprite->attr2.width + 1) << 3;
+                struct Character *character = video_getCharacter(ram, sprite->attr.bank, charIndex);
+                int width = (size.width + 1) << 3;
                 int minX = sprite->x - SPRITE_OFFSET_X;
                 int maxX = minX + width;
                 if (minX < 0) minX = 0;
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
                 uint8_t *buffer = &scanlineSpriteBuffer[minX];
                 int spriteX = minX - sprite->x + SPRITE_OFFSET_X;
-                if (sprite->attr1.flipX)
+                if (sprite->attr.flipX)
                 {
                     spriteX = width - spriteX - 1;
                 }
@@ -104,10 +105,10 @@ void video_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int 
                     int pixel = video_getCharacterPixel(character, spriteX & 0x07, spriteY & 0x07);
                     if (pixel)
                     {
-                        *buffer = pixel | (sprite->attr1.palette << 2) | (sprite->attr1.priority << 7);
+                        *buffer = pixel | (sprite->attr.palette << 2) | (sprite->attr.priority << 7);
                     }
                     buffer++;
-                    if (sprite->attr1.flipX)
+                    if (sprite->attr.flipX)
                     {
                         if (!(spriteX & 0x07))
                         {

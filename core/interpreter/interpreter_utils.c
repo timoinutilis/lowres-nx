@@ -83,7 +83,7 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
     }
 }
 
-struct TypedValue itp_evaluateSpriteSizeAttributes(struct Core *core, union SpriteSizeAttributes oldAttr, bool isOptional)
+struct TypedValue itp_evaluateSpriteSizeAttributes(struct Core *core, union SpriteSize oldAttr, bool isOptional)
 {
     struct Interpreter *interpreter = &core->interpreter;
     if (interpreter->pc->type == TokenBracketOpen)
@@ -91,7 +91,7 @@ struct TypedValue itp_evaluateSpriteSizeAttributes(struct Core *core, union Spri
         // bracket open
         interpreter->pc++;
         
-        union SpriteSizeAttributes resultAttr = oldAttr;
+        union SpriteSize resultAttr = oldAttr;
         
         // width value
         struct TypedValue wValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
