@@ -18,7 +18,6 @@
 //
 
 #include "video_chip.h"
-#include "character_rom.h"
 #include "core.h"
 #include <string.h>
 
@@ -27,20 +26,6 @@ int video_getCharacterPixel(struct Character *character, int x, int y)
     int b0 = (character->data[y] >> (7 - x)) & 0x01;
     int b1 = (character->data[y | 8] >> (7 - x)) & 0x01;
     return b0 | (b1 << 1);
-}
-
-struct Character *video_getCharacter(struct VideoRam *ram, int bank, int characterIndex)
-{
-    struct CharacterBank *characterBank;
-    if (bank)
-    {
-        characterBank = (struct CharacterBank *)CharacterRom;
-    }
-    else
-    {
-        characterBank = &ram->characterBank;
-    }
-    return &characterBank->characters[characterIndex];
 }
 
 void video_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct Plane *plane, int y, int scrollX, int scrollY, uint8_t *scanlineBuffer)
@@ -56,7 +41,7 @@ void video_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct 
         if (cell->attr.priority >= (*scanlineBuffer >> 7))
         {
             int cellX = planeX & 7;
-            struct Character *character = video_getCharacter(ram, cell->attr.bank, cell->character);
+            struct Character *character = &ram->characters[cell->character];
             int pixel = video_getCharacterPixel(character, cell->attr.flipX ? (7 - cellX) : cellX, cell->attr.flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
@@ -72,33 +57,31 @@ void video_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int 
     for (int i = NUM_SPRITES - 1; i >= 0; i--)
     {
         struct Sprite *sprite = &reg->sprites[i];
-        union SpriteSize size = reg->sizes[i];
         if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
-            int height = (size.height + 1) << 3;
-            if (spriteY >= 0 && spriteY < height)
+            int size = (sprite->attr.size + 1) << 3;
+            if (spriteY >= 0 && spriteY < size)
             {
                 if (sprite->attr.flipY)
                 {
-                    spriteY = height - spriteY - 1;
+                    spriteY = size - spriteY - 1;
                 }
                 int charIndex = sprite->character + ((spriteY >> 3) << 4);
                 if (sprite->attr.flipX)
                 {
-                    charIndex += size.width;
+                    charIndex += sprite->attr.size;
                 }
-                struct Character *character = video_getCharacter(ram, sprite->attr.bank, charIndex);
-                int width = (size.width + 1) << 3;
+                struct Character *character = &ram->characters[charIndex];
                 int minX = sprite->x - SPRITE_OFFSET_X;
-                int maxX = minX + width;
+                int maxX = minX + size;
                 if (minX < 0) minX = 0;
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
                 uint8_t *buffer = &scanlineSpriteBuffer[minX];
                 int spriteX = minX - sprite->x + SPRITE_OFFSET_X;
                 if (sprite->attr.flipX)
                 {
-                    spriteX = width - spriteX - 1;
+                    spriteX = size - spriteX - 1;
                 }
                 for (int x = minX; x < maxX; x++)
                 {

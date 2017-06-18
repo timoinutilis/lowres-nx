@@ -36,35 +36,35 @@ struct Machine {
     struct VideoRam videoRam; // 8 KB
 
     // 0xA000
-    uint8_t workingRam[0x3C00]; // 15 KB
+    uint8_t workingRam[0x4000]; // 16 KB
     
-    // 0xDC00
-    uint8_t persistentRam[0x400]; // 1 KB
-
     // 0xE000
-    struct CharacterBank characterRom; // 4 KB
-
-    // 0xF000
-    struct SpriteRegisters spriteRegisters; // 320 B
-    uint8_t reserved4[0x200 - sizeof(struct SpriteRegisters)];
+    uint8_t persistentRam[0x100]; // 256 B
+    uint8_t reserved1[0xF00];
     
-    // 0xF200
+    // 0xF000
+    uint8_t reservedMemory[0xFE00 - 0xF000];
+
+    // 0xFE00
+    struct SpriteRegisters spriteRegisters; // 256 B
+    
+    // 0xFF00
     struct ColorRegisters colorRegisters; // 32 B
     
-    // 0xF220
-    uint8_t reserved[0xFF40 - 0xF220];
+    // 0xFF20
+    struct VideoRegisters videoRegisters;
+    uint8_t reservedVideo[0x20 - sizeof(struct VideoRegisters)];
     
     // 0xFF40
-    struct VideoRegisters videoRegisters;
-    uint8_t reserved3[0x40 - sizeof(struct VideoRegisters)];
+    struct AudioRegisters audioRegisters;
+    uint8_t reservedAudio[0x20 - sizeof(struct AudioRegisters)];
+
+    // 0xFF60
+    struct IORegisters ioRegisters;
+    uint8_t reservedIO[0x20 - sizeof(struct IORegisters)];
     
     // 0xFF80
-    struct AudioRegisters audioRegisters;
-    uint8_t reserved2[0x40 - sizeof(struct AudioRegisters)];
-
-    // 0xFFC0
-    struct IORegisters ioRegisters;
-    uint8_t reserved1[0x40 - sizeof(struct IORegisters)];
+    uint8_t reservedRegisters[0x10000 - 0xFF80];
 };
 
 void machine_init(struct Machine *machine);

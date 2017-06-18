@@ -115,45 +115,6 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_SPRITE_S(struct Core *core)
-{
-    struct Interpreter *interpreter = &core->interpreter;
-    
-    // SPRITE.S
-    ++interpreter->pc;
-    
-    // n value
-    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
-    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
-    
-    union SpriteSize size;
-    int n = 0;
-    if (interpreter->pass == PassRun)
-    {
-        n = nValue.v.floatValue;
-        size = core->machine.spriteRegisters.sizes[n];
-    }
-    else
-    {
-        size.value = 0;
-    }
-    
-    // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-    ++interpreter->pc;
-    
-    // atrb value
-    struct TypedValue aValue = itp_evaluateSpriteSizeAttributes(core, size, false);
-    if (aValue.type == ValueTypeError) return aValue.v.errorCode;
-    
-    if (interpreter->pass == PassRun)
-    {
-        core->machine.spriteRegisters.sizes[n].value = aValue.v.floatValue;
-    }
-    
-    return itp_endOfCommand(interpreter);
-}
-
 struct TypedValue fnc_SPRITE(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
@@ -199,10 +160,6 @@ struct TypedValue fnc_SPRITE(struct Core *core)
                 value.v.floatValue = sprite->attr.value;
                 break;
 
-            case TokenSPRITES:
-                value.v.floatValue = core->machine.spriteRegisters.sizes[n].value;
-                break;
-                
             default:
                 assert(0);
                 break;

@@ -1289,7 +1289,6 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenSPRITEY:
         case TokenSPRITEC:
         case TokenSPRITEA:
-        case TokenSPRITES:
             return fnc_SPRITE(core);
             
         case TokenTOUCH:
@@ -1487,9 +1486,6 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenSPRITEA:
             return cmd_SPRITE_A(core);
-            
-        case TokenSPRITES:
-            return cmd_SPRITE_S(core);
             
         case TokenSPRITE:
             return cmd_SPRITE(core);

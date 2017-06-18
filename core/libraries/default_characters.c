@@ -17,9 +17,9 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "character_rom.h"
+#include "default_characters.h"
 
-uint8_t CharacterRom[][16] = {
+uint8_t DefaultCharacters[][16] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
     { 0, 24, 24, 24, 24, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
     { 0, 108, 108, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },

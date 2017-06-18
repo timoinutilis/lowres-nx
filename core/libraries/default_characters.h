@@ -17,11 +17,11 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef character_rom_h
-#define character_rom_h
+#ifndef default_characters_h
+#define default_characters_h
 
 #include <stdio.h>
 
-extern uint8_t CharacterRom[][16];
+extern uint8_t DefaultCharacters[][16];
 
-#endif /* character_rom_h */
+#endif /* default_characters_h */

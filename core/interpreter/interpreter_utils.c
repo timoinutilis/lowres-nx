@@ -27,14 +27,6 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
         ++interpreter->pc;
         
-        // bank value
-        struct TypedValue bValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-        if (bValue.type == ValueTypeError) return bValue;
-        
-        // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
         // flip x value
         struct TypedValue fxValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
         if (fxValue.type == ValueTypeError) return fxValue;
@@ -54,6 +46,14 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         // priority value
         struct TypedValue priValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
         if (priValue.type == ValueTypeError) return priValue;
+
+        // comma
+        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+        ++interpreter->pc;
+        
+        // size value
+        struct TypedValue sValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
+        if (sValue.type == ValueTypeError) return sValue;
         
         // bracket close
         if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
@@ -62,57 +62,10 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         if (interpreter->pass == PassRun)
         {
             if (palValue.type != ValueTypeNull) resultAttr.palette = palValue.v.floatValue;
-            if (bValue.type != ValueTypeNull) resultAttr.bank = bValue.v.floatValue;
             if (fxValue.type != ValueTypeNull) resultAttr.flipX = fxValue.v.floatValue;
             if (fyValue.type != ValueTypeNull) resultAttr.flipY = fyValue.v.floatValue;
             if (priValue.type != ValueTypeNull) resultAttr.priority = priValue.v.floatValue;
-        }
-        
-        struct TypedValue resultValue;
-        resultValue.type = ValueTypeFloat;
-        resultValue.v.floatValue = resultAttr.value;
-        return resultValue;
-    }
-    else if (isOptional)
-    {
-        return itp_evaluateOptionalNumericExpression(core, 0, 255);
-    }
-    else
-    {
-        return itp_evaluateNumericExpression(core, 0, 255);
-    }
-}
-
-struct TypedValue itp_evaluateSpriteSizeAttributes(struct Core *core, union SpriteSize oldAttr, bool isOptional)
-{
-    struct Interpreter *interpreter = &core->interpreter;
-    if (interpreter->pc->type == TokenBracketOpen)
-    {
-        // bracket open
-        interpreter->pc++;
-        
-        union SpriteSize resultAttr = oldAttr;
-        
-        // width value
-        struct TypedValue wValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
-        if (wValue.type == ValueTypeError) return wValue;
-        
-        // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // height value
-        struct TypedValue hValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
-        if (hValue.type == ValueTypeError) return hValue;
-        
-        // bracket close
-        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
-        interpreter->pc++;
-        
-        if (interpreter->pass == PassRun)
-        {
-            if (wValue.type != ValueTypeNull) resultAttr.width = wValue.v.floatValue;
-            if (hValue.type != ValueTypeNull) resultAttr.height = hValue.v.floatValue;
+            if (sValue.type != ValueTypeNull) resultAttr.size = sValue.v.floatValue;
         }
         
         struct TypedValue resultValue;

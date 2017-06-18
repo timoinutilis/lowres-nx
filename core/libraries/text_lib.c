@@ -19,18 +19,21 @@
 
 #include "text_lib.h"
 #include "core.h"
+#include "default_characters.h"
 #include <string.h>
 
 void txtlib_init(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
+    lib->fontCharOffset = 192;
     
     txtlib_clearScreen(core);
-    lib->fontCharAttr.bank = 1;
     
     core->machine.colorRegisters.colors[1] = (3 << 4) | (3 << 2) | 3;
     core->machine.colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
     core->machine.colorRegisters.colors[3] = (1 << 4) | (1 << 2) | 1;
+    
+    memcpy(&core->machine.videoRam.characters[192], DefaultCharacters, 1024);
 }
 
 struct Plane *txtlib_getCurrentBackground(struct Core *core)

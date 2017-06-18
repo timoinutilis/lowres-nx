@@ -36,12 +36,12 @@
 		92624BF31EAD1CFC00EB3A3C /* variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BD11EAD1CFC00EB3A3C /* variables.c */; };
 		92624BF41EAD1CFC00EB3A3C /* text_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BD41EAD1CFC00EB3A3C /* text_lib.c */; };
 		92624BF51EAD1CFC00EB3A3C /* audio_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BD71EAD1CFC00EB3A3C /* audio_chip.c */; };
-		92624BF61EAD1CFC00EB3A3C /* character_rom.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BD91EAD1CFC00EB3A3C /* character_rom.c */; };
 		92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDC1EAD1CFC00EB3A3C /* machine.c */; };
 		92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDE1EAD1CFC00EB3A3C /* video_chip.c */; };
 		9284CE4C1ED1EE1600891E7D /* cmd_files.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284CE4A1ED1EE1600891E7D /* cmd_files.c */; };
 		928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */; };
 		928C1FEF1EB638A5002AE5C9 /* LowResNXWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */; };
+		92CA6E201EF717F6008B3A21 /* default_characters.c in Sources */ = {isa = PBXBuildFile; fileRef = 92CA6E1E1EF717F6008B3A21 /* default_characters.c */; };
 		92FA567C1EC62F6000C9DBB3 /* cmd_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 92FA567A1EC62F6000C9DBB3 /* cmd_io.c */; };
 /* End PBXBuildFile section */
 
@@ -103,8 +103,6 @@
 		92624BD51EAD1CFC00EB3A3C /* text_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = text_lib.h; sourceTree = "<group>"; };
 		92624BD71EAD1CFC00EB3A3C /* audio_chip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = audio_chip.c; sourceTree = "<group>"; };
 		92624BD81EAD1CFC00EB3A3C /* audio_chip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_chip.h; sourceTree = "<group>"; };
-		92624BD91EAD1CFC00EB3A3C /* character_rom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = character_rom.c; sourceTree = "<group>"; };
-		92624BDA1EAD1CFC00EB3A3C /* character_rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = character_rom.h; sourceTree = "<group>"; };
 		92624BDB1EAD1CFC00EB3A3C /* io_chip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io_chip.h; sourceTree = "<group>"; };
 		92624BDC1EAD1CFC00EB3A3C /* machine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = machine.c; sourceTree = "<group>"; };
 		92624BDD1EAD1CFC00EB3A3C /* machine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = machine.h; sourceTree = "<group>"; };
@@ -117,6 +115,8 @@
 		9284CE4B1ED1EE1600891E7D /* cmd_files.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_files.h; sourceTree = "<group>"; };
 		928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXWindowController.swift; sourceTree = "<group>"; };
 		928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LowResNXWindowController.xib; sourceTree = "<group>"; };
+		92CA6E1E1EF717F6008B3A21 /* default_characters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = default_characters.c; sourceTree = "<group>"; };
+		92CA6E1F1EF717F6008B3A21 /* default_characters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = default_characters.h; sourceTree = "<group>"; };
 		92FA567A1EC62F6000C9DBB3 /* cmd_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_io.c; sourceTree = "<group>"; };
 		92FA567B1EC62F6000C9DBB3 /* cmd_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_io.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -247,6 +247,8 @@
 			children = (
 				92624BD41EAD1CFC00EB3A3C /* text_lib.c */,
 				92624BD51EAD1CFC00EB3A3C /* text_lib.h */,
+				92CA6E1E1EF717F6008B3A21 /* default_characters.c */,
+				92CA6E1F1EF717F6008B3A21 /* default_characters.h */,
 			);
 			path = libraries;
 			sourceTree = "<group>";
@@ -256,8 +258,6 @@
 			children = (
 				92624BD71EAD1CFC00EB3A3C /* audio_chip.c */,
 				92624BD81EAD1CFC00EB3A3C /* audio_chip.h */,
-				92624BD91EAD1CFC00EB3A3C /* character_rom.c */,
-				92624BDA1EAD1CFC00EB3A3C /* character_rom.h */,
 				92624BDB1EAD1CFC00EB3A3C /* io_chip.h */,
 				92624BDC1EAD1CFC00EB3A3C /* machine.c */,
 				92624BDD1EAD1CFC00EB3A3C /* machine.h */,
@@ -374,8 +374,8 @@
 				92624BE41EAD1CFC00EB3A3C /* big_endian.c in Sources */,
 				92624BEE1EAD1CFC00EB3A3C /* interpreter.c in Sources */,
 				924D0B9B1EB51317005CDA17 /* LowResNXView.swift in Sources */,
+				92CA6E201EF717F6008B3A21 /* default_characters.c in Sources */,
 				92624BE91EAD1CFC00EB3A3C /* cmd_strings.c in Sources */,
-				92624BF61EAD1CFC00EB3A3C /* character_rom.c in Sources */,
 				92624B991EAD1B8800EB3A3C /* AppDelegate.swift in Sources */,
 				92624BEF1EAD1CFC00EB3A3C /* labels.c in Sources */,
 				92624BF51EAD1CFC00EB3A3C /* audio_chip.c in Sources */,

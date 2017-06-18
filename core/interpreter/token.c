@@ -132,7 +132,6 @@ const char *TokenStrings[] = {
     "SOURCE",
     "SPRITE.A",
     "SPRITE.C",
-    "SPRITE.S",
     "SPRITE.X",
     "SPRITE.Y",
     "SPRITE",

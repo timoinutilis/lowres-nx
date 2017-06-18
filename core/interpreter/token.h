@@ -136,7 +136,6 @@ enum TokenType {
     TokenSOURCE,
     TokenSPRITEA,
     TokenSPRITEC,
-    TokenSPRITES,
     TokenSPRITEX,
     TokenSPRITEY,
     TokenSPRITE,

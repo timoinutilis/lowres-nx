@@ -41,31 +41,15 @@ struct Character {
     uint8_t data[16];
 };
 
-// ================ Character Bank ================
-
-// 4096 bytes
-struct CharacterBank {
-    struct Character characters[NUM_CHARACTERS];
-};
-
 // ================ Sprite ================
 
 union CharacterAttributes {
     struct {
         uint8_t palette:3;
-        uint8_t reserved:1;
-        uint8_t bank:1;
         uint8_t flipX:1;
         uint8_t flipY:1;
         uint8_t priority:1;
-    };
-    uint8_t value;
-};
-
-union SpriteSize {
-    struct {
-        uint8_t width:2; // 1-4 characters
-        uint8_t height:2; // 1-4 characters
+        uint8_t size:2; // 1x1 - 4x4 characters
     };
     uint8_t value;
 };
@@ -99,7 +83,7 @@ struct Plane {
 
 // 8 KB
 struct VideoRam {
-    struct CharacterBank characterBank; // 4 KB
+    struct Character characters[NUM_CHARACTERS]; // 4 KB
     struct Plane planeA; // 2 KB
     struct Plane planeB; // 2 KB
 };
@@ -110,7 +94,6 @@ struct VideoRam {
 
 struct SpriteRegisters {
     struct Sprite sprites[NUM_SPRITES]; // 256 bytes
-    union SpriteSize sizes[NUM_SPRITES]; // 64 bytes
 };
 
 struct ColorRegisters {

@@ -28,7 +28,6 @@ struct Core;
 
 enum ErrorCode cmd_SPRITE(struct Core *core);
 enum ErrorCode cmd_SPRITE_A(struct Core *core);
-enum ErrorCode cmd_SPRITE_S(struct Core *core);
 struct TypedValue fnc_SPRITE(struct Core *core);
 
 #endif /* cmd_sprites_h */
