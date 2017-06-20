@@ -29,7 +29,6 @@
 #include "labels.h"
 #include "variables.h"
 #include "data.h"
-#include "big_endian.h"
 #include "text_lib.h"
 
 #define BAS_TRUE -1.0f
@@ -66,8 +65,8 @@ struct Symbol {
 };
 
 struct RomDataEntry {
-    BigEndianUInt16 start;
-    BigEndianUInt16 length;
+    int start;
+    int length;
 };
 
 enum InterruptType {
@@ -86,6 +85,9 @@ struct Interpreter {
     int numTokens;
     struct Symbol symbols[MAX_SYMBOLS];
     int numSymbols;
+    
+    struct RomDataEntry romDataEntries[MAX_ROM_DATA_ENTRIES];
+    bool romIncludesDefaultCharacters;
     
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
     int numLabelStackItems;

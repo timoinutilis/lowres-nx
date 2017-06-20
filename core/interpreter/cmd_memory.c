@@ -188,15 +188,14 @@ struct TypedValue fnc_START_LENGTH(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        struct RomDataEntry *entries = (struct RomDataEntry *)core->machine.cartridgeRom;
         int index = indexValue.v.floatValue;
         if (type == TokenLENGTH)
         {
-            value.v.floatValue = BigEndianUInt16_get(&entries[index].length);
+            value.v.floatValue = interpreter->romDataEntries[index].length;
         }
         else
         {
-            value.v.floatValue = BigEndianUInt16_get(&entries[index].start);
+            value.v.floatValue = interpreter->romDataEntries[index].start;
         }
     }
     return value;

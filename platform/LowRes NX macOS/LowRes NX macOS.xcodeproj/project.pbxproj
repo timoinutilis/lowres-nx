@@ -18,7 +18,6 @@
 		92624BA01EAD1B8800EB3A3C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92624B9F1EAD1B8800EB3A3C /* Assets.xcassets */; };
 		92624BA31EAD1B8800EB3A3C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92624BA11EAD1B8800EB3A3C /* MainMenu.xib */; };
 		92624BE31EAD1CFC00EB3A3C /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BAF1EAD1CFB00EB3A3C /* core.c */; };
-		92624BE41EAD1CFC00EB3A3C /* big_endian.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BB21EAD1CFB00EB3A3C /* big_endian.c */; };
 		92624BE51EAD1CFC00EB3A3C /* cmd_control.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BB41EAD1CFB00EB3A3C /* cmd_control.c */; };
 		92624BE61EAD1CFC00EB3A3C /* cmd_data.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BB61EAD1CFB00EB3A3C /* cmd_data.c */; };
 		92624BE71EAD1CFC00EB3A3C /* cmd_maths.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BB81EAD1CFB00EB3A3C /* cmd_maths.c */; };
@@ -66,8 +65,6 @@
 		92624BA41EAD1B8800EB3A3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		92624BAF1EAD1CFB00EB3A3C /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core.c; sourceTree = "<group>"; };
 		92624BB01EAD1CFB00EB3A3C /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
-		92624BB21EAD1CFB00EB3A3C /* big_endian.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = big_endian.c; sourceTree = "<group>"; };
-		92624BB31EAD1CFB00EB3A3C /* big_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = big_endian.h; sourceTree = "<group>"; };
 		92624BB41EAD1CFB00EB3A3C /* cmd_control.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_control.c; sourceTree = "<group>"; };
 		92624BB51EAD1CFB00EB3A3C /* cmd_control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_control.h; sourceTree = "<group>"; };
 		92624BB61EAD1CFB00EB3A3C /* cmd_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_data.c; sourceTree = "<group>"; };
@@ -193,8 +190,6 @@
 		92624BB11EAD1CFB00EB3A3C /* interpreter */ = {
 			isa = PBXGroup;
 			children = (
-				92624BB21EAD1CFB00EB3A3C /* big_endian.c */,
-				92624BB31EAD1CFB00EB3A3C /* big_endian.h */,
 				92624BB41EAD1CFB00EB3A3C /* cmd_control.c */,
 				92624BB51EAD1CFB00EB3A3C /* cmd_control.h */,
 				92624BB61EAD1CFB00EB3A3C /* cmd_data.c */,
@@ -371,7 +366,6 @@
 				92624BE51EAD1CFC00EB3A3C /* cmd_control.c in Sources */,
 				92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */,
 				92624BE61EAD1CFC00EB3A3C /* cmd_data.c in Sources */,
-				92624BE41EAD1CFC00EB3A3C /* big_endian.c in Sources */,
 				92624BEE1EAD1CFC00EB3A3C /* interpreter.c in Sources */,
 				924D0B9B1EB51317005CDA17 /* LowResNXView.swift in Sources */,
 				92CA6E201EF717F6008B3A21 /* default_characters.c in Sources */,

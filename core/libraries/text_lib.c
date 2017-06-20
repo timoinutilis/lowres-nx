@@ -19,7 +19,6 @@
 
 #include "text_lib.h"
 #include "core.h"
-#include "default_characters.h"
 #include <string.h>
 
 void txtlib_init(struct Core *core)
@@ -33,7 +32,11 @@ void txtlib_init(struct Core *core)
     core->machine.colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
     core->machine.colorRegisters.colors[3] = (1 << 4) | (1 << 2) | 1;
     
-    memcpy(&core->machine.videoRam.characters[192], DefaultCharacters, 1024);
+    if (core->interpreter.romIncludesDefaultCharacters)
+    {
+        struct RomDataEntry *entry0 = core->interpreter.romDataEntries;
+        memcpy(core->machine.videoRam.characters, &core->machine.cartridgeRom[entry0->start], entry0->length);
+    }
 }
 
 struct Plane *txtlib_getCurrentBackground(struct Core *core)

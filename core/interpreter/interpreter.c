@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 #include "core.h"
+#include "default_characters.h"
 #include "cmd_control.h"
 #include "cmd_variables.h"
 #include "cmd_data.h"
@@ -560,9 +561,9 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
     
     // ROM DATA
     
-    struct RomDataEntry *romDataEntries = (struct RomDataEntry *)core->machine.cartridgeRom;
+    struct RomDataEntry *romDataEntries = interpreter->romDataEntries;
     
-    uint8_t *currentRomByte = (uint8_t *)&romDataEntries[MAX_ROM_DATA_ENTRIES]; // after entries
+    uint8_t *currentRomByte = core->machine.cartridgeRom;
     uint8_t *endRomByte = &core->machine.cartridgeRom[0x8000];
     
     while (*character)
@@ -590,7 +591,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             if (*character != ':') return ErrorUnexpectedCharacter;
             
             if (entryIndex >= MAX_ROM_DATA_ENTRIES) return ErrorIndexOutOfBounds;
-            if (BigEndianUInt16_get(&romDataEntries[entryIndex].length) > 0) return ErrorIndexAlreadyDefined;
+            if (romDataEntries[entryIndex].length > 0) return ErrorIndexAlreadyDefined;
             
             // skip until end of line
             do
@@ -630,12 +631,10 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             }
             if (!shift) return ErrorSyntax; // incomplete hex value
             
-            int start = (int)(startByte - core->machine.cartridgeRom);
-            int length = (int)(currentRomByte - startByte);
             struct RomDataEntry *entry = &romDataEntries[entryIndex];
-            BigEndianUInt16_set(&entry->start, start);
-            BigEndianUInt16_set(&entry->length, length);
-            printf("index %d: start=%d length=%d\n", entryIndex, start, length);
+            entry->start = (int)(startByte - core->machine.cartridgeRom);
+            entry->length = (int)(currentRomByte - startByte);
+            printf("index %d: start=%d length=%d\n", entryIndex, entry->start, entry->length);
         }
         else if (*character == ' ' || *character == '\t' || *character == '\n')
         {
@@ -645,6 +644,21 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         {
             return ErrorUnexpectedCharacter;
         }
+    }
+    
+    // add default characters if #0 is unused
+    struct RomDataEntry *entry0 = &interpreter->romDataEntries[0];
+    if (entry0->length == 0 && endRomByte - currentRomByte >= 4096)
+    {
+        memcpy(currentRomByte, DefaultCharacters, 4096);
+        entry0->start = (int)(currentRomByte - core->machine.cartridgeRom);
+        entry0->length = 4096;
+        interpreter->romIncludesDefaultCharacters = true;
+        printf("default characters: start=%d length=%d\n", entry0->start, entry0->length);
+    }
+    else
+    {
+        printf("no default characters added to ROM\n");
     }
     
     return ErrorNone;
