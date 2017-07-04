@@ -26,15 +26,25 @@
 
 union Gamepad {
     struct {
-        uint8_t status_up:1;
-        uint8_t status_down:1;
-        uint8_t status_left:1;
-        uint8_t status_right:1;
-        uint8_t status_buttonA:1;
-        uint8_t status_buttonB:1;
+        uint8_t up:1;
+        uint8_t down:1;
+        uint8_t left:1;
+        uint8_t right:1;
+        uint8_t buttonA:1;
+        uint8_t buttonB:1;
     };
-    uint8_t status;
-} ;
+    uint8_t value;
+};
+
+// ================ Status ================
+
+union IOStatus {
+    struct {
+        uint8_t pause:1;
+        uint8_t touch:1;
+    };
+    uint8_t value;
+};
 
 // ===============================================
 // ================ I/O Registers ================
@@ -45,13 +55,7 @@ struct IORegisters {
     uint8_t touchX;
     uint8_t touchY;
     char key;
-    union {
-        struct {
-            uint8_t status_pause:1;
-            uint8_t status_touch:1;
-        };
-        uint8_t status;
-    };
+    union IOStatus status;
 };
 
 #endif /* io_chip_h */

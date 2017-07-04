@@ -30,6 +30,7 @@
 #include "variables.h"
 #include "data.h"
 #include "text_lib.h"
+#include "io_chip.h"
 
 #define BAS_TRUE -1.0f
 #define BAS_FALSE 0.0f
@@ -111,6 +112,8 @@ struct Interpreter {
     
     int waitCount;
     bool exitEvaluation;
+    union Gamepad lastFrameGamepads[NUM_GAMEPADS];
+    union IOStatus lastFrameIOStatus;
     
     struct TextLib textLib;
 };
@@ -119,6 +122,7 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode);
 void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);
 void itp_runInterrupt(struct Core *core, enum InterruptType type);
+void itp_rememberFrameIO(struct Core *core);
 void itp_freeProgram(struct Core *core);
 enum ErrorCode itp_getExitErrorCode(struct Core *core);
 int itp_getPcPositionInSourceCode(struct Core *core);

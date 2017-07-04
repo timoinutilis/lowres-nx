@@ -29,5 +29,7 @@ struct Core;
 struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core);
 struct TypedValue fnc_BUTTON(struct Core *core);
 struct TypedValue fnc_TOUCH(struct Core *core);
+struct TypedValue fnc_TAP(struct Core *core);
+struct TypedValue fnc_TOUCH_X_Y(struct Core *core);
 
 #endif /* cmd_io_h */

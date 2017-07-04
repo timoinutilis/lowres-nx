@@ -44,6 +44,7 @@ void core_update(struct Core *core)
 {
     itp_runProgram(core);
     itp_runInterrupt(core, InterruptTypeVBL);
+    itp_rememberFrameIO(core);
 }
 
 void core_rasterUpdate(struct Core *core)
@@ -72,7 +73,7 @@ void core_returnPressed(struct Core *core)
 void core_touchPressed(struct Core *core, int x, int y)
 {
     core_touchDragged(core, x, y);
-    core->machine.ioRegisters.status_touch = 1;
+    core->machine.ioRegisters.status.touch = 1;
 }
 
 void core_touchDragged(struct Core *core, int x, int y)
@@ -85,7 +86,7 @@ void core_touchDragged(struct Core *core, int x, int y)
 
 void core_touchReleased(struct Core *core)
 {
-    core->machine.ioRegisters.status_touch = 0;
+    core->machine.ioRegisters.status.touch = 0;
 }
 
 void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button)
@@ -93,22 +94,22 @@ void core_gamepadPressed(struct Core *core, int player, enum GamepadButton butto
     switch (button)
     {
         case GamepadButtonUp:
-            core->machine.ioRegisters.gamepads[player].status_up = 1;
+            core->machine.ioRegisters.gamepads[player].up = 1;
             break;
         case GamepadButtonDown:
-            core->machine.ioRegisters.gamepads[player].status_down = 1;
+            core->machine.ioRegisters.gamepads[player].down = 1;
             break;
         case GamepadButtonLeft:
-            core->machine.ioRegisters.gamepads[player].status_left = 1;
+            core->machine.ioRegisters.gamepads[player].left = 1;
             break;
         case GamepadButtonRight:
-            core->machine.ioRegisters.gamepads[player].status_right = 1;
+            core->machine.ioRegisters.gamepads[player].right = 1;
             break;
         case GamepadButtonA:
-            core->machine.ioRegisters.gamepads[player].status_buttonA = 1;
+            core->machine.ioRegisters.gamepads[player].buttonA = 1;
             break;
         case GamepadButtonB:
-            core->machine.ioRegisters.gamepads[player].status_buttonB = 1;
+            core->machine.ioRegisters.gamepads[player].buttonB = 1;
             break;
     }
 }
@@ -118,22 +119,22 @@ void core_gamepadReleased(struct Core *core, int player, enum GamepadButton butt
     switch (button)
     {
         case GamepadButtonUp:
-            core->machine.ioRegisters.gamepads[player].status_up = 0;
+            core->machine.ioRegisters.gamepads[player].up = 0;
             break;
         case GamepadButtonDown:
-            core->machine.ioRegisters.gamepads[player].status_down = 0;
+            core->machine.ioRegisters.gamepads[player].down = 0;
             break;
         case GamepadButtonLeft:
-            core->machine.ioRegisters.gamepads[player].status_left = 0;
+            core->machine.ioRegisters.gamepads[player].left = 0;
             break;
         case GamepadButtonRight:
-            core->machine.ioRegisters.gamepads[player].status_right = 0;
+            core->machine.ioRegisters.gamepads[player].right = 0;
             break;
         case GamepadButtonA:
-            core->machine.ioRegisters.gamepads[player].status_buttonA = 0;
+            core->machine.ioRegisters.gamepads[player].buttonA = 0;
             break;
         case GamepadButtonB:
-            core->machine.ioRegisters.gamepads[player].status_buttonB = 0;
+            core->machine.ioRegisters.gamepads[player].buttonB = 0;
             break;
     }
 }

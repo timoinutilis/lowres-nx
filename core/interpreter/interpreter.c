@@ -230,6 +230,15 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
 
 }
 
+void itp_rememberFrameIO(struct Core *core)
+{
+    for (int i = 0; i < NUM_GAMEPADS; i++)
+    {
+        core->interpreter.lastFrameGamepads[i] = core->machine.ioRegisters.gamepads[i];
+    }
+    core->interpreter.lastFrameIOStatus = core->machine.ioRegisters.status;
+}
+
 void itp_freeProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
@@ -1306,9 +1315,14 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             return fnc_SPRITE(core);
             
         case TokenTOUCH:
+            return fnc_TOUCH(core);
+
+        case TokenTAP:
+            return fnc_TAP(core);
+            
         case TokenTOUCHX:
         case TokenTOUCHY:
-            return fnc_TOUCH(core);
+            return fnc_TOUCH_X_Y(core);
             
         default:
             break;
