@@ -40,7 +40,7 @@ END
 * Values *
 **********
 
-[LET ]var=v
+[LET] var=v
 DIM ...
 SWAP var1,var2
 DATA ...
@@ -108,25 +108,25 @@ BG FILL x1,y1 TO x2,y2
 CELL x,y
 =CELL.C(x,y)
 =CELL.A(x,y)
-CHAR n,(pal,b,fx,fy,pri)
+CHAR n,(pal,fx,fy,pri,s)
 CLS [b]
 NUMBER x,y,n,d
 TEXT x,y,s$
-FONT (pal,b,fx,fy,pri),c
+FONT (pal,fx,fy,pri,s),c
 
 *******
 * I/O *
 *******
 
-=UP(p)
-=DOWN(p)
-=LEFT(p)
-=RIGHT(p)
-=BUTTON(p,n)
-=BUTTON(p,n)
+=UP [TAP](p)
+=DOWN [TAP](p)
+=LEFT [TAP](p)
+=RIGHT [TAP](p)
+=BUTTON [TAP](p,n)
 =TOUCH.X
 =TOUCH.Y
 =TOUCH
+=TAP
 =INKEY$
 
 **********
@@ -163,13 +163,11 @@ FILL a,n[,v]
 ***********
 
 SPRITE n,x,y,c
-SPRITE.A n,(pal,b,fx,fy,pri)
-SPRITE.S n,(w,h)
+SPRITE.A n,(pal,fx,fy,pri,s)
 =SPRITE.X(n)
 =SPRITE.Y(n)
 =SPRITE.C(n)
 =SPRITE.A(n)
-=SPRITE.S(n)
 
 *********
 * FILES *
