@@ -78,10 +78,13 @@ void core_touchPressed(struct Core *core, int x, int y)
 
 void core_touchDragged(struct Core *core, int x, int y)
 {
-    if (x < 0) x = 0; else if (x >= SCREEN_WIDTH) x = SCREEN_WIDTH - 1;
-    if (y < 0) y = 0; else if (y >= SCREEN_HEIGHT) y = SCREEN_HEIGHT - 1;
-    core->machine.ioRegisters.touchX = x;
-    core->machine.ioRegisters.touchY = y;
+    if (core->machine.ioRegisters.status.touch)
+    {
+        if (x < 0) x = 0; else if (x >= SCREEN_WIDTH) x = SCREEN_WIDTH - 1;
+        if (y < 0) y = 0; else if (y >= SCREEN_HEIGHT) y = SCREEN_HEIGHT - 1;
+        core->machine.ioRegisters.touchX = x;
+        core->machine.ioRegisters.touchY = y;
+    }
 }
 
 void core_touchReleased(struct Core *core)

@@ -128,7 +128,9 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     
     override func mouseDown(with event: NSEvent) {
         let point = screenPoint(event: event)
-        core_touchPressed(core, Int32(point.x), Int32(point.y))
+        if point.y >= 0 {
+            core_touchPressed(core, Int32(point.x), Int32(point.y))
+        }
     }
     
     override func mouseUp(with event: NSEvent) {
