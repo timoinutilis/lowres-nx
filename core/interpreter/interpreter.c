@@ -265,13 +265,21 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
 
 }
 
-void itp_rememberFrameIO(struct Core *core)
+void itp_didFinishVBL(struct Core *core)
 {
+    // remember this frame's IO
     for (int i = 0; i < NUM_GAMEPADS; i++)
     {
         core->interpreter.lastFrameGamepads[i] = core->machine.ioRegisters.gamepads[i];
     }
     core->interpreter.lastFrameIOStatus = core->machine.ioRegisters.status;
+    
+    // timer
+    core->interpreter.timer++;
+    if (core->interpreter.timer >= TIMER_WRAP_VALUE)
+    {
+        core->interpreter.timer = 0;
+    }
 }
 
 void itp_freeProgram(struct Core *core)

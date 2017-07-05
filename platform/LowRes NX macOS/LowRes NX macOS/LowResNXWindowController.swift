@@ -31,8 +31,10 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         coreDelegate.diskDriveDidSave = diskDriveDidSave
         core_setDelegate(core, &coreDelegate)
         
+        let secondsSincePowerOn = -(NSApp.delegate as! AppDelegate).launchDate.timeIntervalSinceNow
+        core_willRunProgram(core, Int(secondsSincePowerOn))
+        
         timer = Timer.scheduledTimer(timeInterval: 1.0/30.0, target: self, selector: #selector(LowResNXWindowController.update), userInfo: nil, repeats: true)
-
     }
     
     func windowWillClose(_ notification: Notification) {

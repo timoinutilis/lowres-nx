@@ -45,6 +45,7 @@ enum GamepadButton {
 void core_init(struct Core *core);
 void core_deinit(struct Core *core);
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);
+void core_willRunProgram(struct Core *core, long secondsSincePowerOn);
 void core_update(struct Core *core);
 void core_rasterUpdate(struct Core *core);
 

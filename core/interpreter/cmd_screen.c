@@ -199,7 +199,7 @@ struct TypedValue fnc_screen0(struct Core *core)
         switch (type)
         {
             case TokenTIMER:
-                value.v.floatValue = 0; //TODO
+                value.v.floatValue = core->interpreter.timer;
                 break;
                 
             case TokenRASTER:

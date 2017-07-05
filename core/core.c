@@ -40,11 +40,16 @@ void core_setDelegate(struct Core *core, struct CoreDelegate *delegate)
     core->delegate = delegate;
 }
 
+void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
+{
+    core->interpreter.timer = (float)(secondsSincePowerOn * 30 % TIMER_WRAP_VALUE);
+}
+
 void core_update(struct Core *core)
 {
     itp_runProgram(core);
     itp_runInterrupt(core, InterruptTypeVBL);
-    itp_rememberFrameIO(core);
+    itp_didFinishVBL(core);
 }
 
 void core_rasterUpdate(struct Core *core)
