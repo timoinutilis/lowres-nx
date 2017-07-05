@@ -69,7 +69,12 @@ enum ErrorCode {
     ErrorOutOfData,
     ErrorIllegalMemoryAccess,
     ErrorTooManyCommandCycles,
-    ErrorNotAllowedInInterrupt
+    ErrorNotAllowedInInterrupt,
+    ErrorIfWithoutEndIf,
+    ErrorForWithoutNext,
+    ErrorDoWithoutLoop,
+    ErrorRepeatWithoutUntil,
+    ErrorWhileWithoutWend,
 };
 
 const char *err_getString(enum ErrorCode errorCode);

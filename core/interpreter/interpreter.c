@@ -69,7 +69,42 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
     while (errorCode == ErrorNone && interpreter->pc->type != TokenUndefined);
     
     if (errorCode != ErrorNone) return errorCode;
-    assert(interpreter->numLabelStackItems == 0);
+    
+    if (interpreter->numLabelStackItems > 0)
+    {
+        struct LabelStackItem *item = &interpreter->labelStackItems[0];
+        switch (item->type)
+        {
+            case LabelTypeIF:
+                errorCode = ErrorIfWithoutEndIf;
+                break;
+                
+            case LabelTypeFOR:
+                errorCode =  ErrorForWithoutNext;
+                
+            case LabelTypeDO:
+                errorCode =  ErrorDoWithoutLoop;
+                
+            case LabelTypeREPEAT:
+                errorCode =  ErrorRepeatWithoutUntil;
+                
+            case LabelTypeWHILE:
+                errorCode =  ErrorWhileWithoutWend;
+                
+            case LabelTypeFORVar:
+            case LabelTypeFORLimit:
+            case LabelTypeELSE:
+            case LabelTypeGOSUB:
+            case LabelTypeONGOSUB:
+                // should not happen in compile time
+                break;
+        }
+        if (errorCode != ErrorNone)
+        {
+            interpreter->pc = item->token;
+            return errorCode;
+        }
+    }
     
     // global null string
     interpreter->nullString = rcstring_new(NULL, 0);
