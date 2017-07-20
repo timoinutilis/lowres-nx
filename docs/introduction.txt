@@ -1,0 +1,6 @@
+**********************
+* What is LowRes NX? *
+**********************
+
+LowRes NX is a simulated retro game console, which can be programmed in the classic BASIC language. It has its own technical specifications, but it's very much inspired by actual 8-bit and 16-bit game consoles. It doesn't only look and sound retro, but actually works like classic hardware.
+
