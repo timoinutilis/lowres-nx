@@ -21,6 +21,11 @@ the equal symbol:
 NAME$="LOWRES NX"
 LIVES=3
 
+Hexadecimal and binary notation can be used for number values:
+$FF02
+%11001011
+
+
 *************
 * Operators *
 *************
@@ -877,10 +882,10 @@ SPRITE.A
     fy      flip vertically (0/1)
     pri     priority flag (0/1)
     s       size (0-3):
-            0: 1 character
-            1: 2x2 characters
-            2: 3x3 characters
-            3: 4x4 characters
+            0: 1 character (8x8 pixels)
+            1: 2x2 characters (16x16 pixels)
+            2: 3x3 characters (24x24 pixels)
+            3: 4x4 characters (32x32 pixels)
 
     SPRITE.A n,a
 
