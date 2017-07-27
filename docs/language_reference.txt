@@ -927,6 +927,8 @@ LOAD
     at address a. Only the entry number in the file name is actually
     used, the rest of the name can be omitted (for example "#0").
 
+    LOAD is meant to be used for tools only. Use ROM entries for game
+    data.
 
 SAVE
 
@@ -940,3 +942,6 @@ SAVE
     COMMENT can be any text up to 31 characters and serves as
     information only.
     Example: "#0:MAIN SPRITES"
+
+    SAVE is meant to be used for tools only. Use persistent memory to
+    store game states.

@@ -4,3 +4,52 @@
 
 LowRes NX is a simulated retro game console, which can be programmed in the classic BASIC language. It has its own technical specifications, but it's very much inspired by actual 8-bit and 16-bit game consoles. It doesn't only look and sound retro, but actually works like classic hardware.
 
+LowRes NX simulates graphics, sound and I/O chips and makes their hardware registers accessable in its memory map. Although most of the features are available via simple BASIC statements, it's possible to program video, audio and I/O directly by accessing the memory.
+
+
+******************
+* Specifications *
+******************
+
+- Cartridge ROM: 32 KB 
+- Video RAM: 8 KB
+- Working RAM: 16 KB
+- Persistent RAM: 256 B per cartridge
+- Screen resolution: 160×128
+- Characters: 256, used for sprites and backgrounds (incl. fonts)
+- Character size: 8×8-pixel
+- Character depth: 2 bits (3 colors + transparency)
+- Colors: 8 programmable palettes + backdrop color
+- Backgrounds: Two with each 32×32 cells, scrollable, wrap around edges
+- Sprites: 64
+- Sprite sizes: 8×8, 16×16, 24×24, 32×32
+- Cell/sprite attributes: palette index, flip X, flip Y, priority
+- Input: Two game controllers with d-pad and two buttons + pause
+- Optional input: Keyboard and touch/mouse
+
+Note: The number of characters, sprites and backgrounds are limitations for what NX can show on screen simultaneously. In total your game can have as many as you can fit into the cartridge ROM.
+
+
+*****************
+* Program Files *
+*****************
+
+A program file contains a complete game or application, including all its data, stored as simple text. When a program file is opened in LowRes NX, it converts the data to the cartridge ROM and runs the program.
+
+The first part is the BASIC source code. Please read the language reference document for further explaination.
+
+The second part are the cartridge ROM entries. These are up to 16 numbered data blocks, which can contain any kind of binary data, for example graphics, level maps, music, etc. Each entry starts with a line with the following format:
+#N:COMMENT
+N is the entry number (0-15), COMMENT can be any text with up to 31 characters, for example "MAIN SPRITES" or "MAP LEVEL 1".
+This line is followed by the actual data, byte by byte as hexadecimal values, until the next ROM entry or the end of the file.
+
+When the program is running, all ROM entries are accessable in the first 32 KB of the memory. Use the BASIC functions START and LENGTH to get the exact address of each entry.
+
+
+**********************
+* Virtual Disk Files *
+**********************
+
+The BASIC statements LOAD and SAVE can be used to store data on a virtual disk, which can contain up to 16 files. Usually all programs in a folder share the same virtual disk. Its format is the same as the ROM entries part in a program file, so data can be easily transferred between disks and programs.
+
+Virtual disks are meant to be used for development tools only, for example image and map editors or music programs. Games should use persistent memory instead. Imagine that the standard LowRes NX console doesn't have a disk drive.
