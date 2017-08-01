@@ -136,13 +136,11 @@ bool disk_importDisk(struct Core *core, const char *input)
             int length = (int)(currentDataByte - startByte);
             entry->start = start;
             entry->length = length;
-            printf("file index %d: start=%d length=%d\n", entryIndex, start, length);
             
             for (int i = entryIndex + 1; i < NUM_FILES; i++)
             {
                 core->diskDrive.entries[i].start = entry->start + entry->length;
             }
-            printf("\n");
         }
         else if (*character == ' ' || *character == '\t' || *character == '\n')
         {

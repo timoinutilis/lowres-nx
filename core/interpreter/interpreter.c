@@ -578,7 +578,6 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                 // add new symbol
                 strcpy(interpreter->symbols[interpreter->numSymbols].name, symbolName);
                 symbolIndex = interpreter->numSymbols++;
-                printf("symbol %d: %s\n", symbolIndex, symbolName);
             }
             if (isString)
             {
@@ -686,7 +685,6 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             struct RomDataEntry *entry = &romDataEntries[entryIndex];
             entry->start = (int)(startByte - core->machine.cartridgeRom);
             entry->length = (int)(currentRomByte - startByte);
-            printf("index %d: start=%d length=%d\n", entryIndex, entry->start, entry->length);
         }
         else if (*character == ' ' || *character == '\t' || *character == '\n')
         {
@@ -706,11 +704,6 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         entry0->start = (int)(currentRomByte - core->machine.cartridgeRom);
         entry0->length = 4096;
         interpreter->romIncludesDefaultCharacters = true;
-        printf("default characters: start=%d length=%d\n", entry0->start, entry0->length);
-    }
-    else
-    {
-        printf("no default characters added to ROM\n");
     }
     
     return ErrorNone;

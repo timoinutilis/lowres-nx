@@ -77,8 +77,8 @@ void core_returnPressed(struct Core *core)
 
 void core_touchPressed(struct Core *core, int x, int y)
 {
-    core_touchDragged(core, x, y);
     core->machine.ioRegisters.status.touch = 1;
+    core_touchDragged(core, x, y);
 }
 
 void core_touchDragged(struct Core *core, int x, int y)

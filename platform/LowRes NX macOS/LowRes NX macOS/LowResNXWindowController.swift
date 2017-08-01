@@ -56,21 +56,21 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
             core_gamepadPressed(core, 0, GamepadButtonDown)
         case 126:
             core_gamepadPressed(core, 0, GamepadButtonUp)
-        case 47:
+        case 6, 43: // Z, ,
             core_gamepadPressed(core, 0, GamepadButtonA)
-        case 44:
+        case 7, 47: // X, .
             core_gamepadPressed(core, 0, GamepadButtonB)
-        case 2:
+        case 2: // D
             core_gamepadPressed(core, 1, GamepadButtonLeft)
-        case 5:
+        case 5: // G
             core_gamepadPressed(core, 1, GamepadButtonRight)
-        case 3:
+        case 3: // F
             core_gamepadPressed(core, 1, GamepadButtonDown)
-        case 15:
+        case 15: // R
             core_gamepadPressed(core, 1, GamepadButtonUp)
-        case 0:
+        case 0: // A
             core_gamepadPressed(core, 1, GamepadButtonA)
-        case 1:
+        case 1: // S
             core_gamepadPressed(core, 1, GamepadButtonB)
         default:
             break
@@ -102,21 +102,21 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
             core_gamepadReleased(core, 0, GamepadButtonDown)
         case 126:
             core_gamepadReleased(core, 0, GamepadButtonUp)
-        case 47:
+        case 6, 43: // Z, ,
             core_gamepadReleased(core, 0, GamepadButtonA)
-        case 44:
+        case 7, 47: // X, .
             core_gamepadReleased(core, 0, GamepadButtonB)
-        case 2:
+        case 2: // D
             core_gamepadReleased(core, 1, GamepadButtonLeft)
-        case 5:
+        case 5: // G
             core_gamepadReleased(core, 1, GamepadButtonRight)
-        case 3:
+        case 3: // F
             core_gamepadReleased(core, 1, GamepadButtonDown)
-        case 15:
+        case 15: // R
             core_gamepadReleased(core, 1, GamepadButtonUp)
-        case 0:
+        case 0: // A
             core_gamepadReleased(core, 1, GamepadButtonA)
-        case 1:
+        case 1: // S
             core_gamepadReleased(core, 1, GamepadButtonB)
         default:
             break

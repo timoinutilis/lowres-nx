@@ -36,7 +36,6 @@ struct RCString *rcstring_new(const char *chars, size_t len)
         }
         string->chars[len] = 0; // end of string
         rcstring_count++;
-//        printf("new string %lx: %s\n", (unsigned long)string, string->chars);
     }
     return string;
 }
@@ -44,16 +43,13 @@ struct RCString *rcstring_new(const char *chars, size_t len)
 void rcstring_retain(struct RCString *string)
 {
     string->refCount++;
-//    printf("retain string %lx refc: %d\n", (unsigned long)string, string->refCount);
 }
 
 void rcstring_release(struct RCString *string)
 {
     string->refCount--;
-//    printf("release string %lx refc: %d\n", (unsigned long)string, string->refCount);
     if (string->refCount == 0)
     {
-//        printf("--- free\n");
         free((void *)string);
         rcstring_count--;
     }

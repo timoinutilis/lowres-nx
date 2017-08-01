@@ -22,15 +22,15 @@ program video, audio and I/O directly by accessing the memory.
 - Video RAM: 8 KB
 - Working RAM: 16 KB
 - Persistent RAM: 256 B per cartridge
-- Screen resolution: 160×128
+- Screen resolution: 160x128
 - Characters: 256, used for sprites and backgrounds (incl. fonts)
-- Character size: 8×8-pixel
+- Character size: 8x8-pixel
 - Character depth: 2 bits (3 colors + transparency)
 - Colors: 8 programmable palettes + backdrop color
-- Backgrounds: Two with each 32×32 cells, scrollable, wrap around
+- Backgrounds: Two with each 32x32 cells, scrollable, wrap around
     edges
 - Sprites: 64
-- Sprite sizes: 8×8, 16×16, 24×24, 32×32
+- Sprite sizes: 8x8, 16x16, 24x24, 32x32
 - Cell/sprite attributes: palette index, flip X, flip Y, priority
 - Input: Two game controllers with d-pad and two buttons + pause
 - Optional input: Keyboard and touch/mouse

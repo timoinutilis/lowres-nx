@@ -69,7 +69,7 @@ class LowResNXDocument: NSDocument {
     }
     
     func nxDiskURL() -> URL {
-        return fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nxd")
+        return fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nx")
     }
 }
 
