@@ -131,3 +131,14 @@ layers (not 4 as mentioned before):
 - Background 1 (BG 1) - prio 1
 - Background 0 (BG 0) - prio 1
 - Sprites - prio 1
+
+
+****************
+* Default Font *
+****************
+
+If cartridge ROM entry 0 is not used by a program, the compiler adds
+character data for the default font. It occupies the characters
+192-255 and is automatically copied to video RAM on program start.
+If you want to use the default font, make sure to keep ROM entry 0
+unused.
