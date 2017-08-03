@@ -87,9 +87,10 @@ IF NAME$>"LOWRES CODER" THEN PRINT GREET$
 REM
 
     REM remark
+    ' remark
 
     Allows you to put comments into your program. REM lines are not
-    executed.
+    executed. You can use an apostrophe (') in place of the word REM.
 
 
 IF...THEN...ELSE

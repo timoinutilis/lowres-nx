@@ -36,6 +36,7 @@ enum TokenType {
     TokenColon,
     TokenComma,
     TokenSemicolon,
+    TokenApostrophe,
     TokenEol,
     
     // Operators

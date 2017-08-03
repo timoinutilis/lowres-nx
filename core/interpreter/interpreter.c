@@ -508,7 +508,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         }
         if (foundKeywordToken != TokenUndefined)
         {
-            if (foundKeywordToken == TokenREM)
+            if (foundKeywordToken == TokenREM || foundKeywordToken == TokenApostrophe)
             {
                 // REM comment, skip until end of line
                 while (*character)
@@ -1381,6 +1381,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             break;
             
         case TokenREM:
+        case TokenApostrophe:
             ++interpreter->pc;
             break;
             

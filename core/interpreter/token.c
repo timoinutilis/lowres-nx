@@ -32,6 +32,7 @@ const char *TokenStrings[] = {
     ":",
     ",",
     ";",
+    "'",
     NULL,
     
     // Operators
