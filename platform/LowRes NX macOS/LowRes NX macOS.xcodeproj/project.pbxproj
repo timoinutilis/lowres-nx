@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9206D41D1F39060A00AF0B00 /* sprites_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 9206D41B1F39060A00AF0B00 /* sprites_lib.c */; };
 		921607441EC0E97B008B702C /* cmd_background.c in Sources */ = {isa = PBXBuildFile; fileRef = 921607421EC0E97B008B702C /* cmd_background.c */; };
 		9229C3731EBF8AFF009CF378 /* cmd_sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 9229C3711EBF8AFF009CF378 /* cmd_sprites.c */; };
 		922AFF991ED5FFAB00002BFA /* disk_drive.c in Sources */ = {isa = PBXBuildFile; fileRef = 922AFF971ED5FFAB00002BFA /* disk_drive.c */; };
@@ -45,6 +46,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9206D41B1F39060A00AF0B00 /* sprites_lib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sprites_lib.c; sourceTree = "<group>"; };
+		9206D41C1F39060A00AF0B00 /* sprites_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sprites_lib.h; sourceTree = "<group>"; };
 		921607421EC0E97B008B702C /* cmd_background.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_background.c; sourceTree = "<group>"; };
 		921607431EC0E97B008B702C /* cmd_background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_background.h; sourceTree = "<group>"; };
 		9229C3711EBF8AFF009CF378 /* cmd_sprites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_sprites.c; sourceTree = "<group>"; };
@@ -242,6 +245,8 @@
 			children = (
 				92624BD41EAD1CFC00EB3A3C /* text_lib.c */,
 				92624BD51EAD1CFC00EB3A3C /* text_lib.h */,
+				9206D41B1F39060A00AF0B00 /* sprites_lib.c */,
+				9206D41C1F39060A00AF0B00 /* sprites_lib.h */,
 				92CA6E1E1EF717F6008B3A21 /* default_characters.c */,
 				92CA6E1F1EF717F6008B3A21 /* default_characters.h */,
 			);
@@ -354,6 +359,7 @@
 				92624BE81EAD1CFC00EB3A3C /* cmd_memory.c in Sources */,
 				92624BF31EAD1CFC00EB3A3C /* variables.c in Sources */,
 				92624BED1EAD1CFC00EB3A3C /* error.c in Sources */,
+				9206D41D1F39060A00AF0B00 /* sprites_lib.c in Sources */,
 				92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */,
 				92624B9B1EAD1B8800EB3A3C /* LowResNXDocument.swift in Sources */,
 				928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */,

@@ -17,19 +17,18 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef cmd_sprites_h
-#define cmd_sprites_h
+#ifndef sprites_lib_h
+#define sprites_lib_h
 
 #include <stdio.h>
-#include "error.h"
-#include "value.h"
+#include <stdbool.h>
 
 struct Core;
 
-enum ErrorCode cmd_SPRITE(struct Core *core);
-enum ErrorCode cmd_SPRITE_A(struct Core *core);
-struct TypedValue fnc_SPRITE(struct Core *core);
-struct TypedValue fnc_SPRITE_HIT(struct Core *core);
-struct TypedValue fnc_HIT(struct Core *core);
+struct SpritesLib {
+    int lastHit;
+};
 
-#endif /* cmd_sprites_h */
+bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, int lastIndex);
+
+#endif /* sprites_lib_h */

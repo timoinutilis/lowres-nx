@@ -22,6 +22,7 @@
 #include "value.h"
 #include "cmd_text.h"
 #include "interpreter_utils.h"
+#include "sprites_lib.h"
 #include <assert.h>
 
 enum ErrorCode cmd_SPRITE(struct Core *core)
@@ -165,5 +166,80 @@ struct TypedValue fnc_SPRITE(struct Core *core)
                 break;
         }
     }
+    return value;
+}
+
+struct TypedValue fnc_SPRITE_HIT(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // SPRITE
+    ++interpreter->pc;
+    
+    // HIT
+    if (interpreter->pc->type != TokenHIT) return val_makeError(ErrorUnexpectedToken);
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    ++interpreter->pc;
+    
+    // sprite number
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
+    if (nValue.type == ValueTypeError) return nValue;
+    
+    int first = 0;
+    int last = NUM_SPRITES - 1;
+    
+    // other sprite number
+    if (interpreter->pc->type == TokenComma)
+    {
+        ++interpreter->pc;
+        struct TypedValue otherValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
+        if (otherValue.type == ValueTypeError) return otherValue;
+        first = otherValue.v.floatValue;
+        last = first;
+        
+        // last sprite number
+        if (interpreter->pc->type == TokenTO)
+        {
+            ++interpreter->pc;
+            struct TypedValue lastValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
+            if (lastValue.type == ValueTypeError) return lastValue;
+            last = lastValue.v.floatValue;
+        }
+    }
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        bool hits = sprlib_checkCollision(core, nValue.v.floatValue, first, last);
+        value.v.floatValue = hits ? BAS_TRUE : BAS_FALSE;
+    }
+    
+    return value;
+}
+
+struct TypedValue fnc_HIT(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // HIT
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        value.v.floatValue = interpreter->spritesLib.lastHit;
+    }
+    
     return value;
 }

@@ -94,6 +94,7 @@ enum TokenType {
     TokenGOSUB,
     TokenGOTO,
     TokenHEX,
+    TokenHIT,
     TokenIF,
     TokenINKEY,
     TokenINPUT,

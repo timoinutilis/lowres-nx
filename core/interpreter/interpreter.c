@@ -1350,6 +1350,12 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenSPRITEA:
             return fnc_SPRITE(core);
             
+        case TokenSPRITE:
+            return fnc_SPRITE_HIT(core);
+            
+        case TokenHIT:
+            return fnc_HIT(core);
+            
         case TokenTOUCH:
             return fnc_TOUCH(core);
 

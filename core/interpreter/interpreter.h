@@ -30,6 +30,7 @@
 #include "variables.h"
 #include "data.h"
 #include "text_lib.h"
+#include "sprites_lib.h"
 #include "io_chip.h"
 
 #define BAS_TRUE -1.0f
@@ -117,6 +118,7 @@ struct Interpreter {
     float timer;
     
     struct TextLib textLib;
+    struct SpritesLib spritesLib;
 };
 
 enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode);

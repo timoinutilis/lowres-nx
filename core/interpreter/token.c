@@ -90,6 +90,7 @@ const char *TokenStrings[] = {
     "GOSUB",
     "GOTO",
     "HEX$",
+    "HIT",
     "IF",
     "INKEY$",
     "INPUT",
