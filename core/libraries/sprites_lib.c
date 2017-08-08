@@ -22,21 +22,70 @@
 
 bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struct Sprite *otherSprite)
 {
-    int ax1 = sprite->x;
-    int ay1 = sprite->y;
     int ax2 = otherSprite->x;
     int ay2 = otherSprite->y;
     
-    if ((ax1 != 0 || ay1 != 0) && (ax2 != 0 || ay2 != 0))
+    if (ax2 != 0 || ay2 != 0)
     {
-        int bx1 = ax1 + 8 * (sprite->attr.size + 1);
-        int by1 = ay1 + 8 * (sprite->attr.size + 1);
-        int bx2 = ax2 + 8 * (otherSprite->attr.size + 1);
-        int by2 = ay2 + 8 * (otherSprite->attr.size + 1);
+        int ax1 = sprite->x;
+        int ay1 = sprite->y;
         
+        int s1 = 8 * (sprite->attr.size + 1);
+        int s2 = 8 * (otherSprite->attr.size + 1);
+        
+        int bx1 = ax1 + s1;
+        int by1 = ay1 + s1;
+        int bx2 = ax2 + s2;
+        int by2 = ay2 + s2;
+        
+        // rectangle check
         if (bx1 > ax2 && by1 > ay2 && ax1 < bx2 && ay1 < by2)
         {
-            return true;
+            // pixel exact check
+            int diffX = ax2 - ax1;
+            int diffY = ay2 - ay1;
+            
+            struct Character *characters = core->machine.videoRam.characters;
+            int c1 = sprite->character;
+            int c2 = otherSprite->character;
+            
+            for (int line = 0; line < s1; line++)
+            {
+                if (line - diffY >= 0 && line - diffY < s2)
+                {
+                    uint32_t source1 = 0;
+                    int chLine1 = line & 7;
+                    int rc1 = c1 + line / 8 * 16;
+                    for (int i = 0; i <= sprite->attr.size; i++)
+                    {
+                        uint8_t *data = characters[rc1 + i].data;
+                        source1 |= (data[chLine1] | data[chLine1 + 8]) << (24 - i * 8);
+                    }
+                    
+                    uint32_t source2 = 0;
+                    int chLine2 = (line - diffY) & 7;
+                    int rc2 = c2 + (line - diffY) / 8 * 16;
+                    for (int i = 0; i <= otherSprite->attr.size; i++)
+                    {
+                        uint8_t *data = characters[rc2 + i].data;
+                        uint32_t val = (data[chLine2] | data[chLine2 + 8]);
+                        int shift = (24 - i * 8 - diffX);
+                        if (shift >= 0 && shift < 32)
+                        {
+                            source2 |= val << shift;
+                        }
+                        else if (shift > -32 && shift < 0)
+                        {
+                            source2 |= val >> -shift;
+                        }
+                    }
+                    
+                    if (source1 & source2)
+                    {
+                        return true;
+                    }
+                }
+            }
         }
     }
     return false;
@@ -47,14 +96,17 @@ bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, in
     struct Sprite *sprites = core->machine.spriteRegisters.sprites;
     struct Sprite *sprite = &sprites[checkIndex];
     
-    for (int i = firstIndex; i <= lastIndex; i++)
+    if (sprite->x != 0 || sprite->y != 0)
     {
-        if (i != checkIndex)
+        for (int i = firstIndex; i <= lastIndex; i++)
         {
-            if (sprlib_checkSingleCollision(core, sprite, &sprites[i]))
+            if (i != checkIndex)
             {
-                core->interpreter.spritesLib.lastHit = i;
-                return true;
+                if (sprlib_checkSingleCollision(core, sprite, &sprites[i]))
+                {
+                    core->interpreter.spritesLib.lastHit = i;
+                    return true;
+                }
             }
         }
     }
