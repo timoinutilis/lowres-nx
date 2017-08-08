@@ -80,6 +80,7 @@ NAME$="LOWRES NX"
 GREET$="HELLO "+NAME$+"!"
 IF NAME$>"LOWRES CODER" THEN PRINT GREET$
 
+
 *******************
 * Program Control *
 *******************
@@ -914,6 +915,25 @@ SPRITE.A
     SPRITE.A(n)
 
     Returns the attributes of sprite n as an 8-bit value.
+
+
+=SPRITE HIT
+
+    SPRITE HIT(n[,a [TO b]])
+
+    Returns true if sprite n collides with another sprite (which means
+    that pixels overlap). If no more parameters are given, it will
+    check with all other visible sprites. If the a parameter is added,
+    it will check only with that sprite a. If all parameters are
+    given, it will check with all sprites from number a to number b.
+
+
+=HIT
+
+    HIT
+
+    Returns the number of the sprite which collided with the sprite of
+    the last call of SPRITE HIT.
 
 
 *********
