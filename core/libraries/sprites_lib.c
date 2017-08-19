@@ -30,8 +30,8 @@ bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struc
         int ax1 = sprite->x;
         int ay1 = sprite->y;
         
-        int s1 = 8 * (sprite->attr.size + 1);
-        int s2 = 8 * (otherSprite->attr.size + 1);
+        int s1 = (sprite->attr.size + 1) << 3;
+        int s2 = (otherSprite->attr.size + 1) << 3;
         
         int bx1 = ax1 + s1;
         int by1 = ay1 + s1;
@@ -53,23 +53,40 @@ bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struc
             {
                 if (line - diffY >= 0 && line - diffY < s2)
                 {
+                    int line1 = sprite->attr.flipY ? (s1 - line - 1) : line;
+                    int line2 = otherSprite->attr.flipY ? (s2 - (line - diffY) - 1) : (line - diffY);
+                    bool flx1 = sprite->attr.flipX;
+                    bool flx2 = otherSprite->attr.flipX;
+                    
                     uint32_t source1 = 0;
-                    int chLine1 = line & 7;
-                    int rc1 = c1 + line / 8 * 16;
+                    int chLine1 = line1 & 7;
+                    int rc1 = c1 + (line1 >> 3 << 4);
                     for (int i = 0; i <= sprite->attr.size; i++)
                     {
-                        uint8_t *data = characters[rc1 + i].data;
-                        source1 |= (data[chLine1] | data[chLine1 + 8]) << (24 - i * 8);
+                        uint8_t *data = characters[flx1 ? (rc1 + sprite->attr.size - i) : (rc1 + i)].data;
+                        uint32_t val = (data[chLine1] | data[chLine1 + 8]);
+                        if (flx1)
+                        {
+                            // reverse bits
+                            val = (((val * 0x0802LU & 0x22110LU) | (val * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16) & 0xFF;
+                        }
+                        source1 |= val << (24 - (i << 3));
                     }
                     
                     uint32_t source2 = 0;
-                    int chLine2 = (line - diffY) & 7;
-                    int rc2 = c2 + (line - diffY) / 8 * 16;
+                    int chLine2 = line2 & 7;
+                    int rc2 = c2 + (line2 >> 3 << 4);
                     for (int i = 0; i <= otherSprite->attr.size; i++)
                     {
-                        uint8_t *data = characters[rc2 + i].data;
+                        uint8_t *data = characters[flx2 ? (rc2 + otherSprite->attr.size - i) : (rc2 + i)].data;
                         uint32_t val = (data[chLine2] | data[chLine2 + 8]);
-                        int shift = (24 - i * 8 - diffX);
+                        if (flx2)
+                        {
+                            // reverse bits
+                            val = (((val * 0x0802LU & 0x22110LU) | (val * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16) & 0xFF;
+                        }
+                        
+                        int shift = (24 - (i << 3) - diffX);
                         if (shift >= 0 && shift < 32)
                         {
                             source2 |= val << shift;
