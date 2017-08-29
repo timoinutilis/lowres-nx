@@ -563,7 +563,9 @@ BG COPY
     BG COPY x1,y1,w,h TO x2,y2
 
     Copies a two-dimensional part of the current source to the
-    current background.
+    current background. The destination co-ordinates can be outside of
+    the background size (32x32), but they will be wrapped around the
+    edges (32->0, 33->1, etc.).
 
 
 BG SCROLL

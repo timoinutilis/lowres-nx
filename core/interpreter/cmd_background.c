@@ -113,7 +113,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     ++interpreter->pc;
     
     // dst X value
-    struct TypedValue dstXValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue dstXValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (dstXValue.type == ValueTypeError) return dstXValue.v.errorCode;
     
     // comma
@@ -121,7 +121,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     ++interpreter->pc;
     
     // dst Y value
-    struct TypedValue dstYValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue dstYValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (dstYValue.type == ValueTypeError) return dstYValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
