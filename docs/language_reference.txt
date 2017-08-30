@@ -1,5 +1,6 @@
 The programming language of LowRes NX is based on the classic BASIC,
-but with labels instead of line numbers. Let's call it LowRes BASIC.
+but with labels instead of line numbers.
+
 
 ***********************
 * Types and Variables *
