@@ -418,9 +418,27 @@ enum ErrorCode cmd_RETURN(struct Core *core)
     struct Interpreter *interpreter = &core->interpreter;
     
     // RETURN
+    struct Token *tokenRETURN = interpreter->pc;
     ++interpreter->pc;
     
-    if (interpreter->pass == PassRun)
+    // Identifier
+    struct Token *tokenIdentifier = NULL;
+    if (interpreter->pc->type == TokenIdentifier)
+    {
+        tokenIdentifier = interpreter->pc;
+        ++interpreter->pc;
+    }
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        if (tokenIdentifier)
+        {
+            struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+            if (!item) return ErrorUndefinedLabel;
+            tokenRETURN->jumpToken = item->token;
+        }
+    }
+    else if (interpreter->pass == PassRun)
     {
         struct LabelStackItem *itemGOSUB = lab_popLabelStackItem(interpreter);
         if (!itemGOSUB) return ErrorReturnWithoutGosub;
@@ -428,12 +446,23 @@ enum ErrorCode cmd_RETURN(struct Core *core)
         if (itemGOSUB->type == LabelTypeONGOSUB)
         {
             // exit from interrupt
+            if (tokenRETURN->jumpToken) return ErrorNotAllowedInInterrupt;
             interpreter->exitEvaluation = true;
         }
         else if (itemGOSUB->type == LabelTypeGOSUB)
         {
-            // jump back
-            interpreter->pc = itemGOSUB->token; // after GOSUB
+            if (tokenRETURN->jumpToken)
+            {
+                // jump to label
+                interpreter->pc = tokenRETURN->jumpToken; // after label
+                // clear stack
+                interpreter->numLabelStackItems = 0;
+            }
+            else
+            {
+                // jump back
+                interpreter->pc = itemGOSUB->token; // after GOSUB
+            }
         }
         else
         {

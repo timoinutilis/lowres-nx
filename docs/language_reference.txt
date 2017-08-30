@@ -111,17 +111,25 @@ GOTO
 
     GOTO label
 
-    label:
-    statements
+    Jumps to the given label.
 
 
 GOSUB...RETURN
 
     GOSUB label
 
-    label:
-    statements
+    Adds the current program position to a stack and jumps to the
+    given label.
+
     RETURN
+
+    Jumps back to the position of the last call of GOSUB and removes
+    it from the stack.
+
+    RETURN label
+
+    Works like GOTO, but clears the whole stack. Use this to exit from
+    a subroutine, if you want to continue your program somewhere else.
 
 
 FOR...NEXT
