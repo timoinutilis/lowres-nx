@@ -76,6 +76,7 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
         switch (item->type)
         {
             case LabelTypeIF:
+            case LabelTypeELSEIF:
                 errorCode = ErrorIfWithoutEndIf;
                 break;
                 
@@ -1427,7 +1428,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_INPUT(core);
         
         case TokenIF:
-            return cmd_IF(core);
+            return cmd_IF(core, false);
         
         case TokenELSE:
             return cmd_ELSE(core);

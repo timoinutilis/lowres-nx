@@ -39,7 +39,7 @@ enum ErrorCode cmd_END(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_IF(struct Core *core)
+enum ErrorCode cmd_IF(struct Core *core, bool isAfterBlockElse)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -61,7 +61,7 @@ enum ErrorCode cmd_IF(struct Core *core)
         {
             // IF block
             if (interpreter->isSingleLineIf) return ErrorExpectedCommand;
-            enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeIF, tokenIF);
+            enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, isAfterBlockElse ? LabelTypeELSEIF : LabelTypeIF, tokenIF);
             if (errorCode != ErrorNone) return errorCode;
             
             // Eol
@@ -113,13 +113,32 @@ enum ErrorCode cmd_ELSE(struct Core *core)
         else
         {
             struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
-            if (!item || item->type != LabelTypeIF) return ErrorElseWithoutIf;
-            item->token->jumpToken = interpreter->pc;
-        
+            if (!item) return ErrorElseWithoutIf;
+            if (item->type == LabelTypeIF)
+            {
+                item->token->jumpToken = interpreter->pc;
+            }
+            else if (item->type == LabelTypeELSEIF)
+            {
+                item->token->jumpToken = interpreter->pc;
+                
+                item = lab_popLabelStackItem(interpreter);
+                assert(item->type == LabelTypeELSE);
+                item->token->jumpToken = tokenELSE;
+            }
+            else
+            {
+                return ErrorElseWithoutIf;
+            }
+            
             enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeELSE, tokenELSE);
             if (errorCode != ErrorNone) return errorCode;
             
-            if (interpreter->pc->type != TokenIF)
+            if (interpreter->pc->type == TokenIF)
+            {
+                return cmd_IF(core, true);
+            }
+            else
             {
                 // Eol
                 if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
@@ -153,26 +172,17 @@ enum ErrorCode cmd_END_IF(struct Core *core)
         {
             return ErrorEndIfWithoutIf;
         }
-        else if (item->type == LabelTypeIF)
+        else if (item->type == LabelTypeIF || item->type == LabelTypeELSE)
         {
             item->token->jumpToken = interpreter->pc;
         }
-        else if (item->type == LabelTypeELSE)
+        else if (item->type == LabelTypeELSEIF)
         {
-            while (1)
-            {
-                item->token->jumpToken = interpreter->pc;
-                
-                item = lab_peekLabelStackItem(interpreter);
-                if (item && item->type == LabelTypeELSE)
-                {
-                    item = lab_popLabelStackItem(interpreter);
-                }
-                else
-                {
-                    break;
-                }
-            }
+            item->token->jumpToken = interpreter->pc;
+            
+            item = lab_popLabelStackItem(interpreter);
+            assert(item->type == LabelTypeELSE);
+            item->token->jumpToken = interpreter->pc;
         }
         else
         {

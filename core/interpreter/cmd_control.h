@@ -21,12 +21,13 @@
 #define cmd_control_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "error.h"
 
 struct Core;
 
 enum ErrorCode cmd_END(struct Core *core);
-enum ErrorCode cmd_IF(struct Core *core);
+enum ErrorCode cmd_IF(struct Core *core, bool isAfterBlockElse);
 enum ErrorCode cmd_ELSE(struct Core *core);
 enum ErrorCode cmd_END_IF(struct Core *core);
 enum ErrorCode cmd_FOR(struct Core *core);
