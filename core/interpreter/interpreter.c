@@ -475,7 +475,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             {
                 size_t keywordLen = strlen(keyword);
                 int keywordIsAlphaNum = strchr(CharSetAlphaNum, keyword[0]) != NULL;
-                for (int pos = 0; pos <= keywordLen && character[pos]; pos++)
+                for (int pos = 0; pos <= keywordLen; pos++)
                 {
                     char textCharacter = character[pos];
                     
@@ -488,7 +488,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                             break;
                         }
                     }
-                    else if (keywordIsAlphaNum && strchr(CharSetAlphaNum, textCharacter))
+                    else if (keywordIsAlphaNum && textCharacter && strchr(CharSetAlphaNum, textCharacter))
                     {
                         // matching, but word is longer, so seems to be an identifier
                         break;
