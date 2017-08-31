@@ -42,6 +42,7 @@ const char *CharSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 const char *CharSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
 const char *CharSetHex = "0123456789ABCDEF";
 
+const char *itp_uppercaseString(const char *source);
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
@@ -52,7 +53,12 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
 {
     // Tokenize
     
-    enum ErrorCode errorCode = itp_tokenizeProgram(core, sourceCode);
+    const char *uppercaseSourceCode = itp_uppercaseString(sourceCode);
+    if (!uppercaseSourceCode) return ErrorOutOfMemory;
+    
+    enum ErrorCode errorCode = itp_tokenizeProgram(core, uppercaseSourceCode);
+    free((void *)uppercaseSourceCode);
+    uppercaseSourceCode = NULL;
     if (errorCode != ErrorNone) return errorCode;
     
     struct Interpreter *interpreter = &core->interpreter;
@@ -319,6 +325,29 @@ enum ErrorCode itp_getExitErrorCode(struct Core *core)
 int itp_getPcPositionInSourceCode(struct Core *core)
 {
     return core->interpreter.pc->sourcePosition;
+}
+
+const char *itp_uppercaseString(const char *source)
+{
+    size_t len = strlen(source);
+    char *buffer = malloc(len);
+    if (buffer)
+    {
+        const char *sourceChar = source;
+        char *destChar = buffer;
+        char finalChar = 0;
+        while (*sourceChar)
+        {
+            finalChar = *sourceChar++;
+            if (finalChar >= 'a' && finalChar <= 'z')
+            {
+                finalChar -= 32;
+            }
+            *destChar++ = finalChar;
+        }
+        *destChar = 0;
+    }
+    return buffer;
 }
 
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)

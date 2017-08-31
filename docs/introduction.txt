@@ -13,6 +13,9 @@ hardware registers accessable in its memory map. Although most of the
 features are available via simple BASIC statements, it's possible to
 program video, audio and I/O directly by accessing the memory.
 
+Imagine LowRes NX as a handheld game console with a d-pad, two action
+buttons and a little rubber keyboard below a slidable touchscreen.
+
 
 ******************
 * Specifications *
