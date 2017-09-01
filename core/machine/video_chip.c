@@ -18,34 +18,14 @@
 //
 
 #include "video_chip.h"
-#include "character_rom.h"
 #include "core.h"
 #include <string.h>
 
 int video_getCharacterPixel(struct Character *character, int x, int y)
 {
-    if (x < 4)
-    {
-        return (character->data[y << 1] >> ((3 - x) << 1)) & 0x03;
-    }
-    else
-    {
-        return (character->data[(y << 1) + 1] >> ((7 - x) << 1)) & 0x03;
-    }
-}
-
-struct Character *video_getCharacter(struct VideoRam *ram, int bank, int characterIndex)
-{
-    struct CharacterBank *characterBank;
-    if (bank)
-    {
-        characterBank = (struct CharacterBank *)CharacterRom;
-    }
-    else
-    {
-        characterBank = &ram->characterBank;
-    }
-    return &characterBank->characters[characterIndex];
+    int b0 = (character->data[y] >> (7 - x)) & 0x01;
+    int b1 = (character->data[y | 8] >> (7 - x)) & 0x01;
+    return b0 | (b1 << 1);
 }
 
 void video_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct Plane *plane, int y, int scrollX, int scrollY, uint8_t *scanlineBuffer)
@@ -61,7 +41,7 @@ void video_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct 
         if (cell->attr.priority >= (*scanlineBuffer >> 7))
         {
             int cellX = planeX & 7;
-            struct Character *character = video_getCharacter(ram, cell->attr.bank, cell->character);
+            struct Character *character = &ram->characters[cell->character];
             int pixel = video_getCharacterPixel(character, cell->attr.flipX ? (7 - cellX) : cellX, cell->attr.flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
@@ -80,39 +60,38 @@ void video_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int 
         if (sprite->x != 0 || sprite->y != 0)
         {
             int spriteY = y - sprite->y + SPRITE_OFFSET_Y;
-            int height = (sprite->attr2.height + 1) << 3;
-            if (spriteY >= 0 && spriteY < height)
+            int size = (sprite->attr.size + 1) << 3;
+            if (spriteY >= 0 && spriteY < size)
             {
-                if (sprite->attr1.flipY)
+                if (sprite->attr.flipY)
                 {
-                    spriteY = height - spriteY - 1;
+                    spriteY = size - spriteY - 1;
                 }
                 int charIndex = sprite->character + ((spriteY >> 3) << 4);
-                if (sprite->attr1.flipX)
+                if (sprite->attr.flipX)
                 {
-                    charIndex += sprite->attr2.width;
+                    charIndex += sprite->attr.size;
                 }
-                struct Character *character = video_getCharacter(ram, sprite->attr1.bank, charIndex);
-                int width = (sprite->attr2.width + 1) << 3;
+                struct Character *character = &ram->characters[charIndex];
                 int minX = sprite->x - SPRITE_OFFSET_X;
-                int maxX = minX + width;
+                int maxX = minX + size;
                 if (minX < 0) minX = 0;
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
                 uint8_t *buffer = &scanlineSpriteBuffer[minX];
                 int spriteX = minX - sprite->x + SPRITE_OFFSET_X;
-                if (sprite->attr1.flipX)
+                if (sprite->attr.flipX)
                 {
-                    spriteX = width - spriteX - 1;
+                    spriteX = size - spriteX - 1;
                 }
                 for (int x = minX; x < maxX; x++)
                 {
                     int pixel = video_getCharacterPixel(character, spriteX & 0x07, spriteY & 0x07);
                     if (pixel)
                     {
-                        *buffer = pixel | (sprite->attr1.palette << 2) | (sprite->attr1.priority << 7);
+                        *buffer = pixel | (sprite->attr.palette << 2) | (sprite->attr.priority << 7);
                     }
                     buffer++;
-                    if (sprite->attr1.flipX)
+                    if (sprite->attr.flipX)
                     {
                         if (!(spriteX & 0x07))
                         {
@@ -159,10 +138,19 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
         reg->rasterLine = y;
         core_rasterUpdate(core);
         memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
-        memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
-        video_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
-        video_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
-        video_renderSprites(sreg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
+        if (reg->attr.planeBEnabled)
+        {
+            video_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
+        }
+        if (reg->attr.planeAEnabled)
+        {
+            video_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
+        }
+        if (reg->attr.spritesEnabled)
+        {
+            memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
+            video_renderSprites(sreg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
+        }
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
             int color = creg->colors[scanlineBuffer[x] & 0x7F];
@@ -172,7 +160,8 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
             *outputByte++ = r * 0x55;
             *outputByte++ = g * 0x55;
             *outputByte++ = b * 0x55;
+            outputByte++;
         }
-        outputByte += (bytesPerLine - SCREEN_WIDTH*3);
+        outputByte += (bytesPerLine - SCREEN_WIDTH*4);
     }
 }

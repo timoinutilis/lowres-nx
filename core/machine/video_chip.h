@@ -25,7 +25,7 @@
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 128
 #define NUM_CHARACTERS 256
-#define NUM_COLORS 64
+#define NUM_PALETTES 8
 #define PLANE_COLUMNS 32
 #define PLANE_ROWS 32
 #define NUM_SPRITES 64
@@ -41,42 +41,25 @@ struct Character {
     uint8_t data[16];
 };
 
-// ================ Character Bank ================
-
-// 4096 bytes
-struct CharacterBank {
-    struct Character characters[NUM_CHARACTERS];
-};
-
 // ================ Sprite ================
 
 union CharacterAttributes {
     struct {
-        uint8_t palette:4;
-        uint8_t bank:1;
+        uint8_t palette:3;
         uint8_t flipX:1;
         uint8_t flipY:1;
         uint8_t priority:1;
+        uint8_t size:2; // 1x1 - 4x4 characters
     };
     uint8_t value;
 };
 
-// ================ Sprite ================
-
-// 8 bytes
+// 4 bytes
 struct Sprite {
     uint8_t x;
     uint8_t y;
     uint8_t character;
-    union CharacterAttributes attr1;
-    union {
-        struct {
-            uint8_t width:2; // 1-4 characters
-            uint8_t height:2; // 1-4 characters
-        };
-        uint8_t value;
-    } attr2;
-    uint8_t reserved[3];
+    union CharacterAttributes attr;
 };
 
 // ================ Cell ================
@@ -100,7 +83,7 @@ struct Plane {
 
 // 8 KB
 struct VideoRam {
-    struct CharacterBank characterBank; // 4 KB
+    struct Character characters[NUM_CHARACTERS]; // 4 KB
     struct Plane planeA; // 2 KB
     struct Plane planeB; // 2 KB
 };
@@ -110,17 +93,24 @@ struct VideoRam {
 // =================================================
 
 struct SpriteRegisters {
-    struct Sprite sprites[NUM_SPRITES]; // 512 bytes
+    struct Sprite sprites[NUM_SPRITES]; // 256 bytes
 };
 
 struct ColorRegisters {
-    uint8_t colors[NUM_COLORS]; // 64 bytes
+    uint8_t colors[NUM_PALETTES * 4]; // 32 bytes
+};
+
+union DisplayAttributes {
+    struct {
+        uint8_t spritesEnabled:1;
+        uint8_t planeAEnabled:1;
+        uint8_t planeBEnabled:1;
+    };
+    uint8_t value;
 };
 
 struct VideoRegisters {
-    union {
-        uint8_t attributes;
-    };
+    union DisplayAttributes attr;
     uint8_t scrollAX;
     uint8_t scrollAY;
     uint8_t scrollBX;

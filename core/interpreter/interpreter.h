@@ -29,10 +29,19 @@
 #include "labels.h"
 #include "variables.h"
 #include "data.h"
-#include "big_endian.h"
 #include "text_lib.h"
+#include "sprites_lib.h"
+#include "io_chip.h"
+
+#define BAS_TRUE -1.0f
+#define BAS_FALSE 0.0f
 
 struct Core;
+
+extern const char *CharSetDigits;
+extern const char *CharSetLetters;
+extern const char *CharSetAlphaNum;
+extern const char *CharSetHex;
 
 enum Pass {
     PassPrepare,
@@ -58,8 +67,8 @@ struct Symbol {
 };
 
 struct RomDataEntry {
-    BigEndianUInt16 start;
-    BigEndianUInt16 length;
+    int start;
+    int length;
 };
 
 enum InterruptType {
@@ -78,6 +87,9 @@ struct Interpreter {
     int numTokens;
     struct Symbol symbols[MAX_SYMBOLS];
     int numSymbols;
+    
+    struct RomDataEntry romDataEntries[MAX_ROM_DATA_ENTRIES];
+    bool romIncludesDefaultCharacters;
     
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
     int numLabelStackItems;
@@ -101,19 +113,28 @@ struct Interpreter {
     
     int waitCount;
     bool exitEvaluation;
+    union Gamepad lastFrameGamepads[NUM_GAMEPADS];
+    union IOStatus lastFrameIOStatus;
+    float timer;
     
     struct TextLib textLib;
+    struct SpritesLib spritesLib;
 };
 
 enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode);
 void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);
 void itp_runInterrupt(struct Core *core, enum InterruptType type);
+void itp_didFinishVBL(struct Core *core);
 void itp_freeProgram(struct Core *core);
+enum ErrorCode itp_getExitErrorCode(struct Core *core);
+int itp_getPcPositionInSourceCode(struct Core *core);
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode);
 struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass);
 struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int max);
+struct TypedValue itp_evaluateOptionalExpression(struct Core *core, enum TypeClass typeClass);
+struct TypedValue itp_evaluateOptionalNumericExpression(struct Core *core, int min, int max);
 int itp_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode itp_endOfCommand(struct Interpreter *interpreter);
 

@@ -11,12 +11,17 @@ print "{",
 for row in range(16):
 	for column in range(16):
 		print "{",
-		for charY in range(8):
-			y = row*8+charY
-			val = 0
-			for charX in range(8):
-				pixel = im.getpixel((column*8+charX, y))[0] / 64
-				val |= (pixel << (7-charX)*2)
-			print str((val >> 8) & 0xFF)+ ",", str(val & 0xFF)+ ",",
+		for bit in range(2):
+			for charY in range(8):
+				y = row*8+charY
+				val = 0
+				for charX in range(8):
+					pixel = im.getpixel((column*8+charX, y))[0] / 64
+					pcolor = 0
+					if pixel > 0:
+						pcolor = 4 - pixel
+					pbit = (pcolor >> bit) & 0x01
+					val |= (pbit << (7-charX))
+				print str(val & 0xFF)+ ",",
 		print "},"
 print "}"

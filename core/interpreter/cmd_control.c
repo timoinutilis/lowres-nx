@@ -25,10 +25,7 @@ enum ErrorCode cmd_END(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // END
     ++interpreter->pc;
@@ -42,7 +39,7 @@ enum ErrorCode cmd_END(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_IF(struct Core *core)
+enum ErrorCode cmd_IF(struct Core *core, bool isAfterBlockElse)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -64,7 +61,7 @@ enum ErrorCode cmd_IF(struct Core *core)
         {
             // IF block
             if (interpreter->isSingleLineIf) return ErrorExpectedCommand;
-            enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeIF, tokenIF);
+            enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, isAfterBlockElse ? LabelTypeELSEIF : LabelTypeIF, tokenIF);
             if (errorCode != ErrorNone) return errorCode;
             
             // Eol
@@ -116,13 +113,32 @@ enum ErrorCode cmd_ELSE(struct Core *core)
         else
         {
             struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
-            if (!item || item->type != LabelTypeIF) return ErrorElseWithoutIf;
-            item->token->jumpToken = interpreter->pc;
-        
+            if (!item) return ErrorElseWithoutIf;
+            if (item->type == LabelTypeIF)
+            {
+                item->token->jumpToken = interpreter->pc;
+            }
+            else if (item->type == LabelTypeELSEIF)
+            {
+                item->token->jumpToken = interpreter->pc;
+                
+                item = lab_popLabelStackItem(interpreter);
+                assert(item->type == LabelTypeELSE);
+                item->token->jumpToken = tokenELSE;
+            }
+            else
+            {
+                return ErrorElseWithoutIf;
+            }
+            
             enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeELSE, tokenELSE);
             if (errorCode != ErrorNone) return errorCode;
             
-            if (interpreter->pc->type != TokenIF)
+            if (interpreter->pc->type == TokenIF)
+            {
+                return cmd_IF(core, true);
+            }
+            else
             {
                 // Eol
                 if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
@@ -137,7 +153,7 @@ enum ErrorCode cmd_ELSE(struct Core *core)
     return ErrorNone;
 }
 
-enum ErrorCode cmd_ENDIF(struct Core *core)
+enum ErrorCode cmd_END_IF(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -156,26 +172,17 @@ enum ErrorCode cmd_ENDIF(struct Core *core)
         {
             return ErrorEndIfWithoutIf;
         }
-        else if (item->type == LabelTypeIF)
+        else if (item->type == LabelTypeIF || item->type == LabelTypeELSE)
         {
             item->token->jumpToken = interpreter->pc;
         }
-        else if (item->type == LabelTypeELSE)
+        else if (item->type == LabelTypeELSEIF)
         {
-            while (1)
-            {
-                item->token->jumpToken = interpreter->pc;
-                
-                item = lab_peekLabelStackItem(interpreter);
-                if (item && item->type == LabelTypeELSE)
-                {
-                    item = lab_popLabelStackItem(interpreter);
-                }
-                else
-                {
-                    break;
-                }
-            }
+            item->token->jumpToken = interpreter->pc;
+            
+            item = lab_popLabelStackItem(interpreter);
+            assert(item->type == LabelTypeELSE);
+            item->token->jumpToken = interpreter->pc;
         }
         else
         {
@@ -349,10 +356,7 @@ enum ErrorCode cmd_GOTO(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // GOTO
     struct Token *tokenGOTO = interpreter->pc;
@@ -414,9 +418,27 @@ enum ErrorCode cmd_RETURN(struct Core *core)
     struct Interpreter *interpreter = &core->interpreter;
     
     // RETURN
+    struct Token *tokenRETURN = interpreter->pc;
     ++interpreter->pc;
     
-    if (interpreter->pass == PassRun)
+    // Identifier
+    struct Token *tokenIdentifier = NULL;
+    if (interpreter->pc->type == TokenIdentifier)
+    {
+        tokenIdentifier = interpreter->pc;
+        ++interpreter->pc;
+    }
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        if (tokenIdentifier)
+        {
+            struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+            if (!item) return ErrorUndefinedLabel;
+            tokenRETURN->jumpToken = item->token;
+        }
+    }
+    else if (interpreter->pass == PassRun)
     {
         struct LabelStackItem *itemGOSUB = lab_popLabelStackItem(interpreter);
         if (!itemGOSUB) return ErrorReturnWithoutGosub;
@@ -424,12 +446,23 @@ enum ErrorCode cmd_RETURN(struct Core *core)
         if (itemGOSUB->type == LabelTypeONGOSUB)
         {
             // exit from interrupt
+            if (tokenRETURN->jumpToken) return ErrorNotAllowedInInterrupt;
             interpreter->exitEvaluation = true;
         }
         else if (itemGOSUB->type == LabelTypeGOSUB)
         {
-            // jump back
-            interpreter->pc = itemGOSUB->token; // after GOSUB
+            if (tokenRETURN->jumpToken)
+            {
+                // jump to label
+                interpreter->pc = tokenRETURN->jumpToken; // after label
+                // clear stack
+                interpreter->numLabelStackItems = 0;
+            }
+            else
+            {
+                // jump back
+                interpreter->pc = itemGOSUB->token; // after GOSUB
+            }
         }
         else
         {
@@ -444,10 +477,7 @@ enum ErrorCode cmd_WAIT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt)
-    {
-        return ErrorNotAllowedInInterrupt;
-    }
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // WAIT
     ++interpreter->pc;

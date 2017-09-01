@@ -21,14 +21,10 @@
 #include <assert.h>
 #include <string.h>
 #include <stdbool.h>
-#include "character_rom.h"
 
 void machine_init(struct Machine *machine)
 {
     assert(sizeof(struct Machine) == 0x10000);
-    
-    // Copy character ROM data to machine
-    memcpy((struct CharacterBank *)&machine->characterRom, CharacterRom, sizeof(struct CharacterBank));
 }
 
 int machine_peek(struct Machine *machine, int address)
@@ -47,12 +43,12 @@ bool machine_poke(struct Machine *machine, int address, int value)
         // cartridge ROM or outside RAM
         return false;
     }
-    if (address >= 0xE000 && address < 0xF000)
+    if (address >= 0xE100 && address < 0xFE00)
     {
-        // character ROM
+        // reserved memory
         return false;
     }
-    if (address >= 0xF240 && address < 0xFF40)
+    if (address >= 0xFF80)
     {
         // reserved registers
         return false;

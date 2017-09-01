@@ -1,0 +1,128 @@
+**************
+* Memory Map *
+**************
+
+$0000 - Cartridge ROM (32 KB)
+
+$8000 - Character Data (4 KB)
+$9000 - BG0 Data (2 KB)
+$9800 - BG1 Data (2 KB)
+
+$A000 - Working RAM (16 KB)
+
+$E000 - Persistent RAM (256 B)
+
+$FE00 - Sprite Registers (256 B)
+$FF00 - Color Registers (32 B)
+$FF20 - Video Registers
+$FF40 - Audio Registers
+$FF60 - I/O Registers
+
+
+******************
+* Character Data *
+******************
+
+A character is an 8x8-pixel image with 2 bits per pixel, with a
+resulting size of 16 bytes. The video RAM has space for 256
+characters.
+The first 8 bytes of a character contain the low bits of all its
+pixels, followed by 8 more bytes containing the high bits of all
+pixels.
+
+
+***********
+* BG Data *
+***********
+
+A background is a map of 32x32 character cells. Each cell occupies two
+bytes:
+- Character number
+- Attributes:
+    Bit     Purpose
+    0-2     Palette number
+    3       Flip X
+    4       Flip Y
+    5       Priority
+    6-7     Unused
+
+
+********************
+* Sprite Registers *
+********************
+
+There are 64 sprites available, each occupies 4 bytes:
+- X position
+- Y position
+- Character number
+- Attributes:
+    Bit     Purpose
+    0-2     Palette number
+    3       Flip X
+    4       Flip Y
+    5       Priority
+    6-7     Size:
+            0: 1 character (8x8 pixels)
+            1: 2x2 characters (16x16 pixels)
+            2: 3x3 characters (24x24 pixels)
+            3: 4x4 characters (32x32 pixels)
+
+
+*******************
+* Color Registers *
+*******************
+
+There are 8 palettes of each 4 colors. One color is one byte:
+Bits    Component
+0-1     Blue
+2-3     Green
+4-5     Red
+
+
+*******************
+* Video Registers *
+*******************
+
+$FF20 - Attributes:
+    Bit     Purpose
+    0       Sprites enabled
+    1       BG0 enabled
+    2       BG1 enabled
+
+$FF21 - BG0 scroll offset X
+$FF22 - BG0 scroll offset Y
+$FF23 - BG1 scroll offset X
+$FF24 - BG1 scroll offset Y
+$FF25 - Raster line
+
+
+*******************
+* Audio Registers *
+*******************
+
+- Not yet defined -
+
+
+*****************
+* I/O Registers *
+*****************
+
+$FF60 - Gamepad 0 status
+$FF61 - Gamepad 1 status
+
+Gamepad status:
+    Bit     Purpose
+    0       Up
+    1       Down
+    2       Left
+    3       Right
+    4       Button A
+    5       Button B
+
+$FF62 - Last touch X position
+$FF63 - Last touch Y position
+$FF64 - Last pressed key (ASCII code)
+$FF65 - Status:
+    Bit     Purpose
+    0       Pause button
+    1       Touch

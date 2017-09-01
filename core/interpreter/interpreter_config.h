@@ -20,7 +20,7 @@
 #ifndef interpreter_config_h
 #define interpreter_config_h
 
-#define MAX_TOKENS 2048
+#define MAX_TOKENS 8192
 #define MAX_SYMBOLS 128
 #define MAX_LABEL_STACK_ITEMS 128
 #define MAX_JUMP_LABEL_ITEMS 128
@@ -30,8 +30,9 @@
 #define MAX_ARRAY_DIMENSIONS 4
 #define MAX_ARRAY_SIZE 32768
 #define MAX_ROM_DATA_ENTRIES 16
-#define MAX_CYCLES_PER_FRAME 100
-#define MAX_CYCLES_PER_RASTER 100
-#define MAX_CYCLES_PER_VBL 100
+#define MAX_CYCLES_PER_FRAME 4096
+#define MAX_CYCLES_PER_RASTER 128
+#define MAX_CYCLES_PER_VBL 128
+#define TIMER_WRAP_VALUE 2592000
 
 #endif /* interpreter_config_h */

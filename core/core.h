@@ -23,14 +23,39 @@
 #include <stdio.h>
 #include "machine.h"
 #include "interpreter.h"
+#include "disk_drive.h"
+#include "core_delegate.h"
 
 struct Core {
     struct Machine machine;
     struct Interpreter interpreter;
+    struct DiskDrive diskDrive;
+    struct CoreDelegate *delegate;
+};
+
+enum GamepadButton {
+    GamepadButtonUp,
+    GamepadButtonDown,
+    GamepadButtonLeft,
+    GamepadButtonRight,
+    GamepadButtonA,
+    GamepadButtonB
 };
 
 void core_init(struct Core *core);
+void core_deinit(struct Core *core);
+void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);
+void core_willRunProgram(struct Core *core, long secondsSincePowerOn);
 void core_update(struct Core *core);
 void core_rasterUpdate(struct Core *core);
+
+void core_keyPressed(struct Core *core, char key);
+void core_backspacePressed(struct Core *core);
+void core_returnPressed(struct Core *core);
+void core_touchPressed(struct Core *core, int x, int y);
+void core_touchDragged(struct Core *core, int x, int y);
+void core_touchReleased(struct Core *core);
+void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button);
+void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button);
 
 #endif /* core_h */

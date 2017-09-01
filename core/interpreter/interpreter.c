@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 #include "core.h"
+#include "default_characters.h"
 #include "cmd_control.h"
 #include "cmd_variables.h"
 #include "cmd_data.h"
@@ -30,7 +31,18 @@
 #include "cmd_memory.h"
 #include "cmd_text.h"
 #include "cmd_maths.h"
+#include "cmd_background.h"
+#include "cmd_screen.h"
+#include "cmd_sprites.h"
+#include "cmd_io.h"
+#include "cmd_files.h"
 
+const char *CharSetDigits = "0123456789";
+const char *CharSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+const char *CharSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
+const char *CharSetHex = "0123456789ABCDEF";
+
+const char *itp_uppercaseString(const char *source);
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
@@ -41,7 +53,12 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
 {
     // Tokenize
     
-    enum ErrorCode errorCode = itp_tokenizeProgram(core, sourceCode);
+    const char *uppercaseSourceCode = itp_uppercaseString(sourceCode);
+    if (!uppercaseSourceCode) return ErrorOutOfMemory;
+    
+    enum ErrorCode errorCode = itp_tokenizeProgram(core, uppercaseSourceCode);
+    free((void *)uppercaseSourceCode);
+    uppercaseSourceCode = NULL;
     if (errorCode != ErrorNone) return errorCode;
     
     struct Interpreter *interpreter = &core->interpreter;
@@ -58,7 +75,43 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
     while (errorCode == ErrorNone && interpreter->pc->type != TokenUndefined);
     
     if (errorCode != ErrorNone) return errorCode;
-    assert(interpreter->numLabelStackItems == 0);
+    
+    if (interpreter->numLabelStackItems > 0)
+    {
+        struct LabelStackItem *item = &interpreter->labelStackItems[0];
+        switch (item->type)
+        {
+            case LabelTypeIF:
+            case LabelTypeELSEIF:
+                errorCode = ErrorIfWithoutEndIf;
+                break;
+                
+            case LabelTypeFOR:
+                errorCode =  ErrorForWithoutNext;
+                
+            case LabelTypeDO:
+                errorCode =  ErrorDoWithoutLoop;
+                
+            case LabelTypeREPEAT:
+                errorCode =  ErrorRepeatWithoutUntil;
+                
+            case LabelTypeWHILE:
+                errorCode =  ErrorWhileWithoutWend;
+                
+            case LabelTypeFORVar:
+            case LabelTypeFORLimit:
+            case LabelTypeELSE:
+            case LabelTypeGOSUB:
+            case LabelTypeONGOSUB:
+                // should not happen in compile time
+                break;
+        }
+        if (errorCode != ErrorNone)
+        {
+            interpreter->pc = item->token;
+            return errorCode;
+        }
+    }
     
     // global null string
     interpreter->nullString = rcstring_new(NULL, 0);
@@ -83,6 +136,8 @@ void itp_resetProgram(struct Core *core)
     interpreter->numArrayVariables = 0;
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
+    
+    txtlib_init(core);
 }
 
 void itp_runProgram(struct Core *core)
@@ -114,6 +169,7 @@ void itp_runProgram(struct Core *core)
             {
                 interpreter->exitErrorCode = errorCode;
                 interpreter->state = StateEnd;
+                core->delegate->interpreterDidFail(core->delegate->context);
             }
             break;
         }
@@ -193,11 +249,13 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 {
                     interpreter->exitErrorCode = ErrorTooManyCommandCycles;
                     interpreter->state = StateEnd;
+                    core->delegate->interpreterDidFail(core->delegate->context);
                 }
                 else if (errorCode != ErrorNone)
                 {
                     interpreter->exitErrorCode = errorCode;
                     interpreter->state = StateEnd;
+                    core->delegate->interpreterDidFail(core->delegate->context);
                 }
                 else
                 {
@@ -212,6 +270,23 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
             break;
     }
 
+}
+
+void itp_didFinishVBL(struct Core *core)
+{
+    // remember this frame's IO
+    for (int i = 0; i < NUM_GAMEPADS; i++)
+    {
+        core->interpreter.lastFrameGamepads[i] = core->machine.ioRegisters.gamepads[i];
+    }
+    core->interpreter.lastFrameIOStatus = core->machine.ioRegisters.status;
+    
+    // timer
+    core->interpreter.timer++;
+    if (core->interpreter.timer >= TIMER_WRAP_VALUE)
+    {
+        core->interpreter.timer = 0;
+    }
 }
 
 void itp_freeProgram(struct Core *core)
@@ -242,13 +317,41 @@ void itp_freeProgram(struct Core *core)
     assert(rcstring_count == 0);
 }
 
+enum ErrorCode itp_getExitErrorCode(struct Core *core)
+{
+    return core->interpreter.exitErrorCode;
+}
+
+int itp_getPcPositionInSourceCode(struct Core *core)
+{
+    return core->interpreter.pc->sourcePosition;
+}
+
+const char *itp_uppercaseString(const char *source)
+{
+    size_t len = strlen(source);
+    char *buffer = malloc(len);
+    if (buffer)
+    {
+        const char *sourceChar = source;
+        char *destChar = buffer;
+        char finalChar = 0;
+        while (*sourceChar)
+        {
+            finalChar = *sourceChar++;
+            if (finalChar >= 'a' && finalChar <= 'z')
+            {
+                finalChar -= 32;
+            }
+            *destChar++ = finalChar;
+        }
+        *destChar = 0;
+    }
+    return buffer;
+}
+
 enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
 {
-    const char *charSetDigits = "0123456789";
-    const char *charSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    const char *charSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
-    const char *charSetHex = "0123456789ABCDEF";
-    
     struct Interpreter *interpreter = &core->interpreter;
     const char *character = sourceCode;
     
@@ -256,7 +359,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
     
     while (*character && *character != '#')
     {
-        if (interpreter->numTokens >= MAX_TOKENS)
+        if (interpreter->numTokens >= MAX_TOKENS - 1)
         {
             return ErrorTooManyTokens;
         }
@@ -304,13 +407,13 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         }
         
         // number
-        if (strchr(charSetDigits, *character))
+        if (strchr(CharSetDigits, *character))
         {
             float number = 0;
             int afterDot = 0;
             while (*character)
             {
-                if (strchr(charSetDigits, *character))
+                if (strchr(CharSetDigits, *character))
                 {
                     int digit = (int)*character - (int)'0';
                     if (afterDot == 0)
@@ -348,11 +451,36 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             int number = 0;
             while (*character)
             {
-                char *spos = strchr(charSetHex, *character);
+                char *spos = strchr(CharSetHex, *character);
                 if (spos)
                 {
-                    int digit = (int)(spos - charSetHex);
+                    int digit = (int)(spos - CharSetHex);
                     number <<= 4;
+                    number += digit;
+                    character++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            token->type = TokenFloat;
+            token->floatValue = number;
+            interpreter->numTokens++;
+            continue;
+        }
+        
+        // bin number
+        if (*character == '%')
+        {
+            character++;
+            int number = 0;
+            while (*character)
+            {
+                if (*character == '0' || *character == '1')
+                {
+                    int digit = *character - '0';
+                    number <<= 1;
                     number += digit;
                     character++;
                 }
@@ -375,8 +503,8 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             if (keyword)
             {
                 size_t keywordLen = strlen(keyword);
-                int keywordIsAlphaNum = strchr(charSetAlphaNum, keyword[0]) != NULL;
-                for (int pos = 0; pos <= keywordLen && character[pos]; pos++)
+                int keywordIsAlphaNum = strchr(CharSetAlphaNum, keyword[0]) != NULL;
+                for (int pos = 0; pos <= keywordLen; pos++)
                 {
                     char textCharacter = character[pos];
                     
@@ -389,7 +517,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                             break;
                         }
                     }
-                    else if (keywordIsAlphaNum && strchr(charSetAlphaNum, textCharacter))
+                    else if (keywordIsAlphaNum && textCharacter && strchr(CharSetAlphaNum, textCharacter))
                     {
                         // matching, but word is longer, so seems to be an identifier
                         break;
@@ -410,7 +538,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         }
         if (foundKeywordToken != TokenUndefined)
         {
-            if (foundKeywordToken == TokenREM)
+            if (foundKeywordToken == TokenREM || foundKeywordToken == TokenApostrophe)
             {
                 // REM comment, skip until end of line
                 while (*character)
@@ -433,13 +561,13 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         }
         
         // Symbol
-        if (strchr(charSetLetters, *character))
+        if (strchr(CharSetLetters, *character))
         {
             const char *firstCharacter = character;
             char isString = 0;
             while (*character)
             {
-                if (strchr(charSetAlphaNum, *character))
+                if (strchr(CharSetAlphaNum, *character))
                 {
                     character++;
                 }
@@ -480,7 +608,6 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
                 // add new symbol
                 strcpy(interpreter->symbols[interpreter->numSymbols].name, symbolName);
                 symbolIndex = interpreter->numSymbols++;
-                printf("symbol %d: %s\n", symbolIndex, symbolName);
             }
             if (isString)
             {
@@ -506,11 +633,18 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         return ErrorUnexpectedCharacter;
     }
     
+    // add EOL to the end
+    struct Token *token = &interpreter->tokens[interpreter->numTokens];
+    token->sourcePosition = (int)(character - sourceCode);
+    token->type = TokenEol;
+    interpreter->numTokens++;
+
+    
     // ROM DATA
     
-    struct RomDataEntry *romDataEntries = (struct RomDataEntry *)core->machine.cartridgeRom;
+    struct RomDataEntry *romDataEntries = interpreter->romDataEntries;
     
-    uint8_t *currentRomByte = (uint8_t *)&romDataEntries[MAX_ROM_DATA_ENTRIES]; // after entries
+    uint8_t *currentRomByte = core->machine.cartridgeRom;
     uint8_t *endRomByte = &core->machine.cartridgeRom[0x8000];
     
     while (*character)
@@ -523,7 +657,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             int entryIndex = 0;
             while (*character)
             {
-                if (strchr(charSetDigits, *character))
+                if (strchr(CharSetDigits, *character))
                 {
                     int digit = (int)*character - (int)'0';
                     entryIndex *= 10;
@@ -538,7 +672,7 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             if (*character != ':') return ErrorUnexpectedCharacter;
             
             if (entryIndex >= MAX_ROM_DATA_ENTRIES) return ErrorIndexOutOfBounds;
-            if (BigEndianUInt16_get(&romDataEntries[entryIndex].length) > 0) return ErrorIndexAlreadyDefined;
+            if (romDataEntries[entryIndex].length > 0) return ErrorIndexAlreadyDefined;
             
             // skip until end of line
             do
@@ -553,10 +687,10 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             int value = 0;
             while (*character && *character != '#')
             {
-                char *spos = strchr(charSetHex, *character);
+                char *spos = strchr(CharSetHex, *character);
                 if (spos)
                 {
-                    int digit = (int)(spos - charSetHex);
+                    int digit = (int)(spos - CharSetHex);
                     if (shift)
                     {
                         value = digit << 4;
@@ -578,12 +712,9 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
             }
             if (!shift) return ErrorSyntax; // incomplete hex value
             
-            int start = (int)(startByte - core->machine.cartridgeRom);
-            int length = (int)(currentRomByte - startByte);
             struct RomDataEntry *entry = &romDataEntries[entryIndex];
-            BigEndianUInt16_set(&entry->start, start);
-            BigEndianUInt16_set(&entry->length, length);
-            printf("index %d: start=%d length=%d\n", entryIndex, start, length);
+            entry->start = (int)(startByte - core->machine.cartridgeRom);
+            entry->length = (int)(currentRomByte - startByte);
         }
         else if (*character == ' ' || *character == '\t' || *character == '\n')
         {
@@ -593,6 +724,16 @@ enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
         {
             return ErrorUnexpectedCharacter;
         }
+    }
+    
+    // add default characters if #0 is unused
+    struct RomDataEntry *entry0 = &interpreter->romDataEntries[0];
+    if (entry0->length == 0 && endRomByte - currentRomByte >= 4096)
+    {
+        memcpy(currentRomByte, DefaultCharacters, 4096);
+        entry0->start = (int)(currentRomByte - core->machine.cartridgeRom);
+        entry0->length = 4096;
+        interpreter->romIncludesDefaultCharacters = true;
     }
     
     return ErrorNone;
@@ -765,6 +906,28 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int 
     return value;
 }
 
+struct TypedValue itp_evaluateOptionalExpression(struct Core *core, enum TypeClass typeClass)
+{
+    if (core->interpreter.pc->type == TokenComma || core->interpreter.pc->type == TokenBracketClose || itp_isEndOfCommand(&core->interpreter))
+    {
+        struct TypedValue value;
+        value.type = ValueTypeNull;
+        return value;
+    }
+    return itp_evaluateExpression(core, typeClass);
+}
+
+struct TypedValue itp_evaluateOptionalNumericExpression(struct Core *core, int min, int max)
+{
+    if (core->interpreter.pc->type == TokenComma || core->interpreter.pc->type == TokenBracketClose || itp_isEndOfCommand(&core->interpreter))
+    {
+        struct TypedValue value;
+        value.type = ValueTypeNull;
+        return value;
+    }
+    return itp_evaluateNumericExpression(core, min, max);
+}
+
 bool itp_isTokenLevel(enum TokenType token, int level)
 {
     switch (level)
@@ -877,27 +1040,27 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     break;
                 }
                 case TokenEq: {
-                    newValue.v.floatValue = (value.v.floatValue == rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue == rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenUneq: {
-                    newValue.v.floatValue = (value.v.floatValue != rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue != rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenGr: {
-                    newValue.v.floatValue = (value.v.floatValue > rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue > rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenLe: {
-                    newValue.v.floatValue = (value.v.floatValue < rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue < rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenGrEq: {
-                    newValue.v.floatValue = (value.v.floatValue >= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue >= rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenLeEq: {
-                    newValue.v.floatValue = (value.v.floatValue <= rightValue.v.floatValue) ? -1.0f : 0.0f;
+                    newValue.v.floatValue = (value.v.floatValue <= rightValue.v.floatValue) ? BAS_TRUE : BAS_FALSE;
                     break;
                 }
                 case TokenPlus: {
@@ -938,7 +1101,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) == 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) == 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -946,7 +1109,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) != 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) != 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -954,7 +1117,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) > 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) > 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -962,7 +1125,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) < 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) < 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -970,7 +1133,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) >= 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) >= 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -978,7 +1141,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.type = ValueTypeFloat;
                     if (interpreter->pass == PassRun)
                     {
-                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) <= 0) ? -1.0f : 0.0f;
+                        newValue.v.floatValue = (strcmp(value.v.stringValue->chars, rightValue.v.stringValue->chars) <= 0) ? BAS_TRUE : BAS_FALSE;
                     }
                     break;
                 }
@@ -1016,6 +1179,11 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                 rcstring_release(value.v.stringValue);
                 rcstring_release(rightValue.v.stringValue);
             }
+        }
+        else
+        {
+            assert(0);
+            newValue.v.floatValue = 0;
         }
         
         value = newValue;
@@ -1135,9 +1303,9 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenINSTR:
             return fnc_INSTR(core);
             
-        case TokenLEFT:
-        case TokenRIGHT:
-            return fnc_LEFT_RIGHT(core);
+        case TokenLEFTStr:
+        case TokenRIGHTStr:
+            return fnc_LEFTStr_RIGHTStr(core);
             
         case TokenLEN:
             return fnc_LEN(core);
@@ -1156,7 +1324,6 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenPI:
         case TokenRND:
-        case TokenTIMER:
             return fnc_math0(core);
             
         case TokenABS:
@@ -1181,7 +1348,54 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenSTART:
         case TokenLENGTH:
             return fnc_START_LENGTH(core);
+            
+        case TokenCOLOR:
+            return fnc_COLOR(core);
+            
+        case TokenTIMER:
+        case TokenRASTER:
+        case TokenDISPLAYA:
+            return fnc_screen0(core);
+            
+        case TokenDISPLAYX:
+        case TokenDISPLAYY:
+            return fnc_DISPLAY_X_Y(core);
+            
+        case TokenCELLA:
+        case TokenCELLC:
+            return fnc_CELL(core);
+            
+        case TokenUP:
+        case TokenDOWN:
+        case TokenLEFT:
+        case TokenRIGHT:
+            return fnc_UP_DOWN_LEFT_RIGHT(core);
+            
+        case TokenBUTTON:
+            return fnc_BUTTON(core);
+            
+        case TokenSPRITEX:
+        case TokenSPRITEY:
+        case TokenSPRITEC:
+        case TokenSPRITEA:
+            return fnc_SPRITE(core);
+            
+        case TokenSPRITE:
+            return fnc_SPRITE_HIT(core);
+            
+        case TokenHIT:
+            return fnc_HIT(core);
+            
+        case TokenTOUCH:
+            return fnc_TOUCH(core);
 
+        case TokenTAP:
+            return fnc_TAP(core);
+            
+        case TokenTOUCHX:
+        case TokenTOUCHY:
+            return fnc_TOUCH_X_Y(core);
+            
         default:
             break;
     }
@@ -1203,6 +1417,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             break;
             
         case TokenREM:
+        case TokenApostrophe:
             ++interpreter->pc;
             break;
             
@@ -1220,7 +1435,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenEND:
             if (itp_getNextTokenType(interpreter) == TokenIF)
             {
-                return cmd_ENDIF(core);
+                return cmd_END_IF(core);
             }
             return cmd_END(core);
             
@@ -1242,7 +1457,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_INPUT(core);
         
         case TokenIF:
-            return cmd_IF(core);
+            return cmd_IF(core, false);
         
         case TokenELSE:
             return cmd_ELSE(core);
@@ -1316,12 +1531,71 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenRANDOMIZE:
             return cmd_RANDOMIZE(core);
             
-        case TokenLEFT:
-        case TokenRIGHT:
+        case TokenLEFTStr:
+        case TokenRIGHTStr:
             return cmd_LEFT_RIGHT(core);
             
         case TokenMID:
             return cmd_MID(core);
+            
+        case TokenWINDOW:
+            return cmd_WINDOW(core);
+            
+        case TokenFONT:
+            return cmd_FONT(core);
+            
+        case TokenLOCATE:
+            return cmd_LOCATE(core);
+            
+        case TokenCLW:
+            return cmd_CLW(core);
+            
+        case TokenBG:
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenSOURCE:
+                    return cmd_BG_SOURCE(core);
+                    
+                case TokenCOPY:
+                    return cmd_BG_COPY(core);
+                    
+                case TokenSCROLL:
+                    return cmd_BG_SCROLL(core);
+                    
+                case TokenFILL:
+                    return cmd_BG_FILL(core);
+                    
+                default:
+                    return cmd_BG(core);
+            }
+            break;
+            
+        case TokenCHAR:
+            return cmd_CHAR(core);
+            
+        case TokenCELL:
+            return cmd_CELL(core);
+            
+        case TokenPALETTE:
+            return cmd_PALETTE(core);
+            
+        case TokenDISPLAY:
+            return cmd_DISPLAY(core);
+
+        case TokenDISPLAYA:
+            return cmd_DISPLAY_A(core);
+            
+        case TokenSPRITEA:
+            return cmd_SPRITE_A(core);
+            
+        case TokenSPRITE:
+            return cmd_SPRITE(core);
+            
+        case TokenSAVE:
+            return cmd_SAVE(core);
+            
+        case TokenLOAD:
+            return cmd_LOAD(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

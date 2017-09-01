@@ -19,34 +19,68 @@
 
 #include "text_lib.h"
 #include "core.h"
+#include <string.h>
 
-void txtlib_scrollIfNeeded(struct Core *core)
+void txtlib_init(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = &core->machine.videoRam.planeB;
+    lib->fontCharOffset = 192;
     
-    if (lib->cursorY >= lib->areaHeight)
+    txtlib_clearScreen(core);
+    
+    core->machine.colorRegisters.colors[1] = (3 << 4) | (3 << 2) | 3;
+    core->machine.colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
+    core->machine.colorRegisters.colors[3] = (1 << 4) | (1 << 2) | 1;
+    
+    if (core->interpreter.romIncludesDefaultCharacters)
+    {
+        struct RomDataEntry *entry0 = core->interpreter.romDataEntries;
+        memcpy(core->machine.videoRam.characters, &core->machine.cartridgeRom[entry0->start], entry0->length);
+    }
+}
+
+struct Plane *txtlib_getCurrentBackground(struct Core *core)
+{
+    return (core->interpreter.textLib.bg == 0) ? &core->machine.videoRam.planeA : &core->machine.videoRam.planeB;
+}
+
+struct Plane *txtlib_getWindowBackground(struct Core *core)
+{
+    return (core->interpreter.textLib.windowBg == 0) ? &core->machine.videoRam.planeA : &core->machine.videoRam.planeB;
+}
+
+void txtlib_scroll(struct Plane *plane, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY)
+{
+    for (int y = fromY; y <= toY; y++)
+    {
+        for (int x = fromX; x <= toX; x++)
+        {
+            plane->cells[y][x] = plane->cells[(y - deltaY) & 0x1F][(x - deltaX) & 0x1F];
+        }
+    }
+}
+
+void txtlib_scrollWindowIfNeeded(struct Core *core)
+{
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct Plane *plane = txtlib_getWindowBackground(core);
+    
+    if (lib->cursorY >= lib->windowHeight)
     {
         // scroll
-        for (int y = 0; y < lib->areaHeight - 1; y++)
+        txtlib_scroll(plane, lib->windowX, lib->windowY, lib->windowX + lib->windowWidth - 1, lib->windowY + lib->windowHeight - 1, 0, -1);
+        
+        // clear bottom line
+        int py = lib->windowY + lib->windowHeight - 1;
+        for (int x = 0; x < lib->windowWidth; x++)
         {
-            int py = y + lib->areaY;
-            for (int x = 0; x < lib->areaWidth; x++)
-            {
-                int px = x + lib->areaX;
-                plane->cells[py][px] = plane->cells[py+1][px];
-            }
-        }
-        int py = lib->areaY + lib->areaHeight - 1;
-        for (int x = 0; x < lib->areaWidth; x++)
-        {
-            int px = x + lib->areaX;
+            int px = x + lib->windowX;
             struct Cell *cell = &plane->cells[py][px];
-            cell->character = lib->characterOffset; // space
-            cell->attr.value = lib->charAttr.value;
+            cell->character = lib->fontCharOffset; // space
+            cell->attr = lib->fontCharAttr;
         }
         
-        lib->cursorY = lib->areaHeight - 1;
+        lib->cursorY = lib->windowHeight - 1;
         core->interpreter.exitEvaluation = true;
     }
 }
@@ -54,17 +88,17 @@ void txtlib_scrollIfNeeded(struct Core *core)
 void txtlib_printText(struct Core *core, const char *text)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = &core->machine.videoRam.planeB;
+    struct Plane *plane = txtlib_getWindowBackground(core);
     const char *letter = text;
     while (*letter)
     {
-        txtlib_scrollIfNeeded(core);
+        txtlib_scrollWindowIfNeeded(core);
         
         if (*letter >= 32)
         {
-            struct Cell *cell = &plane->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
-            cell->attr.value = lib->charAttr.value;
-            cell->character = lib->characterOffset + (*letter - 32);
+            struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
+            cell->attr.value = lib->fontCharAttr.value;
+            cell->character = lib->fontCharOffset + (*letter - 32);
         
             lib->cursorX++;
         }
@@ -74,7 +108,7 @@ void txtlib_printText(struct Core *core, const char *text)
             lib->cursorY++;
         }
         
-        if (lib->cursorX >= lib->areaWidth)
+        if (lib->cursorX >= lib->windowWidth)
         {
             lib->cursorX = 0;
             lib->cursorY++;
@@ -87,12 +121,12 @@ void txtlib_printText(struct Core *core, const char *text)
 bool txtlib_deleteBackward(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = &core->machine.videoRam.planeB;
+    struct Plane *plane = txtlib_getWindowBackground(core);
     
     // clear cursor
-    struct Cell *cell = &plane->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
-    cell->attr.value = lib->charAttr.value;
-    cell->character = lib->characterOffset;
+    struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
+    cell->attr.value = lib->fontCharAttr.value;
+    cell->character = lib->fontCharOffset;
     
     // move back cursor
     if (lib->cursorX > 0)
@@ -101,7 +135,7 @@ bool txtlib_deleteBackward(struct Core *core)
     }
     else if (lib->cursorY > 0)
     {
-        lib->cursorX = lib->areaX + lib->areaWidth - 1;
+        lib->cursorX = lib->windowX + lib->windowWidth - 1;
         lib->cursorY--;
     }
     else
@@ -110,9 +144,9 @@ bool txtlib_deleteBackward(struct Core *core)
     }
     
     // clear cell
-    cell = &plane->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
-    cell->attr.value = lib->charAttr.value;
-    cell->character = lib->characterOffset;
+    cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
+    cell->attr.value = lib->fontCharAttr.value;
+    cell->character = lib->fontCharOffset;
     
     return true;
 }
@@ -120,15 +154,15 @@ bool txtlib_deleteBackward(struct Core *core)
 void txtlib_writeText(struct Core *core, const char *text, int x, int y)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = &core->machine.videoRam.planeB;
+    struct Plane *plane = txtlib_getCurrentBackground(core);
     const char *letter = text;
     while (*letter)
     {
         if (*letter >= 32)
         {
             struct Cell *cell = &plane->cells[y][x];
-            cell->attr.value = lib->charAttr.value;
-            cell->character = lib->characterOffset + (*letter - 32);
+            cell->attr.value = lib->fontCharAttr.value;
+            cell->character = lib->fontCharOffset + (*letter - 32);
             
             x++;
         }
@@ -139,7 +173,7 @@ void txtlib_writeText(struct Core *core, const char *text, int x, int y)
 void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = &core->machine.videoRam.planeB;
+    struct Plane *plane = txtlib_getCurrentBackground(core);
     
     x += digits;
     int div = 1;
@@ -147,8 +181,8 @@ void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
     {
         x--;
         struct Cell *cell = &plane->cells[y][x];
-        cell->attr.value = lib->charAttr.value;
-        cell->character = lib->characterOffset + ((number / div) % 10 + 16);
+        cell->attr.value = lib->fontCharAttr.value;
+        cell->character = lib->fontCharOffset + ((number / div) % 10 + 16);
         div *= 10;
     }
 }
@@ -161,13 +195,13 @@ void txtlib_inputBegin(struct Core *core)
     lib->blink = 0;
     core->machine.ioRegisters.key = 0;
     
-    txtlib_scrollIfNeeded(core);
+    txtlib_scrollWindowIfNeeded(core);
 }
 
 bool txtlib_inputUpdate(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = &core->machine.videoRam.planeB;
+    struct Plane *plane = txtlib_getWindowBackground(core);
     
     char key = core->machine.ioRegisters.key;
     bool done = false;
@@ -186,9 +220,9 @@ bool txtlib_inputUpdate(struct Core *core)
         else if (key == '\n')
         {
             // clear cursor
-            struct Cell *cell = &plane->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
-            cell->attr.value = lib->charAttr.value;
-            cell->character = lib->characterOffset;
+            struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
+            cell->attr.value = lib->fontCharAttr.value;
+            cell->character = lib->fontCharOffset;
             
             txtlib_printText(core, "\n");
             done = true;
@@ -202,7 +236,7 @@ bool txtlib_inputUpdate(struct Core *core)
                 lib->inputBuffer[lib->inputLength++] = key;
                 lib->inputBuffer[lib->inputLength] = 0;
                 
-                txtlib_scrollIfNeeded(core);
+                txtlib_scrollWindowIfNeeded(core);
             }
         }
         lib->blink = 0;
@@ -210,9 +244,9 @@ bool txtlib_inputUpdate(struct Core *core)
     }
     if (!done)
     {
-        struct Cell *cell = &plane->cells[lib->cursorY + lib->areaY][lib->cursorX + lib->areaX];
-        cell->attr.value = lib->charAttr.value;
-        cell->character = lib->characterOffset + (lib->blink++ < 15 ? 63 : 0);
+        struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
+        cell->attr.value = lib->fontCharAttr.value;
+        cell->character = lib->fontCharOffset + (lib->blink++ < 15 ? 63 : 0);
         
         if (lib->blink == 30)
         {
@@ -222,22 +256,114 @@ bool txtlib_inputUpdate(struct Core *core)
     return done;
 }
 
-void txtlib_clear(struct Core *core)
+void txtlib_clearWindow(struct Core *core)
 {
     struct TextLib *lib = &core->interpreter.textLib;
-    struct Plane *plane = &core->machine.videoRam.planeB;
+    struct Plane *plane = txtlib_getWindowBackground(core);
     
     lib->cursorX = 0;
     lib->cursorY = 0;
-    for (int y = 0; y < lib->areaHeight; y++)
+    for (int y = 0; y < lib->windowHeight; y++)
     {
-        int py = y + lib->areaY;
-        for (int x = 0; x < lib->areaWidth; x++)
+        int py = y + lib->windowY;
+        for (int x = 0; x < lib->windowWidth; x++)
         {
-            int px = x + lib->areaX;
+            int px = x + lib->windowX;
             struct Cell *cell = &plane->cells[py][px];
-            cell->character = lib->characterOffset;
-            cell->attr = lib->charAttr;
+            cell->character = lib->fontCharOffset;
+            cell->attr = lib->fontCharAttr;
+        }
+    }
+}
+
+void txtlib_clearScreen(struct Core *core)
+{
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct VideoRegisters *reg = &core->machine.videoRegisters;
+    
+    memset(&core->machine.videoRam.planeA, 0, sizeof(struct Plane));
+    memset(&core->machine.videoRam.planeB, 0, sizeof(struct Plane));
+    
+    reg->scrollAX = 0;
+    reg->scrollAY = 0;
+    reg->scrollBX = 0;
+    reg->scrollBY = 0;
+    reg->attr.spritesEnabled = 1;
+    reg->attr.planeAEnabled = 1;
+    reg->attr.planeBEnabled = 1;
+    
+    lib->windowX = 0;
+    lib->windowY = 0;
+    lib->windowWidth = 20;
+    lib->windowHeight = 16;
+    lib->cursorX = 0;
+    lib->cursorY = 0;
+    lib->bg = 0;
+}
+
+void txtlib_clearBackground(struct Core *core, int bg)
+{
+    if (bg == 0)
+    {
+        memset(&core->machine.videoRam.planeA, 0, sizeof(struct Plane));
+    }
+    else if (bg == 1)
+    {
+        memset(&core->machine.videoRam.planeB, 0, sizeof(struct Plane));
+    }
+}
+
+struct Cell *txtlib_getCell(struct Core *core, int x, int y)
+{
+    struct Plane *plane = txtlib_getCurrentBackground(core);
+    return &plane->cells[y][x];
+}
+
+void txtlib_setCell(struct Core *core, int x, int y)
+{
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct Plane *plane = txtlib_getCurrentBackground(core);
+    struct Cell *cell = &plane->cells[y][x];
+    cell->character = lib->cellChar;
+    cell->attr = lib->cellCharAttr;
+}
+
+void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY)
+{
+    struct TextLib *lib = &core->interpreter.textLib;
+    struct Plane *plane = txtlib_getCurrentBackground(core);
+    for (int y = fromY; y <= toY; y++)
+    {
+        for (int x = fromX; x <= toX; x++)
+        {
+            struct Cell *cell = &plane->cells[y][x];
+            cell->character = lib->cellChar;
+            cell->attr = lib->cellCharAttr;
+        }
+    }
+}
+
+void txtlib_scrollBackground(struct Core *core, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY)
+{
+    struct Plane *plane = txtlib_getCurrentBackground(core);
+    txtlib_scroll(plane, fromX, fromY, toX, toY, deltaX, deltaY);
+}
+
+void txtlib_copyBackground(struct Core *core, int srcX, int srcY, int width, int height, int dstX, int dstY)
+{
+    struct Plane *plane = txtlib_getCurrentBackground(core);
+    struct TextLib *lib = &core->interpreter.textLib;
+    
+    for (int y = 0; y < height; y++)
+    {
+        int py = dstY + y;
+        int addr = lib->sourceAddress + ((srcY + y) * lib->sourceWidth + srcX) * 2;
+        for (int x = 0; x < width; x++)
+        {
+            int px = dstX + x;
+            struct Cell *cell = &plane->cells[py & 0x1F][px & 0x1F];
+            cell->character = machine_peek(&core->machine, addr++);
+            cell->attr.value = machine_peek(&core->machine, addr++);
         }
     }
 }

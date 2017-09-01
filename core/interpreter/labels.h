@@ -28,6 +28,7 @@ struct Token;
 enum LabelType {
     LabelTypeIF,
     LabelTypeELSE,
+    LabelTypeELSEIF,
     LabelTypeFOR,
     LabelTypeFORVar,
     LabelTypeFORLimit,

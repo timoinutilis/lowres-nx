@@ -66,5 +66,15 @@ const char *ErrorStrings[] = {
     "Out Of Data",
     "Illegal Memory Access",
     "Too Many Command Cycles",
-    "Not Allowed In Interrupt"
+    "Not Allowed In Interrupt",
+    "IF Without END IF",
+    "FOR Without NEXT",
+    "DO Without LOOP",
+    "REPEAT Without UNTIL",
+    "WHILE Without WEND",
 };
+
+const char *err_getString(enum ErrorCode errorCode)
+{
+    return ErrorStrings[errorCode];
+}

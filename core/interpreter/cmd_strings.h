@@ -30,7 +30,7 @@ struct TypedValue fnc_BIN_HEX(struct Core *core);
 struct TypedValue fnc_CHR(struct Core *core);
 struct TypedValue fnc_INKEY(struct Core *core);
 struct TypedValue fnc_INSTR(struct Core *core);
-struct TypedValue fnc_LEFT_RIGHT(struct Core *core);
+struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core);
 struct TypedValue fnc_LEN(struct Core *core);
 struct TypedValue fnc_MID(struct Core *core);
 struct TypedValue fnc_STR(struct Core *core);

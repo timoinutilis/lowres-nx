@@ -126,7 +126,7 @@ struct TypedValue fnc_CHR(struct Core *core)
     ++interpreter->pc;
     
     // expression
-    struct TypedValue numericValue = itp_evaluateExpression(core, TypeClassNumeric);
+    struct TypedValue numericValue = itp_evaluateNumericExpression(core, 0, 255);
     if (numericValue.type == ValueTypeError) return numericValue;
     
     // bracket close
@@ -138,8 +138,6 @@ struct TypedValue fnc_CHR(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        if (numericValue.v.floatValue < 0 || numericValue.v.floatValue > 255) return val_makeError(ErrorInvalidParameter);
-        
         char ch = numericValue.v.floatValue;
         struct RCString *rcstring = rcstring_new(&ch, 1);
         if (!rcstring) return val_makeError(ErrorOutOfMemory);
@@ -249,7 +247,7 @@ struct TypedValue fnc_INSTR(struct Core *core)
     return resultValue;
 }
 
-struct TypedValue fnc_LEFT_RIGHT(struct Core *core)
+struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
@@ -288,7 +286,7 @@ struct TypedValue fnc_LEFT_RIGHT(struct Core *core)
         
         if (number < len)
         {
-            size_t start = (type == TokenLEFT) ? 0 : len - number;
+            size_t start = (type == TokenLEFTStr) ? 0 : len - number;
             
             struct RCString *rcstring = rcstring_new(&stringValue.v.stringValue->chars[start], number);
             if (!rcstring) return val_makeError(ErrorOutOfMemory);
@@ -540,14 +538,14 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
             number = resultLen;
         }
         
-        if (type == TokenLEFT)
+        if (type == TokenLEFTStr)
         {
             for (size_t i = 0; i < number; i++)
             {
                 resultString[i] = replaceString[i];
             }
         }
-        else if (type == TokenRIGHT)
+        else if (type == TokenRIGHTStr)
         {
             for (size_t i = 0; i < number; i++)
             {
