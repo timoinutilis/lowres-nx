@@ -146,3 +146,14 @@ void core_gamepadReleased(struct Core *core, int player, enum GamepadButton butt
             break;
     }
 }
+
+void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB)
+{
+    union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[player];
+    gamepad->up = up;
+    gamepad->down = down;
+    gamepad->left = left;
+    gamepad->right = right;
+    gamepad->buttonA = buttonA;
+    gamepad->buttonB = buttonB;
+}

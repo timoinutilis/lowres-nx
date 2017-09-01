@@ -21,6 +21,7 @@
 #define core_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "machine.h"
 #include "interpreter.h"
 #include "disk_drive.h"
@@ -57,5 +58,6 @@ void core_touchDragged(struct Core *core, int x, int y);
 void core_touchReleased(struct Core *core);
 void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button);
 void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button);
+void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
 
 #endif /* core_h */

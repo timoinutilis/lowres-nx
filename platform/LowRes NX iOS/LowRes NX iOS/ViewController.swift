@@ -13,6 +13,11 @@ class ViewController: UIViewController {
     @IBOutlet weak var nxView: LowResNXView!
     @IBOutlet weak var widthConstraint: NSLayoutConstraint!
     
+    @IBOutlet var onePlayerView: UIView!
+    @IBOutlet weak var player1Gamepad: Gamepad!
+    @IBOutlet weak var player1ButtonA: UIButton!
+    @IBOutlet weak var player1ButtonB: UIButton!
+    
     var core: UnsafeMutablePointer<Core>? = nil
     var coreDelegate = CoreDelegate()
     var displayLink: CADisplayLink?
@@ -41,6 +46,8 @@ class ViewController: UIViewController {
         }
         displayLink.add(to: .current, forMode: .defaultRunLoopMode)
         self.displayLink = displayLink
+        
+        addOnePlayerView()
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -49,11 +56,26 @@ class ViewController: UIViewController {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        let width = view.bounds.size.width
-        widthConstraint.constant = floor(width / CGFloat(SCREEN_WIDTH)) * CGFloat(SCREEN_WIDTH)
+        let screenWidth = view.bounds.size.width
+        let screenHeight = view.bounds.size.height
+        let maxWidthFactor = floor(screenWidth / CGFloat(SCREEN_WIDTH))
+        let maxHeightFactor = floor(screenHeight / CGFloat(SCREEN_HEIGHT))
+        widthConstraint.constant = (maxWidthFactor < maxHeightFactor) ? maxWidthFactor * CGFloat(SCREEN_WIDTH) : maxHeightFactor * CGFloat(SCREEN_WIDTH)
+    }
+    
+    private func addOnePlayerView() {
+        onePlayerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(onePlayerView)
+        let bottom = NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: onePlayerView, attribute: .bottom, multiplier: 1, constant: 44)
+        let left = NSLayoutConstraint(item: view, attribute: .left, relatedBy: .equal, toItem: onePlayerView, attribute: .left, multiplier: 1, constant: 0)
+        let right = NSLayoutConstraint(item: view, attribute: .right, relatedBy: .equal, toItem: onePlayerView, attribute: .right, multiplier: 1, constant: 0)
+        bottom.isActive = true
+        left.isActive = true
+        right.isActive = true
     }
     
     func update(displaylink: CADisplayLink) {
+        core_setGamepad(core, 0, player1Gamepad.isDirUp, player1Gamepad.isDirDown, player1Gamepad.isDirLeft, player1Gamepad.isDirRight, player1ButtonA.isHighlighted, player1ButtonB.isHighlighted)
         core_update(core)
         nxView.render()
     }
