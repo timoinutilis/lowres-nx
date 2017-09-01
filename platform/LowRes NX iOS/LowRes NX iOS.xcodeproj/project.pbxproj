@@ -42,15 +42,14 @@
 		9205E9481F599FE000927A3F /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 9205E9291F599FE000927A3F /* machine.c */; };
 		9205E9491F599FE000927A3F /* video_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 9205E92B1F599FE000927A3F /* video_chip.c */; };
 		9205E94C1F59A96600927A3F /* program.nx in Resources */ = {isa = PBXBuildFile; fileRef = 9205E94B1F59A96600927A3F /* program.nx */; };
+		9205E94E1F59BEE900927A3F /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205E94D1F59BEE900927A3F /* LowResNXView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9205E8D61F599F7300927A3F /* LowRes NX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9205E8D91F599F7300927A3F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9205E8DB1F599F7300927A3F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		9205E8DE1F599F7300927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9205E8E01F599F7300927A3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9205E8E31F599F7300927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9205E8E51F599F7300927A3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9205E8ED1F599FE000927A3F /* disk_drive.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = disk_drive.c; sourceTree = "<group>"; };
 		9205E8EE1F599FE000927A3F /* disk_drive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disk_drive.h; sourceTree = "<group>"; };
@@ -115,6 +114,9 @@
 		9205E92C1F599FE000927A3F /* video_chip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = video_chip.h; sourceTree = "<group>"; };
 		9205E94A1F59A3A400927A3F /* LowResNX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LowResNX-Bridging-Header.h"; sourceTree = "<group>"; };
 		9205E94B1F59A96600927A3F /* program.nx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = program.nx; sourceTree = "<group>"; };
+		9205E94D1F59BEE900927A3F /* LowResNXView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXView.swift; sourceTree = "<group>"; };
+		9205E9511F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9205E9521F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +154,7 @@
 				9205E94A1F59A3A400927A3F /* LowResNX-Bridging-Header.h */,
 				9205E8D91F599F7300927A3F /* AppDelegate.swift */,
 				9205E8DB1F599F7300927A3F /* ViewController.swift */,
+				9205E94D1F59BEE900927A3F /* LowResNXView.swift */,
 				9205E8DD1F599F7300927A3F /* Main.storyboard */,
 				9205E8E01F599F7300927A3F /* Assets.xcassets */,
 				9205E8E21F599F7300927A3F /* LaunchScreen.storyboard */,
@@ -345,6 +348,7 @@
 				9205E9381F599FE000927A3F /* cmd_strings.c in Sources */,
 				9205E9451F599FE000927A3F /* sprites_lib.c in Sources */,
 				9205E9441F599FE000927A3F /* default_characters.c in Sources */,
+				9205E94E1F59BEE900927A3F /* LowResNXView.swift in Sources */,
 				9205E9411F599FE000927A3F /* token.c in Sources */,
 				9205E9401F599FE000927A3F /* rcstring.c in Sources */,
 				9205E92D1F599FE000927A3F /* disk_drive.c in Sources */,
@@ -375,7 +379,7 @@
 		9205E8DD1F599F7300927A3F /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9205E8DE1F599F7300927A3F /* Base */,
+				9205E9511F59C57D00927A3F /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -383,7 +387,7 @@
 		9205E8E21F599F7300927A3F /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9205E8E31F599F7300927A3F /* Base */,
+				9205E9521F59C57D00927A3F /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -432,7 +436,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -477,7 +481,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -533,6 +537,7 @@
 				9205E8EA1F599F7300927A3F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
