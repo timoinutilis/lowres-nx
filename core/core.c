@@ -26,7 +26,7 @@ void core_init(struct Core *core)
 {
     memset(core, 0, sizeof(struct Core));
     
-    machine_init(&core->machine);
+    machine_init(core);
     disk_init(core);
 }
 
@@ -156,4 +156,14 @@ void core_setGamepad(struct Core *core, int player, bool up, bool down, bool lef
     gamepad->right = right;
     gamepad->buttonA = buttonA;
     gamepad->buttonB = buttonB;
+}
+
+int core_getGamepadsEnabled(struct Core *core)
+{
+    return core->machine.ioRegisters.attr.gamepadsEnabled;
+}
+
+bool core_getKeyboardEnabled(struct Core *core)
+{
+    return core->machine.ioRegisters.attr.keyboardEnabled;
 }

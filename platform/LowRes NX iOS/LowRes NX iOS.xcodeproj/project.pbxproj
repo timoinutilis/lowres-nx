@@ -43,6 +43,7 @@
 		9205E9491F599FE000927A3F /* video_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 9205E92B1F599FE000927A3F /* video_chip.c */; };
 		9205E94C1F59A96600927A3F /* program.nx in Resources */ = {isa = PBXBuildFile; fileRef = 9205E94B1F59A96600927A3F /* program.nx */; };
 		9205E94E1F59BEE900927A3F /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205E94D1F59BEE900927A3F /* LowResNXView.swift */; };
+		92521BCF1F5B105E0078A7C7 /* CoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92521BCE1F5B105E0078A7C7 /* CoreWrapper.swift */; };
 		92ADF9841F59CF2900027CFD /* Gamepad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92ADF9831F59CF2900027CFD /* Gamepad.swift */; };
 /* End PBXBuildFile section */
 
@@ -118,6 +119,7 @@
 		9205E94D1F59BEE900927A3F /* LowResNXView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXView.swift; sourceTree = "<group>"; };
 		9205E9511F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9205E9521F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		92521BCE1F5B105E0078A7C7 /* CoreWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreWrapper.swift; sourceTree = "<group>"; };
 		92ADF9831F59CF2900027CFD /* Gamepad.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gamepad.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,6 +157,7 @@
 			children = (
 				9205E94A1F59A3A400927A3F /* LowResNX-Bridging-Header.h */,
 				9205E8D91F599F7300927A3F /* AppDelegate.swift */,
+				92521BCE1F5B105E0078A7C7 /* CoreWrapper.swift */,
 				9205E8DB1F599F7300927A3F /* ViewController.swift */,
 				9205E94D1F59BEE900927A3F /* LowResNXView.swift */,
 				92ADF9831F59CF2900027CFD /* Gamepad.swift */,
@@ -349,6 +352,7 @@
 				9205E9321F599FE000927A3F /* cmd_files.c in Sources */,
 				9205E9461F599FE000927A3F /* text_lib.c in Sources */,
 				9205E9381F599FE000927A3F /* cmd_strings.c in Sources */,
+				92521BCF1F5B105E0078A7C7 /* CoreWrapper.swift in Sources */,
 				9205E9451F599FE000927A3F /* sprites_lib.c in Sources */,
 				9205E9441F599FE000927A3F /* default_characters.c in Sources */,
 				9205E94E1F59BEE900927A3F /* LowResNXView.swift in Sources */,

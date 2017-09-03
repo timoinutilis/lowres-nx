@@ -25,6 +25,7 @@ struct CoreDelegate {
     void (*interpreterDidFail)(void *context);
     void (*diskDriveWillAccess)(void *context);
     void (*diskDriveDidSave)(void *context);
+    void (*controlsDidChange)(void *context);
 };
 
 #endif /* core_delegate_h */

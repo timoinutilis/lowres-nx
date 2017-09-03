@@ -44,7 +44,7 @@ struct TypedValue fnc_PEEK(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        int peek = machine_peek(&core->machine, addressValue.v.floatValue);
+        int peek = machine_peek(core, addressValue.v.floatValue);
         if (peek == -1) return val_makeError(ErrorIllegalMemoryAccess);
         resultValue.v.floatValue = peek;
     }
@@ -71,7 +71,7 @@ enum ErrorCode cmd_POKE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        bool poke = machine_poke(&core->machine, addressValue.v.floatValue, pokeValue.v.floatValue);
+        bool poke = machine_poke(core, addressValue.v.floatValue, pokeValue.v.floatValue);
         if (!poke) return ErrorIllegalMemoryAccess;
     }
     
@@ -113,7 +113,7 @@ enum ErrorCode cmd_FILL(struct Core *core)
         int length = lengthValue.v.floatValue;
         for (int i = 0; i < length; i++)
         {
-            bool poke = machine_poke(&core->machine, start + i, fill);
+            bool poke = machine_poke(core, start + i, fill);
             if (!poke) return ErrorIllegalMemoryAccess;
         }
     }
@@ -153,9 +153,9 @@ enum ErrorCode cmd_COPY(struct Core *core)
         int destination = destinationValue.v.floatValue;
         for (int i = 0; i < length; i++)
         {
-            int peek = machine_peek(&core->machine, source + i);
+            int peek = machine_peek(core, source + i);
             if (peek == -1) return ErrorIllegalMemoryAccess;
-            bool poke = machine_poke(&core->machine, destination + i, peek);
+            bool poke = machine_poke(core, destination + i, peek);
             if (!poke) return ErrorIllegalMemoryAccess;
         }
     }

@@ -26,6 +26,8 @@
 #include "video_chip.h"
 #include "audio_chip.h"
 
+struct Core;
+
 // 64 KB
 struct Machine {
     
@@ -67,8 +69,8 @@ struct Machine {
     uint8_t reservedRegisters[0x10000 - 0xFF80];
 };
 
-void machine_init(struct Machine *machine);
-int machine_peek(struct Machine *machine, int address);
-bool machine_poke(struct Machine *machine, int address, int value);
+void machine_init(struct Core *core);
+int machine_peek(struct Core *core, int address);
+bool machine_poke(struct Core *core, int address, int value);
 
 #endif /* machine_h */

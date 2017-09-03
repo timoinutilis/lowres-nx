@@ -40,9 +40,16 @@
                     <connections>
                         <outlet property="nxView" destination="b9G-Li-wZu" id="o6z-oE-YdM"/>
                         <outlet property="onePlayerView" destination="8NU-mv-D8a" id="0Vk-oO-17a"/>
-                        <outlet property="player1ButtonA" destination="8DX-Sv-oPY" id="woc-cB-Xuw"/>
-                        <outlet property="player1ButtonB" destination="1GA-EP-ubx" id="hoV-TU-Dp9"/>
-                        <outlet property="player1Gamepad" destination="a0x-YB-1aj" id="j6b-nG-y4a"/>
+                        <outlet property="player1ButtonA" destination="Nu7-WT-K6p" id="n3y-Zg-yHO"/>
+                        <outlet property="player1ButtonB" destination="Rd9-hL-HtY" id="zr0-aN-f8a"/>
+                        <outlet property="player1Gamepad" destination="Eni-rf-0J1" id="mSp-kc-7XQ"/>
+                        <outlet property="player2ButtonA" destination="3tA-fv-KHN" id="OOU-XJ-sFL"/>
+                        <outlet property="player2ButtonB" destination="dhG-GB-kWg" id="AVA-WW-YMJ"/>
+                        <outlet property="player2Gamepad" destination="met-Rh-tJz" id="6vL-TK-e8o"/>
+                        <outlet property="playerButtonA" destination="8DX-Sv-oPY" id="Qai-ON-4sK"/>
+                        <outlet property="playerButtonB" destination="1GA-EP-ubx" id="Wly-mC-rge"/>
+                        <outlet property="playerGamepad" destination="a0x-YB-1aj" id="pJc-t6-B4j"/>
+                        <outlet property="twoPlayerView" destination="kKe-uP-6RR" id="40v-EP-R45"/>
                         <outlet property="widthConstraint" destination="7vO-fu-6vJ" id="LAa-ep-evn"/>
                     </connections>
                 </viewController>
@@ -95,6 +102,84 @@
                         <constraint firstAttribute="bottom" secondItem="nQ1-UK-Nln" secondAttribute="bottom" id="ehw-vo-usO"/>
                         <constraint firstAttribute="trailing" secondItem="nQ1-UK-Nln" secondAttribute="trailing" id="kJn-sf-DuA"/>
                         <constraint firstItem="a0x-YB-1aj" firstAttribute="leading" secondItem="8NU-mv-D8a" secondAttribute="leading" constant="11" id="tOo-Fs-4Aa"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" id="kKe-uP-6RR">
+                    <rect key="frame" x="0.0" y="0.0" width="686" height="150"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <view alpha="0.5" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Eni-rf-0J1" customClass="Gamepad" customModule="LowRes_NX" customModuleProvider="target">
+                            <rect key="frame" x="11" y="9" width="130" height="130"/>
+                            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="130" placeholder="YES" id="hO4-gY-fvy"/>
+                                <constraint firstAttribute="height" constant="130" placeholder="YES" id="o1l-6f-KtC"/>
+                            </constraints>
+                        </view>
+                        <button opaque="NO" alpha="0.5" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nu7-WT-K6p" userLabel="Button A">
+                            <rect key="frame" x="149" y="71" width="68" height="68"/>
+                            <state key="normal" image="button_a">
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <state key="highlighted" image="button_a_pressed"/>
+                        </button>
+                        <button opaque="NO" alpha="0.5" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rd9-hL-HtY" userLabel="Button B">
+                            <rect key="frame" x="225" y="71" width="68" height="68"/>
+                            <state key="normal" image="button_b">
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <state key="highlighted" image="button_b_pressed"/>
+                        </button>
+                        <view alpha="0.5" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="met-Rh-tJz" customClass="Gamepad" customModule="LowRes_NX" customModuleProvider="target">
+                            <rect key="frame" x="393" y="9" width="130" height="130"/>
+                            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="130" placeholder="YES" id="b0U-eP-82a"/>
+                                <constraint firstAttribute="width" constant="130" placeholder="YES" id="cFd-R0-g3b"/>
+                            </constraints>
+                        </view>
+                        <button opaque="NO" alpha="0.5" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3tA-fv-KHN" userLabel="Button A">
+                            <rect key="frame" x="531" y="71" width="68" height="68"/>
+                            <state key="normal" image="button_a">
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <state key="highlighted" image="button_a_pressed"/>
+                        </button>
+                        <button opaque="NO" alpha="0.5" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dhG-GB-kWg" userLabel="Button B">
+                            <rect key="frame" x="607" y="71" width="68" height="68"/>
+                            <state key="normal" image="button_b">
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <state key="highlighted" image="button_b_pressed"/>
+                        </button>
+                        <button opaque="NO" alpha="0.5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="586-UI-EPC" userLabel="Pause Button">
+                            <rect key="frame" x="631" y="8" width="55" height="55"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="55" id="U36-AD-MpF"/>
+                                <constraint firstAttribute="width" constant="55" id="rmy-ho-RyR"/>
+                            </constraints>
+                            <state key="normal" image="pause">
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="dhG-GB-kWg" secondAttribute="bottom" constant="11" id="ACF-OW-34V"/>
+                        <constraint firstAttribute="trailing" secondItem="dhG-GB-kWg" secondAttribute="trailing" constant="11" id="Dnd-RG-qoM"/>
+                        <constraint firstAttribute="bottom" secondItem="met-Rh-tJz" secondAttribute="bottom" constant="11" id="KGr-qU-STy"/>
+                        <constraint firstItem="dhG-GB-kWg" firstAttribute="leading" secondItem="3tA-fv-KHN" secondAttribute="trailing" constant="8" id="NGJ-Lb-aZG"/>
+                        <constraint firstItem="Eni-rf-0J1" firstAttribute="leading" secondItem="kKe-uP-6RR" secondAttribute="leading" constant="11" id="TZr-8e-EKs"/>
+                        <constraint firstAttribute="trailing" secondItem="586-UI-EPC" secondAttribute="trailing" id="WJB-Y2-0EF"/>
+                        <constraint firstItem="Rd9-hL-HtY" firstAttribute="leading" secondItem="Nu7-WT-K6p" secondAttribute="trailing" constant="8" id="eQw-PH-Cpx"/>
+                        <constraint firstAttribute="bottom" secondItem="Rd9-hL-HtY" secondAttribute="bottom" constant="11" id="hip-Rk-tYD"/>
+                        <constraint firstAttribute="bottom" secondItem="Eni-rf-0J1" secondAttribute="bottom" constant="11" id="hui-JA-o6g"/>
+                        <constraint firstItem="Nu7-WT-K6p" firstAttribute="leading" secondItem="Eni-rf-0J1" secondAttribute="trailing" constant="8" id="iRp-KT-29e"/>
+                        <constraint firstAttribute="bottom" secondItem="3tA-fv-KHN" secondAttribute="bottom" constant="11" id="l18-uE-3vR"/>
+                        <constraint firstAttribute="bottom" secondItem="Nu7-WT-K6p" secondAttribute="bottom" constant="11" id="nva-Yi-5ec"/>
+                        <constraint firstItem="dhG-GB-kWg" firstAttribute="top" secondItem="586-UI-EPC" secondAttribute="bottom" constant="8" id="q8U-HE-jjC"/>
+                        <constraint firstItem="3tA-fv-KHN" firstAttribute="leading" secondItem="met-Rh-tJz" secondAttribute="trailing" constant="8" id="uJ0-YK-zKX"/>
+                        <constraint firstItem="Eni-rf-0J1" firstAttribute="top" secondItem="kKe-uP-6RR" secondAttribute="top" priority="750" id="waP-dn-8uf"/>
                     </constraints>
                 </view>
             </objects>

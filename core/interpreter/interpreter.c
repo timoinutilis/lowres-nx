@@ -1597,6 +1597,12 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenLOAD:
             return cmd_LOAD(core);
             
+        case TokenGAMEPAD:
+            return cmd_GAMEPAD(core);
+            
+        case TokenKEYBOARD:
+            return cmd_KEYBOARD(core);
+            
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;

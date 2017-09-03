@@ -46,6 +46,16 @@ union IOStatus {
     uint8_t value;
 };
 
+// ================ Attributes ================
+
+union IOAttributes {
+    struct {
+        uint8_t gamepadsEnabled:2; // 0: off (touch enabled), 1...2: number of players (touch disabled)
+        uint8_t keyboardEnabled:1;
+    };
+    uint8_t value;
+};
+
 // ===============================================
 // ================ I/O Registers ================
 // ===============================================
@@ -56,6 +66,7 @@ struct IORegisters {
     uint8_t touchY;
     char key;
     union IOStatus status;
+    union IOAttributes attr;
 };
 
 #endif /* io_chip_h */

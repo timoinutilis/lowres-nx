@@ -21,6 +21,61 @@
 #include "core.h"
 #include <assert.h>
 
+enum ErrorCode cmd_KEYBOARD(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // KEYBOARD
+    ++interpreter->pc;
+    
+    // ON/OFF
+    enum TokenType type = interpreter->pc->type;
+    if (type != TokenON && type != TokenOFF) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        core->machine.ioRegisters.attr.keyboardEnabled = (type == TokenON);
+        core->delegate->controlsDidChange(core->delegate->context);
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_GAMEPAD(struct Core *core)
+{
+    struct Interpreter *interpreter = &core->interpreter;
+    
+    // GAMEPAD
+    ++interpreter->pc;
+    
+    int num = 0;
+    if (interpreter->pc->type == TokenOFF)
+    {
+        // OFF
+        ++interpreter->pc;
+    }
+    else if (interpreter->pc->type == TokenFloat)
+    {
+        // number
+        struct TypedValue value = itp_evaluateNumericExpression(core, 0, 2);
+        if (value.type == ValueTypeError) return value.v.errorCode;
+        num = value.v.floatValue;
+    }
+    else
+    {
+        return ErrorUnexpectedToken;
+    }
+    
+    if (interpreter->pass == PassRun)
+    {
+        core->machine.ioRegisters.attr.gamepadsEnabled = num;
+        core->delegate->controlsDidChange(core->delegate->context);
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
 struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;

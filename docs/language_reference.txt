@@ -626,6 +626,12 @@ FONT
 * USER CONTROLS *
 *****************
 
+GAMEPAD
+    
+    GAMEPAD n
+    GAMEPAD OFF
+
+
 =UP
 =DOWN
 =LEFT
@@ -684,6 +690,12 @@ FONT
 
     Returns true if the screen is currently touched and was not
     touched the last frame.
+
+
+KEYBOARD ON/OFF
+
+    KEYBOARD ON
+    KEYBOARD OFF
 
 
 =INKEY$

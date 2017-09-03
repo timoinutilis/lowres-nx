@@ -126,3 +126,11 @@ $FF65 - Status:
     Bit     Purpose
     0       Pause button
     1       Touch
+
+$FF66 - Attributes:
+    Bit     Purpose
+    0-1     Gamepads enabled:
+            0: off (touchscreen enabled)
+            1: 1 player (touchscreen disabled)
+            2: 2 players (touchscreen disabled)
+    2       Keyboard enabled

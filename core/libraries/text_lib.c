@@ -362,8 +362,8 @@ void txtlib_copyBackground(struct Core *core, int srcX, int srcY, int width, int
         {
             int px = dstX + x;
             struct Cell *cell = &plane->cells[py & 0x1F][px & 0x1F];
-            cell->character = machine_peek(&core->machine, addr++);
-            cell->attr.value = machine_peek(&core->machine, addr++);
+            cell->character = machine_peek(core, addr++);
+            cell->attr.value = machine_peek(core, addr++);
         }
     }
 }

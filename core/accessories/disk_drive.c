@@ -268,7 +268,7 @@ void disk_saveFile(struct Core *core, char *name, int address, int length)
         int start = entry->start;
         for (int i = 0; i < length; i++)
         {
-            int peek = machine_peek(&core->machine, address + i);
+            int peek = machine_peek(core, address + i);
             assert(peek != -1);
             data[i + start] = peek;
         }
@@ -306,7 +306,7 @@ void disk_loadFile(struct Core *core, char *name, int address)
         int length = entry->length;
         for (int i = 0; i < length; i++)
         {
-            bool poke = machine_poke(&core->machine, address + i, data[i + start]);
+            bool poke = machine_poke(core, address + i, data[i + start]);
             assert(poke);
         }
     }

@@ -21,22 +21,23 @@
 #include <assert.h>
 #include <string.h>
 #include <stdbool.h>
+#include "core.h"
 
-void machine_init(struct Machine *machine)
+void machine_init(struct Core *core)
 {
     assert(sizeof(struct Machine) == 0x10000);
 }
 
-int machine_peek(struct Machine *machine, int address)
+int machine_peek(struct Core *core, int address)
 {
     if (address < 0 || address > 0xFFFF)
     {
         return -1;
     }
-    return *(uint8_t *)((uint8_t *)machine + address);
+    return *(uint8_t *)((uint8_t *)&core->machine + address);
 }
 
-bool machine_poke(struct Machine *machine, int address, int value)
+bool machine_poke(struct Core *core, int address, int value)
 {
     if (address < 0x8000 || address > 0xFFFF)
     {
@@ -53,6 +54,12 @@ bool machine_poke(struct Machine *machine, int address, int value)
         // reserved registers
         return false;
     }
-    *(uint8_t *)((uint8_t *)machine + address) = value & 0xFF;
+    *(uint8_t *)((uint8_t *)&core->machine + address) = value & 0xFF;
+    
+    if (address == 0xFF66)
+    {
+        // IO attributes
+        core->delegate->controlsDidChange(core->delegate->context);
+    }
     return true;
 }
