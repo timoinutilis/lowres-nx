@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -11,6 +11,7 @@
             <connections>
                 <outlet property="backgroundView" destination="ZuJ-Uu-0gr" id="Syj-cB-zoZ"/>
                 <outlet property="lowResNXView" destination="Xyp-2x-tAP" id="gAw-MQ-5nD"/>
+                <outlet property="widthConstraint" destination="BbL-a5-i9P" id="Qsp-Bp-jJD"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -32,6 +33,7 @@
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Xyp-2x-tAP" customClass="LowResNXView" customModule="LowRes_NX" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="640" height="512"/>
                         <constraints>
+                            <constraint firstAttribute="width" constant="640" id="BbL-a5-i9P"/>
                             <constraint firstAttribute="width" secondItem="Xyp-2x-tAP" secondAttribute="height" multiplier="5:4" id="cAP-gu-BNC"/>
                         </constraints>
                     </customView>
@@ -40,13 +42,9 @@
                     <constraint firstItem="Xyp-2x-tAP" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="8z6-2t-38S"/>
                     <constraint firstAttribute="trailing" secondItem="ZuJ-Uu-0gr" secondAttribute="trailing" id="GYl-j3-BeQ"/>
                     <constraint firstItem="ZuJ-Uu-0gr" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="Pxs-he-NvT"/>
-                    <constraint firstAttribute="bottom" secondItem="Xyp-2x-tAP" secondAttribute="bottom" id="Uyc-9p-SqG"/>
                     <constraint firstItem="Xyp-2x-tAP" firstAttribute="centerY" secondItem="se5-gp-TjO" secondAttribute="centerY" id="XXS-DW-oGg"/>
-                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="f6e-ru-NH3"/>
                     <constraint firstAttribute="bottom" secondItem="ZuJ-Uu-0gr" secondAttribute="bottom" id="gzm-K8-WwI"/>
                     <constraint firstItem="ZuJ-Uu-0gr" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="h35-fy-n4X"/>
-                    <constraint firstItem="Xyp-2x-tAP" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="se5-gp-TjO" secondAttribute="leading" id="owc-Ch-O76"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Xyp-2x-tAP" secondAttribute="trailing" id="z4e-RH-8ak"/>
                 </constraints>
             </view>
             <connections>

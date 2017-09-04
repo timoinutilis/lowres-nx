@@ -27,15 +27,15 @@ class ProgramError: NSError {
 
 class LowResNXDocument: NSDocument {
     var sourceCode = ""
-    var core = Core()
+    var coreWrapper = CoreWrapper()
     
     override init() {
         super.init()
-        core_init(&core)
+        core_init(&coreWrapper.core)
     }
     
     deinit {
-        core_deinit(&core)
+        core_deinit(&coreWrapper.core)
     }
     
     override class func autosavesInPlace() -> Bool {
@@ -48,14 +48,14 @@ class LowResNXDocument: NSDocument {
 
     override func read(from data: Data, ofType typeName: String) throws {
         sourceCode = String(data: data, encoding: .ascii)!
-        let errorCode = itp_compileProgram(&core, sourceCode.cString(using: .ascii))
+        let errorCode = itp_compileProgram(&coreWrapper.core, sourceCode.cString(using: .ascii))
         if errorCode != ErrorNone {
             throw getProgramError(errorCode: errorCode)
         }
     }
     
     func getProgramError(errorCode: ErrorCode) -> ProgramError {
-        let cIndex = itp_getPcPositionInSourceCode(&core)
+        let cIndex = itp_getPcPositionInSourceCode(&coreWrapper.core)
         let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(cIndex))
         let lineRange = sourceCode.lineRange(for: index ..< index)
         let lineString = sourceCode.substring(with: lineRange)

@@ -26,9 +26,9 @@ class LowResNXView: NSView {
         dataProvider = CGDataProvider(directInfo: data, size: off_t(dataLength), callbacks: &callbacks)
     }
     
-    func render(core: UnsafeMutablePointer<Core>) {
+    func render(coreWrapper: CoreWrapper) {
         if let dataProvider = dataProvider {
-            video_renderScreen(core, data, SCREEN_WIDTH*4)
+            video_renderScreen(&coreWrapper.core, data, SCREEN_WIDTH*4)
             let image = CGImage(width: Int(SCREEN_WIDTH), height: Int(SCREEN_HEIGHT), bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: Int(SCREEN_WIDTH)*4, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue), provider: dataProvider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)
             
             layer?.contents = image
