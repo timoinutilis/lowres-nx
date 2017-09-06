@@ -227,3 +227,6 @@ func diskDriveDidSave(context: UnsafeMutableRawPointer?) -> Void {
         }
     }
 }
+
+func controlsDidChange(context: UnsafeMutableRawPointer?) -> Void {
+}
