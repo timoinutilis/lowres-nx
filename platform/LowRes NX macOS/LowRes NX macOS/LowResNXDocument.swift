@@ -28,16 +28,7 @@ class ProgramError: NSError {
 class LowResNXDocument: NSDocument {
     var sourceCode = ""
     var coreWrapper = CoreWrapper()
-    
-    override init() {
-        super.init()
-        core_init(&coreWrapper.core)
-    }
-    
-    deinit {
-        core_deinit(&coreWrapper.core)
-    }
-    
+        
     override class func autosavesInPlace() -> Bool {
         return false
     }
@@ -48,7 +39,8 @@ class LowResNXDocument: NSDocument {
 
     override func read(from data: Data, ofType typeName: String) throws {
         sourceCode = String(data: data, encoding: .ascii)!
-        let errorCode = itp_compileProgram(&coreWrapper.core, sourceCode.cString(using: .ascii))
+        let cString = sourceCode.cString(using: .ascii)
+        let errorCode = itp_compileProgram(&coreWrapper.core, cString)
         if errorCode != ErrorNone {
             throw getProgramError(errorCode: errorCode)
         }

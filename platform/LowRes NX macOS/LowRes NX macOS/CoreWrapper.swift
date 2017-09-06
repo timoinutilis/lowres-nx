@@ -9,5 +9,16 @@
 import Cocoa
 
 class CoreWrapper: NSObject {
+    
     var core = Core()
+    
+    override init() {
+        super.init()
+        core_init(&core)
+    }
+    
+    deinit {
+        core_deinit(&core)
+    }
+    
 }

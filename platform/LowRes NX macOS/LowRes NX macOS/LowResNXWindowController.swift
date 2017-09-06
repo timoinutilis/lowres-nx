@@ -31,6 +31,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
             coreDelegate.interpreterDidFail = interpreterDidFail
             coreDelegate.diskDriveWillAccess = diskDriveWillAccess
             coreDelegate.diskDriveDidSave = diskDriveDidSave
+            coreDelegate.controlsDidChange = controlsDidChange
             core_setDelegate(&coreWrapper.core, &coreDelegate)
             
             let secondsSincePowerOn = -(NSApp.delegate as! AppDelegate).launchDate.timeIntervalSinceNow
