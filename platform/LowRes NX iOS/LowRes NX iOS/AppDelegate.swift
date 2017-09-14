@@ -15,25 +15,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var coreWrapper = CoreWrapper()
     var programSourceCode: String?
 
-    deinit {
-        itp_freeProgram(&coreWrapper.core)
-    }
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
-        core_init(&coreWrapper.core)
-        
+                
         if let filePath = Bundle.main.path(forResource: "program", ofType: "nx") {
             do {
-                try programSourceCode = String(contentsOfFile: filePath, encoding: .ascii)
+                let programSourceCode = try String(contentsOfFile: filePath, encoding: .ascii)
                 
-                let cString = programSourceCode?.cString(using: .ascii)
+                let cString = programSourceCode.cString(using: .ascii)
                 let errorCode = itp_compileProgram(&coreWrapper.core, cString)
                 if errorCode != ErrorNone {
-                    // compiler error
+                    print("compiler error:", err_getString(errorCode))
                 }
             } catch {
-                // file error
+                print("file error:", error.localizedDescription)
             }
         }
         
