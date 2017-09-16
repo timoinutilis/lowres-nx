@@ -44,6 +44,8 @@
 		9205E94C1F59A96600927A3F /* program.nx in Resources */ = {isa = PBXBuildFile; fileRef = 9205E94B1F59A96600927A3F /* program.nx */; };
 		9205E94E1F59BEE900927A3F /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205E94D1F59BEE900927A3F /* LowResNXView.swift */; };
 		92521BCF1F5B105E0078A7C7 /* CoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92521BCE1F5B105E0078A7C7 /* CoreWrapper.swift */; };
+		92AE47D41F6D94A1008BD49C /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47D01F6D94A1008BD49C /* overlay.c */; };
+		92AE47D51F6D94A1008BD49C /* overlay_data.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47D21F6D94A1008BD49C /* overlay_data.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -119,6 +121,10 @@
 		9205E9511F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9205E9521F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		92521BCE1F5B105E0078A7C7 /* CoreWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreWrapper.swift; sourceTree = "<group>"; };
+		92AE47D01F6D94A1008BD49C /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
+		92AE47D11F6D94A1008BD49C /* overlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
+		92AE47D21F6D94A1008BD49C /* overlay_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay_data.c; sourceTree = "<group>"; };
+		92AE47D31F6D94A1008BD49C /* overlay_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay_data.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +182,7 @@
 				9205E91E1F599FE000927A3F /* libraries */,
 				9205E9251F599FE000927A3F /* machine */,
 				9205E8EC1F599FE000927A3F /* accessories */,
+				92AE47CF1F6D94A1008BD49C /* overlay */,
 			);
 			name = core;
 			path = ../../core;
@@ -267,6 +274,17 @@
 			path = machine;
 			sourceTree = "<group>";
 		};
+		92AE47CF1F6D94A1008BD49C /* overlay */ = {
+			isa = PBXGroup;
+			children = (
+				92AE47D01F6D94A1008BD49C /* overlay.c */,
+				92AE47D11F6D94A1008BD49C /* overlay.h */,
+				92AE47D21F6D94A1008BD49C /* overlay_data.c */,
+				92AE47D31F6D94A1008BD49C /* overlay_data.h */,
+			);
+			path = overlay;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -346,6 +364,7 @@
 				9205E9351F599FE000927A3F /* cmd_memory.c in Sources */,
 				9205E92E1F599FE000927A3F /* core.c in Sources */,
 				9205E8DC1F599F7300927A3F /* ViewController.swift in Sources */,
+				92AE47D51F6D94A1008BD49C /* overlay_data.c in Sources */,
 				9205E9321F599FE000927A3F /* cmd_files.c in Sources */,
 				9205E9461F599FE000927A3F /* text_lib.c in Sources */,
 				9205E9381F599FE000927A3F /* cmd_strings.c in Sources */,
@@ -371,6 +390,7 @@
 				9205E92F1F599FE000927A3F /* cmd_background.c in Sources */,
 				9205E9421F599FE000927A3F /* value.c in Sources */,
 				9205E9471F599FE000927A3F /* audio_chip.c in Sources */,
+				92AE47D41F6D94A1008BD49C /* overlay.c in Sources */,
 				9205E9481F599FE000927A3F /* machine.c in Sources */,
 				9205E9311F599FE000927A3F /* cmd_data.c in Sources */,
 				9205E93B1F599FE000927A3F /* data.c in Sources */,

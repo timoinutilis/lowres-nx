@@ -21,16 +21,43 @@
 #define overlay_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "video_chip.h"
 #include "overlay_data.h"
 
 struct Core;
 
+struct OverlayTouch {
+    bool touched;
+    int x;
+    int y;
+    int currentButton;
+};
+
+enum OverlayButtonType {
+    OverlayButtonTypeDPad,
+    OverlayButtonTypeA,
+    OverlayButtonTypeB,
+    OverlayButtonTypePause,
+};
+
+struct OverlayButton {
+    enum OverlayButtonType type;
+    int x;
+    int y;
+    int currentTouch;
+};
+
 struct Overlay {
     struct Plane plane;
+    struct OverlayTouch touch;
+    struct OverlayButton buttons[4];
 };
 
 void overlay_init(struct Core *core);
-void overlay_drawGamepads(struct Core *core);
+void overlay_drawButtons(struct Core *core);
+void overlay_touchPressed(struct Core *core, int x, int y);
+void overlay_touchDragged(struct Core *core, int x, int y);
+void overlay_touchReleased(struct Core *core);
 
 #endif /* overlay_h */
