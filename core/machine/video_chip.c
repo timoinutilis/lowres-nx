@@ -21,6 +21,8 @@
 #include "core.h"
 #include <string.h>
 
+#define OVERLAY_FLAG (1<<6)
+
 int video_getCharacterPixel(struct Character *character, int x, int y)
 {
     int b0 = (character->data[y] >> (7 - x)) & 0x01;
@@ -28,7 +30,7 @@ int video_getCharacterPixel(struct Character *character, int x, int y)
     return b0 | (b1 << 1);
 }
 
-void video_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct Plane *plane, int y, int scrollX, int scrollY, uint8_t *scanlineBuffer)
+void video_renderPlane(struct Character *characters, struct Plane *plane, int y, int scrollX, int scrollY, int pixelFlag, uint8_t *scanlineBuffer)
 {
     int planeY = y + scrollY;
     int row = (planeY >> 3) & 31;
@@ -41,11 +43,11 @@ void video_renderPlane(struct VideoRegisters *reg, struct VideoRam *ram, struct 
         if (cell->attr.priority >= (*scanlineBuffer >> 7))
         {
             int cellX = planeX & 7;
-            struct Character *character = &ram->characters[cell->character];
+            struct Character *character = &characters[cell->character];
             int pixel = video_getCharacterPixel(character, cell->attr.flipX ? (7 - cellX) : cellX, cell->attr.flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
-                *scanlineBuffer = pixel | (cell->attr.palette << 2) | (cell->attr.priority << 7);
+                *scanlineBuffer = pixel | (cell->attr.palette << 2) | (cell->attr.priority << 7) | pixelFlag;
             }
         }
         scanlineBuffer++;
@@ -140,20 +142,25 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
         memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
         if (reg->attr.planeBEnabled)
         {
-            video_renderPlane(reg, ram, &ram->planeB, y, reg->scrollBX, reg->scrollBY, scanlineBuffer);
+            video_renderPlane(ram->characters, &ram->planeB, y, reg->scrollBX, reg->scrollBY, 0, scanlineBuffer);
         }
         if (reg->attr.planeAEnabled)
         {
-            video_renderPlane(reg, ram, &ram->planeA, y, reg->scrollAX, reg->scrollAY, scanlineBuffer);
+            video_renderPlane(ram->characters, &ram->planeA, y, reg->scrollAX, reg->scrollAY, 0, scanlineBuffer);
         }
         if (reg->attr.spritesEnabled)
         {
             memset(scanlineSpriteBuffer, 0, sizeof(scanlineSpriteBuffer));
             video_renderSprites(sreg, ram, y, scanlineBuffer, scanlineSpriteBuffer);
         }
+        
+        // overlay
+        video_renderPlane((struct Character *)overlayCharacters, &core->overlay.plane, y, 0, 0, OVERLAY_FLAG, scanlineBuffer);
+        
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
-            int color = creg->colors[scanlineBuffer[x] & 0x7F];
+            int colorIndex = scanlineBuffer[x] & 0x1F;
+            int color = (scanlineBuffer[x] & OVERLAY_FLAG) ? overlayColors[colorIndex] : creg->colors[colorIndex];
             int r = (color >> 4) & 0x03;
             int g = (color >> 2) & 0x03;
             int b = color & 0x03;

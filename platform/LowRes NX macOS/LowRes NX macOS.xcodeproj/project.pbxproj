@@ -42,6 +42,8 @@
 		9284CE4C1ED1EE1600891E7D /* cmd_files.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284CE4A1ED1EE1600891E7D /* cmd_files.c */; };
 		928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */; };
 		928C1FEF1EB638A5002AE5C9 /* LowResNXWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */; };
+		92AE47CB1F6D8288008BD49C /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47C91F6D8288008BD49C /* overlay.c */; };
+		92AE47CE1F6D85A3008BD49C /* overlay_data.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47CC1F6D85A3008BD49C /* overlay_data.c */; };
 		92CA6E201EF717F6008B3A21 /* default_characters.c in Sources */ = {isa = PBXBuildFile; fileRef = 92CA6E1E1EF717F6008B3A21 /* default_characters.c */; };
 		92FA567C1EC62F6000C9DBB3 /* cmd_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 92FA567A1EC62F6000C9DBB3 /* cmd_io.c */; };
 /* End PBXBuildFile section */
@@ -117,6 +119,10 @@
 		9284CE4B1ED1EE1600891E7D /* cmd_files.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_files.h; sourceTree = "<group>"; };
 		928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowResNXWindowController.swift; sourceTree = "<group>"; };
 		928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LowResNXWindowController.xib; sourceTree = "<group>"; };
+		92AE47C91F6D8288008BD49C /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
+		92AE47CA1F6D8288008BD49C /* overlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
+		92AE47CC1F6D85A3008BD49C /* overlay_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay_data.c; sourceTree = "<group>"; };
+		92AE47CD1F6D85A3008BD49C /* overlay_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay_data.h; sourceTree = "<group>"; };
 		92CA6E1E1EF717F6008B3A21 /* default_characters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = default_characters.c; sourceTree = "<group>"; };
 		92CA6E1F1EF717F6008B3A21 /* default_characters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = default_characters.h; sourceTree = "<group>"; };
 		92FA567A1EC62F6000C9DBB3 /* cmd_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_io.c; sourceTree = "<group>"; };
@@ -188,6 +194,7 @@
 				92624BD31EAD1CFC00EB3A3C /* libraries */,
 				92624BD61EAD1CFC00EB3A3C /* machine */,
 				922AFF961ED5FF7D00002BFA /* accessories */,
+				92AE47C81F6D8288008BD49C /* overlay */,
 			);
 			name = core;
 			path = ../../core;
@@ -277,6 +284,17 @@
 				92624C031EAD35C600EB3A3C /* QuartzCore.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		92AE47C81F6D8288008BD49C /* overlay */ = {
+			isa = PBXGroup;
+			children = (
+				92AE47C91F6D8288008BD49C /* overlay.c */,
+				92AE47CA1F6D8288008BD49C /* overlay.h */,
+				92AE47CC1F6D85A3008BD49C /* overlay_data.c */,
+				92AE47CD1F6D85A3008BD49C /* overlay_data.h */,
+			);
+			path = overlay;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -369,6 +387,7 @@
 				928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */,
 				92624BEA1EAD1CFC00EB3A3C /* cmd_text.c in Sources */,
 				92624BEC1EAD1CFC00EB3A3C /* data.c in Sources */,
+				92AE47CB1F6D8288008BD49C /* overlay.c in Sources */,
 				921607441EC0E97B008B702C /* cmd_background.c in Sources */,
 				92624BF01EAD1CFC00EB3A3C /* rcstring.c in Sources */,
 				922AFF991ED5FFAB00002BFA /* disk_drive.c in Sources */,
@@ -381,6 +400,7 @@
 				92CA6E201EF717F6008B3A21 /* default_characters.c in Sources */,
 				92624BE91EAD1CFC00EB3A3C /* cmd_strings.c in Sources */,
 				92624B991EAD1B8800EB3A3C /* AppDelegate.swift in Sources */,
+				92AE47CE1F6D85A3008BD49C /* overlay_data.c in Sources */,
 				92624BEF1EAD1CFC00EB3A3C /* labels.c in Sources */,
 				92624BF51EAD1CFC00EB3A3C /* audio_chip.c in Sources */,
 				92624BF41EAD1CFC00EB3A3C /* text_lib.c in Sources */,

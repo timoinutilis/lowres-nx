@@ -27,6 +27,7 @@ void core_init(struct Core *core)
     memset(core, 0, sizeof(struct Core));
     
     machine_init(core);
+    overlay_init(core);
     disk_init(core);
 }
 
@@ -49,6 +50,7 @@ void core_update(struct Core *core)
 {
     itp_runProgram(core);
     itp_runInterrupt(core, InterruptTypeVBL);
+    overlay_drawGamepads(core);
     itp_didFinishVBL(core);
 }
 
