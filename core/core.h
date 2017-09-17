@@ -50,7 +50,6 @@ void core_deinit(struct Core *core);
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn);
 void core_update(struct Core *core);
-void core_rasterUpdate(struct Core *core);
 
 void core_keyPressed(struct Core *core, char key);
 void core_backspacePressed(struct Core *core);
@@ -62,7 +61,6 @@ void core_gamepadPressed(struct Core *core, int player, enum GamepadButton butto
 void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button);
 void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
 
-int core_getGamepadsEnabled(struct Core *core);
 bool core_getKeyboardEnabled(struct Core *core);
 
 #endif /* core_h */

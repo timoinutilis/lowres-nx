@@ -59,6 +59,7 @@ bool machine_poke(struct Core *core, int address, int value)
     if (address == 0xFF66)
     {
         // IO attributes
+        overlay_updateButtonConfiguration(core);
         core->delegate->controlsDidChange(core->delegate->context);
     }
     return true;

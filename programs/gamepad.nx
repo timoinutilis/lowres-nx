@@ -10,6 +10,9 @@ X(0)=60
 Y(0)=64
 X(1)=100
 Y(1)=64
+
+GAMEPAD 2
+
 DO
   FOR I=0 TO 1
     SPRITE I,,,130

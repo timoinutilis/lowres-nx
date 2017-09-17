@@ -138,7 +138,7 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
     for (int y = 0; y < SCREEN_HEIGHT; y++)
     {
         reg->rasterLine = y;
-        core_rasterUpdate(core);
+        itp_runInterrupt(core, InterruptTypeRaster);
         memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
         if (reg->attr.planeBEnabled)
         {

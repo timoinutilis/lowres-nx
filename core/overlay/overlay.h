@@ -25,6 +25,8 @@
 #include "video_chip.h"
 #include "overlay_data.h"
 
+#define MAX_BUTTONS 7
+
 struct Core;
 
 struct OverlayTouch {
@@ -45,16 +47,18 @@ struct OverlayButton {
     enum OverlayButtonType type;
     int x;
     int y;
-    int currentTouch;
+    int player;
 };
 
 struct Overlay {
     struct Plane plane;
     struct OverlayTouch touch;
-    struct OverlayButton buttons[4];
+    struct OverlayButton buttons[MAX_BUTTONS];
+    int numButtons;
 };
 
 void overlay_init(struct Core *core);
+void overlay_updateButtonConfiguration(struct Core *core);
 void overlay_drawButtons(struct Core *core);
 void overlay_touchPressed(struct Core *core, int x, int y);
 void overlay_touchDragged(struct Core *core, int x, int y);

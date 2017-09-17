@@ -195,6 +195,9 @@ void txtlib_inputBegin(struct Core *core)
     lib->blink = 0;
     core->machine.ioRegisters.key = 0;
     
+    core->machine.ioRegisters.attr.keyboardEnabled = 1;
+    core->delegate->controlsDidChange(core->delegate->context);
+    
     txtlib_scrollWindowIfNeeded(core);
 }
 

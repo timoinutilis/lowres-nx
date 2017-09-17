@@ -51,33 +51,41 @@ void core_update(struct Core *core)
     itp_runProgram(core);
     itp_runInterrupt(core, InterruptTypeVBL);
     itp_didFinishVBL(core);
-    if (core->machine.ioRegisters.attr.gamepadsEnabled)
-    {
-        overlay_drawButtons(core);
-    }
-}
-
-void core_rasterUpdate(struct Core *core)
-{
-    itp_runInterrupt(core, InterruptTypeRaster);
+    overlay_drawButtons(core);
 }
 
 void core_keyPressed(struct Core *core, char key)
 {
-    if (key >= 32 && key < 127)
+    if (core->machine.ioRegisters.attr.keyboardEnabled)
     {
-        core->machine.ioRegisters.key = key;
+        if (key >= 32 && key < 127)
+        {
+            core->machine.ioRegisters.key = key;
+        }
+    }
+    else
+    {
+        if (key == 'p' || key == 'P')
+        {
+            core->machine.ioRegisters.status.pause = 1;
+        }
     }
 }
 
 void core_backspacePressed(struct Core *core)
 {
-    core->machine.ioRegisters.key = '\b';
+    if (core->machine.ioRegisters.attr.keyboardEnabled)
+    {
+        core->machine.ioRegisters.key = '\b';
+    }
 }
 
 void core_returnPressed(struct Core *core)
 {
-    core->machine.ioRegisters.key = '\n';
+    if (core->machine.ioRegisters.attr.keyboardEnabled)
+    {
+        core->machine.ioRegisters.key = '\n';
+    }
 }
 
 void core_touchPressed(struct Core *core, int x, int y)
@@ -188,11 +196,6 @@ void core_setGamepad(struct Core *core, int player, bool up, bool down, bool lef
         gamepad->buttonA = buttonA;
         gamepad->buttonB = buttonB;
     }
-}
-
-int core_getGamepadsEnabled(struct Core *core)
-{
-    return core->machine.ioRegisters.attr.gamepadsEnabled;
 }
 
 bool core_getKeyboardEnabled(struct Core *core)
