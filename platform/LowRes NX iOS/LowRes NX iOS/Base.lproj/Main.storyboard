@@ -22,28 +22,46 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="b9G-Li-wZu" customClass="LowResNXView" customModule="LowRes_NX" customModuleProvider="target">
-                                <rect key="frame" x="27" y="205.5" width="320" height="256"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Spk-aV-ecP">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="b9G-Li-wZu" customClass="LowResNXView" customModule="LowRes_NX" customModuleProvider="target">
+                                        <rect key="frame" x="27.5" y="205.5" width="320" height="256"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="320" id="7vO-fu-6vJ"/>
+                                            <constraint firstAttribute="width" secondItem="b9G-Li-wZu" secondAttribute="height" multiplier="5:4" id="XSJ-yb-6zl"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="320" id="7vO-fu-6vJ"/>
-                                    <constraint firstAttribute="width" secondItem="b9G-Li-wZu" secondAttribute="height" multiplier="5:4" id="XSJ-yb-6zl"/>
+                                    <constraint firstItem="b9G-Li-wZu" firstAttribute="centerY" secondItem="Spk-aV-ecP" secondAttribute="centerY" id="G7P-cN-Giu"/>
+                                    <constraint firstItem="b9G-Li-wZu" firstAttribute="centerX" secondItem="Spk-aV-ecP" secondAttribute="centerX" id="PCW-ev-YSA"/>
+                                    <constraint firstItem="b9G-Li-wZu" firstAttribute="centerX" secondItem="Spk-aV-ecP" secondAttribute="centerX" id="mpj-Ve-WsP"/>
+                                    <constraint firstItem="b9G-Li-wZu" firstAttribute="centerY" secondItem="Spk-aV-ecP" secondAttribute="centerY" id="ooJ-QN-5pg"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="b9G-Li-wZu" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="DfX-ot-hAc"/>
-                            <constraint firstItem="b9G-Li-wZu" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Mpi-fE-HoW"/>
+                            <constraint firstItem="Spk-aV-ecP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="Nif-xE-qG5"/>
+                            <constraint firstAttribute="trailing" secondItem="Spk-aV-ecP" secondAttribute="trailing" id="RXa-me-LU6"/>
+                            <constraint firstItem="Spk-aV-ecP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="kgf-ex-iz0"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Spk-aV-ecP" secondAttribute="bottom" id="sZ9-Eo-Z5A"/>
                         </constraints>
                     </view>
+                    <nil key="simulatedStatusBarMetrics"/>
                     <connections>
+                        <outlet property="containerView" destination="Spk-aV-ecP" id="AEa-Yg-GyL"/>
+                        <outlet property="keyboardConstraint" destination="sZ9-Eo-Z5A" id="uTa-v1-c0M"/>
                         <outlet property="nxView" destination="b9G-Li-wZu" id="o6z-oE-YdM"/>
                         <outlet property="widthConstraint" destination="7vO-fu-6vJ" id="LAa-ep-evn"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="141.59999999999999" y="138.98050974512745"/>
         </scene>
     </scenes>
 </document>
