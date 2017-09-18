@@ -23,6 +23,11 @@ class LowResNXView: UIView {
         dataProvider = CGDataProvider(directInfo: data, size: off_t(dataLength), callbacks: &callbacks)
     }
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        isMultipleTouchEnabled = true
+    }
+    
     func render() {
         if let coreWrapper = coreWrapper, let dataProvider = dataProvider {
             video_renderScreen(&coreWrapper.core, data, SCREEN_WIDTH*4)
@@ -34,28 +39,36 @@ class LowResNXView: UIView {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let coreWrapper = coreWrapper, let touch = touches.first {
-            let point = screenPoint(touch: touch)
-            core_touchPressed(&coreWrapper.core, Int32(point.x), Int32(point.y))
+        if let coreWrapper = coreWrapper {
+            for touch in touches {
+                let point = screenPoint(touch: touch)
+                core_touchPressed(&coreWrapper.core, Int32(point.x), Int32(point.y), Unmanaged.passUnretained(touch).toOpaque())
+            }
         }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let coreWrapper = coreWrapper, let touch = touches.first {
-            let point = screenPoint(touch: touch)
-            core_touchDragged(&coreWrapper.core, Int32(point.x), Int32(point.y))
+        if let coreWrapper = coreWrapper {
+            for touch in touches {
+                let point = screenPoint(touch: touch)
+                core_touchDragged(&coreWrapper.core, Int32(point.x), Int32(point.y), Unmanaged.passUnretained(touch).toOpaque())
+            }
         }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let coreWrapper = coreWrapper {
-            core_touchReleased(&coreWrapper.core)
+            for touch in touches {
+                core_touchReleased(&coreWrapper.core, Unmanaged.passUnretained(touch).toOpaque())
+            }
         }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let coreWrapper = coreWrapper {
-            core_touchReleased(&coreWrapper.core)
+            for touch in touches {
+                core_touchReleased(&coreWrapper.core, Unmanaged.passUnretained(touch).toOpaque())
+            }
         }
     }
     

@@ -159,8 +159,14 @@ bool overlay_isInsideButton(struct OverlayButton *button, int x, int y)
 {
     int pixelX = button->x << 3;
     int pixelY = button->y << 3;
-    int size = (button->type == OverlayButtonTypeDPad) ? 24 : 16;
-    return (x >= pixelX && y >= pixelY && x < pixelX + size && y < pixelY + size);
+    if (button->type == OverlayButtonTypeDPad)
+    {
+        return (x >= pixelX - 8 && y >= pixelY - 8 && x < pixelX + 32 && y < pixelY + 32);
+    }
+    else
+    {
+        return (x >= pixelX && y >= pixelY && x < pixelX + 16 && y < pixelY + 16);
+    }
 }
 
 void overlay_handleDPad(union Gamepad *gamepad, struct OverlayButton *button, int x, int y)
@@ -174,17 +180,34 @@ void overlay_handleDPad(union Gamepad *gamepad, struct OverlayButton *button, in
     gamepad->right = (diffX > 3.0) && fabsf(diffY / diffX) < 2.0 ? 1 : 0;
 }
 
-void overlay_touchPressed(struct Core *core, int x, int y)
+struct OverlayTouch *overlay_getTouch(struct Core *core, const void *touchReference)
+{
+    for (int i = 0; i < MAX_TOUCHES; i++)
+    {
+        struct OverlayTouch *touch = &core->overlay.touch[i];
+        if (touch->reference == touchReference)
+        {
+            return touch;
+        }
+    }
+    return NULL;
+}
+
+void overlay_touchPressed(struct Core *core, int x, int y, const void *touchReference)
 {
     for (int i = 0; i < core->overlay.numButtons; i++)
     {
         struct OverlayButton *button = &core->overlay.buttons[i];
         if (overlay_isInsideButton(button, x, y))
         {
-            core->overlay.touch.x = x;
-            core->overlay.touch.y = y;
-            core->overlay.touch.touched = true;
-            core->overlay.touch.currentButton = i;
+            struct OverlayTouch *touch = overlay_getTouch(core, NULL);
+            if (!touch) return;
+            
+            touch->reference = touchReference;
+            touch->x = x;
+            touch->y = y;
+            touch->touched = true;
+            touch->currentButton = i;
             
             union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[button->player];
             switch (button->type)
@@ -210,10 +233,10 @@ void overlay_touchPressed(struct Core *core, int x, int y)
     }
 }
 
-void overlay_touchDragged(struct Core *core, int x, int y)
+void overlay_touchDragged(struct Core *core, int x, int y, const void *touchReference)
 {
-    struct OverlayTouch *touch = &core->overlay.touch;
-    if (touch->touched)
+    struct OverlayTouch *touch = overlay_getTouch(core, touchReference);
+    if (touch && touch->touched)
     {
         struct OverlayButton *button = &core->overlay.buttons[touch->currentButton];
         if (button->type == OverlayButtonTypeDPad)
@@ -224,9 +247,11 @@ void overlay_touchDragged(struct Core *core, int x, int y)
     }
 }
 
-void overlay_touchReleased(struct Core *core)
+void overlay_touchReleased(struct Core *core, const void *touchReference)
 {
-    struct OverlayTouch *touch = &core->overlay.touch;
+    struct OverlayTouch *touch = overlay_getTouch(core, touchReference);
+    if (!touch) return;
+    
     if (touch->touched)
     {
         struct OverlayButton *button = &core->overlay.buttons[touch->currentButton];
@@ -256,4 +281,6 @@ void overlay_touchReleased(struct Core *core)
         
         touch->touched = false;
     }
+    
+    touch->reference = NULL;
 }

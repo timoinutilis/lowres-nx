@@ -26,10 +26,12 @@
 #include "overlay_data.h"
 
 #define MAX_BUTTONS 7
+#define MAX_TOUCHES 4
 
 struct Core;
 
 struct OverlayTouch {
+    const void *reference;
     bool touched;
     int x;
     int y;
@@ -52,7 +54,7 @@ struct OverlayButton {
 
 struct Overlay {
     struct Plane plane;
-    struct OverlayTouch touch;
+    struct OverlayTouch touch[MAX_TOUCHES];
     struct OverlayButton buttons[MAX_BUTTONS];
     int numButtons;
 };
@@ -60,8 +62,8 @@ struct Overlay {
 void overlay_init(struct Core *core);
 void overlay_updateButtonConfiguration(struct Core *core);
 void overlay_drawButtons(struct Core *core);
-void overlay_touchPressed(struct Core *core, int x, int y);
-void overlay_touchDragged(struct Core *core, int x, int y);
-void overlay_touchReleased(struct Core *core);
+void overlay_touchPressed(struct Core *core, int x, int y, const void *touchReference);
+void overlay_touchDragged(struct Core *core, int x, int y, const void *touchReference);
+void overlay_touchReleased(struct Core *core, const void *touchReference);
 
 #endif /* overlay_h */

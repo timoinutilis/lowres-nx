@@ -88,24 +88,24 @@ void core_returnPressed(struct Core *core)
     }
 }
 
-void core_touchPressed(struct Core *core, int x, int y)
+void core_touchPressed(struct Core *core, int x, int y, const void *touchReference)
 {
     if (core->machine.ioRegisters.attr.gamepadsEnabled)
     {
-        overlay_touchPressed(core, x, y);
+        overlay_touchPressed(core, x, y, touchReference);
     }
     else
     {
         core->machine.ioRegisters.status.touch = 1;
-        core_touchDragged(core, x, y);
+        core_touchDragged(core, x, y, touchReference);
     }
 }
 
-void core_touchDragged(struct Core *core, int x, int y)
+void core_touchDragged(struct Core *core, int x, int y, const void *touchReference)
 {
     if (core->machine.ioRegisters.attr.gamepadsEnabled)
     {
-        overlay_touchDragged(core, x, y);
+        overlay_touchDragged(core, x, y, touchReference);
     }
     else if (core->machine.ioRegisters.status.touch)
     {
@@ -116,11 +116,11 @@ void core_touchDragged(struct Core *core, int x, int y)
     }
 }
 
-void core_touchReleased(struct Core *core)
+void core_touchReleased(struct Core *core, const void *touchReference)
 {
     if (core->machine.ioRegisters.attr.gamepadsEnabled)
     {
-        overlay_touchReleased(core);
+        overlay_touchReleased(core, touchReference);
     }
     else
     {

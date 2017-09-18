@@ -150,7 +150,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     override func mouseDragged(with event: NSEvent) {
         if let coreWrapper = coreWrapper {
             let point = screenPoint(event: event)
-            core_touchDragged(&coreWrapper.core, Int32(point.x), Int32(point.y))
+            core_touchDragged(&coreWrapper.core, Int32(point.x), Int32(point.y), nil)
         }
     }
     
@@ -158,14 +158,14 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         if let coreWrapper = coreWrapper {
             let point = screenPoint(event: event)
             if point.y >= 0 {
-                core_touchPressed(&coreWrapper.core, Int32(point.x), Int32(point.y))
+                core_touchPressed(&coreWrapper.core, Int32(point.x), Int32(point.y), nil)
             }
         }
     }
     
     override func mouseUp(with event: NSEvent) {
         if let coreWrapper = coreWrapper {
-            core_touchReleased(&coreWrapper.core)
+            core_touchReleased(&coreWrapper.core, nil)
         }
     }
     
