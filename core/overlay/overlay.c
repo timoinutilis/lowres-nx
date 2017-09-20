@@ -161,8 +161,10 @@ void overlay_clear(struct Core *core)
     {
         for (int x = 0; x < PLANE_COLUMNS; x++)
         {
-            plane->cells[y][x].attr.palette = 0;
-            plane->cells[y][x].attr.priority = 1;
+            struct Cell *cell = &plane->cells[y][x];
+            cell->character = 0;
+            cell->attr.palette = 0;
+            cell->attr.priority = 1;
         }
     }
 }
