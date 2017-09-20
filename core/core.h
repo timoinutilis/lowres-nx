@@ -34,6 +34,7 @@ struct Core {
     struct DiskDrive diskDrive;
     struct Overlay overlay;
     struct CoreDelegate *delegate;
+    int numPhysicalGamepads;
 };
 
 enum GamepadButton {
@@ -60,7 +61,9 @@ void core_touchReleased(struct Core *core, const void *touchReference);
 void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button);
 void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button);
 void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
+void core_pausePressed(struct Core *core);
 
+void core_setNumPhysicalGamepads(struct Core *core, int num);
 bool core_getKeyboardEnabled(struct Core *core);
 
 #endif /* core_h */

@@ -37,6 +37,9 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
             let secondsSincePowerOn = -(NSApp.delegate as! AppDelegate).launchDate.timeIntervalSinceNow
             core_willRunProgram(&coreWrapper.core, Int(secondsSincePowerOn))
             
+            // keyboard counts as physical gamepads
+            core_setNumPhysicalGamepads(&coreWrapper.core, 2)
+            
             timer = Timer.scheduledTimer(timeInterval: 1.0/30.0, target: self, selector: #selector(LowResNXWindowController.update), userInfo: nil, repeats: true)
         }
     }

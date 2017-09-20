@@ -22,18 +22,11 @@
 #include "io_chip.h"
 #include <math.h>
 
+void overlay_clear(struct Core *core);
+
+
 void overlay_init(struct Core *core)
 {
-    struct Plane *plane = &core->overlay.plane;
-    for (int y = 0; y < PLANE_ROWS; y++)
-    {
-        for (int x = 0; x < PLANE_COLUMNS; x++)
-        {
-            plane->cells[y][x].attr.palette = 0;
-            plane->cells[y][x].attr.priority = 1;
-        }
-    }
-    
     overlay_updateButtonConfiguration(core);
 }
 
@@ -41,31 +34,35 @@ void overlay_updateButtonConfiguration(struct Core *core)
 {
     struct OverlayButton *buttons = core->overlay.buttons;
     
-    if (core->machine.ioRegisters.attr.gamepadsEnabled == 1)
+    int numOverlayGamepads = (int)core->machine.ioRegisters.attr.gamepadsEnabled - core->numPhysicalGamepads;
+    
+    if (numOverlayGamepads == 1)
     {
+        int player = core->numPhysicalGamepads;
+        
         core->overlay.numButtons = 4;
         
         buttons[0].type = OverlayButtonTypeDPad;
         buttons[0].x = 1;
         buttons[0].y = 12;
-        buttons[0].player = 0;
+        buttons[0].player = player;
         
         buttons[1].type = OverlayButtonTypeA;
         buttons[1].x = 15;
         buttons[1].y = 13;
-        buttons[1].player = 0;
+        buttons[1].player = player;
         
         buttons[2].type = OverlayButtonTypeB;
         buttons[2].x = 17;
         buttons[2].y = 12;
-        buttons[2].player = 0;
+        buttons[2].player = player;
         
         buttons[3].type = OverlayButtonTypePause;
         buttons[3].x = 12;
         buttons[3].y = 14;
-        buttons[3].player = 0;
+        buttons[3].player = player;
     }
-    else if (core->machine.ioRegisters.attr.gamepadsEnabled == 2)
+    else if (numOverlayGamepads == 2)
     {
         core->overlay.numButtons = 6;
         
@@ -103,6 +100,8 @@ void overlay_updateButtonConfiguration(struct Core *core)
     {
         core->overlay.numButtons = 0;
     }
+    
+    overlay_clear(core);
 }
 
 void overlay_drawDPad(struct Plane *plane, int x, int y, union Gamepad gamepad)
@@ -151,6 +150,19 @@ void overlay_drawButtons(struct Core *core)
             case OverlayButtonTypePause:
                 overlay_drawButton(plane, button->x, button->y, core->machine.ioRegisters.status.pause ? 8 : 6);
                 break;
+        }
+    }
+}
+
+void overlay_clear(struct Core *core)
+{
+    struct Plane *plane = &core->overlay.plane;
+    for (int y = 0; y < PLANE_ROWS; y++)
+    {
+        for (int x = 0; x < PLANE_COLUMNS; x++)
+        {
+            plane->cells[y][x].attr.palette = 0;
+            plane->cells[y][x].attr.priority = 1;
         }
     }
 }

@@ -130,7 +130,7 @@ void core_touchReleased(struct Core *core, const void *touchReference)
 
 void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button)
 {
-    if (core->machine.ioRegisters.attr.gamepadsEnabled)
+    if (core->machine.ioRegisters.attr.gamepadsEnabled > player)
     {
         switch (button)
         {
@@ -158,7 +158,7 @@ void core_gamepadPressed(struct Core *core, int player, enum GamepadButton butto
 
 void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button)
 {
-    if (core->machine.ioRegisters.attr.gamepadsEnabled)
+    if (core->machine.ioRegisters.attr.gamepadsEnabled > player)
     {
         switch (button)
         {
@@ -186,7 +186,7 @@ void core_gamepadReleased(struct Core *core, int player, enum GamepadButton butt
 
 void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB)
 {
-    if (core->machine.ioRegisters.attr.gamepadsEnabled)
+    if (core->machine.ioRegisters.attr.gamepadsEnabled > player)
     {
         union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[player];
         gamepad->up = up;
@@ -196,6 +196,19 @@ void core_setGamepad(struct Core *core, int player, bool up, bool down, bool lef
         gamepad->buttonA = buttonA;
         gamepad->buttonB = buttonB;
     }
+}
+
+void core_pausePressed(struct Core *core)
+{
+    if (core->machine.ioRegisters.attr.gamepadsEnabled > 0) {
+        core->machine.ioRegisters.status.pause = 1;
+    }
+}
+
+void core_setNumPhysicalGamepads(struct Core *core, int num)
+{
+    core->numPhysicalGamepads = num;
+    overlay_updateButtonConfiguration(core);
 }
 
 bool core_getKeyboardEnabled(struct Core *core)

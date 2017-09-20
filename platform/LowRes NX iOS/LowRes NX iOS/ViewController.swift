@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GameController
 
 class ViewController: UIViewController, UIKeyInput {
     
@@ -59,6 +60,12 @@ class ViewController: UIViewController, UIKeyInput {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(controllerDidConnect), name: .GCControllerDidConnect, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(controllerDidDisconnect), name: .GCControllerDidDisconnect, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -88,9 +95,52 @@ class ViewController: UIViewController, UIKeyInput {
     }
     
     func update(displaylink: CADisplayLink) {
+        updateGameControllers()
+        
         if let coreWrapper = coreWrapper {
             core_update(&coreWrapper.core)
             nxView.render()
+        }
+    }
+    
+    func configureGameControllers() {
+        if let coreWrapper = coreWrapper {
+            let gameControllers = GCController.controllers()
+            
+            core_setNumPhysicalGamepads(&coreWrapper.core, Int32(gameControllers.count))
+            
+            var count = 0
+            for gameController in gameControllers {
+                gameController.playerIndex = GCControllerPlayerIndex(rawValue: count)!
+                gameController.controllerPausedHandler = { [weak self] (controller) in
+                    if let coreWrapper = self?.coreWrapper {
+                        core_pausePressed(&coreWrapper.core)
+                    }
+                }
+                count += 1
+            }
+        }
+    }
+    
+    func updateGameControllers() {
+        if let coreWrapper = coreWrapper {
+            for gameController in GCController.controllers() {
+                if let gamepad = gameController.gamepad, gameController.playerIndex != .indexUnset {
+                    var up = gamepad.dpad.up.isPressed
+                    var down = gamepad.dpad.down.isPressed
+                    var left = gamepad.dpad.left.isPressed
+                    var right = gamepad.dpad.right.isPressed
+                    if let stick = gameController.extendedGamepad?.leftThumbstick {
+                        up = up || stick.up.isPressed
+                        down = down || stick.down.isPressed
+                        left = left || stick.left.isPressed
+                        right = right || stick.right.isPressed
+                    }
+                    let buttonA = gamepad.buttonA.isPressed || gamepad.buttonX.isPressed
+                    let buttonB = gamepad.buttonB.isPressed || gamepad.buttonY.isPressed
+                    core_setGamepad(&coreWrapper.core, Int32(gameController.playerIndex.rawValue), up, down, left, right, buttonA, buttonB)
+                }
+            }
         }
     }
     
@@ -128,6 +178,14 @@ class ViewController: UIViewController, UIKeyInput {
         })
     }
     
+    func controllerDidConnect(_ notification: NSNotification) {
+        configureGameControllers()
+    }
+
+    func controllerDidDisconnect(_ notification: NSNotification) {
+        configureGameControllers()
+    }
+    
     // MARK: - Core Delegate
     
     func coreInterpreterDidFail() {
@@ -140,6 +198,8 @@ class ViewController: UIViewController, UIKeyInput {
     }
     
     func coreControlsDidChange() {
+        configureGameControllers()
+        
         if let coreWrapper = coreWrapper {
             if core_getKeyboardEnabled(&coreWrapper.core) {
                 becomeFirstResponder()
