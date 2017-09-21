@@ -20,6 +20,7 @@
 #include "text_lib.h"
 #include "core.h"
 #include <string.h>
+#include <assert.h>
 
 void txtlib_init(struct Core *core)
 {
@@ -41,12 +42,32 @@ void txtlib_init(struct Core *core)
 
 struct Plane *txtlib_getCurrentBackground(struct Core *core)
 {
-    return (core->interpreter.textLib.bg == 0) ? &core->machine.videoRam.planeA : &core->machine.videoRam.planeB;
+    switch (core->interpreter.textLib.bg)
+    {
+        case 0:
+            return &core->machine.videoRam.planeA;
+        case 1:
+            return &core->machine.videoRam.planeB;
+        case 2:
+            return &core->overlay.plane;
+        default:
+            assert(0);
+    }
 }
 
 struct Plane *txtlib_getWindowBackground(struct Core *core)
 {
-    return (core->interpreter.textLib.windowBg == 0) ? &core->machine.videoRam.planeA : &core->machine.videoRam.planeB;
+    switch (core->interpreter.textLib.windowBg)
+    {
+        case 0:
+            return &core->machine.videoRam.planeA;
+        case 1:
+            return &core->machine.videoRam.planeB;
+        case 2:
+            return &core->overlay.plane;
+        default:
+            assert(0);
+    }
 }
 
 void txtlib_scroll(struct Plane *plane, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY)

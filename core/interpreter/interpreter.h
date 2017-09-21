@@ -53,6 +53,7 @@ enum State {
     StateEvaluate,
     StateWait,
     StateInput,
+    StatePaused,
     StateEnd
 };
 

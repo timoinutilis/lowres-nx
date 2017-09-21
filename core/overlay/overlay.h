@@ -57,11 +57,13 @@ struct Overlay {
     struct OverlayTouch touch[MAX_TOUCHES];
     struct OverlayButton buttons[MAX_BUTTONS];
     int numButtons;
+    int timer;
 };
 
 void overlay_init(struct Core *core);
 void overlay_updateButtonConfiguration(struct Core *core);
-void overlay_drawButtons(struct Core *core);
+void overlay_updateState(struct Core *core);
+void overlay_draw(struct Core *core);
 void overlay_touchPressed(struct Core *core, int x, int y, const void *touchReference);
 void overlay_touchDragged(struct Core *core, int x, int y, const void *touchReference);
 void overlay_touchReleased(struct Core *core, const void *touchReference);

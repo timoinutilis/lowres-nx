@@ -51,7 +51,7 @@ void core_update(struct Core *core)
     itp_runProgram(core);
     itp_runInterrupt(core, InterruptTypeVBL);
     itp_didFinishVBL(core);
-    overlay_drawButtons(core);
+    overlay_draw(core);
 }
 
 void core_keyPressed(struct Core *core, char key)
@@ -67,7 +67,15 @@ void core_keyPressed(struct Core *core, char key)
     {
         if (key == 'p' || key == 'P')
         {
-            core->machine.ioRegisters.status.pause = 1;
+            if (core->interpreter.state == StatePaused)
+            {
+                core->interpreter.state = StateEvaluate;
+                overlay_updateState(core);
+            }
+            else
+            {
+                core->machine.ioRegisters.status.pause = 1;
+            }
         }
     }
 }
@@ -90,7 +98,12 @@ void core_returnPressed(struct Core *core)
 
 void core_touchPressed(struct Core *core, int x, int y, const void *touchReference)
 {
-    if (core->machine.ioRegisters.attr.gamepadsEnabled)
+    if (core->interpreter.state == StatePaused)
+    {
+        core->interpreter.state = StateEvaluate;
+        overlay_updateState(core);
+    }
+    else if (core->machine.ioRegisters.attr.gamepadsEnabled)
     {
         overlay_touchPressed(core, x, y, touchReference);
     }
@@ -200,7 +213,12 @@ void core_setGamepad(struct Core *core, int player, bool up, bool down, bool lef
 
 void core_pausePressed(struct Core *core)
 {
-    if (core->machine.ioRegisters.attr.gamepadsEnabled > 0) {
+    if (core->interpreter.state == StatePaused)
+    {
+        core->interpreter.state = StateEvaluate;
+        overlay_updateState(core);
+    }
+    else if (core->machine.ioRegisters.attr.gamepadsEnabled > 0) {
         core->machine.ioRegisters.status.pause = 1;
     }
 }

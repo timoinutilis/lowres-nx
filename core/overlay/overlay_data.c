@@ -20,10 +20,16 @@
 #include "overlay_data.h"
 
 uint8_t overlayColors[] = {
+    // gamepads
     0,
     (3 << 4) | (3 << 2) | 3,
     (2 << 4) | (2 << 2) | 2,
-    (1 << 4) | (1 << 2) | 1
+    (1 << 4) | (1 << 2) | 1,
+    // paused text
+    0,
+    (3 << 4) | (3 << 2) | 3,
+    0,
+    0
 };
 
 uint8_t overlayCharacters[] = {

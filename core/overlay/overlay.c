@@ -104,6 +104,20 @@ void overlay_updateButtonConfiguration(struct Core *core)
     overlay_clear(core);
 }
 
+void overlay_updateState(struct Core *core)
+{
+    if (core->interpreter.state == StatePaused)
+    {
+        core->overlay.numButtons = 0;
+        overlay_clear(core);
+        core->overlay.timer = 0;
+    }
+    else
+    {
+        overlay_updateButtonConfiguration(core);
+    }
+}
+
 void overlay_drawDPad(struct Plane *plane, int x, int y, union Gamepad gamepad)
 {
     plane->cells[y][x].character = 16;
@@ -152,6 +166,33 @@ void overlay_drawButtons(struct Core *core)
                 break;
         }
     }
+}
+
+void overlay_draw(struct Core *core)
+{
+    if (core->interpreter.state == StatePaused)
+    {
+        struct TextLib *lib = &core->interpreter.textLib;
+        struct TextLib userTextLib = *lib;
+        lib->bg = 2;
+        lib->fontCharAttr.priority = 1;
+        lib->fontCharAttr.palette = 1;
+        lib->fontCharOffset = 64;
+        if (core->overlay.timer % 30 < 20)
+        {
+            txtlib_writeText(core, "PAUSED", 7, 7);
+        }
+        else
+        {
+            txtlib_writeText(core, "      ", 7, 7);
+        }
+        core->interpreter.textLib = userTextLib;
+    }
+    else
+    {
+        overlay_drawButtons(core);
+    }
+    core->overlay.timer++;
 }
 
 void overlay_clear(struct Core *core)

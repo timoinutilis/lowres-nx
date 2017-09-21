@@ -198,6 +198,7 @@ void itp_runProgram(struct Core *core)
         }
             
         case StateNoProgram:
+        case StatePaused:
         case StateEnd:
             break;
     }
@@ -212,6 +213,7 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
         case StateEvaluate:
         case StateWait:
         case StateInput:
+        case StatePaused:
         {
             struct Token *startToken;
             int maxCycles;
@@ -274,18 +276,35 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
 
 void itp_didFinishVBL(struct Core *core)
 {
+    struct Interpreter *interpreter = &core->interpreter;
+    
     // remember this frame's IO
     for (int i = 0; i < NUM_GAMEPADS; i++)
     {
-        core->interpreter.lastFrameGamepads[i] = core->machine.ioRegisters.gamepads[i];
+        interpreter->lastFrameGamepads[i] = core->machine.ioRegisters.gamepads[i];
     }
-    core->interpreter.lastFrameIOStatus = core->machine.ioRegisters.status;
+    interpreter->lastFrameIOStatus = core->machine.ioRegisters.status;
     
     // timer
-    core->interpreter.timer++;
-    if (core->interpreter.timer >= TIMER_WRAP_VALUE)
+    interpreter->timer++;
+    if (interpreter->timer >= TIMER_WRAP_VALUE)
     {
-        core->interpreter.timer = 0;
+        interpreter->timer = 0;
+    }
+    
+    if (core->machine.ioRegisters.status.pause)
+    {
+        if (interpreter->state == StateEvaluate || interpreter->state == StateWait)
+        {
+            interpreter->state = StatePaused;
+            overlay_updateState(core);
+        }
+        else if (interpreter->state == StatePaused)
+        {
+            interpreter->state = StateEvaluate;
+            overlay_updateState(core);
+        }
+        core->machine.ioRegisters.status.pause = 0;
     }
 }
 
