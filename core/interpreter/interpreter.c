@@ -37,13 +37,6 @@
 #include "cmd_io.h"
 #include "cmd_files.h"
 
-const char *CharSetDigits = "0123456789";
-const char *CharSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-const char *CharSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
-const char *CharSetHex = "0123456789ABCDEF";
-
-const char *itp_uppercaseString(const char *source);
-enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode);
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
 struct TypedValue itp_evaluateFunction(struct Core *core);
@@ -51,21 +44,21 @@ enum ErrorCode itp_evaluateCommand(struct Core *core);
 
 enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
 {
+    struct Interpreter *interpreter = &core->interpreter;
+    
     // Tokenize
     
-    const char *uppercaseSourceCode = itp_uppercaseString(sourceCode);
-    if (!uppercaseSourceCode) return ErrorOutOfMemory;
-    
-    enum ErrorCode errorCode = itp_tokenizeProgram(core, uppercaseSourceCode);
-    free((void *)uppercaseSourceCode);
-    uppercaseSourceCode = NULL;
-    if (errorCode != ErrorNone) return errorCode;
-    
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Token *errorToken = NULL;
+    enum ErrorCode errorCode = tok_tokenizeProgram(&interpreter->tokenizer, sourceCode, &errorToken);
+    if (errorCode != ErrorNone)
+    {
+        interpreter->pc = errorToken;
+        return errorCode;
+    }
     
     // Prepare
     
-    interpreter->pc = interpreter->tokens;
+    interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->pass = PassPrepare;
     
     do
@@ -125,7 +118,7 @@ void itp_resetProgram(struct Core *core)
 {
     struct Interpreter *interpreter = &core->interpreter;
     
-    interpreter->pc = interpreter->tokens;
+    interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
@@ -316,16 +309,7 @@ void itp_freeProgram(struct Core *core)
     
     var_freeSimpleVariables(interpreter);
     var_freeArrayVariables(interpreter);
-    
-    // Free string tokens
-    for (int i = 0; i < interpreter->numTokens; i++)
-    {
-        struct Token *token = &interpreter->tokens[i];
-        if (token->type == TokenString)
-        {
-            rcstring_release(token->stringValue);
-        }
-    }
+    tok_freeTokens(&interpreter->tokenizer);
     
     // Free null string
     if (interpreter->nullString)
@@ -344,418 +328,6 @@ enum ErrorCode itp_getExitErrorCode(struct Core *core)
 int itp_getPcPositionInSourceCode(struct Core *core)
 {
     return core->interpreter.pc->sourcePosition;
-}
-
-const char *itp_uppercaseString(const char *source)
-{
-    size_t len = strlen(source);
-    char *buffer = malloc(len);
-    if (buffer)
-    {
-        const char *sourceChar = source;
-        char *destChar = buffer;
-        char finalChar = 0;
-        while (*sourceChar)
-        {
-            finalChar = *sourceChar++;
-            if (finalChar >= 'a' && finalChar <= 'z')
-            {
-                finalChar -= 32;
-            }
-            *destChar++ = finalChar;
-        }
-        *destChar = 0;
-    }
-    return buffer;
-}
-
-enum ErrorCode itp_tokenizeProgram(struct Core *core, const char *sourceCode)
-{
-    struct Interpreter *interpreter = &core->interpreter;
-    const char *character = sourceCode;
-    
-    // PROGRAM
-    
-    while (*character && *character != '#')
-    {
-        if (interpreter->numTokens >= MAX_TOKENS - 1)
-        {
-            return ErrorTooManyTokens;
-        }
-        struct Token *token = &interpreter->tokens[interpreter->numTokens];
-        token->sourcePosition = (int)(character - sourceCode);
-        interpreter->pc = token; // for error handling
-        
-        // line break
-        if (*character == '\n')
-        {
-            token->type = TokenEol;
-            interpreter->numTokens++;
-            character++;
-            continue;
-        }
-        
-        // space
-        if (*character == ' ' || *character == '\t')
-        {
-            character++;
-            continue;
-        }
-        
-        // string
-        if (*character == '"')
-        {
-            character++;
-            const char *firstCharacter = character;
-            while (*character && *character != '"')
-            {
-                character++;
-                if (*character == '\n')
-                {
-                    return ErrorUnterminatedString;
-                }
-            }
-            int len = (int)(character - firstCharacter);
-            struct RCString *string = rcstring_new(firstCharacter, len);
-            if (!string) return ErrorOutOfMemory;
-            token->type = TokenString;
-            token->stringValue = string;
-            interpreter->numTokens++;
-            character++;
-            continue;
-        }
-        
-        // number
-        if (strchr(CharSetDigits, *character))
-        {
-            float number = 0;
-            int afterDot = 0;
-            while (*character)
-            {
-                if (strchr(CharSetDigits, *character))
-                {
-                    int digit = (int)*character - (int)'0';
-                    if (afterDot == 0)
-                    {
-                        number *= 10;
-                        number += digit;
-                    }
-                    else
-                    {
-                        number += (float)digit / afterDot;
-                        afterDot *= 10;
-                    }
-                    character++;
-                }
-                else if (*character == '.' && afterDot == 0)
-                {
-                    afterDot = 10;
-                    character++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            token->type = TokenFloat;
-            token->floatValue = number;
-            interpreter->numTokens++;
-            continue;
-        }
-        
-        // hex number
-        if (*character == '$')
-        {
-            character++;
-            int number = 0;
-            while (*character)
-            {
-                char *spos = strchr(CharSetHex, *character);
-                if (spos)
-                {
-                    int digit = (int)(spos - CharSetHex);
-                    number <<= 4;
-                    number += digit;
-                    character++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            token->type = TokenFloat;
-            token->floatValue = number;
-            interpreter->numTokens++;
-            continue;
-        }
-        
-        // bin number
-        if (*character == '%')
-        {
-            character++;
-            int number = 0;
-            while (*character)
-            {
-                if (*character == '0' || *character == '1')
-                {
-                    int digit = *character - '0';
-                    number <<= 1;
-                    number += digit;
-                    character++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            token->type = TokenFloat;
-            token->floatValue = number;
-            interpreter->numTokens++;
-            continue;
-        }
-        
-        // Keyword
-        enum TokenType foundKeywordToken = TokenUndefined;
-        for (int i = 0; i < Token_count; i++)
-        {
-            const char *keyword = TokenStrings[i];
-            if (keyword)
-            {
-                size_t keywordLen = strlen(keyword);
-                int keywordIsAlphaNum = strchr(CharSetAlphaNum, keyword[0]) != NULL;
-                for (int pos = 0; pos <= keywordLen; pos++)
-                {
-                    char textCharacter = character[pos];
-                    
-                    if (pos < keywordLen)
-                    {
-                        char symbCharacter = keyword[pos];
-                        if (symbCharacter != textCharacter)
-                        {
-                            // not matching
-                            break;
-                        }
-                    }
-                    else if (keywordIsAlphaNum && textCharacter && strchr(CharSetAlphaNum, textCharacter))
-                    {
-                        // matching, but word is longer, so seems to be an identifier
-                        break;
-                    }
-                    else
-                    {
-                        // symbol found!
-                        foundKeywordToken = i;
-                        character += keywordLen;
-                        break;
-                    }
-                }
-                if (foundKeywordToken != TokenUndefined)
-                {
-                    break;
-                }
-            }
-        }
-        if (foundKeywordToken != TokenUndefined)
-        {
-            if (foundKeywordToken == TokenREM || foundKeywordToken == TokenApostrophe)
-            {
-                // REM comment, skip until end of line
-                while (*character)
-                {
-                    character++;
-                    if (*character == '\n')
-                    {
-                        character++;
-                        break;
-                    }
-                }
-            }
-            else if (foundKeywordToken > Token_reserved)
-            {
-                return ErrorReservedKeyword;
-            }
-            token->type = foundKeywordToken;
-            interpreter->numTokens++;
-            continue;
-        }
-        
-        // Symbol
-        if (strchr(CharSetLetters, *character))
-        {
-            const char *firstCharacter = character;
-            char isString = 0;
-            while (*character)
-            {
-                if (strchr(CharSetAlphaNum, *character))
-                {
-                    character++;
-                }
-                else
-                {
-                    if (*character == '$')
-                    {
-                        isString = 1;
-                        character++;
-                    }
-                    break;
-                }
-            }
-            if (interpreter->numSymbols >= MAX_SYMBOLS)
-            {
-                return ErrorTooManySymbols;
-            }
-            int len = (int)(character - firstCharacter);
-            if (len >= SYMBOL_NAME_SIZE)
-            {
-                return ErrorSymbolNameTooLong;
-            }
-            char symbolName[SYMBOL_NAME_SIZE];
-            memcpy(symbolName, firstCharacter, len);
-            symbolName[len] = 0;
-            int symbolIndex = -1;
-            // find existing symbol
-            for (int i = 0; i < MAX_SYMBOLS && interpreter->symbols[i].name[0] != 0; i++)
-            {
-                if (strcmp(symbolName, interpreter->symbols[i].name) == 0)
-                {
-                    symbolIndex = i;
-                    break;
-                }
-            }
-            if (symbolIndex == -1)
-            {
-                // add new symbol
-                strcpy(interpreter->symbols[interpreter->numSymbols].name, symbolName);
-                symbolIndex = interpreter->numSymbols++;
-            }
-            if (isString)
-            {
-                token->type = TokenStringIdentifier;
-            }
-            else if (*character == ':')
-            {
-                token->type = TokenLabel;
-                character++;
-                enum ErrorCode errorCode = lab_setJumpLabel(interpreter, symbolIndex, token + 1);
-                if (errorCode != ErrorNone) return errorCode;
-            }
-            else
-            {
-                token->type = TokenIdentifier;
-            }
-            token->symbolIndex = symbolIndex;
-            interpreter->numTokens++;
-            continue;
-        }
-        
-        // Unexpected character
-        return ErrorUnexpectedCharacter;
-    }
-    
-    // add EOL to the end
-    struct Token *token = &interpreter->tokens[interpreter->numTokens];
-    token->sourcePosition = (int)(character - sourceCode);
-    token->type = TokenEol;
-    interpreter->numTokens++;
-
-    
-    // ROM DATA
-    
-    struct RomDataEntry *romDataEntries = interpreter->romDataEntries;
-    
-    uint8_t *currentRomByte = core->machine.cartridgeRom;
-    uint8_t *endRomByte = &core->machine.cartridgeRom[0x8000];
-    
-    while (*character)
-    {
-        if (*character == '#')
-        {
-            character++;
-            
-            // entry index
-            int entryIndex = 0;
-            while (*character)
-            {
-                if (strchr(CharSetDigits, *character))
-                {
-                    int digit = (int)*character - (int)'0';
-                    entryIndex *= 10;
-                    entryIndex += digit;
-                    character++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            if (*character != ':') return ErrorUnexpectedCharacter;
-            
-            if (entryIndex >= MAX_ROM_DATA_ENTRIES) return ErrorIndexOutOfBounds;
-            if (romDataEntries[entryIndex].length > 0) return ErrorIndexAlreadyDefined;
-            
-            // skip until end of line
-            do
-            {
-                character++;
-            }
-            while (*character && *character != '\n');
-            
-            // binary data
-            uint8_t *startByte = currentRomByte;
-            bool shift = true;
-            int value = 0;
-            while (*character && *character != '#')
-            {
-                char *spos = strchr(CharSetHex, *character);
-                if (spos)
-                {
-                    int digit = (int)(spos - CharSetHex);
-                    if (shift)
-                    {
-                        value = digit << 4;
-                    }
-                    else
-                    {
-                        value |= digit;
-                        if (currentRomByte >= endRomByte) return ErrorRomIsFull;
-                        *currentRomByte = value;
-                        ++currentRomByte;
-                    }
-                    shift = !shift;
-                }
-                else if (*character != ' ' && *character == '\t' && *character == '\n')
-                {
-                    return ErrorUnexpectedCharacter;
-                }
-                character++;
-            }
-            if (!shift) return ErrorSyntax; // incomplete hex value
-            
-            struct RomDataEntry *entry = &romDataEntries[entryIndex];
-            entry->start = (int)(startByte - core->machine.cartridgeRom);
-            entry->length = (int)(currentRomByte - startByte);
-        }
-        else if (*character == ' ' || *character == '\t' || *character == '\n')
-        {
-            character++;
-        }
-        else
-        {
-            return ErrorUnexpectedCharacter;
-        }
-    }
-    
-    // add default characters if #0 is unused
-    struct RomDataEntry *entry0 = &interpreter->romDataEntries[0];
-    if (entry0->length == 0 && endRomByte - currentRomByte >= 4096)
-    {
-        memcpy(currentRomByte, DefaultCharacters, 4096);
-        entry0->start = (int)(currentRomByte - core->machine.cartridgeRom);
-        entry0->length = 4096;
-        interpreter->romIncludesDefaultCharacters = true;
-    }
-    
-    return ErrorNone;
 }
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode)

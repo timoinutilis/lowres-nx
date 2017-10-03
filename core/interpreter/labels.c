@@ -48,34 +48,3 @@ struct LabelStackItem *lab_peekLabelStackItem(struct Interpreter *interpreter)
     }
     return NULL;
 }
-
-struct JumpLabelItem *lab_getJumpLabel(struct Interpreter *interpreter, int symbolIndex)
-{
-    struct JumpLabelItem *item;
-    for (int i = 0; i < interpreter->numJumpLabelItems; i++)
-    {
-        item = &interpreter->jumpLabelItems[i];
-        if (item->symbolIndex == symbolIndex)
-        {
-            return item;
-        }
-    }
-    return NULL;
-}
-
-enum ErrorCode lab_setJumpLabel(struct Interpreter *interpreter, int symbolIndex, struct Token *token)
-{
-    if (lab_getJumpLabel(interpreter, symbolIndex) != NULL)
-    {
-        return ErrorLabelAlreadyDefined;
-    }
-    if (interpreter->numJumpLabelItems >= MAX_JUMP_LABEL_ITEMS)
-    {
-        return ErrorTooManyLabels;
-    }
-    struct JumpLabelItem *item = &interpreter->jumpLabelItems[interpreter->numJumpLabelItems];
-    item->symbolIndex = symbolIndex;
-    item->token = token;
-    interpreter->numJumpLabelItems++;
-    return ErrorNone;
-}

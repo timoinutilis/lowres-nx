@@ -369,7 +369,7 @@ enum ErrorCode cmd_GOTO(struct Core *core)
 
     if (interpreter->pass == PassPrepare)
     {
-        struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+        struct JumpLabelItem *item = tok_getJumpLabel(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedLabel;
         tokenGOTO->jumpToken = item->token;
         
@@ -397,7 +397,7 @@ enum ErrorCode cmd_GOSUB(struct Core *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+        struct JumpLabelItem *item = tok_getJumpLabel(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedLabel;
         tokenGOSUB->jumpToken = item->token;
         
@@ -433,7 +433,7 @@ enum ErrorCode cmd_RETURN(struct Core *core)
     {
         if (tokenIdentifier)
         {
-            struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+            struct JumpLabelItem *item = tok_getJumpLabel(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
             if (!item) return ErrorUndefinedLabel;
             tokenRETURN->jumpToken = item->token;
         }
@@ -548,7 +548,7 @@ enum ErrorCode cmd_ON(struct Core *core)
         
         if (interpreter->pass == PassPrepare)
         {
-            struct JumpLabelItem *item = lab_getJumpLabel(interpreter, tokenIdentifier->symbolIndex);
+            struct JumpLabelItem *item = tok_getJumpLabel(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
             if (!item) return ErrorUndefinedLabel;
             tokenGOSUB->jumpToken = item->token;
         }

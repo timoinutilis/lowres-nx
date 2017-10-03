@@ -110,7 +110,7 @@ enum ErrorCode cmd_RESTORE(struct Core *core)
     {
         if (interpreter->pass == PassPrepare)
         {
-            struct JumpLabelItem *item = lab_getJumpLabel(interpreter, interpreter->pc->symbolIndex);
+            struct JumpLabelItem *item = tok_getJumpLabel(&interpreter->tokenizer, interpreter->pc->symbolIndex);
             if (!item) return ErrorUndefinedLabel;
             tokenRESTORE->jumpToken = item->token;
         }

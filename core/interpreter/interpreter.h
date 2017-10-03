@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "interpreter_config.h"
+#include "tokenizer.h"
 #include "token.h"
 #include "error.h"
 #include "value.h"
@@ -63,10 +64,6 @@ enum Mode {
     ModeInterrupt
 };
 
-struct Symbol {
-    char name[SYMBOL_NAME_SIZE];
-};
-
 struct RomDataEntry {
     int start;
     int length;
@@ -84,18 +81,14 @@ struct Interpreter {
     struct Token *pc;
     enum ErrorCode exitErrorCode;
     
-    struct Token tokens[MAX_TOKENS];
-    int numTokens;
-    struct Symbol symbols[MAX_SYMBOLS];
-    int numSymbols;
+    struct Tokenizer tokenizer;
     
     struct RomDataEntry romDataEntries[MAX_ROM_DATA_ENTRIES];
     bool romIncludesDefaultCharacters;
     
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
     int numLabelStackItems;
-    struct JumpLabelItem jumpLabelItems[MAX_JUMP_LABEL_ITEMS];
-    int numJumpLabelItems;
+    
     bool isSingleLineIf;
     
     struct SimpleVariable simpleVariables[MAX_SIMPLE_VARIABLES];
