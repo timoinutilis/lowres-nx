@@ -23,7 +23,7 @@
 
 enum ErrorCode cmd_END(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
@@ -41,7 +41,7 @@ enum ErrorCode cmd_END(struct Core *core)
 
 enum ErrorCode cmd_IF(struct Core *core, bool isAfterBlockElse)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // IF
     struct Token *tokenIF = interpreter->pc;
@@ -92,7 +92,7 @@ enum ErrorCode cmd_IF(struct Core *core, bool isAfterBlockElse)
 
 enum ErrorCode cmd_ELSE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // ELSE
     struct Token *tokenELSE = interpreter->pc;
@@ -155,7 +155,7 @@ enum ErrorCode cmd_ELSE(struct Core *core)
 
 enum ErrorCode cmd_END_IF(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // END IF
     ++interpreter->pc;
@@ -194,7 +194,7 @@ enum ErrorCode cmd_END_IF(struct Core *core)
 
 enum ErrorCode cmd_FOR(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // FOR
     struct Token *tokenFOR = interpreter->pc;
@@ -268,7 +268,7 @@ enum ErrorCode cmd_FOR(struct Core *core)
 
 enum ErrorCode cmd_NEXT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     struct LabelStackItem *itemFORLimit = NULL;
     struct LabelStackItem *itemFORVar = NULL;
     struct LabelStackItem *itemFOR = NULL;
@@ -354,7 +354,7 @@ enum ErrorCode cmd_NEXT(struct Core *core)
 
 enum ErrorCode cmd_GOTO(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
@@ -384,7 +384,7 @@ enum ErrorCode cmd_GOTO(struct Core *core)
 
 enum ErrorCode cmd_GOSUB(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // GOSUB
     struct Token *tokenGOSUB = interpreter->pc;
@@ -415,7 +415,7 @@ enum ErrorCode cmd_GOSUB(struct Core *core)
 
 enum ErrorCode cmd_RETURN(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // RETURN
     struct Token *tokenRETURN = interpreter->pc;
@@ -475,7 +475,7 @@ enum ErrorCode cmd_RETURN(struct Core *core)
 
 enum ErrorCode cmd_WAIT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
@@ -509,7 +509,7 @@ enum ErrorCode cmd_WAIT(struct Core *core)
 
 enum ErrorCode cmd_ON(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // ON
     ++interpreter->pc;
@@ -570,7 +570,7 @@ enum ErrorCode cmd_ON(struct Core *core)
 
 enum ErrorCode cmd_DO(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // DO
     ++interpreter->pc;
@@ -590,7 +590,7 @@ enum ErrorCode cmd_DO(struct Core *core)
 
 enum ErrorCode cmd_LOOP(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // LOOP
     struct Token *tokenLOOP = interpreter->pc;
@@ -617,7 +617,7 @@ enum ErrorCode cmd_LOOP(struct Core *core)
 
 enum ErrorCode cmd_REPEAT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // REPEAT
     ++interpreter->pc;
@@ -637,7 +637,7 @@ enum ErrorCode cmd_REPEAT(struct Core *core)
 
 enum ErrorCode cmd_UNTIL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // UNTIL
     struct Token *tokenUNTIL = interpreter->pc;
@@ -671,7 +671,7 @@ enum ErrorCode cmd_UNTIL(struct Core *core)
 
 enum ErrorCode cmd_WHILE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // WHILE
     struct Token *tokenWHILE = interpreter->pc;
@@ -703,7 +703,7 @@ enum ErrorCode cmd_WHILE(struct Core *core)
 
 enum ErrorCode cmd_WEND(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // WEND
     struct Token *tokenWEND = interpreter->pc;

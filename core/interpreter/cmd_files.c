@@ -23,7 +23,7 @@
 
 enum ErrorCode cmd_LOAD(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // LOAD
     ++interpreter->pc;
@@ -53,7 +53,7 @@ enum ErrorCode cmd_LOAD(struct Core *core)
 
 enum ErrorCode cmd_SAVE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // SAVE
     ++interpreter->pc;
@@ -91,7 +91,7 @@ enum ErrorCode cmd_SAVE(struct Core *core)
 
 struct TypedValue fnc_FIRST(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // FIRST$
     ++interpreter->pc;
@@ -113,7 +113,7 @@ struct TypedValue fnc_FIRST(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        resultValue.v.stringValue = core->interpreter.nullString;
+        resultValue.v.stringValue = core->interpreter->nullString;
         rcstring_retain(resultValue.v.stringValue);
         rcstring_release(filterValue.v.stringValue);
     }
@@ -122,7 +122,7 @@ struct TypedValue fnc_FIRST(struct Core *core)
 
 struct TypedValue fnc_NEXT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // NEXT$
     ++interpreter->pc;
@@ -132,7 +132,7 @@ struct TypedValue fnc_NEXT(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        resultValue.v.stringValue = core->interpreter.nullString;
+        resultValue.v.stringValue = core->interpreter->nullString;
         rcstring_retain(resultValue.v.stringValue);
     }
     return resultValue;

@@ -24,32 +24,32 @@
 
 void txtlib_init(struct Core *core)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     lib->fontCharOffset = 192;
     
     txtlib_clearScreen(core);
     
-    core->machine.colorRegisters.colors[1] = (3 << 4) | (3 << 2) | 3;
-    core->machine.colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
-    core->machine.colorRegisters.colors[3] = (1 << 4) | (1 << 2) | 1;
+    core->machine->colorRegisters.colors[1] = (3 << 4) | (3 << 2) | 3;
+    core->machine->colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
+    core->machine->colorRegisters.colors[3] = (1 << 4) | (1 << 2) | 1;
     
-    if (core->interpreter.romIncludesDefaultCharacters)
+    if (core->interpreter->romIncludesDefaultCharacters)
     {
-        struct RomDataEntry *entry0 = core->interpreter.romDataEntries;
-        memcpy(core->machine.videoRam.characters, &core->machine.cartridgeRom[entry0->start], entry0->length);
+        struct RomDataEntry *entry0 = core->interpreter->romDataEntries;
+        memcpy(core->machine->videoRam.characters, &core->machine->cartridgeRom[entry0->start], entry0->length);
     }
 }
 
 struct Plane *txtlib_getCurrentBackground(struct Core *core)
 {
-    switch (core->interpreter.textLib.bg)
+    switch (core->interpreter->textLib.bg)
     {
         case 0:
-            return &core->machine.videoRam.planeA;
+            return &core->machine->videoRam.planeA;
         case 1:
-            return &core->machine.videoRam.planeB;
+            return &core->machine->videoRam.planeB;
         case 2:
-            return &core->overlay.plane;
+            return &core->overlay->plane;
         default:
             assert(0);
     }
@@ -57,14 +57,14 @@ struct Plane *txtlib_getCurrentBackground(struct Core *core)
 
 struct Plane *txtlib_getWindowBackground(struct Core *core)
 {
-    switch (core->interpreter.textLib.windowBg)
+    switch (core->interpreter->textLib.windowBg)
     {
         case 0:
-            return &core->machine.videoRam.planeA;
+            return &core->machine->videoRam.planeA;
         case 1:
-            return &core->machine.videoRam.planeB;
+            return &core->machine->videoRam.planeB;
         case 2:
-            return &core->overlay.plane;
+            return &core->overlay->plane;
         default:
             assert(0);
     }
@@ -83,7 +83,7 @@ void txtlib_scroll(struct Plane *plane, int fromX, int fromY, int toX, int toY, 
 
 void txtlib_scrollWindowIfNeeded(struct Core *core)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getWindowBackground(core);
     
     if (lib->cursorY >= lib->windowHeight)
@@ -102,13 +102,13 @@ void txtlib_scrollWindowIfNeeded(struct Core *core)
         }
         
         lib->cursorY = lib->windowHeight - 1;
-        core->interpreter.exitEvaluation = true;
+        core->interpreter->exitEvaluation = true;
     }
 }
 
 void txtlib_printText(struct Core *core, const char *text)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getWindowBackground(core);
     const char *letter = text;
     while (*letter)
@@ -141,7 +141,7 @@ void txtlib_printText(struct Core *core, const char *text)
 
 bool txtlib_deleteBackward(struct Core *core)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getWindowBackground(core);
     
     // clear cursor
@@ -174,7 +174,7 @@ bool txtlib_deleteBackward(struct Core *core)
 
 void txtlib_writeText(struct Core *core, const char *text, int x, int y)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getCurrentBackground(core);
     const char *letter = text;
     while (*letter)
@@ -193,7 +193,7 @@ void txtlib_writeText(struct Core *core, const char *text, int x, int y)
 
 void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getCurrentBackground(core);
     
     x += digits;
@@ -210,13 +210,13 @@ void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
 
 void txtlib_inputBegin(struct Core *core)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     lib->inputBuffer[0] = 0;
     lib->inputLength = 0;
     lib->blink = 0;
-    core->machine.ioRegisters.key = 0;
+    core->machine->ioRegisters.key = 0;
     
-    core->machine.ioRegisters.attr.keyboardEnabled = 1;
+    core->machine->ioRegisters.attr.keyboardEnabled = 1;
     core->delegate->controlsDidChange(core->delegate->context);
     
     txtlib_scrollWindowIfNeeded(core);
@@ -224,10 +224,10 @@ void txtlib_inputBegin(struct Core *core)
 
 bool txtlib_inputUpdate(struct Core *core)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getWindowBackground(core);
     
-    char key = core->machine.ioRegisters.key;
+    char key = core->machine->ioRegisters.key;
     bool done = false;
     if (key)
     {
@@ -264,7 +264,7 @@ bool txtlib_inputUpdate(struct Core *core)
             }
         }
         lib->blink = 0;
-        core->machine.ioRegisters.key = 0;
+        core->machine->ioRegisters.key = 0;
     }
     if (!done)
     {
@@ -282,7 +282,7 @@ bool txtlib_inputUpdate(struct Core *core)
 
 void txtlib_clearWindow(struct Core *core)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getWindowBackground(core);
     
     lib->cursorX = 0;
@@ -302,11 +302,11 @@ void txtlib_clearWindow(struct Core *core)
 
 void txtlib_clearScreen(struct Core *core)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
-    struct VideoRegisters *reg = &core->machine.videoRegisters;
+    struct TextLib *lib = &core->interpreter->textLib;
+    struct VideoRegisters *reg = &core->machine->videoRegisters;
     
-    memset(&core->machine.videoRam.planeA, 0, sizeof(struct Plane));
-    memset(&core->machine.videoRam.planeB, 0, sizeof(struct Plane));
+    memset(&core->machine->videoRam.planeA, 0, sizeof(struct Plane));
+    memset(&core->machine->videoRam.planeB, 0, sizeof(struct Plane));
     
     reg->scrollAX = 0;
     reg->scrollAY = 0;
@@ -329,11 +329,11 @@ void txtlib_clearBackground(struct Core *core, int bg)
 {
     if (bg == 0)
     {
-        memset(&core->machine.videoRam.planeA, 0, sizeof(struct Plane));
+        memset(&core->machine->videoRam.planeA, 0, sizeof(struct Plane));
     }
     else if (bg == 1)
     {
-        memset(&core->machine.videoRam.planeB, 0, sizeof(struct Plane));
+        memset(&core->machine->videoRam.planeB, 0, sizeof(struct Plane));
     }
 }
 
@@ -345,7 +345,7 @@ struct Cell *txtlib_getCell(struct Core *core, int x, int y)
 
 void txtlib_setCell(struct Core *core, int x, int y)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getCurrentBackground(core);
     struct Cell *cell = &plane->cells[y][x];
     cell->character = lib->cellChar;
@@ -354,7 +354,7 @@ void txtlib_setCell(struct Core *core, int x, int y)
 
 void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY)
 {
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getCurrentBackground(core);
     for (int y = fromY; y <= toY; y++)
     {
@@ -376,7 +376,7 @@ void txtlib_scrollBackground(struct Core *core, int fromX, int fromY, int toX, i
 void txtlib_copyBackground(struct Core *core, int srcX, int srcY, int width, int height, int dstX, int dstY)
 {
     struct Plane *plane = txtlib_getCurrentBackground(core);
-    struct TextLib *lib = &core->interpreter.textLib;
+    struct TextLib *lib = &core->interpreter->textLib;
     
     for (int y = 0; y < height; y++)
     {

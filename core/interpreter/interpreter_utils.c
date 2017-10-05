@@ -11,7 +11,7 @@
 
 struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr, bool isOptional)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pc->type == TokenBracketOpen)
     {
         // bracket open
@@ -85,7 +85,7 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
 
 struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union DisplayAttributes oldAttr)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pc->type == TokenBracketOpen)
     {
         // bracket open

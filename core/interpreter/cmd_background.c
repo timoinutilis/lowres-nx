@@ -26,7 +26,7 @@
 
 enum ErrorCode cmd_BG(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // BG
     ++interpreter->pc;
@@ -45,7 +45,7 @@ enum ErrorCode cmd_BG(struct Core *core)
 
 enum ErrorCode cmd_BG_SOURCE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // BG SOURCE
     ++interpreter->pc;
@@ -65,8 +65,8 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        core->interpreter.textLib.sourceAddress = aValue.v.floatValue;
-        core->interpreter.textLib.sourceWidth = wValue.v.floatValue;
+        core->interpreter->textLib.sourceAddress = aValue.v.floatValue;
+        core->interpreter->textLib.sourceWidth = wValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -74,7 +74,7 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
 
 enum ErrorCode cmd_BG_COPY(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // BG COPY
     ++interpreter->pc;
@@ -134,7 +134,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
 
 enum ErrorCode cmd_BG_SCROLL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // BG SCROLL
     ++interpreter->pc;
@@ -194,7 +194,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
 
 enum ErrorCode cmd_CHAR(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // CHAR
     ++interpreter->pc;
@@ -222,7 +222,7 @@ enum ErrorCode cmd_CHAR(struct Core *core)
 
 enum ErrorCode cmd_BG_FILL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // BG FILL
     ++interpreter->pc;
@@ -266,7 +266,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
 
 enum ErrorCode cmd_CELL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // CELL
     ++interpreter->pc;
@@ -293,7 +293,7 @@ enum ErrorCode cmd_CELL(struct Core *core)
 
 struct TypedValue fnc_CELL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // CELL.?
     enum TokenType type = interpreter->pc->type;

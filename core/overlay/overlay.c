@@ -32,15 +32,15 @@ void overlay_init(struct Core *core)
 
 void overlay_updateButtonConfiguration(struct Core *core)
 {
-    struct OverlayButton *buttons = core->overlay.buttons;
+    struct OverlayButton *buttons = core->overlay->buttons;
     
-    int numOverlayGamepads = (int)core->machine.ioRegisters.attr.gamepadsEnabled - core->numPhysicalGamepads;
+    int numOverlayGamepads = (int)core->machine->ioRegisters.attr.gamepadsEnabled - core->numPhysicalGamepads;
     
     if (numOverlayGamepads == 1)
     {
         int player = core->numPhysicalGamepads;
         
-        core->overlay.numButtons = 4;
+        core->overlay->numButtons = 4;
         
         buttons[0].type = OverlayButtonTypeDPad;
         buttons[0].x = 1;
@@ -64,7 +64,7 @@ void overlay_updateButtonConfiguration(struct Core *core)
     }
     else if (numOverlayGamepads == 2)
     {
-        core->overlay.numButtons = 6;
+        core->overlay->numButtons = 6;
         
         buttons[0].type = OverlayButtonTypeDPad;
         buttons[0].x = 1;
@@ -98,7 +98,7 @@ void overlay_updateButtonConfiguration(struct Core *core)
     }
     else
     {
-        core->overlay.numButtons = 0;
+        core->overlay->numButtons = 0;
     }
     
     overlay_clear(core);
@@ -106,11 +106,11 @@ void overlay_updateButtonConfiguration(struct Core *core)
 
 void overlay_updateState(struct Core *core)
 {
-    if (core->interpreter.state == StatePaused)
+    if (core->interpreter->state == StatePaused)
     {
-        core->overlay.numButtons = 0;
+        core->overlay->numButtons = 0;
         overlay_clear(core);
-        core->overlay.timer = 0;
+        core->overlay->timer = 0;
     }
     else
     {
@@ -141,12 +141,12 @@ void overlay_drawButton(struct Plane *plane, int x, int y, int character)
 
 void overlay_drawButtons(struct Core *core)
 {
-    struct Plane *plane = &core->overlay.plane;
+    struct Plane *plane = &core->overlay->plane;
     
-    for (int i = 0; i < core->overlay.numButtons; i++)
+    for (int i = 0; i < core->overlay->numButtons; i++)
     {
-        struct OverlayButton *button = &core->overlay.buttons[i];
-        union Gamepad gamepad = core->machine.ioRegisters.gamepads[button->player];
+        struct OverlayButton *button = &core->overlay->buttons[i];
+        union Gamepad gamepad = core->machine->ioRegisters.gamepads[button->player];
         switch (button->type)
         {
             case OverlayButtonTypeDPad:
@@ -162,7 +162,7 @@ void overlay_drawButtons(struct Core *core)
                 break;
                 
             case OverlayButtonTypePause:
-                overlay_drawButton(plane, button->x, button->y, core->machine.ioRegisters.status.pause ? 8 : 6);
+                overlay_drawButton(plane, button->x, button->y, core->machine->ioRegisters.status.pause ? 8 : 6);
                 break;
         }
     }
@@ -170,15 +170,15 @@ void overlay_drawButtons(struct Core *core)
 
 void overlay_draw(struct Core *core)
 {
-    if (core->interpreter.state == StatePaused)
+    if (core->interpreter->state == StatePaused)
     {
-        struct TextLib *lib = &core->interpreter.textLib;
+        struct TextLib *lib = &core->interpreter->textLib;
         struct TextLib userTextLib = *lib;
         lib->bg = 2;
         lib->fontCharAttr.priority = 1;
         lib->fontCharAttr.palette = 1;
         lib->fontCharOffset = 64;
-        if (core->overlay.timer % 30 < 20)
+        if (core->overlay->timer % 30 < 20)
         {
             txtlib_writeText(core, "PAUSED", 7, 7);
         }
@@ -186,18 +186,18 @@ void overlay_draw(struct Core *core)
         {
             txtlib_writeText(core, "      ", 7, 7);
         }
-        core->interpreter.textLib = userTextLib;
+        core->interpreter->textLib = userTextLib;
     }
     else
     {
         overlay_drawButtons(core);
     }
-    core->overlay.timer++;
+    core->overlay->timer++;
 }
 
 void overlay_clear(struct Core *core)
 {
-    struct Plane *plane = &core->overlay.plane;
+    struct Plane *plane = &core->overlay->plane;
     for (int y = 0; y < PLANE_ROWS; y++)
     {
         for (int x = 0; x < PLANE_COLUMNS; x++)
@@ -239,7 +239,7 @@ struct OverlayTouch *overlay_getTouch(struct Core *core, const void *touchRefere
 {
     for (int i = 0; i < MAX_TOUCHES; i++)
     {
-        struct OverlayTouch *touch = &core->overlay.touch[i];
+        struct OverlayTouch *touch = &core->overlay->touch[i];
         if (touch->reference == touchReference)
         {
             return touch;
@@ -250,9 +250,9 @@ struct OverlayTouch *overlay_getTouch(struct Core *core, const void *touchRefere
 
 void overlay_touchPressed(struct Core *core, int x, int y, const void *touchReference)
 {
-    for (int i = 0; i < core->overlay.numButtons; i++)
+    for (int i = 0; i < core->overlay->numButtons; i++)
     {
-        struct OverlayButton *button = &core->overlay.buttons[i];
+        struct OverlayButton *button = &core->overlay->buttons[i];
         if (overlay_isInsideButton(button, x, y))
         {
             struct OverlayTouch *touch = overlay_getTouch(core, NULL);
@@ -264,7 +264,7 @@ void overlay_touchPressed(struct Core *core, int x, int y, const void *touchRefe
             touch->touched = true;
             touch->currentButton = i;
             
-            union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[button->player];
+            union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[button->player];
             switch (button->type)
             {
                 case OverlayButtonTypeDPad:
@@ -280,7 +280,7 @@ void overlay_touchPressed(struct Core *core, int x, int y, const void *touchRefe
                     break;
                     
                 case OverlayButtonTypePause:
-                    core->machine.ioRegisters.status.pause = 1;
+                    core->machine->ioRegisters.status.pause = 1;
                     break;
             }
             break;
@@ -293,10 +293,10 @@ void overlay_touchDragged(struct Core *core, int x, int y, const void *touchRefe
     struct OverlayTouch *touch = overlay_getTouch(core, touchReference);
     if (touch && touch->touched)
     {
-        struct OverlayButton *button = &core->overlay.buttons[touch->currentButton];
+        struct OverlayButton *button = &core->overlay->buttons[touch->currentButton];
         if (button->type == OverlayButtonTypeDPad)
         {
-            union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[button->player];
+            union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[button->player];
             overlay_handleDPad(gamepad, button, x, y);
         }
     }
@@ -309,9 +309,9 @@ void overlay_touchReleased(struct Core *core, const void *touchReference)
     
     if (touch->touched)
     {
-        struct OverlayButton *button = &core->overlay.buttons[touch->currentButton];
+        struct OverlayButton *button = &core->overlay->buttons[touch->currentButton];
         
-        union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[button->player];
+        union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[button->player];
         switch (button->type)
         {
             case OverlayButtonTypeDPad:
@@ -330,7 +330,7 @@ void overlay_touchReleased(struct Core *core, const void *touchReference)
                 break;
                 
             case OverlayButtonTypePause:
-                core->machine.ioRegisters.status.pause = 0;
+                core->machine->ioRegisters.status.pause = 0;
                 break;
         }
         

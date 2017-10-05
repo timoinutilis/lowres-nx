@@ -131,10 +131,10 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
     uint8_t scanlineSpriteBuffer[SCREEN_WIDTH];
     uint8_t *outputByte = outputRGB;
     
-    struct VideoRam *ram = &core->machine.videoRam;
-    struct VideoRegisters *reg = &core->machine.videoRegisters;
-    struct SpriteRegisters *sreg = &core->machine.spriteRegisters;
-    struct ColorRegisters *creg = &core->machine.colorRegisters;
+    struct VideoRam *ram = &core->machine->videoRam;
+    struct VideoRegisters *reg = &core->machine->videoRegisters;
+    struct SpriteRegisters *sreg = &core->machine->spriteRegisters;
+    struct ColorRegisters *creg = &core->machine->colorRegisters;
     for (int y = 0; y < SCREEN_HEIGHT; y++)
     {
         reg->rasterLine = y;
@@ -155,7 +155,7 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
         }
         
         // overlay
-        video_renderPlane((struct Character *)overlayCharacters, &core->overlay.plane, y, 0, 0, OVERLAY_FLAG, scanlineBuffer);
+        video_renderPlane((struct Character *)overlayCharacters, &core->overlay->plane, y, 0, 0, OVERLAY_FLAG, scanlineBuffer);
         
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {

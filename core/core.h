@@ -29,10 +29,10 @@
 #include "core_delegate.h"
 
 struct Core {
-    struct Machine machine;
-    struct Interpreter interpreter;
-    struct DiskDrive diskDrive;
-    struct Overlay overlay;
+    struct Machine *machine;
+    struct Interpreter *interpreter;
+    struct DiskDrive *diskDrive;
+    struct Overlay *overlay;
     struct CoreDelegate *delegate;
     int numPhysicalGamepads;
 };

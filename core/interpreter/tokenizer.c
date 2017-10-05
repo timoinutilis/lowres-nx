@@ -19,13 +19,9 @@
 
 #include "tokenizer.h"
 #include "error.h"
+#include "charsets.h"
 #include <string.h>
 #include <stdlib.h>
-
-const char *CharSetDigits = "0123456789";
-const char *CharSetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-const char *CharSetAlphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
-const char *CharSetHex = "0123456789ABCDEF";
 
 enum ErrorCode tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const char *sourceCode, struct Token **errorToken);
 const char *tok_uppercaseString(const char *source);
@@ -355,91 +351,7 @@ enum ErrorCode tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const c
     
     
     // ROM DATA
-    /*
-    struct RomDataEntry *romDataEntries = interpreter->romDataEntries;
-    
-    uint8_t *currentRomByte = core->machine.cartridgeRom;
-    uint8_t *endRomByte = &core->machine.cartridgeRom[0x8000];
-    
-    while (*character)
-    {
-        if (*character == '#')
-        {
-            character++;
-            
-            // entry index
-            int entryIndex = 0;
-            while (*character)
-            {
-                if (strchr(CharSetDigits, *character))
-                {
-                    int digit = (int)*character - (int)'0';
-                    entryIndex *= 10;
-                    entryIndex += digit;
-                    character++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            if (*character != ':') return ErrorUnexpectedCharacter;
-            
-            if (entryIndex >= MAX_ROM_DATA_ENTRIES) return ErrorIndexOutOfBounds;
-            if (romDataEntries[entryIndex].length > 0) return ErrorIndexAlreadyDefined;
-            
-            // skip until end of line
-            do
-            {
-                character++;
-            }
-            while (*character && *character != '\n');
-            
-            // binary data
-            uint8_t *startByte = currentRomByte;
-            bool shift = true;
-            int value = 0;
-            while (*character && *character != '#')
-            {
-                char *spos = strchr(CharSetHex, *character);
-                if (spos)
-                {
-                    int digit = (int)(spos - CharSetHex);
-                    if (shift)
-                    {
-                        value = digit << 4;
-                    }
-                    else
-                    {
-                        value |= digit;
-                        if (currentRomByte >= endRomByte) return ErrorRomIsFull;
-                        *currentRomByte = value;
-                        ++currentRomByte;
-                    }
-                    shift = !shift;
-                }
-                else if (*character != ' ' && *character == '\t' && *character == '\n')
-                {
-                    return ErrorUnexpectedCharacter;
-                }
-                character++;
-            }
-            if (!shift) return ErrorSyntax; // incomplete hex value
-            
-            struct RomDataEntry *entry = &romDataEntries[entryIndex];
-            entry->start = (int)(startByte - core->machine.cartridgeRom);
-            entry->length = (int)(currentRomByte - startByte);
-        }
-        else if (*character == ' ' || *character == '\t' || *character == '\n')
-        {
-            character++;
-        }
-        else
-        {
-            return ErrorUnexpectedCharacter;
-        }
-    }
-    
+/*
     // add default characters if #0 is unused
     struct RomDataEntry *entry0 = &interpreter->romDataEntries[0];
     if (entry0->length == 0 && endRomByte - currentRomByte >= 4096)

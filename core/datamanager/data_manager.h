@@ -17,26 +17,29 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef disk_drive_h
-#define disk_drive_h
+#ifndef data_manager_h
+#define data_manager_h
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "data_manager.h"
+#include "error.h"
 
-struct Core;
+#define MAX_ENTRIES 16
+#define DATA_SIZE 0x8000
+#define ENTRY_COMMENT_SIZE 32
 
-struct DiskDrive {
-    struct DataManager dataManager;
-    bool hasChanges;
+struct DataEntry {
+    char comment[ENTRY_COMMENT_SIZE];
+    int start;
+    int length;
 };
 
-void disk_init(struct Core *core);
-void disk_deinit(struct Core *core);
-bool disk_importDisk(struct Core *core, const char *input);
-char *disk_exportDisk(struct Core *core);
+struct DataManager {
+    struct DataEntry entries[MAX_ENTRIES];
+    uint8_t *data;
+};
 
-void disk_saveFile(struct Core *core, char *name, int address, int length);
-void disk_loadFile(struct Core *core, char *name, int address);
+enum ErrorCode data_import(struct DataManager *manager, const char *input);
+char *data_export(struct DataManager *manager);
 
-#endif /* disk_drive_h */
+#endif /* data_manager_h */

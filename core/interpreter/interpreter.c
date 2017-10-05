@@ -42,9 +42,14 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
 struct TypedValue itp_evaluateFunction(struct Core *core);
 enum ErrorCode itp_evaluateCommand(struct Core *core);
 
+void itp_init(struct Core *core)
+{
+    core->interpreter->dataManager.data = core->machine->cartridgeRom;
+}
+
 enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // Tokenize
     
@@ -116,7 +121,7 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
 
 void itp_resetProgram(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->pass = PassRun;
@@ -135,7 +140,7 @@ void itp_resetProgram(struct Core *core)
 
 void itp_runProgram(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     switch (interpreter->state)
     {
@@ -199,7 +204,7 @@ void itp_runProgram(struct Core *core)
 
 void itp_runInterrupt(struct Core *core, enum InterruptType type)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     switch (interpreter->state)
     {
@@ -269,14 +274,14 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
 
 void itp_didFinishVBL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // remember this frame's IO
     for (int i = 0; i < NUM_GAMEPADS; i++)
     {
-        interpreter->lastFrameGamepads[i] = core->machine.ioRegisters.gamepads[i];
+        interpreter->lastFrameGamepads[i] = core->machine->ioRegisters.gamepads[i];
     }
-    interpreter->lastFrameIOStatus = core->machine.ioRegisters.status;
+    interpreter->lastFrameIOStatus = core->machine->ioRegisters.status;
     
     // timer
     interpreter->timer++;
@@ -285,7 +290,7 @@ void itp_didFinishVBL(struct Core *core)
         interpreter->timer = 0;
     }
     
-    if (core->machine.ioRegisters.status.pause)
+    if (core->machine->ioRegisters.status.pause)
     {
         if (interpreter->state == StateEvaluate || interpreter->state == StateWait)
         {
@@ -297,13 +302,13 @@ void itp_didFinishVBL(struct Core *core)
             interpreter->state = StateEvaluate;
             overlay_updateState(core);
         }
-        core->machine.ioRegisters.status.pause = 0;
+        core->machine->ioRegisters.status.pause = 0;
     }
 }
 
 void itp_freeProgram(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     interpreter->state = StateNoProgram;
     
@@ -322,17 +327,17 @@ void itp_freeProgram(struct Core *core)
 
 enum ErrorCode itp_getExitErrorCode(struct Core *core)
 {
-    return core->interpreter.exitErrorCode;
+    return core->interpreter->exitErrorCode;
 }
 
 int itp_getPcPositionInSourceCode(struct Core *core)
 {
-    return core->interpreter.pc->sourcePosition;
+    return core->interpreter->pc->sourcePosition;
 }
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     struct Token *tokenIdentifier = interpreter->pc;
     
@@ -459,7 +464,7 @@ enum ErrorCode itp_checkTypeClass(struct Interpreter *interpreter, enum ValueTyp
 struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass)
 {
     struct TypedValue value = itp_evaluateExpressionLevel(core, 0);
-    enum ErrorCode errorCode = itp_checkTypeClass(&core->interpreter, value.type, typeClass);
+    enum ErrorCode errorCode = itp_checkTypeClass(core->interpreter, value.type, typeClass);
     if (errorCode != ErrorNone)
     {
         value.type = ValueTypeError;
@@ -474,14 +479,14 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int 
     if (value.type != ValueTypeError)
     {
         enum ErrorCode errorCode = ErrorNone;
-        if (core->interpreter.pass == PassPrepare)
+        if (core->interpreter->pass == PassPrepare)
         {
             if (value.type != ValueTypeFloat)
             {
                 errorCode = ErrorExpectedNumericExpression;
             }
         }
-        else if (core->interpreter.pass == PassRun)
+        else if (core->interpreter->pass == PassRun)
         {
             if ((int)value.v.floatValue < min || (int)value.v.floatValue > max)
             {
@@ -499,7 +504,7 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int 
 
 struct TypedValue itp_evaluateOptionalExpression(struct Core *core, enum TypeClass typeClass)
 {
-    if (core->interpreter.pc->type == TokenComma || core->interpreter.pc->type == TokenBracketClose || itp_isEndOfCommand(&core->interpreter))
+    if (core->interpreter->pc->type == TokenComma || core->interpreter->pc->type == TokenBracketClose || itp_isEndOfCommand(core->interpreter))
     {
         struct TypedValue value;
         value.type = ValueTypeNull;
@@ -510,7 +515,7 @@ struct TypedValue itp_evaluateOptionalExpression(struct Core *core, enum TypeCla
 
 struct TypedValue itp_evaluateOptionalNumericExpression(struct Core *core, int min, int max)
 {
-    if (core->interpreter.pc->type == TokenComma || core->interpreter.pc->type == TokenBracketClose || itp_isEndOfCommand(&core->interpreter))
+    if (core->interpreter->pc->type == TokenComma || core->interpreter->pc->type == TokenBracketClose || itp_isEndOfCommand(core->interpreter))
     {
         struct TypedValue value;
         value.type = ValueTypeNull;
@@ -547,7 +552,7 @@ bool itp_isTokenLevel(enum TokenType token, int level)
 
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     enum TokenType type = interpreter->pc->type;
     
     if (level == 2 && type == TokenNOT)
@@ -555,7 +560,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         ++interpreter->pc;
         struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
         if (value.type == ValueTypeError) return value;
-        enum ErrorCode errorCode = itp_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        enum ErrorCode errorCode = itp_checkTypeClass(core->interpreter, value.type, TypeClassNumeric);
         if (errorCode != ErrorNone)
         {
             value.type = ValueTypeError;
@@ -572,7 +577,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         ++interpreter->pc;
         struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
         if (value.type == ValueTypeError) return value;
-        enum ErrorCode errorCode = itp_checkTypeClass(&core->interpreter, value.type, TypeClassNumeric);
+        enum ErrorCode errorCode = itp_checkTypeClass(core->interpreter, value.type, TypeClassNumeric);
         if (errorCode != ErrorNone)
         {
             value.type = ValueTypeError;
@@ -785,7 +790,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
 
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // check for function
     struct TypedValue value = itp_evaluateFunction(core);
@@ -878,7 +883,7 @@ enum TokenType itp_getNextTokenType(struct Interpreter *interpreter)
 
 struct TypedValue itp_evaluateFunction(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     switch (interpreter->pc->type)
     {
         case TokenASC:
@@ -997,7 +1002,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
 
 enum ErrorCode itp_evaluateCommand(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     switch (interpreter->pc->type)
     {
         case TokenUndefined:

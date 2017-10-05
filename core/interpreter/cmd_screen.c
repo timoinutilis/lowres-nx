@@ -24,7 +24,7 @@
 
 enum ErrorCode cmd_PALETTE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // PALETTE
     ++interpreter->pc;
@@ -68,7 +68,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         int n = nValue.v.floatValue;
-        uint8_t *palColors = &core->machine.colorRegisters.colors[n * 4];
+        uint8_t *palColors = &core->machine->colorRegisters.colors[n * 4];
         if (c0Value.type != ValueTypeNull) palColors[0] = c0Value.v.floatValue;
         if (c1Value.type != ValueTypeNull) palColors[1] = c1Value.v.floatValue;
         if (c2Value.type != ValueTypeNull) palColors[2] = c2Value.v.floatValue;
@@ -80,7 +80,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
 
 enum ErrorCode cmd_DISPLAY(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // DISPLAY
     ++interpreter->pc;
@@ -112,13 +112,13 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
         int y = (int)yValue.v.floatValue & 0xFF;
         if (bg == 0)
         {
-            core->machine.videoRegisters.scrollAX = x;
-            core->machine.videoRegisters.scrollAY = y;
+            core->machine->videoRegisters.scrollAX = x;
+            core->machine->videoRegisters.scrollAY = y;
         }
         else
         {
-            core->machine.videoRegisters.scrollBX = x;
-            core->machine.videoRegisters.scrollBY = y;
+            core->machine->videoRegisters.scrollBX = x;
+            core->machine->videoRegisters.scrollBY = y;
         }
     }
     
@@ -127,18 +127,18 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
 
 enum ErrorCode cmd_DISPLAY_A(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // DISPLAY.A
     ++interpreter->pc;
     
     // atrb value
-    struct TypedValue aValue = itp_evaluateDisplayAttributes(core, core->machine.videoRegisters.attr);
+    struct TypedValue aValue = itp_evaluateDisplayAttributes(core, core->machine->videoRegisters.attr);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-         core->machine.videoRegisters.attr.value = aValue.v.floatValue;
+         core->machine->videoRegisters.attr.value = aValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -146,7 +146,7 @@ enum ErrorCode cmd_DISPLAY_A(struct Core *core)
 
 struct TypedValue fnc_COLOR(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // COLOR
     ++interpreter->pc;
@@ -178,14 +178,14 @@ struct TypedValue fnc_COLOR(struct Core *core)
     {
         int p = pValue.v.floatValue;
         int n = nValue.v.floatValue;
-        value.v.floatValue = core->machine.colorRegisters.colors[p * 4 + n];
+        value.v.floatValue = core->machine->colorRegisters.colors[p * 4 + n];
     }
     return value;
 }
 
 struct TypedValue fnc_screen0(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // function
     enum TokenType type = interpreter->pc->type;
@@ -199,15 +199,15 @@ struct TypedValue fnc_screen0(struct Core *core)
         switch (type)
         {
             case TokenTIMER:
-                value.v.floatValue = core->interpreter.timer;
+                value.v.floatValue = core->interpreter->timer;
                 break;
                 
             case TokenRASTER:
-                value.v.floatValue = core->machine.videoRegisters.rasterLine;
+                value.v.floatValue = core->machine->videoRegisters.rasterLine;
                 break;
                 
             case TokenDISPLAYA:
-                value.v.floatValue = core->machine.videoRegisters.attr.value;
+                value.v.floatValue = core->machine->videoRegisters.attr.value;
                 break;
                 
             default:
@@ -220,7 +220,7 @@ struct TypedValue fnc_screen0(struct Core *core)
 
 struct TypedValue fnc_DISPLAY_X_Y(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // DISPLAY.?
     enum TokenType type = interpreter->pc->type;
@@ -247,11 +247,11 @@ struct TypedValue fnc_DISPLAY_X_Y(struct Core *core)
         switch (type)
         {
             case TokenDISPLAYX:
-                value.v.floatValue = (bg == 0) ? core->machine.videoRegisters.scrollAX : core->machine.videoRegisters.scrollBX;
+                value.v.floatValue = (bg == 0) ? core->machine->videoRegisters.scrollAX : core->machine->videoRegisters.scrollBX;
                 break;
                 
             case TokenDISPLAYY:
-                value.v.floatValue = (bg == 0) ? core->machine.videoRegisters.scrollAY : core->machine.videoRegisters.scrollBY;
+                value.v.floatValue = (bg == 0) ? core->machine->videoRegisters.scrollAY : core->machine->videoRegisters.scrollBY;
                 break;
                 
             default:

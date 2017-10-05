@@ -22,7 +22,7 @@
 
 struct TypedValue fnc_PEEK(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // PEEK
     ++interpreter->pc;
@@ -53,7 +53,7 @@ struct TypedValue fnc_PEEK(struct Core *core)
 
 enum ErrorCode cmd_POKE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // POKE
     ++interpreter->pc;
@@ -80,7 +80,7 @@ enum ErrorCode cmd_POKE(struct Core *core)
 
 enum ErrorCode cmd_FILL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // FILL
     ++interpreter->pc;
@@ -123,7 +123,7 @@ enum ErrorCode cmd_FILL(struct Core *core)
 
 enum ErrorCode cmd_COPY(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // COPY
     ++interpreter->pc;
@@ -165,7 +165,7 @@ enum ErrorCode cmd_COPY(struct Core *core)
 
 struct TypedValue fnc_START_LENGTH(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // START/LENGTH
     enum TokenType type = interpreter->pc->type;

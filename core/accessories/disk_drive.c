@@ -29,19 +29,19 @@ void disk_init(struct Core *core)
 
 void disk_deinit(struct Core *core)
 {
-    if (core->diskDrive.data)
+    if (core->diskDrive->data)
     {
-        free(core->diskDrive.data);
-        core->diskDrive.data = NULL;
+        free(core->diskDrive->data);
+        core->diskDrive->data = NULL;
     }
 }
 
 void disk_prepare(struct Core *core)
 {
-    if (core->diskDrive.data == NULL)
+    if (core->diskDrive->data == NULL)
     {
-        core->diskDrive.data = calloc(DISK_SIZE, 1);
-        assert(core->diskDrive.data != NULL);
+        core->diskDrive->data = calloc(DISK_SIZE, 1);
+        assert(core->diskDrive->data != NULL);
         
         core->delegate->diskDriveWillAccess(core->delegate->context);
     }
@@ -50,8 +50,8 @@ void disk_prepare(struct Core *core)
 bool disk_importDisk(struct Core *core, const char *input)
 {
     const char *character = input;
-    uint8_t *currentDataByte = core->diskDrive.data;
-    uint8_t *endDataByte = &core->diskDrive.data[DISK_SIZE];
+    uint8_t *currentDataByte = core->diskDrive->data;
+    uint8_t *endDataByte = &core->diskDrive->data[DISK_SIZE];
     
     // skip stuff before
     //TODO: make sure # is start of line
@@ -87,7 +87,7 @@ bool disk_importDisk(struct Core *core, const char *input)
             
             if (entryIndex >= NUM_FILES) return false;
             
-            struct FileEntry *entry = &core->diskDrive.entries[entryIndex];
+            struct FileEntry *entry = &core->diskDrive->entries[entryIndex];
             if (entry->length > 0) return false;
             
             // file comment
@@ -132,14 +132,14 @@ bool disk_importDisk(struct Core *core, const char *input)
             }
             if (!shift) return false; // incomplete hex value
             
-            int start = (int)(startByte - core->diskDrive.data);
+            int start = (int)(startByte - core->diskDrive->data);
             int length = (int)(currentDataByte - startByte);
             entry->start = start;
             entry->length = length;
             
             for (int i = entryIndex + 1; i < NUM_FILES; i++)
             {
-                core->diskDrive.entries[i].start = entry->start + entry->length;
+                core->diskDrive->entries[i].start = entry->start + entry->length;
             }
         }
         else if (*character == ' ' || *character == '\t' || *character == '\n')
@@ -172,7 +172,7 @@ int disk_calcOutputSize(struct DiskDrive *diskDrive)
 
 char *disk_exportDisk(struct Core *core)
 {
-    size_t outputSize = disk_calcOutputSize(&core->diskDrive);
+    size_t outputSize = disk_calcOutputSize(core->diskDrive);
     if (outputSize > 0)
     {
         char *output = calloc(outputSize, 1);
@@ -181,14 +181,14 @@ char *disk_exportDisk(struct Core *core)
         {
             for (int i = 0; i < NUM_FILES; i++)
             {
-                struct FileEntry *entry = &core->diskDrive.entries[i];
+                struct FileEntry *entry = &core->diskDrive->entries[i];
                 if (entry->length > 0)
                 {
                     sprintf(current, "#%d:%s\n", i, entry->comment);
                     current += strlen(current);
                     int valuesInLine = 0;
                     int pos = 0;
-                    uint8_t *entryData = &core->diskDrive.data[entry->start];
+                    uint8_t *entryData = &core->diskDrive->data[entry->start];
                     while (pos < entry->length)
                     {
                         sprintf(current, "%02X", entryData[pos]);
@@ -214,7 +214,7 @@ char *disk_exportDisk(struct Core *core)
                 }
             }
             
-            core->diskDrive.hasChanges = false;
+            core->diskDrive->hasChanges = false;
         }
         return output;
     }
@@ -234,8 +234,8 @@ void disk_saveFile(struct Core *core, char *name, int address, int length)
     }
     else
     {
-        struct FileEntry *entry = &core->diskDrive.entries[index];
-        uint8_t *data = core->diskDrive.data;
+        struct FileEntry *entry = &core->diskDrive->entries[index];
+        uint8_t *data = core->diskDrive->data;
         
         // move data of higher files
         int nextStart = entry->start + length;
@@ -276,12 +276,12 @@ void disk_saveFile(struct Core *core, char *name, int address, int length)
         // move entry positions
         for (int i = index + 1; i < NUM_FILES; i++)
         {
-            struct FileEntry *thisEntry = &core->diskDrive.entries[i];
-            struct FileEntry *prevEntry = &core->diskDrive.entries[i - 1];
+            struct FileEntry *thisEntry = &core->diskDrive->entries[i];
+            struct FileEntry *prevEntry = &core->diskDrive->entries[i - 1];
             thisEntry->start = prevEntry->start + prevEntry->length;
         }
         
-        core->diskDrive.hasChanges = true;
+        core->diskDrive->hasChanges = true;
         core->delegate->diskDriveDidSave(core->delegate->context);
     }
 }
@@ -298,8 +298,8 @@ void disk_loadFile(struct Core *core, char *name, int address)
     }
     else
     {
-        struct FileEntry *entry = &core->diskDrive.entries[index];
-        uint8_t *data = core->diskDrive.data;
+        struct FileEntry *entry = &core->diskDrive->entries[index];
+        uint8_t *data = core->diskDrive->data;
         
         // read file
         int start = entry->start;

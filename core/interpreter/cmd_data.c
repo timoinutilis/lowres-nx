@@ -22,7 +22,7 @@
 
 enum ErrorCode cmd_DATA(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     if (interpreter->pass == PassPrepare)
     {
@@ -55,7 +55,7 @@ enum ErrorCode cmd_DATA(struct Core *core)
 
 enum ErrorCode cmd_READ(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     do
     {
@@ -99,7 +99,7 @@ enum ErrorCode cmd_READ(struct Core *core)
 
 enum ErrorCode cmd_RESTORE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // RESTORE
     struct Token *tokenRESTORE = interpreter->pc;

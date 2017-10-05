@@ -23,7 +23,7 @@
 
 enum ErrorCode cmd_KEYBOARD(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // KEYBOARD
     ++interpreter->pc;
@@ -35,7 +35,7 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        core->machine.ioRegisters.attr.keyboardEnabled = (type == TokenON);
+        core->machine->ioRegisters.attr.keyboardEnabled = (type == TokenON);
         core->delegate->controlsDidChange(core->delegate->context);
     }
     
@@ -44,7 +44,7 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
 
 enum ErrorCode cmd_GAMEPAD(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // GAMEPAD
     ++interpreter->pc;
@@ -69,7 +69,7 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        core->machine.ioRegisters.attr.gamepadsEnabled = num;
+        core->machine->ioRegisters.attr.gamepadsEnabled = num;
         core->delegate->controlsDidChange(core->delegate->context);
         overlay_updateButtonConfiguration(core);
     }
@@ -79,7 +79,7 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
 
 struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // UP/DOWN/LEFT/RIGHT
     enum TokenType type = interpreter->pc->type;
@@ -113,8 +113,8 @@ struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
         int p = pValue.v.floatValue;
         int active = 0;
         int lastFrameActive = 0;
-        union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[p];
-        union Gamepad *lastFrameGamepad = &core->interpreter.lastFrameGamepads[p];
+        union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[p];
+        union Gamepad *lastFrameGamepad = &core->interpreter->lastFrameGamepads[p];
         switch (type)
         {
             case TokenUP:
@@ -148,7 +148,7 @@ struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
 
 struct TypedValue fnc_BUTTON(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // BUTTON
     ++interpreter->pc;
@@ -188,14 +188,14 @@ struct TypedValue fnc_BUTTON(struct Core *core)
     {
         int p = pValue.v.floatValue;
         int n = nValue.v.floatValue;
-        union Gamepad *gamepad = &core->machine.ioRegisters.gamepads[p];
+        union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[p];
 
         int active = (n == 0) ? gamepad->buttonA : gamepad->buttonB;
         
         if (active && tap)
         {
             // invalidate button if it was already pressed last frame
-            union Gamepad *lastFrameGamepad = &core->interpreter.lastFrameGamepads[p];
+            union Gamepad *lastFrameGamepad = &core->interpreter->lastFrameGamepads[p];
             if ((n == 0) ? lastFrameGamepad->buttonA : lastFrameGamepad->buttonB)
             {
                 active = 0;
@@ -209,7 +209,7 @@ struct TypedValue fnc_BUTTON(struct Core *core)
 
 struct TypedValue fnc_TOUCH(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // TOUCH
     ++interpreter->pc;
@@ -219,14 +219,14 @@ struct TypedValue fnc_TOUCH(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        value.v.floatValue = core->machine.ioRegisters.status.touch ? BAS_TRUE : BAS_FALSE;
+        value.v.floatValue = core->machine->ioRegisters.status.touch ? BAS_TRUE : BAS_FALSE;
     }
     return value;
 }
 
 struct TypedValue fnc_TAP(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // TAP
     ++interpreter->pc;
@@ -236,14 +236,14 @@ struct TypedValue fnc_TAP(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        value.v.floatValue = (core->machine.ioRegisters.status.touch && !core->interpreter.lastFrameIOStatus.touch) ? BAS_TRUE : BAS_FALSE;
+        value.v.floatValue = (core->machine->ioRegisters.status.touch && !core->interpreter->lastFrameIOStatus.touch) ? BAS_TRUE : BAS_FALSE;
     }
     return value;
 }
 
 struct TypedValue fnc_TOUCH_X_Y(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // TOUCH.?
     enum TokenType type = interpreter->pc->type;
@@ -256,11 +256,11 @@ struct TypedValue fnc_TOUCH_X_Y(struct Core *core)
     {
         if (type == TokenTOUCHX)
         {
-            value.v.floatValue = core->machine.ioRegisters.touchX;
+            value.v.floatValue = core->machine->ioRegisters.touchX;
         }
         else if (type == TokenTOUCHY)
         {
-            value.v.floatValue = core->machine.ioRegisters.touchY;
+            value.v.floatValue = core->machine->ioRegisters.touchY;
         }
         else
         {

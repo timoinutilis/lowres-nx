@@ -17,26 +17,12 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef disk_drive_h
-#define disk_drive_h
+#ifndef charsets_h
+#define charsets_h
 
-#include <stdio.h>
-#include <stdbool.h>
-#include "data_manager.h"
+extern const char *CharSetDigits;
+extern const char *CharSetLetters;
+extern const char *CharSetAlphaNum;
+extern const char *CharSetHex;
 
-struct Core;
-
-struct DiskDrive {
-    struct DataManager dataManager;
-    bool hasChanges;
-};
-
-void disk_init(struct Core *core);
-void disk_deinit(struct Core *core);
-bool disk_importDisk(struct Core *core, const char *input);
-char *disk_exportDisk(struct Core *core);
-
-void disk_saveFile(struct Core *core, char *name, int address, int length);
-void disk_loadFile(struct Core *core, char *name, int address);
-
-#endif /* disk_drive_h */
+#endif /* charsets_h */

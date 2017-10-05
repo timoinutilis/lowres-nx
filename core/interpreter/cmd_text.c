@@ -26,7 +26,7 @@
 
 enum ErrorCode cmd_PRINT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     bool newLine = true;
@@ -83,7 +83,7 @@ enum ErrorCode cmd_PRINT(struct Core *core)
 
 enum ErrorCode cmd_INPUT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // INPUT
@@ -118,7 +118,7 @@ enum ErrorCode cmd_INPUT(struct Core *core)
 
 enum ErrorCode cmd_endINPUT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // identifier
     enum ErrorCode errorCode = ErrorNone;
@@ -149,7 +149,7 @@ enum ErrorCode cmd_endINPUT(struct Core *core)
 
 enum ErrorCode cmd_TEXT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // TEXT
     ++interpreter->pc;
@@ -184,7 +184,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
 
 enum ErrorCode cmd_NUMBER(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // NUMBER
     ++interpreter->pc;
@@ -227,7 +227,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
 
 enum ErrorCode cmd_CLS(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // CLS
@@ -259,7 +259,7 @@ enum ErrorCode cmd_CLS(struct Core *core)
 
 enum ErrorCode cmd_WINDOW(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // WINDOW
@@ -303,11 +303,11 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        core->interpreter.textLib.windowX = xValue.v.floatValue;
-        core->interpreter.textLib.windowY = yValue.v.floatValue;
-        core->interpreter.textLib.windowWidth = wValue.v.floatValue;
-        core->interpreter.textLib.windowHeight = hValue.v.floatValue;
-        core->interpreter.textLib.bg = bgValue.v.floatValue;
+        core->interpreter->textLib.windowX = xValue.v.floatValue;
+        core->interpreter->textLib.windowY = yValue.v.floatValue;
+        core->interpreter->textLib.windowWidth = wValue.v.floatValue;
+        core->interpreter->textLib.windowHeight = hValue.v.floatValue;
+        core->interpreter->textLib.bg = bgValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -315,7 +315,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
 
 enum ErrorCode cmd_FONT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // FONT
     ++interpreter->pc;
@@ -343,14 +343,14 @@ enum ErrorCode cmd_FONT(struct Core *core)
 
 enum ErrorCode cmd_LOCATE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // LOCATE
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, core->interpreter.textLib.windowWidth - 1);
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, core->interpreter->textLib.windowWidth - 1);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -358,13 +358,13 @@ enum ErrorCode cmd_LOCATE(struct Core *core)
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, core->interpreter.textLib.windowHeight - 1);
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, core->interpreter->textLib.windowHeight - 1);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     if (interpreter->pass == PassRun)
     {
-        core->interpreter.textLib.cursorX = xValue.v.floatValue;
-        core->interpreter.textLib.cursorY = yValue.v.floatValue;
+        core->interpreter->textLib.cursorX = xValue.v.floatValue;
+        core->interpreter->textLib.cursorY = yValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);
@@ -372,7 +372,7 @@ enum ErrorCode cmd_LOCATE(struct Core *core)
 
 enum ErrorCode cmd_CLW(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // CLW

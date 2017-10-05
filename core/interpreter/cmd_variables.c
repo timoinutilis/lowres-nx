@@ -22,7 +22,7 @@
 
 enum ErrorCode cmd_LET(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // LET keyword is optional
     if (interpreter->pc->type == TokenLET)
@@ -58,7 +58,7 @@ enum ErrorCode cmd_LET(struct Core *core)
 
 enum ErrorCode cmd_DIM(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     do
@@ -116,7 +116,7 @@ enum ErrorCode cmd_DIM(struct Core *core)
 
 enum ErrorCode cmd_SWAP(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
 
     // SWAP
     ++interpreter->pc;

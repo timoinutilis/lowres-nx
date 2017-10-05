@@ -27,7 +27,7 @@
 
 struct TypedValue fnc_ASC(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // ASC
     ++interpreter->pc;
@@ -60,7 +60,7 @@ struct TypedValue fnc_ASC(struct Core *core)
 
 struct TypedValue fnc_BIN_HEX(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // BIN$/HEX$
     enum TokenType type = interpreter->pc->type;
@@ -116,7 +116,7 @@ struct TypedValue fnc_BIN_HEX(struct Core *core)
 
 struct TypedValue fnc_CHR(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // CHR$
     ++interpreter->pc;
@@ -149,7 +149,7 @@ struct TypedValue fnc_CHR(struct Core *core)
 
 struct TypedValue fnc_INKEY(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // INKEY$
     ++interpreter->pc;
@@ -159,10 +159,10 @@ struct TypedValue fnc_INKEY(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        char key = core->machine.ioRegisters.key;
+        char key = core->machine->ioRegisters.key;
         if (key)
         {
-            core->machine.ioRegisters.key = 0;
+            core->machine->ioRegisters.key = 0;
             
             struct RCString *rcstring = rcstring_new(&key, 1);
             if (!rcstring) return val_makeError(ErrorOutOfMemory);
@@ -180,7 +180,7 @@ struct TypedValue fnc_INKEY(struct Core *core)
 
 struct TypedValue fnc_INSTR(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // INSTR
     ++interpreter->pc;
@@ -249,7 +249,7 @@ struct TypedValue fnc_INSTR(struct Core *core)
 
 struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // LEFT$/RIGHT$
     enum TokenType type = interpreter->pc->type;
@@ -305,7 +305,7 @@ struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core)
 
 struct TypedValue fnc_LEN(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // LEN
     ++interpreter->pc;
@@ -335,7 +335,7 @@ struct TypedValue fnc_LEN(struct Core *core)
 
 struct TypedValue fnc_MID(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // MID$
     ++interpreter->pc;
@@ -409,7 +409,7 @@ struct TypedValue fnc_MID(struct Core *core)
 
 struct TypedValue fnc_STR(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // STR$
     ++interpreter->pc;
@@ -442,7 +442,7 @@ struct TypedValue fnc_STR(struct Core *core)
 
 struct TypedValue fnc_VAL(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // VAL
     ++interpreter->pc;
@@ -472,7 +472,7 @@ struct TypedValue fnc_VAL(struct Core *core)
 
 enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // LEFT$/RIGHT$
     enum TokenType type = interpreter->pc->type;
@@ -561,7 +561,7 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
 
 enum ErrorCode cmd_MID(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // MID$
     ++interpreter->pc;

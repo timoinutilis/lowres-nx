@@ -27,7 +27,7 @@
 
 enum ErrorCode cmd_SPRITE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // SPRITE
     ++interpreter->pc;
@@ -63,7 +63,7 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         int n = nValue.v.floatValue;
-        struct Sprite *sprite = &core->machine.spriteRegisters.sprites[n];
+        struct Sprite *sprite = &core->machine->spriteRegisters.sprites[n];
         if (xValue.type != ValueTypeNull) sprite->x = (int)xValue.v.floatValue & 0xFF;
         if (yValue.type != ValueTypeNull) sprite->y = (int)yValue.v.floatValue & 0xFF;
         if (cValue.type != ValueTypeNull) sprite->character = cValue.v.floatValue;
@@ -74,7 +74,7 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
 
 enum ErrorCode cmd_SPRITE_A(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // SPRITE.A
     ++interpreter->pc;
@@ -87,7 +87,7 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         int n = nValue.v.floatValue;
-        sprite = &core->machine.spriteRegisters.sprites[n];
+        sprite = &core->machine->spriteRegisters.sprites[n];
     }
     
     // comma
@@ -118,7 +118,7 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
 
 struct TypedValue fnc_SPRITE(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // SPRITE.?
     enum TokenType type = interpreter->pc->type;
@@ -142,7 +142,7 @@ struct TypedValue fnc_SPRITE(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         int n = nValue.v.floatValue;
-        struct Sprite *sprite = &core->machine.spriteRegisters.sprites[n];
+        struct Sprite *sprite = &core->machine->spriteRegisters.sprites[n];
         switch (type)
         {
             case TokenSPRITEX:
@@ -171,7 +171,7 @@ struct TypedValue fnc_SPRITE(struct Core *core)
 
 struct TypedValue fnc_SPRITE_HIT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // SPRITE
     ++interpreter->pc;
@@ -228,7 +228,7 @@ struct TypedValue fnc_SPRITE_HIT(struct Core *core)
 
 struct TypedValue fnc_HIT(struct Core *core)
 {
-    struct Interpreter *interpreter = &core->interpreter;
+    struct Interpreter *interpreter = core->interpreter;
     
     // HIT
     ++interpreter->pc;

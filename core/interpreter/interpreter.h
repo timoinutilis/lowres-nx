@@ -33,16 +33,12 @@
 #include "text_lib.h"
 #include "sprites_lib.h"
 #include "io_chip.h"
+#include "data_manager.h"
 
 #define BAS_TRUE -1.0f
 #define BAS_FALSE 0.0f
 
 struct Core;
-
-extern const char *CharSetDigits;
-extern const char *CharSetLetters;
-extern const char *CharSetAlphaNum;
-extern const char *CharSetHex;
 
 enum Pass {
     PassPrepare,
@@ -64,11 +60,6 @@ enum Mode {
     ModeInterrupt
 };
 
-struct RomDataEntry {
-    int start;
-    int length;
-};
-
 enum InterruptType {
     InterruptTypeRaster,
     InterruptTypeVBL
@@ -83,7 +74,7 @@ struct Interpreter {
     
     struct Tokenizer tokenizer;
     
-    struct RomDataEntry romDataEntries[MAX_ROM_DATA_ENTRIES];
+    struct DataManager romDataManager;
     bool romIncludesDefaultCharacters;
     
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
@@ -115,6 +106,7 @@ struct Interpreter {
     struct SpritesLib spritesLib;
 };
 
+void itp_init(struct Core *core);
 enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode);
 void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);

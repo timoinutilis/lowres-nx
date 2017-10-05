@@ -45,7 +45,7 @@ bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struc
             int diffX = ax2 - ax1;
             int diffY = ay2 - ay1;
             
-            struct Character *characters = core->machine.videoRam.characters;
+            struct Character *characters = core->machine->videoRam.characters;
             int c1 = sprite->character;
             int c2 = otherSprite->character;
             
@@ -110,7 +110,7 @@ bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struc
 
 bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, int lastIndex)
 {
-    struct Sprite *sprites = core->machine.spriteRegisters.sprites;
+    struct Sprite *sprites = core->machine->spriteRegisters.sprites;
     struct Sprite *sprite = &sprites[checkIndex];
     
     if (sprite->x != 0 || sprite->y != 0)
@@ -121,7 +121,7 @@ bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, in
             {
                 if (sprlib_checkSingleCollision(core, sprite, &sprites[i]))
                 {
-                    core->interpreter.spritesLib.lastHit = i;
+                    core->interpreter->spritesLib.lastHit = i;
                     return true;
                 }
             }
