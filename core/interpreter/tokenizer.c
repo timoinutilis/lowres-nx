@@ -22,43 +22,17 @@
 #include "charsets.h"
 #include <string.h>
 #include <stdlib.h>
-
-enum ErrorCode tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const char *sourceCode, struct Token **errorToken);
-const char *tok_uppercaseString(const char *source);
-
+#include "string_utils.h"
 
 enum ErrorCode tok_tokenizeProgram(struct Tokenizer *tokenizer, const char *sourceCode, struct Token **errorToken)
 {
-    const char *uppercaseSourceCode = tok_uppercaseString(sourceCode);
+    const char *uppercaseSourceCode = uppercaseString(sourceCode);
     if (!uppercaseSourceCode) return ErrorOutOfMemory;
     
     enum ErrorCode errorCode = tok_tokenizeUppercaseProgram(tokenizer, uppercaseSourceCode, errorToken);
     free((void *)uppercaseSourceCode);
     
     return errorCode;
-}
-
-const char *tok_uppercaseString(const char *source)
-{
-    size_t len = strlen(source);
-    char *buffer = malloc(len);
-    if (buffer)
-    {
-        const char *sourceChar = source;
-        char *destChar = buffer;
-        char finalChar = 0;
-        while (*sourceChar)
-        {
-            finalChar = *sourceChar++;
-            if (finalChar >= 'a' && finalChar <= 'z')
-            {
-                finalChar -= 32;
-            }
-            *destChar++ = finalChar;
-        }
-        *destChar = 0;
-    }
-    return buffer;
 }
 
 enum ErrorCode tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const char *sourceCode, struct Token **errorToken)
@@ -348,20 +322,6 @@ enum ErrorCode tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const c
     token->sourcePosition = (int)(character - sourceCode);
     token->type = TokenEol;
     tokenizer->numTokens++;
-    
-    
-    // ROM DATA
-/*
-    // add default characters if #0 is unused
-    struct RomDataEntry *entry0 = &interpreter->romDataEntries[0];
-    if (entry0->length == 0 && endRomByte - currentRomByte >= 4096)
-    {
-        memcpy(currentRomByte, DefaultCharacters, 4096);
-        entry0->start = (int)(currentRomByte - core->machine.cartridgeRom);
-        entry0->length = 4096;
-        interpreter->romIncludesDefaultCharacters = true;
-    }
-    */
     
     *errorToken = NULL;
     return ErrorNone;

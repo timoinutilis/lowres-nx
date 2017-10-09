@@ -19,6 +19,7 @@
 
 #include "cmd_memory.h"
 #include "core.h"
+#include "data_manager.h"
 
 struct TypedValue fnc_PEEK(struct Core *core)
 {
@@ -176,7 +177,7 @@ struct TypedValue fnc_START_LENGTH(struct Core *core)
     ++interpreter->pc;
     
     // index expression
-    struct TypedValue indexValue = itp_evaluateNumericExpression(core, 0, MAX_ROM_DATA_ENTRIES - 1);
+    struct TypedValue indexValue = itp_evaluateNumericExpression(core, 0, MAX_ENTRIES - 1);
     if (indexValue.type == ValueTypeError) return indexValue;
     
     // bracket close
@@ -191,11 +192,11 @@ struct TypedValue fnc_START_LENGTH(struct Core *core)
         int index = indexValue.v.floatValue;
         if (type == TokenLENGTH)
         {
-            value.v.floatValue = interpreter->romDataEntries[index].length;
+            value.v.floatValue = interpreter->romDataManager.entries[index].length;
         }
         else
         {
-            value.v.floatValue = interpreter->romDataEntries[index].start;
+            value.v.floatValue = interpreter->romDataManager.entries[index].start;
         }
     }
     return value;

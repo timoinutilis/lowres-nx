@@ -34,7 +34,7 @@ int machine_peek(struct Core *core, int address)
     {
         return -1;
     }
-    return *(uint8_t *)((uint8_t *)&core->machine + address);
+    return *(uint8_t *)((uint8_t *)core->machine + address);
 }
 
 bool machine_poke(struct Core *core, int address, int value)
@@ -54,7 +54,7 @@ bool machine_poke(struct Core *core, int address, int value)
         // reserved registers
         return false;
     }
-    *(uint8_t *)((uint8_t *)&core->machine + address) = value & 0xFF;
+    *(uint8_t *)((uint8_t *)core->machine + address) = value & 0xFF;
     
     if (address == 0xFF66)
     {

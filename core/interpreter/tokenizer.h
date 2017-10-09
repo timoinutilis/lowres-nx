@@ -45,6 +45,7 @@ struct Tokenizer
 };
 
 enum ErrorCode tok_tokenizeProgram(struct Tokenizer *tokenizer, const char *sourceCode, struct Token **errorToken);
+enum ErrorCode tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const char *sourceCode, struct Token **errorToken);
 void tok_freeTokens(struct Tokenizer *tokenizer);
 struct JumpLabelItem *tok_getJumpLabel(struct Tokenizer *tokenizer, int symbolIndex);
 enum ErrorCode tok_setJumpLabel(struct Tokenizer *tokenizer, int symbolIndex, struct Token *token);

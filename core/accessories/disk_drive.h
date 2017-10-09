@@ -28,13 +28,10 @@ struct Core;
 
 struct DiskDrive {
     struct DataManager dataManager;
-    bool hasChanges;
 };
 
 void disk_init(struct Core *core);
 void disk_deinit(struct Core *core);
-bool disk_importDisk(struct Core *core, const char *input);
-char *disk_exportDisk(struct Core *core);
 
 void disk_saveFile(struct Core *core, char *name, int address, int length);
 void disk_loadFile(struct Core *core, char *name, int address);

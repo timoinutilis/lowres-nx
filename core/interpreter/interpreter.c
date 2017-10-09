@@ -36,6 +36,7 @@
 #include "cmd_sprites.h"
 #include "cmd_io.h"
 #include "cmd_files.h"
+#include "string_utils.h"
 
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
@@ -44,21 +45,37 @@ enum ErrorCode itp_evaluateCommand(struct Core *core);
 
 void itp_init(struct Core *core)
 {
-    core->interpreter->dataManager.data = core->machine->cartridgeRom;
+    core->interpreter->romDataManager.data = core->machine->cartridgeRom;
 }
 
 enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // Tokenize
+    // Parse source code
+    
+    const char *uppercaseSourceCode = uppercaseString(sourceCode);
+    if (!uppercaseSourceCode) return ErrorOutOfMemory;
     
     struct Token *errorToken = NULL;
-    enum ErrorCode errorCode = tok_tokenizeProgram(&interpreter->tokenizer, sourceCode, &errorToken);
+    enum ErrorCode errorCode = tok_tokenizeUppercaseProgram(&interpreter->tokenizer, uppercaseSourceCode, &errorToken);
     if (errorCode != ErrorNone)
     {
+        free((void *)uppercaseSourceCode);
         interpreter->pc = errorToken;
         return errorCode;
+    }
+    
+    struct DataManager *romDataManager = &interpreter->romDataManager;
+    errorCode = data_uppercaseImport(romDataManager, uppercaseSourceCode);
+    free((void *)uppercaseSourceCode);
+    if (errorCode != ErrorNone) return errorCode;
+
+    // add default characters if ROM entry 0 is unused
+    if (romDataManager->entries[0].length == 0 && (DATA_SIZE - data_currentSize(romDataManager)) >= 4096)
+    {
+        data_setEntry(romDataManager, 0, "DEFAULT CHARACTERS", (uint8_t *)DefaultCharacters, 4096);
+        interpreter->romIncludesDefaultCharacters = true;
     }
     
     // Prepare

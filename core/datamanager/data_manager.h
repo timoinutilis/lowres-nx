@@ -40,6 +40,11 @@ struct DataManager {
 };
 
 enum ErrorCode data_import(struct DataManager *manager, const char *input);
+enum ErrorCode data_uppercaseImport(struct DataManager *manager, const char *input);
 char *data_export(struct DataManager *manager);
+
+int data_currentSize(struct DataManager *manager);
+
+void data_setEntry(struct DataManager *manager, int index, const char *comment, uint8_t *source, int length);
 
 #endif /* data_manager_h */

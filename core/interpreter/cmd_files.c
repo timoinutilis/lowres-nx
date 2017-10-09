@@ -75,7 +75,7 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     ++interpreter->pc;
     
     // length value
-    struct TypedValue lengthValue = itp_evaluateNumericExpression(core, 1, DISK_SIZE - 1);
+    struct TypedValue lengthValue = itp_evaluateNumericExpression(core, 1, DATA_SIZE - 1);
     if (lengthValue.type == ValueTypeError) return lengthValue.v.errorCode;
     
     if (interpreter->pass == PassRun)

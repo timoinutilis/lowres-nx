@@ -17,17 +17,29 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef core_delegate_h
-#define core_delegate_h
+#include "string_utils.h"
+#include <stdlib.h>
+#include <string.h>
 
-#include "data_manager.h"
-
-struct CoreDelegate {
-    void *context;
-    void (*interpreterDidFail)(void *context);
-    void (*diskDriveWillAccess)(void *context, struct DataManager *diskDataManager);
-    void (*diskDriveDidSave)(void *context, struct DataManager *diskDataManager);
-    void (*controlsDidChange)(void *context);
-};
-
-#endif /* core_delegate_h */
+const char *uppercaseString(const char *source)
+{
+    size_t len = strlen(source);
+    char *buffer = malloc(len + 1);
+    if (buffer)
+    {
+        const char *sourceChar = source;
+        char *destChar = buffer;
+        char finalChar = 0;
+        while (*sourceChar)
+        {
+            finalChar = *sourceChar++;
+            if (finalChar >= 'a' && finalChar <= 'z')
+            {
+                finalChar -= 32;
+            }
+            *destChar++ = finalChar;
+        }
+        *destChar = 0;
+    }
+    return buffer;
+}

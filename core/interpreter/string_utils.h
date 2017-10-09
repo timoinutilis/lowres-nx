@@ -17,17 +17,11 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef core_delegate_h
-#define core_delegate_h
+#ifndef string_utils_h
+#define string_utils_h
 
-#include "data_manager.h"
+#include <stdio.h>
 
-struct CoreDelegate {
-    void *context;
-    void (*interpreterDidFail)(void *context);
-    void (*diskDriveWillAccess)(void *context, struct DataManager *diskDataManager);
-    void (*diskDriveDidSave)(void *context, struct DataManager *diskDataManager);
-    void (*controlsDidChange)(void *context);
-};
+const char *uppercaseString(const char *source);
 
-#endif /* core_delegate_h */
+#endif /* string_utils_h */

@@ -35,7 +35,7 @@ void txtlib_init(struct Core *core)
     
     if (core->interpreter->romIncludesDefaultCharacters)
     {
-        struct RomDataEntry *entry0 = core->interpreter->romDataEntries;
+        struct DataEntry *entry0 = core->interpreter->romDataManager.entries;
         memcpy(core->machine->videoRam.characters, &core->machine->cartridgeRom[entry0->start], entry0->length);
     }
 }

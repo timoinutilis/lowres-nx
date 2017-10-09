@@ -21,20 +21,34 @@
 #include "charsets.h"
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
+#include "string_utils.h"
 
 int data_calcOutputSize(struct DataManager *manager);
 
 
 enum ErrorCode data_import(struct DataManager *manager, const char *input)
 {
+    const char *uppercaseInput = uppercaseString(input);
+    if (!uppercaseInput) return ErrorOutOfMemory;
+    
+    enum ErrorCode errorCode = data_uppercaseImport(manager, uppercaseInput);
+    free((void *)uppercaseInput);
+    
+    return errorCode;
+}
+
+enum ErrorCode data_uppercaseImport(struct DataManager *manager, const char *input)
+{
     const char *character = input;
     uint8_t *currentDataByte = manager->data;
     uint8_t *endDataByte = &manager->data[DATA_SIZE];
     
     // skip stuff before
-    //TODO: make sure # is start of line
-    while (*character && *character != '#')
+    const char *prevChar = NULL;
+    while (*character && !(*character == '#' && (!prevChar || *prevChar == '\n')))
     {
+        prevChar = character;
         character++;
     }
     
@@ -175,8 +189,6 @@ char *data_export(struct DataManager *manager)
                     
                 }
             }
-            
-            manager->hasChanges = false;
         }
         return output;
     }
@@ -197,4 +209,63 @@ int data_calcOutputSize(struct DataManager *manager)
         }
     }
     return size;
+}
+
+int data_currentSize(struct DataManager *manager)
+{
+    int size = 0;
+    for (int i = 0; i < MAX_ENTRIES; i++)
+    {
+        size += manager->entries[i].length;
+    }
+    return size;
+}
+
+void data_setEntry(struct DataManager *manager, int index, const char *comment, uint8_t *source, int length)
+{
+    struct DataEntry *entry = &manager->entries[index];
+    uint8_t *data = manager->data;
+        
+    // move data of higher entries
+    int nextStart = entry->start + length;
+    assert(nextStart < DATA_SIZE);
+        
+    if (length > entry->length) // new entry is bigger
+    {
+        int diff = length - entry->length;
+        for (int i = DATA_SIZE - 1; i >= nextStart; i--)
+        {
+            data[i] = data[i - diff];
+        }
+    }
+    else if (length < entry->length) // new entry is smaller
+    {
+        int diff = entry->length - length;
+        for (int i = nextStart; i < DATA_SIZE - diff; i++)
+        {
+            data[i] = data[i + diff];
+        }
+        for (int i = DATA_SIZE - diff; i < DATA_SIZE; i++)
+        {
+            data[i] = 0;
+        }
+    }
+    
+    // write new entry
+    strncpy(entry->comment, comment, ENTRY_COMMENT_SIZE);
+    entry->comment[ENTRY_COMMENT_SIZE - 1] = 0;
+    entry->length = length;
+    int start = entry->start;
+    for (int i = 0; i < length; i++)
+    {
+        data[i + start] = source[i];
+    }
+    
+    // move entry positions
+    for (int i = index + 1; i < MAX_ENTRIES; i++)
+    {
+        struct DataEntry *thisEntry = &manager->entries[i];
+        struct DataEntry *prevEntry = &manager->entries[i - 1];
+        thisEntry->start = prevEntry->start + prevEntry->length;
+    }
 }

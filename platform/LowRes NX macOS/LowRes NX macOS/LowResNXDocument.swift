@@ -29,7 +29,7 @@ class LowResNXDocument: NSDocument {
     var sourceCode = ""
     var coreWrapper = CoreWrapper()
         
-    override class func autosavesInPlace() -> Bool {
+    override class var autosavesInPlace: Bool {
         return false
     }
     
@@ -50,13 +50,13 @@ class LowResNXDocument: NSDocument {
         let cIndex = itp_getPcPositionInSourceCode(&coreWrapper.core)
         let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(cIndex))
         let lineRange = sourceCode.lineRange(for: index ..< index)
-        let lineString = sourceCode.substring(with: lineRange)
+        let lineString = sourceCode[lineRange]
         let lineNumber = sourceCode.countLines(index: index)
-        return ProgramError(errorCode: errorCode, lineNumber: lineNumber, line: lineString)
+        return ProgramError(errorCode: errorCode, lineNumber: lineNumber, line: String(lineString))
     }
     
     override func makeWindowControllers() {
-        let windowController = LowResNXWindowController(windowNibName: "LowResNXWindowController")
+        let windowController = LowResNXWindowController(windowNibName: NSNib.Name(rawValue: "LowResNXWindowController"))
         addWindowController(windowController)
     }
     
