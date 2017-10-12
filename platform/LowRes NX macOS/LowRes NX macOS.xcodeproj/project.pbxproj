@@ -11,6 +11,7 @@
 		9206D41D1F39060A00AF0B00 /* sprites_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 9206D41B1F39060A00AF0B00 /* sprites_lib.c */; };
 		921607441EC0E97B008B702C /* cmd_background.c in Sources */ = {isa = PBXBuildFile; fileRef = 921607421EC0E97B008B702C /* cmd_background.c */; };
 		92206B411F858A0200FAF301 /* tokenizer.c in Sources */ = {isa = PBXBuildFile; fileRef = 92206B3F1F858A0100FAF301 /* tokenizer.c */; };
+		922538A11F8FDA7700B744E4 /* core_delegate.c in Sources */ = {isa = PBXBuildFile; fileRef = 922538A01F8FDA7700B744E4 /* core_delegate.c */; };
 		9229C3731EBF8AFF009CF378 /* cmd_sprites.c in Sources */ = {isa = PBXBuildFile; fileRef = 9229C3711EBF8AFF009CF378 /* cmd_sprites.c */; };
 		922AFF991ED5FFAB00002BFA /* disk_drive.c in Sources */ = {isa = PBXBuildFile; fileRef = 922AFF971ED5FFAB00002BFA /* disk_drive.c */; };
 		923FA9671F8A47BA00F6BDF8 /* string_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 923FA9651F8A47BA00F6BDF8 /* string_utils.c */; };
@@ -60,6 +61,7 @@
 		921607431EC0E97B008B702C /* cmd_background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_background.h; sourceTree = "<group>"; };
 		92206B3F1F858A0100FAF301 /* tokenizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tokenizer.c; sourceTree = "<group>"; };
 		92206B401F858A0200FAF301 /* tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tokenizer.h; sourceTree = "<group>"; };
+		922538A01F8FDA7700B744E4 /* core_delegate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_delegate.c; sourceTree = "<group>"; };
 		9229C3711EBF8AFF009CF378 /* cmd_sprites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_sprites.c; sourceTree = "<group>"; };
 		9229C3721EBF8AFF009CF378 /* cmd_sprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_sprites.h; sourceTree = "<group>"; };
 		922AFF971ED5FFAB00002BFA /* disk_drive.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = disk_drive.c; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 			children = (
 				92624BAF1EAD1CFB00EB3A3C /* core.c */,
 				92624BB01EAD1CFB00EB3A3C /* core.h */,
+				922538A01F8FDA7700B744E4 /* core_delegate.c */,
 				9282B4781ED4CE6A007B0F79 /* core_delegate.h */,
 				92FD9E4A1F86A434008DB2DE /* datamanager */,
 				92624BB11EAD1CFB00EB3A3C /* interpreter */,
@@ -408,6 +411,7 @@
 				924C85FD1EC4D40A00734368 /* cmd_screen.c in Sources */,
 				92624BF21EAD1CFC00EB3A3C /* value.c in Sources */,
 				92624BE81EAD1CFC00EB3A3C /* cmd_memory.c in Sources */,
+				922538A11F8FDA7700B744E4 /* core_delegate.c in Sources */,
 				920156941F5DE7F90036CEE1 /* CoreWrapper.swift in Sources */,
 				92624BF31EAD1CFC00EB3A3C /* variables.c in Sources */,
 				92FD9E501F86A65D008DB2DE /* charsets.c in Sources */,

@@ -217,7 +217,7 @@ void txtlib_inputBegin(struct Core *core)
     core->machine->ioRegisters.key = 0;
     
     core->machine->ioRegisters.attr.keyboardEnabled = 1;
-    core->delegate->controlsDidChange(core->delegate->context);
+    delegate_controlsDidChange(core);
     
     txtlib_scrollWindowIfNeeded(core);
 }

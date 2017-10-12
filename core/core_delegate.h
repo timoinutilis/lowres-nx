@@ -23,12 +23,24 @@
 #include "data_manager.h"
 #include "error.h"
 
+struct Core;
+
+struct ControlsInfo {
+    bool isKeyboardEnabled;
+    int numGamepadsEnabled;
+};
+
 struct CoreDelegate {
     void *context;
     void (*interpreterDidFail)(void *context, struct CoreError coreError);
     void (*diskDriveWillAccess)(void *context, struct DataManager *diskDataManager);
     void (*diskDriveDidSave)(void *context, struct DataManager *diskDataManager);
-    void (*controlsDidChange)(void *context);
+    void (*controlsDidChange)(void *context, struct ControlsInfo);
 };
+
+void delegate_interpreterDidFail(struct Core *core, struct CoreError coreError);
+void delegate_diskDriveWillAccess(struct Core *core);
+void delegate_diskDriveDidSave(struct Core *core);
+void delegate_controlsDidChange(struct Core *core);
 
 #endif /* core_delegate_h */

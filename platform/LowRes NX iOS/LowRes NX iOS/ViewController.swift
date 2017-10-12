@@ -46,6 +46,7 @@ class ViewController: UIViewController, UIKeyInput {
         core_setDelegate(&coreWrapper.core, &coreDelegate)
         
         core_willRunProgram(&coreWrapper.core, 0)
+        configureGameControllers()
         
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(recognizer)
@@ -188,24 +189,20 @@ class ViewController: UIViewController, UIKeyInput {
     
     // MARK: - Core Delegate
     
-    func coreInterpreterDidFail() {
+    func coreInterpreterDidFail(coreError: CoreError) {
     }
     
-    func coreDiskDriveWillAccess() {
+    func coreDiskDriveWillAccess(diskDataManager: UnsafeMutablePointer<DataManager>?) {
     }
     
-    func coreDiskDriveDidSave() {
+    func coreDiskDriveDidSave(diskDataManager: UnsafeMutablePointer<DataManager>?) {
     }
     
-    func coreControlsDidChange() {
-        configureGameControllers()
-        
-        if let coreWrapper = coreWrapper {
-            if core_getKeyboardEnabled(&coreWrapper.core) {
-                becomeFirstResponder()
-            } else {
-                resignFirstResponder()
-            }
+    func coreControlsDidChange(controlsInfo: ControlsInfo) {
+        if controlsInfo.isKeyboardEnabled {
+            becomeFirstResponder()
+        } else {
+            resignFirstResponder()
         }
     }
     
@@ -244,22 +241,22 @@ class ViewController: UIViewController, UIKeyInput {
     
 }
 
-func interpreterDidFail(context: UnsafeMutableRawPointer?) -> Void {
+func interpreterDidFail(context: UnsafeMutableRawPointer?, coreError: CoreError) -> Void {
     let viewController = Unmanaged<ViewController>.fromOpaque(context!).takeUnretainedValue()
-    viewController.coreInterpreterDidFail()
+    viewController.coreInterpreterDidFail(coreError: coreError)
 }
 
-func diskDriveWillAccess(context: UnsafeMutableRawPointer?) -> Void {
+func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
     let viewController = Unmanaged<ViewController>.fromOpaque(context!).takeUnretainedValue()
-    viewController.coreDiskDriveWillAccess()
+    viewController.coreDiskDriveWillAccess(diskDataManager: diskDataManager)
 }
 
-func diskDriveDidSave(context: UnsafeMutableRawPointer?) -> Void {
+func diskDriveDidSave(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
     let viewController = Unmanaged<ViewController>.fromOpaque(context!).takeUnretainedValue()
-    viewController.coreDiskDriveDidSave()
+    viewController.coreDiskDriveDidSave(diskDataManager: diskDataManager)
 }
 
-func controlsDidChange(context: UnsafeMutableRawPointer?) -> Void {
+func controlsDidChange(context: UnsafeMutableRawPointer?, controlsInfo: ControlsInfo) -> Void {
     let viewController = Unmanaged<ViewController>.fromOpaque(context!).takeUnretainedValue()
-    viewController.coreControlsDidChange()
+    viewController.coreControlsDidChange(controlsInfo: controlsInfo)
 }

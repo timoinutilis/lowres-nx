@@ -36,7 +36,7 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         core->machine->ioRegisters.attr.keyboardEnabled = (type == TokenON);
-        core->delegate->controlsDidChange(core->delegate->context);
+        delegate_controlsDidChange(core);
     }
     
     return itp_endOfCommand(interpreter);
@@ -70,7 +70,7 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         core->machine->ioRegisters.attr.gamepadsEnabled = num;
-        core->delegate->controlsDidChange(core->delegate->context);
+        delegate_controlsDidChange(core);
         overlay_updateButtonConfiguration(core);
     }
     

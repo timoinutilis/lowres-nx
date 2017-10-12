@@ -44,6 +44,11 @@
 		9205E94C1F59A96600927A3F /* program.nx in Resources */ = {isa = PBXBuildFile; fileRef = 9205E94B1F59A96600927A3F /* program.nx */; };
 		9205E94E1F59BEE900927A3F /* LowResNXView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205E94D1F59BEE900927A3F /* LowResNXView.swift */; };
 		92521BCF1F5B105E0078A7C7 /* CoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92521BCE1F5B105E0078A7C7 /* CoreWrapper.swift */; };
+		9286A7141F8FB816005C9EC1 /* charsets.c in Sources */ = {isa = PBXBuildFile; fileRef = 9286A70E1F8FB815005C9EC1 /* charsets.c */; };
+		9286A7151F8FB816005C9EC1 /* string_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 9286A7111F8FB816005C9EC1 /* string_utils.c */; };
+		9286A7161F8FB816005C9EC1 /* tokenizer.c in Sources */ = {isa = PBXBuildFile; fileRef = 9286A7121F8FB816005C9EC1 /* tokenizer.c */; };
+		9286A71A1F8FB84A005C9EC1 /* data_manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 9286A7181F8FB84A005C9EC1 /* data_manager.c */; };
+		9286A71C1F8FCE1A005C9EC1 /* core_delegate.c in Sources */ = {isa = PBXBuildFile; fileRef = 9286A71B1F8FCE1A005C9EC1 /* core_delegate.c */; };
 		92AE47D41F6D94A1008BD49C /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47D01F6D94A1008BD49C /* overlay.c */; };
 		92AE47D51F6D94A1008BD49C /* overlay_data.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47D21F6D94A1008BD49C /* overlay_data.c */; };
 /* End PBXBuildFile section */
@@ -121,6 +126,15 @@
 		9205E9511F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9205E9521F59C57D00927A3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		92521BCE1F5B105E0078A7C7 /* CoreWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreWrapper.swift; sourceTree = "<group>"; };
+		9286A70E1F8FB815005C9EC1 /* charsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = charsets.c; sourceTree = "<group>"; };
+		9286A70F1F8FB815005C9EC1 /* tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tokenizer.h; sourceTree = "<group>"; };
+		9286A7101F8FB816005C9EC1 /* string_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_utils.h; sourceTree = "<group>"; };
+		9286A7111F8FB816005C9EC1 /* string_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = string_utils.c; sourceTree = "<group>"; };
+		9286A7121F8FB816005C9EC1 /* tokenizer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tokenizer.c; sourceTree = "<group>"; };
+		9286A7131F8FB816005C9EC1 /* charsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = charsets.h; sourceTree = "<group>"; };
+		9286A7181F8FB84A005C9EC1 /* data_manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_manager.c; sourceTree = "<group>"; };
+		9286A7191F8FB84A005C9EC1 /* data_manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = data_manager.h; sourceTree = "<group>"; };
+		9286A71B1F8FCE1A005C9EC1 /* core_delegate.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = core_delegate.c; sourceTree = "<group>"; };
 		92AE47D01F6D94A1008BD49C /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
 		92AE47D11F6D94A1008BD49C /* overlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
 		92AE47D21F6D94A1008BD49C /* overlay_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay_data.c; sourceTree = "<group>"; };
@@ -178,6 +192,8 @@
 				9205E8EF1F599FE000927A3F /* core.c */,
 				9205E8F01F599FE000927A3F /* core.h */,
 				9205E8F11F599FE000927A3F /* core_delegate.h */,
+				9286A71B1F8FCE1A005C9EC1 /* core_delegate.c */,
+				9286A7171F8FB84A005C9EC1 /* datamanager */,
 				9205E8F21F599FE000927A3F /* interpreter */,
 				9205E91E1F599FE000927A3F /* libraries */,
 				9205E9251F599FE000927A3F /* machine */,
@@ -200,6 +216,12 @@
 		9205E8F21F599FE000927A3F /* interpreter */ = {
 			isa = PBXGroup;
 			children = (
+				9286A70E1F8FB815005C9EC1 /* charsets.c */,
+				9286A7131F8FB816005C9EC1 /* charsets.h */,
+				9286A7111F8FB816005C9EC1 /* string_utils.c */,
+				9286A7101F8FB816005C9EC1 /* string_utils.h */,
+				9286A7121F8FB816005C9EC1 /* tokenizer.c */,
+				9286A70F1F8FB815005C9EC1 /* tokenizer.h */,
 				9205E8F31F599FE000927A3F /* cmd_background.c */,
 				9205E8F41F599FE000927A3F /* cmd_background.h */,
 				9205E8F51F599FE000927A3F /* cmd_control.c */,
@@ -272,6 +294,15 @@
 				9205E92C1F599FE000927A3F /* video_chip.h */,
 			);
 			path = machine;
+			sourceTree = "<group>";
+		};
+		9286A7171F8FB84A005C9EC1 /* datamanager */ = {
+			isa = PBXGroup;
+			children = (
+				9286A7181F8FB84A005C9EC1 /* data_manager.c */,
+				9286A7191F8FB84A005C9EC1 /* data_manager.h */,
+			);
+			path = datamanager;
 			sourceTree = "<group>";
 		};
 		92AE47CF1F6D94A1008BD49C /* overlay */ = {
@@ -362,12 +393,14 @@
 				9205E93E1F599FE000927A3F /* interpreter_utils.c in Sources */,
 				9205E9361F599FE000927A3F /* cmd_screen.c in Sources */,
 				9205E9351F599FE000927A3F /* cmd_memory.c in Sources */,
+				9286A71C1F8FCE1A005C9EC1 /* core_delegate.c in Sources */,
 				9205E92E1F599FE000927A3F /* core.c in Sources */,
 				9205E8DC1F599F7300927A3F /* ViewController.swift in Sources */,
 				92AE47D51F6D94A1008BD49C /* overlay_data.c in Sources */,
 				9205E9321F599FE000927A3F /* cmd_files.c in Sources */,
 				9205E9461F599FE000927A3F /* text_lib.c in Sources */,
 				9205E9381F599FE000927A3F /* cmd_strings.c in Sources */,
+				9286A7151F8FB816005C9EC1 /* string_utils.c in Sources */,
 				92521BCF1F5B105E0078A7C7 /* CoreWrapper.swift in Sources */,
 				9205E9451F599FE000927A3F /* sprites_lib.c in Sources */,
 				9205E9441F599FE000927A3F /* default_characters.c in Sources */,
@@ -376,9 +409,12 @@
 				9205E9401F599FE000927A3F /* rcstring.c in Sources */,
 				9205E92D1F599FE000927A3F /* disk_drive.c in Sources */,
 				9205E8DA1F599F7300927A3F /* AppDelegate.swift in Sources */,
+				9286A71A1F8FB84A005C9EC1 /* data_manager.c in Sources */,
 				9205E9391F599FE000927A3F /* cmd_text.c in Sources */,
 				9205E93F1F599FE000927A3F /* labels.c in Sources */,
 				9205E9331F599FE000927A3F /* cmd_io.c in Sources */,
+				9286A7161F8FB816005C9EC1 /* tokenizer.c in Sources */,
+				9286A7141F8FB816005C9EC1 /* charsets.c in Sources */,
 				9205E9431F599FE000927A3F /* variables.c in Sources */,
 				9205E9371F599FE000927A3F /* cmd_sprites.c in Sources */,
 				9205E9341F599FE000927A3F /* cmd_maths.c in Sources */,

@@ -22,9 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let programSourceCode = try String(contentsOfFile: filePath, encoding: .ascii)
                 
                 let cString = programSourceCode.cString(using: .ascii)
-                let errorCode = itp_compileProgram(&coreWrapper.core, cString)
-                if errorCode != ErrorNone {
-                    print("compiler error:", err_getString(errorCode))
+                let error = itp_compileProgram(&coreWrapper.core, cString)
+                if error.code != ErrorNone {
+                    print("compiler error:", err_getString(error.code))
                 }
             } catch {
                 print("file error:", error.localizedDescription)

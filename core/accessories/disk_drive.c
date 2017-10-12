@@ -45,7 +45,7 @@ void disk_prepare(struct Core *core)
         dataManager->data = calloc(DATA_SIZE, 1);
         assert(dataManager->data != NULL);
         
-        core->delegate->diskDriveWillAccess(core->delegate->context, dataManager);
+        delegate_diskDriveWillAccess(core);
     }
 }
 

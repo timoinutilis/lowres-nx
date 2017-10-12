@@ -181,7 +181,7 @@ void itp_runProgram(struct Core *core)
             if (errorCode != ErrorNone)
             {
                 interpreter->state = StateEnd;
-                core->delegate->interpreterDidFail(core->delegate->context, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
+                delegate_interpreterDidFail(core, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
             }
             break;
         }
@@ -262,12 +262,12 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 if (cycles == maxCycles)
                 {
                     interpreter->state = StateEnd;
-                    core->delegate->interpreterDidFail(core->delegate->context, err_makeCoreError(ErrorTooManyCommandCycles, interpreter->pc->sourcePosition));
+                    delegate_interpreterDidFail(core, err_makeCoreError(ErrorTooManyCommandCycles, interpreter->pc->sourcePosition));
                 }
                 else if (errorCode != ErrorNone)
                 {
                     interpreter->state = StateEnd;
-                    core->delegate->interpreterDidFail(core->delegate->context, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
+                    delegate_interpreterDidFail(core, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
                 }
                 else
                 {
