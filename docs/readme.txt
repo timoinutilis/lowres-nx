@@ -39,12 +39,11 @@
 
 - BASIC commands to list files, LOAD/SAVE may be changed
 - File lists for designer tools
-- Improve UI of designer tools
+- Improve UI of designer tools (merge Character and Background Designer to one program)
 - Reserve keywords for planned features
-- Synchronize rendering with screen refresh
+- Implement persistent RAM
 - Make any nx file selectable as virtual disk (for direct editing)
 - Keep source code when using nx files as virtual disks
-- Screenshot and animated GIF export
 - Final app icon
 - Later: Sound
 - Later: Drawing commands

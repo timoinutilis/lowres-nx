@@ -188,6 +188,7 @@ INPUT
     Lets the user enter a text or number on the keyboard and stores it
     in the variable var. Optionally it can show a prompt text before
     (cannot be a variable).
+    This enables automatically the keyboard.
 
 
 LOCATE
@@ -629,7 +630,13 @@ FONT
 GAMEPAD
     
     GAMEPAD n
+
+    Enables gamepads for n players. A maximum of 2 players are
+    supported. This disables touchscreen/mouse support.
+
     GAMEPAD OFF
+
+    Disables all gamepads and enables touchscreen/mouse support.
 
 
 =UP
@@ -697,6 +704,8 @@ KEYBOARD ON/OFF
     KEYBOARD ON
     KEYBOARD OFF
 
+    Enables or disables the keyboard.
+
 
 =INKEY$
 
@@ -705,6 +714,7 @@ KEYBOARD ON/OFF
     Returns the last pressed key as a string. If no key was pressed,
     it returns an empty string (""). After calling this function its
     value is cleared, so it returns each pressed key only once.
+    The keyboard needs to be enabled for this function.
 
 
 **********
