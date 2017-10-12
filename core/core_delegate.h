@@ -21,10 +21,11 @@
 #define core_delegate_h
 
 #include "data_manager.h"
+#include "error.h"
 
 struct CoreDelegate {
     void *context;
-    void (*interpreterDidFail)(void *context);
+    void (*interpreterDidFail)(void *context, struct CoreError coreError);
     void (*diskDriveWillAccess)(void *context, struct DataManager *diskDataManager);
     void (*diskDriveDidSave)(void *context, struct DataManager *diskDataManager);
     void (*controlsDidChange)(void *context);

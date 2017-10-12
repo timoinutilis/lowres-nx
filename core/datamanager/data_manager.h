@@ -39,8 +39,8 @@ struct DataManager {
     uint8_t *data;
 };
 
-enum ErrorCode data_import(struct DataManager *manager, const char *input);
-enum ErrorCode data_uppercaseImport(struct DataManager *manager, const char *input);
+struct CoreError data_import(struct DataManager *manager, const char *input);
+struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input);
 char *data_export(struct DataManager *manager);
 
 int data_currentSize(struct DataManager *manager);

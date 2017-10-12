@@ -78,3 +78,15 @@ const char *err_getString(enum ErrorCode errorCode)
 {
     return ErrorStrings[errorCode];
 }
+
+struct CoreError err_makeCoreError(enum ErrorCode code, int sourcePosition)
+{
+    struct CoreError error = {code, sourcePosition};
+    return error;
+}
+
+struct CoreError err_noCoreError()
+{
+    struct CoreError error = {ErrorNone, 0};
+    return error;
+}

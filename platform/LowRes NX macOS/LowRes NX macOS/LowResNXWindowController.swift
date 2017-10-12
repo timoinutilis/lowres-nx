@@ -21,7 +21,8 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         super.windowDidLoad()
         window!.delegate = self
         
-        backgroundView.layer!.backgroundColor = CGColor(gray: 0, alpha: 1)
+        backgroundView.wantsLayer = true
+        backgroundView.layer?.backgroundColor = CGColor(gray: 0, alpha: 1)
         
         let lowResNXDocument = document as! LowResNXDocument
         coreWrapper = lowResNXDocument.coreWrapper
@@ -182,13 +183,11 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
 
 }
 
-func interpreterDidFail(context: UnsafeMutableRawPointer?) -> Void {
+func interpreterDidFail(context: UnsafeMutableRawPointer?, coreError: CoreError) -> Void {
     let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
     let nxDocument = windowController.document as! LowResNXDocument
     
-    if let coreWrapper = windowController.coreWrapper {
-        windowController.presentError(nxDocument.getProgramError(errorCode: itp_getExitErrorCode(&coreWrapper.core)))
-    }
+    windowController.presentError(nxDocument.getProgramError(error: coreError))
 }
 
 func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
@@ -198,10 +197,10 @@ func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: Uns
     do {
         let diskURL = nxDocument.nxDiskURL()
         let data = try Data(contentsOf: diskURL)
-        let errorCore = data.withUnsafeBytes({ (chars: UnsafePointer<Int8>) -> ErrorCode in
+        let error = data.withUnsafeBytes({ (chars: UnsafePointer<Int8>) -> CoreError in
             data_import(diskDataManager, chars)
         })
-        if errorCore != ErrorNone {
+        if error.code != ErrorNone {
             //TODO
         }
     } catch {

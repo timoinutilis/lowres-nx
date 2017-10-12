@@ -10,10 +10,10 @@ import Cocoa
 
 class ProgramError: NSError {
     
-    init(errorCode: ErrorCode, lineNumber: Int, line: String) {
-        let errorString = String(cString:err_getString(errorCode))
+    init(error: CoreError, lineNumber: Int, line: String) {
+        let errorString = String(cString:err_getString(error.code))
         let errorText = "Error in line \(lineNumber): \(errorString)\n\(line)"
-        super.init(domain: "LowResNX", code: Int(errorCode.rawValue), userInfo: [
+        super.init(domain: "LowResNX", code: Int(error.code.rawValue), userInfo: [
             NSLocalizedFailureReasonErrorKey: "There was a program error.",
             NSLocalizedRecoverySuggestionErrorKey: errorText
             ])
@@ -40,19 +40,18 @@ class LowResNXDocument: NSDocument {
     override func read(from data: Data, ofType typeName: String) throws {
         sourceCode = String(data: data, encoding: .ascii)!
         let cString = sourceCode.cString(using: .ascii)
-        let errorCode = itp_compileProgram(&coreWrapper.core, cString)
-        if errorCode != ErrorNone {
-            throw getProgramError(errorCode: errorCode)
+        let error = itp_compileProgram(&coreWrapper.core, cString)
+        if error.code != ErrorNone {
+            throw getProgramError(error: error)
         }
     }
     
-    func getProgramError(errorCode: ErrorCode) -> ProgramError {
-        let cIndex = itp_getPcPositionInSourceCode(&coreWrapper.core)
-        let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(cIndex))
+    func getProgramError(error: CoreError) -> ProgramError {
+        let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(error.sourcePosition))
         let lineRange = sourceCode.lineRange(for: index ..< index)
         let lineString = sourceCode[lineRange]
         let lineNumber = sourceCode.countLines(index: index)
-        return ProgramError(errorCode: errorCode, lineNumber: lineNumber, line: String(lineString))
+        return ProgramError(error: error, lineNumber: lineNumber, line: String(lineString))
     }
     
     override func makeWindowControllers() {

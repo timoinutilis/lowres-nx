@@ -27,18 +27,18 @@
 int data_calcOutputSize(struct DataManager *manager);
 
 
-enum ErrorCode data_import(struct DataManager *manager, const char *input)
+struct CoreError data_import(struct DataManager *manager, const char *input)
 {
     const char *uppercaseInput = uppercaseString(input);
-    if (!uppercaseInput) return ErrorOutOfMemory;
+    if (!uppercaseInput) return err_makeCoreError(ErrorOutOfMemory, 0);
     
-    enum ErrorCode errorCode = data_uppercaseImport(manager, uppercaseInput);
+    struct CoreError error = data_uppercaseImport(manager, uppercaseInput);
     free((void *)uppercaseInput);
     
-    return errorCode;
+    return error;
 }
 
-enum ErrorCode data_uppercaseImport(struct DataManager *manager, const char *input)
+struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input)
 {
     const char *character = input;
     uint8_t *currentDataByte = manager->data;
@@ -74,13 +74,13 @@ enum ErrorCode data_uppercaseImport(struct DataManager *manager, const char *inp
                     break;
                 }
             }
-            if (*character != ':') return ErrorUnexpectedCharacter;
+            if (*character != ':') return err_makeCoreError(ErrorUnexpectedCharacter, (int)(character - input));
             character++;
             
-            if (entryIndex >= MAX_ENTRIES) return ErrorIndexOutOfBounds;
+            if (entryIndex >= MAX_ENTRIES) return err_makeCoreError(ErrorIndexOutOfBounds, (int)(character - input));
             
             struct DataEntry *entry = &manager->entries[entryIndex];
-            if (entry->length > 0) return ErrorIndexAlreadyDefined;
+            if (entry->length > 0) return err_makeCoreError(ErrorIndexAlreadyDefined, (int)(character - input));
             
             // file comment
             const char *comment = character;
@@ -110,19 +110,19 @@ enum ErrorCode data_uppercaseImport(struct DataManager *manager, const char *inp
                     else
                     {
                         value |= digit;
-                        if (currentDataByte >= endDataByte) return ErrorRomIsFull;
+                        if (currentDataByte >= endDataByte) return err_makeCoreError(ErrorRomIsFull, (int)(character - input));
                         *currentDataByte = value;
                         ++currentDataByte;
                     }
                     shift = !shift;
                 }
-                else if (*character != ' ' && *character == '\t' && *character == '\n')
+                else if (*character != ' ' && *character != '\t' && *character != '\n')
                 {
-                    return ErrorUnexpectedCharacter;
+                    return err_makeCoreError(ErrorUnexpectedCharacter, (int)(character - input));
                 }
                 character++;
             }
-            if (!shift) return ErrorSyntax; // incomplete hex value
+            if (!shift) return err_makeCoreError(ErrorSyntax, (int)(character - input)); // incomplete hex value
             
             int start = (int)(startByte - manager->data);
             int length = (int)(currentDataByte - startByte);
@@ -140,10 +140,10 @@ enum ErrorCode data_uppercaseImport(struct DataManager *manager, const char *inp
         }
         else
         {
-            return ErrorUnexpectedCharacter;
+            return err_makeCoreError(ErrorUnexpectedCharacter, (int)(character - input));
         }
     }
-    return ErrorNone;
+    return err_noCoreError();
 }
 
 char *data_export(struct DataManager *manager)

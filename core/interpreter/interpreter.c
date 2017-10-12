@@ -48,28 +48,26 @@ void itp_init(struct Core *core)
     core->interpreter->romDataManager.data = core->machine->cartridgeRom;
 }
 
-enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
+struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
 {
     struct Interpreter *interpreter = core->interpreter;
     
     // Parse source code
     
     const char *uppercaseSourceCode = uppercaseString(sourceCode);
-    if (!uppercaseSourceCode) return ErrorOutOfMemory;
+    if (!uppercaseSourceCode) return err_makeCoreError(ErrorOutOfMemory, 0);
     
-    struct Token *errorToken = NULL;
-    enum ErrorCode errorCode = tok_tokenizeUppercaseProgram(&interpreter->tokenizer, uppercaseSourceCode, &errorToken);
-    if (errorCode != ErrorNone)
+    struct CoreError error = tok_tokenizeUppercaseProgram(&interpreter->tokenizer, uppercaseSourceCode);
+    if (error.code != ErrorNone)
     {
         free((void *)uppercaseSourceCode);
-        interpreter->pc = errorToken;
-        return errorCode;
+        return error;
     }
     
     struct DataManager *romDataManager = &interpreter->romDataManager;
-    errorCode = data_uppercaseImport(romDataManager, uppercaseSourceCode);
+    error = data_uppercaseImport(romDataManager, uppercaseSourceCode);
     free((void *)uppercaseSourceCode);
-    if (errorCode != ErrorNone) return errorCode;
+    if (error.code != ErrorNone) return error;
 
     // add default characters if ROM entry 0 is unused
     if (romDataManager->entries[0].length == 0 && (DATA_SIZE - data_currentSize(romDataManager)) >= 4096)
@@ -83,13 +81,14 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
     interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->pass = PassPrepare;
     
+    enum ErrorCode errorCode;
     do
     {
         errorCode = itp_evaluateCommand(core);
     }
     while (errorCode == ErrorNone && interpreter->pc->type != TokenUndefined);
     
-    if (errorCode != ErrorNone) return errorCode;
+    if (errorCode != ErrorNone) return err_makeCoreError(errorCode, interpreter->pc->sourcePosition);
     
     if (interpreter->numLabelStackItems > 0)
     {
@@ -124,7 +123,7 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
         if (errorCode != ErrorNone)
         {
             interpreter->pc = item->token;
-            return errorCode;
+            return err_makeCoreError(errorCode, item->token->sourcePosition);
         }
     }
     
@@ -133,7 +132,7 @@ enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode)
     
     itp_resetProgram(core);
     
-    return ErrorNone;
+    return err_noCoreError();
 }
 
 void itp_resetProgram(struct Core *core)
@@ -144,7 +143,6 @@ void itp_resetProgram(struct Core *core)
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
-    interpreter->exitErrorCode = ErrorNone;
     interpreter->numLabelStackItems = 0;
     interpreter->isSingleLineIf = false;
     interpreter->numSimpleVariables = 0;
@@ -182,9 +180,8 @@ void itp_runProgram(struct Core *core)
             }
             if (errorCode != ErrorNone)
             {
-                interpreter->exitErrorCode = errorCode;
                 interpreter->state = StateEnd;
-                core->delegate->interpreterDidFail(core->delegate->context);
+                core->delegate->interpreterDidFail(core->delegate->context, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
             }
             break;
         }
@@ -264,15 +261,13 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 interpreter->mode = ModeNone;
                 if (cycles == maxCycles)
                 {
-                    interpreter->exitErrorCode = ErrorTooManyCommandCycles;
                     interpreter->state = StateEnd;
-                    core->delegate->interpreterDidFail(core->delegate->context);
+                    core->delegate->interpreterDidFail(core->delegate->context, err_makeCoreError(ErrorTooManyCommandCycles, interpreter->pc->sourcePosition));
                 }
                 else if (errorCode != ErrorNone)
                 {
-                    interpreter->exitErrorCode = errorCode;
                     interpreter->state = StateEnd;
-                    core->delegate->interpreterDidFail(core->delegate->context);
+                    core->delegate->interpreterDidFail(core->delegate->context, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
                 }
                 else
                 {
@@ -340,16 +335,6 @@ void itp_freeProgram(struct Core *core)
     }
     
     assert(rcstring_count == 0);
-}
-
-enum ErrorCode itp_getExitErrorCode(struct Core *core)
-{
-    return core->interpreter->exitErrorCode;
-}
-
-int itp_getPcPositionInSourceCode(struct Core *core)
-{
-    return core->interpreter->pc->sourcePosition;
 }
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode)

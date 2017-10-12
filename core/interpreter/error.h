@@ -77,6 +77,13 @@ enum ErrorCode {
     ErrorWhileWithoutWend,
 };
 
+struct CoreError {
+    enum ErrorCode code;
+    int sourcePosition;
+};
+
 const char *err_getString(enum ErrorCode errorCode);
+struct CoreError err_makeCoreError(enum ErrorCode code, int sourcePosition);
+struct CoreError err_noCoreError();
 
 #endif /* error_h */

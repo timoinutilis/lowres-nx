@@ -70,7 +70,6 @@ struct Interpreter {
     enum State state;
     enum Mode mode;
     struct Token *pc;
-    enum ErrorCode exitErrorCode;
     
     struct Tokenizer tokenizer;
     
@@ -107,14 +106,12 @@ struct Interpreter {
 };
 
 void itp_init(struct Core *core);
-enum ErrorCode itp_compileProgram(struct Core *core, const char *sourceCode);
+struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode);
 void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);
 void itp_runInterrupt(struct Core *core, enum InterruptType type);
 void itp_didFinishVBL(struct Core *core);
 void itp_freeProgram(struct Core *core);
-enum ErrorCode itp_getExitErrorCode(struct Core *core);
-int itp_getPcPositionInSourceCode(struct Core *core);
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode);
 struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass);
