@@ -85,7 +85,7 @@ struct CoreError err_makeCoreError(enum ErrorCode code, int sourcePosition)
     return error;
 }
 
-struct CoreError err_noCoreError()
+struct CoreError err_noCoreError(void)
 {
     struct CoreError error = {ErrorNone, 0};
     return error;

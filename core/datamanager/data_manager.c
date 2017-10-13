@@ -27,18 +27,27 @@
 int data_calcOutputSize(struct DataManager *manager);
 
 
-struct CoreError data_import(struct DataManager *manager, const char *input)
+void data_deinit(struct DataManager *manager)
+{
+    if (manager->diskSourceCode)
+    {
+        free((void *)manager->diskSourceCode);
+        manager->diskSourceCode = NULL;
+    }
+}
+
+struct CoreError data_import(struct DataManager *manager, const char *input, bool keepSourceCode)
 {
     const char *uppercaseInput = uppercaseString(input);
     if (!uppercaseInput) return err_makeCoreError(ErrorOutOfMemory, 0);
     
-    struct CoreError error = data_uppercaseImport(manager, uppercaseInput);
+    struct CoreError error = data_uppercaseImport(manager, uppercaseInput, keepSourceCode);
     free((void *)uppercaseInput);
     
     return error;
 }
 
-struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input)
+struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input, bool keepSourceCode)
 {
     const char *character = input;
     uint8_t *currentDataByte = manager->data;
@@ -50,6 +59,21 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
     {
         prevChar = character;
         character++;
+    }
+    
+    if (manager->diskSourceCode)
+    {
+        free((void *)manager->diskSourceCode);
+        manager->diskSourceCode = NULL;
+    }
+    if (keepSourceCode && *character)
+    {
+        size_t length = (size_t)(character - input);
+        char *diskSourceCode = malloc(length + 1);
+        assert(diskSourceCode);
+        memcpy((void *)diskSourceCode, input, length);
+        diskSourceCode[length] = 0;
+        manager->diskSourceCode = diskSourceCode;
     }
     
     while (*character)
@@ -151,10 +175,17 @@ char *data_export(struct DataManager *manager)
     size_t outputSize = data_calcOutputSize(manager);
     if (outputSize > 0)
     {
-        char *output = calloc(outputSize, 1);
-        char *current = output;
+        char *output = malloc(outputSize);
         if (output)
         {
+            char *current = output;
+            
+            if (manager->diskSourceCode)
+            {
+                strcpy(current, manager->diskSourceCode);
+                current += strlen(manager->diskSourceCode);
+            }
+            
             for (int i = 0; i < MAX_ENTRIES; i++)
             {
                 struct DataEntry *entry = &manager->entries[i];
@@ -208,6 +239,11 @@ int data_calcOutputSize(struct DataManager *manager)
             size += 1; // new line
         }
     }
+    if (manager->diskSourceCode)
+    {
+        size += strlen(manager->diskSourceCode);
+    }
+    size += 1; // 0-byte
     return size;
 }
 

@@ -65,7 +65,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     }
     
     struct DataManager *romDataManager = &interpreter->romDataManager;
-    error = data_uppercaseImport(romDataManager, uppercaseSourceCode);
+    error = data_uppercaseImport(romDataManager, uppercaseSourceCode, false);
     free((void *)uppercaseSourceCode);
     if (error.code != ErrorNone) return error;
 

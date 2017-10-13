@@ -35,6 +35,7 @@ void disk_deinit(struct Core *core)
         free(dataManager->data);
         dataManager->data = NULL;
     }
+    data_deinit(dataManager);
 }
 
 void disk_prepare(struct Core *core)

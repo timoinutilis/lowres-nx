@@ -37,10 +37,12 @@ struct DataEntry {
 struct DataManager {
     struct DataEntry entries[MAX_ENTRIES];
     uint8_t *data;
+    const char *diskSourceCode;
 };
 
-struct CoreError data_import(struct DataManager *manager, const char *input);
-struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input);
+void data_deinit(struct DataManager *manager);
+struct CoreError data_import(struct DataManager *manager, const char *input, bool keepSourceCode);
+struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input, bool keepSourceCode);
 char *data_export(struct DataManager *manager);
 
 int data_currentSize(struct DataManager *manager);

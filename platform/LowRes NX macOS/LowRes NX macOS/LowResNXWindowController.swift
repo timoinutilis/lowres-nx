@@ -198,7 +198,7 @@ func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: Uns
         let diskURL = nxDocument.nxDiskURL()
         let data = try Data(contentsOf: diskURL)
         let error = data.withUnsafeBytes({ (chars: UnsafePointer<Int8>) -> CoreError in
-            data_import(diskDataManager, chars)
+            data_import(diskDataManager, chars, true)
         })
         if error.code != ErrorNone {
             //TODO

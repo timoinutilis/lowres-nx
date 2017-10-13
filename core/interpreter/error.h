@@ -84,6 +84,6 @@ struct CoreError {
 
 const char *err_getString(enum ErrorCode errorCode);
 struct CoreError err_makeCoreError(enum ErrorCode code, int sourcePosition);
-struct CoreError err_noCoreError();
+struct CoreError err_noCoreError(void);
 
 #endif /* error_h */
