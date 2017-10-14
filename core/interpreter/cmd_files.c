@@ -26,6 +26,7 @@ enum ErrorCode cmd_LOAD(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     
     // LOAD
+    struct Token *startPc = interpreter->pc;
     ++interpreter->pc;
     
     // file value
@@ -42,10 +43,17 @@ enum ErrorCode cmd_LOAD(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        disk_loadFile(core, fileValue.v.stringValue->chars, addressValue.v.floatValue);
+        bool ready = disk_loadFile(core, fileValue.v.stringValue->chars, addressValue.v.floatValue);
         rcstring_release(fileValue.v.stringValue);
         
         interpreter->exitEvaluation = true;
+        if (!ready)
+        {
+            // disk not ready
+            interpreter->pc = startPc;
+            interpreter->state = StateWaitForDisk;
+            return ErrorNone;
+        }
     }
     
     return itp_endOfCommand(interpreter);
@@ -56,6 +64,7 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     
     // SAVE
+    struct Token *startPc = interpreter->pc;
     ++interpreter->pc;
     
     // file value
@@ -80,10 +89,17 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        disk_saveFile(core, fileValue.v.stringValue->chars, addressValue.v.floatValue, lengthValue.v.floatValue);
+        bool ready = disk_saveFile(core, fileValue.v.stringValue->chars, addressValue.v.floatValue, lengthValue.v.floatValue);
         rcstring_release(fileValue.v.stringValue);
         
         interpreter->exitEvaluation = true;
+        if (!ready)
+        {
+            // disk not ready
+            interpreter->pc = startPc;
+            interpreter->state = StateWaitForDisk;
+            return ErrorNone;
+        }
     }
     
     return itp_endOfCommand(interpreter);

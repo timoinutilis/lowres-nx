@@ -38,7 +38,7 @@ void disk_deinit(struct Core *core)
     data_deinit(dataManager);
 }
 
-void disk_prepare(struct Core *core)
+bool disk_prepare(struct Core *core)
 {
     struct DataManager *dataManager = &core->diskDrive->dataManager;
     if (dataManager->data == NULL)
@@ -46,13 +46,17 @@ void disk_prepare(struct Core *core)
         dataManager->data = calloc(DATA_SIZE, 1);
         assert(dataManager->data != NULL);
         
-        delegate_diskDriveWillAccess(core);
+        return delegate_diskDriveWillAccess(core);
     }
+    return true;
 }
 
-void disk_saveFile(struct Core *core, char *name, int address, int length)
+bool disk_saveFile(struct Core *core, char *name, int address, int length)
 {
-    disk_prepare(core);
+    if (!disk_prepare(core))
+    {
+        return false;
+    }
     
     int index;
     char comment[ENTRY_COMMENT_SIZE];
@@ -70,11 +74,15 @@ void disk_saveFile(struct Core *core, char *name, int address, int length)
         
         core->delegate->diskDriveDidSave(core->delegate->context, dataManager);
     }
+    return true;
 }
 
-void disk_loadFile(struct Core *core, char *name, int address)
+bool disk_loadFile(struct Core *core, char *name, int address)
 {
-    disk_prepare(core);
+    if (!disk_prepare(core))
+    {
+        return false;
+    }
     
     int index;
     int result = sscanf(name, "#%d", &index);
@@ -96,4 +104,5 @@ void disk_loadFile(struct Core *core, char *name, int address)
             assert(poke);
         }
     }
+    return true;
 }

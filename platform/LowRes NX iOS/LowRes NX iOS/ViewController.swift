@@ -192,7 +192,8 @@ class ViewController: UIViewController, UIKeyInput {
     func coreInterpreterDidFail(coreError: CoreError) {
     }
     
-    func coreDiskDriveWillAccess(diskDataManager: UnsafeMutablePointer<DataManager>?) {
+    func coreDiskDriveWillAccess(diskDataManager: UnsafeMutablePointer<DataManager>?) -> Bool {
+        return true
     }
     
     func coreDiskDriveDidSave(diskDataManager: UnsafeMutablePointer<DataManager>?) {
@@ -246,9 +247,9 @@ func interpreterDidFail(context: UnsafeMutableRawPointer?, coreError: CoreError)
     viewController.coreInterpreterDidFail(coreError: coreError)
 }
 
-func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
+func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Bool {
     let viewController = Unmanaged<ViewController>.fromOpaque(context!).takeUnretainedValue()
-    viewController.coreDiskDriveWillAccess(diskDataManager: diskDataManager)
+    return viewController.coreDiskDriveWillAccess(diskDataManager: diskDataManager)
 }
 
 func diskDriveDidSave(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {

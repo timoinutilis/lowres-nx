@@ -180,51 +180,82 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         let y = CGFloat(SCREEN_HEIGHT) - viewPoint.y * CGFloat(SCREEN_HEIGHT) / lowResNXView.bounds.size.height;
         return CGPoint(x: x, y: y);
     }
+    
+    // MARK: - Core Delegate
+    
+    func coreInterpreterDidFail(coreError: CoreError) -> Void {
+        let nxDocument = document as! LowResNXDocument
+        presentError(nxDocument.getProgramError(error: coreError))
+    }
+    
+    func coreDiskDriveWillAccess(diskDataManager: UnsafeMutablePointer<DataManager>?) -> Bool {
+        let nxDocument = document as! LowResNXDocument
+        
+        let panel = NSOpenPanel()
+        panel.prompt = "Use as Disk"
+        panel.allowedFileTypes = ["nx"]
+        panel.beginSheetModal(for: window!, completionHandler: { (response) in
+            if response == .OK {
+                nxDocument.nxDiskUrl = panel.url
+            } else {
+                nxDocument.nxDiskUrl = nxDocument.fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nx")
+            }
+            
+            if let nxDiskUrl = nxDocument.nxDiskUrl {
+                do {
+                    let data = try Data(contentsOf: nxDiskUrl)
+                    let error = data.withUnsafeBytes({ (chars: UnsafePointer<Int8>) -> CoreError in
+                        data_import(diskDataManager, chars, true)
+                    })
+                    if error.code != ErrorNone {
+                        //TODO
+                    }
+                } catch let error as NSError {
+                    self.presentError(error)
+                }
+            }
+            
+            core_diskLoaded(&self.coreWrapper!.core)
+        })
+        return false
+    }
+    
+    func coreDiskDriveDidSave(diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
+        let nxDocument = document as! LowResNXDocument
+        
+        if let diskUrl = nxDocument.nxDiskUrl {
+            let output = data_export(diskDataManager)
+            if let output = output {
+                let data = Data(bytes: output, count: Int(strlen(output)))
+                do {
+                    try data.write(to: diskUrl)
+                } catch let error as NSError {
+                    presentError(error)
+                }
+                free(output);
+            } else {
+                //TODO
+            }
+        } else {
+            //TODO
+        }
+    }
 
 }
 
 func interpreterDidFail(context: UnsafeMutableRawPointer?, coreError: CoreError) -> Void {
     let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
-    let nxDocument = windowController.document as! LowResNXDocument
-    
-    windowController.presentError(nxDocument.getProgramError(error: coreError))
+    windowController.coreInterpreterDidFail(coreError: coreError)
 }
 
-func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
+func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Bool {
     let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
-    let nxDocument = windowController.document as! LowResNXDocument
-    
-    do {
-        let diskURL = nxDocument.nxDiskURL()
-        let data = try Data(contentsOf: diskURL)
-        let error = data.withUnsafeBytes({ (chars: UnsafePointer<Int8>) -> CoreError in
-            data_import(diskDataManager, chars, true)
-        })
-        if error.code != ErrorNone {
-            //TODO
-        }
-    } catch {
-        
-    }
+    return windowController.coreDiskDriveWillAccess(diskDataManager: diskDataManager)
 }
 
 func diskDriveDidSave(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
     let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
-    let nxDocument = windowController.document as! LowResNXDocument
-    
-    let output = data_export(diskDataManager)
-    if let output = output {
-        let diskURL = nxDocument.nxDiskURL()
-        let data = Data(bytes: output, count: Int(strlen(output)))
-        do {
-            try data.write(to: diskURL)
-        } catch let error as NSError {
-            windowController.presentError(error)
-        }
-        free(output);
-    } else {
-        //TODO
-    }
+    windowController.coreDiskDriveDidSave(diskDataManager: diskDataManager)
 }
 
 func controlsDidChange(context: UnsafeMutableRawPointer?, controlsInfo: ControlsInfo) -> Void {

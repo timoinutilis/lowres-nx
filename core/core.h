@@ -63,6 +63,8 @@ void core_gamepadReleased(struct Core *core, int player, enum GamepadButton butt
 void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
 void core_pausePressed(struct Core *core);
 
+void core_diskLoaded(struct Core *core);
+
 void core_setNumPhysicalGamepads(struct Core *core, int num);
 bool core_getKeyboardEnabled(struct Core *core);
 

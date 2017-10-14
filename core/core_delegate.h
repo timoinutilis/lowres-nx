@@ -32,14 +32,22 @@ struct ControlsInfo {
 
 struct CoreDelegate {
     void *context;
+    
+    /** Called on error */
     void (*interpreterDidFail)(void *context, struct CoreError coreError);
-    void (*diskDriveWillAccess)(void *context, struct DataManager *diskDataManager);
+    
+    /** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */
+    bool (*diskDriveWillAccess)(void *context, struct DataManager *diskDataManager);
+    
+    /** Called when a disk data entry was saved */
     void (*diskDriveDidSave)(void *context, struct DataManager *diskDataManager);
+    
+    /** Called when keyboard or gamepad settings changed */
     void (*controlsDidChange)(void *context, struct ControlsInfo);
 };
 
 void delegate_interpreterDidFail(struct Core *core, struct CoreError coreError);
-void delegate_diskDriveWillAccess(struct Core *core);
+bool delegate_diskDriveWillAccess(struct Core *core);
 void delegate_diskDriveDidSave(struct Core *core);
 void delegate_controlsDidChange(struct Core *core);
 

@@ -28,12 +28,13 @@ void delegate_interpreterDidFail(struct Core *core, struct CoreError coreError)
     }
 }
 
-void delegate_diskDriveWillAccess(struct Core *core)
+bool delegate_diskDriveWillAccess(struct Core *core)
 {
     if (core->delegate->diskDriveWillAccess)
     {
-        core->delegate->diskDriveWillAccess(core->delegate->context, &core->diskDrive->dataManager);
+        return core->delegate->diskDriveWillAccess(core->delegate->context, &core->diskDrive->dataManager);
     }
+    return true;
 }
 
 void delegate_diskDriveDidSave(struct Core *core)

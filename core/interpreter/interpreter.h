@@ -51,6 +51,7 @@ enum State {
     StateWait,
     StateInput,
     StatePaused,
+    StateWaitForDisk,
     StateEnd
 };
 

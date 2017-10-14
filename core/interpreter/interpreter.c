@@ -212,6 +212,7 @@ void itp_runProgram(struct Core *core)
         case StateNoProgram:
         case StatePaused:
         case StateEnd:
+        case StateWaitForDisk:
             break;
     }
 }
@@ -226,6 +227,7 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
         case StateWait:
         case StateInput:
         case StatePaused:
+        case StateWaitForDisk:
         {
             struct Token *startToken;
             int maxCycles;
