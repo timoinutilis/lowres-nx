@@ -26,9 +26,10 @@
 
 int data_calcOutputSize(struct DataManager *manager);
 
-
 void data_deinit(struct DataManager *manager)
 {
+    assert(manager);
+    
     if (manager->diskSourceCode)
     {
         free((void *)manager->diskSourceCode);
@@ -36,8 +37,16 @@ void data_deinit(struct DataManager *manager)
     }
 }
 
+void data_resetEntries(struct DataManager *manager)
+{
+    memset(manager->entries, 0, sizeof(struct DataEntry) * MAX_ENTRIES);
+}
+
 struct CoreError data_import(struct DataManager *manager, const char *input, bool keepSourceCode)
 {
+    assert(manager);
+    assert(input);
+    
     const char *uppercaseInput = uppercaseString(input);
     if (!uppercaseInput) return err_makeCoreError(ErrorOutOfMemory, 0);
     
@@ -49,6 +58,11 @@ struct CoreError data_import(struct DataManager *manager, const char *input, boo
 
 struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input, bool keepSourceCode)
 {
+    assert(manager);
+    assert(input);
+    
+    data_resetEntries(manager);
+    
     const char *character = input;
     uint8_t *currentDataByte = manager->data;
     uint8_t *endDataByte = &manager->data[DATA_SIZE];
@@ -172,6 +186,8 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
 
 char *data_export(struct DataManager *manager)
 {
+    assert(manager);
+    
     size_t outputSize = data_calcOutputSize(manager);
     if (outputSize > 0)
     {

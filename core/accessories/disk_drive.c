@@ -45,10 +45,8 @@ bool disk_prepare(struct Core *core)
     {
         dataManager->data = calloc(DATA_SIZE, 1);
         assert(dataManager->data != NULL);
-        
-        return delegate_diskDriveWillAccess(core);
     }
-    return true;
+    return delegate_diskDriveWillAccess(core);
 }
 
 bool disk_saveFile(struct Core *core, char *name, int address, int length)

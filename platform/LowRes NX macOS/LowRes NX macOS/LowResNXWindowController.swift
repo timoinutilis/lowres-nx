@@ -13,9 +13,11 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     @IBOutlet weak var backgroundView: NSView!
     @IBOutlet weak var widthConstraint: NSLayoutConstraint!
     
-    var timer: Timer? = nil
+    var timer: Timer?
     var coreWrapper: CoreWrapper?
     var coreDelegate = CoreDelegate()
+    var nxDiskUrl: URL?
+    var nxDiskDate: Date?
 
     override func windowDidLoad() {
         super.windowDidLoad()
@@ -181,6 +183,31 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         return CGPoint(x: x, y: y);
     }
     
+    func loadDisk(diskDataManager: UnsafeMutablePointer<DataManager>?) {
+        guard let nxDiskUrl = self.nxDiskUrl else {
+            return
+        }
+        
+        nxDiskDate = fileModificationDate(url: nxDiskUrl) ?? Date()
+        
+        do {
+            let diskString = try String(contentsOf: nxDiskUrl)
+            let chars = diskString.cString(using: .ascii)
+            let error = data_import(diskDataManager, chars, true)
+            if error.code != ErrorNone {
+                let nxDocument = document as! LowResNXDocument
+                presentError(nxDocument.getProgramError(error: error))
+            }
+        } catch let error as NSError {
+            presentError(error)
+        }
+    }
+    
+    func fileModificationDate(url: URL) -> Date? {
+        let attrs = try? FileManager.default.attributesOfItem(atPath: url.path) as NSDictionary
+        return attrs?.fileModificationDate()
+    }
+    
     // MARK: - Core Delegate
     
     func coreInterpreterDidFail(coreError: CoreError) -> Void {
@@ -189,31 +216,25 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     }
     
     func coreDiskDriveWillAccess(diskDataManager: UnsafeMutablePointer<DataManager>?) -> Bool {
-        let nxDocument = document as! LowResNXDocument
+        if let nxDiskUrl = nxDiskUrl {
+            if let modificationDate = fileModificationDate(url: nxDiskUrl), modificationDate > nxDiskDate! {
+                loadDisk(diskDataManager: diskDataManager)
+            }
+            return true
+        }
         
         let panel = NSOpenPanel()
         panel.prompt = "Use as Disk"
         panel.allowedFileTypes = ["nx"]
         panel.beginSheetModal(for: window!, completionHandler: { (response) in
             if response == .OK {
-                nxDocument.nxDiskUrl = panel.url
+                self.nxDiskUrl = panel.url
             } else {
-                nxDocument.nxDiskUrl = nxDocument.fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nx")
+                let nxDocument = self.document as! LowResNXDocument
+                self.nxDiskUrl = nxDocument.fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nx")
             }
             
-            if let nxDiskUrl = nxDocument.nxDiskUrl {
-                do {
-                    let data = try Data(contentsOf: nxDiskUrl)
-                    let error = data.withUnsafeBytes({ (chars: UnsafePointer<Int8>) -> CoreError in
-                        data_import(diskDataManager, chars, true)
-                    })
-                    if error.code != ErrorNone {
-                        //TODO
-                    }
-                } catch let error as NSError {
-                    self.presentError(error)
-                }
-            }
+            self.loadDisk(diskDataManager: diskDataManager)
             
             core_diskLoaded(&self.coreWrapper!.core)
         })
@@ -221,14 +242,13 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
     }
     
     func coreDiskDriveDidSave(diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
-        let nxDocument = document as! LowResNXDocument
-        
-        if let diskUrl = nxDocument.nxDiskUrl {
+        if let nxDiskUrl = nxDiskUrl {
             let output = data_export(diskDataManager)
             if let output = output {
                 let data = Data(bytes: output, count: Int(strlen(output)))
                 do {
-                    try data.write(to: diskUrl)
+                    try data.write(to: nxDiskUrl)
+                    nxDiskDate = fileModificationDate(url: nxDiskUrl) ?? Date()
                 } catch let error as NSError {
                     presentError(error)
                 }
@@ -240,7 +260,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
             //TODO
         }
     }
-
+    
 }
 
 func interpreterDidFail(context: UnsafeMutableRawPointer?, coreError: CoreError) -> Void {

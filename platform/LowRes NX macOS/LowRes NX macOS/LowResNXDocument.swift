@@ -28,7 +28,6 @@ class ProgramError: NSError {
 class LowResNXDocument: NSDocument {
     var sourceCode = ""
     var coreWrapper = CoreWrapper()
-    var nxDiskUrl: URL?
         
     override class var autosavesInPlace: Bool {
         return false
