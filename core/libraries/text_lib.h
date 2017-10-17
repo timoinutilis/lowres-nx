@@ -48,7 +48,6 @@ struct TextLib {
     int blink;
 };
 
-void txtlib_init(struct Core *core);
 void txtlib_printText(struct Core *core, const char *text);
 bool txtlib_deleteBackward(struct Core *core);
 void txtlib_writeText(struct Core *core, const char *text, int x, int y);

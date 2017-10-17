@@ -42,6 +42,7 @@
 		92624BF51EAD1CFC00EB3A3C /* audio_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BD71EAD1CFC00EB3A3C /* audio_chip.c */; };
 		92624BF71EAD1CFC00EB3A3C /* machine.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDC1EAD1CFC00EB3A3C /* machine.c */; };
 		92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92624BDE1EAD1CFC00EB3A3C /* video_chip.c */; };
+		9263A5171F9666B600EA9757 /* startup_sequence.c in Sources */ = {isa = PBXBuildFile; fileRef = 9263A5161F9666B600EA9757 /* startup_sequence.c */; };
 		9284CE4C1ED1EE1600891E7D /* cmd_files.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284CE4A1ED1EE1600891E7D /* cmd_files.c */; };
 		928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C1FEC1EB638A5002AE5C9 /* LowResNXWindowController.swift */; };
 		928C1FEF1EB638A5002AE5C9 /* LowResNXWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 928C1FED1EB638A5002AE5C9 /* LowResNXWindowController.xib */; };
@@ -124,6 +125,8 @@
 		92624BDF1EAD1CFC00EB3A3C /* video_chip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = video_chip.h; sourceTree = "<group>"; };
 		92624C011EAD20E200EB3A3C /* LowResNX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LowResNX-Bridging-Header.h"; sourceTree = "<group>"; };
 		92624C031EAD35C600EB3A3C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		9263A5151F9666B600EA9757 /* startup_sequence.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = startup_sequence.h; sourceTree = "<group>"; };
+		9263A5161F9666B600EA9757 /* startup_sequence.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = startup_sequence.c; sourceTree = "<group>"; };
 		9282B4781ED4CE6A007B0F79 /* core_delegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_delegate.h; sourceTree = "<group>"; };
 		9284CE4A1ED1EE1600891E7D /* cmd_files.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_files.c; sourceTree = "<group>"; };
 		9284CE4B1ED1EE1600891E7D /* cmd_files.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_files.h; sourceTree = "<group>"; };
@@ -275,6 +278,8 @@
 		92624BD31EAD1CFC00EB3A3C /* libraries */ = {
 			isa = PBXGroup;
 			children = (
+				9263A5151F9666B600EA9757 /* startup_sequence.h */,
+				9263A5161F9666B600EA9757 /* startup_sequence.c */,
 				92624BD41EAD1CFC00EB3A3C /* text_lib.c */,
 				92624BD51EAD1CFC00EB3A3C /* text_lib.h */,
 				9206D41B1F39060A00AF0B00 /* sprites_lib.c */,
@@ -420,6 +425,7 @@
 				92624BF81EAD1CFC00EB3A3C /* video_chip.c in Sources */,
 				92624B9B1EAD1B8800EB3A3C /* LowResNXDocument.swift in Sources */,
 				928C1FEE1EB638A5002AE5C9 /* LowResNXWindowController.swift in Sources */,
+				9263A5171F9666B600EA9757 /* startup_sequence.c in Sources */,
 				92624BEA1EAD1CFC00EB3A3C /* cmd_text.c in Sources */,
 				92624BEC1EAD1CFC00EB3A3C /* data.c in Sources */,
 				92AE47CB1F6D8288008BD49C /* overlay.c in Sources */,

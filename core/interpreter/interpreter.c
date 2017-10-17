@@ -37,6 +37,7 @@
 #include "cmd_io.h"
 #include "cmd_files.h"
 #include "string_utils.h"
+#include "startup_sequence.h"
 
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
@@ -70,9 +71,9 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     if (error.code != ErrorNone) return error;
 
     // add default characters if ROM entry 0 is unused
-    if (romDataManager->entries[0].length == 0 && (DATA_SIZE - data_currentSize(romDataManager)) >= 4096)
+    if (romDataManager->entries[0].length == 0 && (DATA_SIZE - data_currentSize(romDataManager)) >= 1024)
     {
-        data_setEntry(romDataManager, 0, "DEFAULT CHARACTERS", (uint8_t *)DefaultCharacters, 4096);
+        data_setEntry(romDataManager, 0, "DEFAULT CHARACTERS", (uint8_t *)DefaultCharacters, 1024);
         interpreter->romIncludesDefaultCharacters = true;
     }
     
@@ -150,7 +151,7 @@ void itp_resetProgram(struct Core *core)
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
     
-    txtlib_init(core);
+    runStartupSequence(core);
 }
 
 void itp_runProgram(struct Core *core)

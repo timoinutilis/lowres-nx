@@ -22,24 +22,6 @@
 #include <string.h>
 #include <assert.h>
 
-void txtlib_init(struct Core *core)
-{
-    struct TextLib *lib = &core->interpreter->textLib;
-    lib->fontCharOffset = 192;
-    
-    txtlib_clearScreen(core);
-    
-    core->machine->colorRegisters.colors[1] = (3 << 4) | (3 << 2) | 3;
-    core->machine->colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
-    core->machine->colorRegisters.colors[3] = (1 << 4) | (1 << 2) | 1;
-    
-    if (core->interpreter->romIncludesDefaultCharacters)
-    {
-        struct DataEntry *entry0 = core->interpreter->romDataManager.entries;
-        memcpy(core->machine->videoRam.characters, &core->machine->cartridgeRom[entry0->start], entry0->length);
-    }
-}
-
 struct Plane *txtlib_getCurrentBackground(struct Core *core)
 {
     switch (core->interpreter->textLib.bg)
