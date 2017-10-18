@@ -97,7 +97,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     ++interpreter->pc;
     
     // width value
-    struct TypedValue wValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue wValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS);
     if (wValue.type == ValueTypeError) return wValue.v.errorCode;
 
     // comma
@@ -105,7 +105,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     ++interpreter->pc;
     
     // height value
-    struct TypedValue hValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue hValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS);
     if (hValue.type == ValueTypeError) return hValue.v.errorCode;
     
     // TO
