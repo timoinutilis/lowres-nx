@@ -80,7 +80,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
         free((void *)manager->diskSourceCode);
         manager->diskSourceCode = NULL;
     }
-    if (keepSourceCode && *character)
+    if (keepSourceCode)
     {
         size_t length = (size_t)(character - input);
         char *diskSourceCode = malloc(length + 1);
