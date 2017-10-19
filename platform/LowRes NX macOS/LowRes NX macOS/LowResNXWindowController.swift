@@ -224,6 +224,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         }
         
         let panel = NSOpenPanel()
+        panel.message = "Select an NX file whose data you want to edit."
         panel.prompt = "Use as Disk"
         panel.allowedFileTypes = ["nx"]
         panel.beginSheetModal(for: window!, completionHandler: { (response) in
@@ -231,7 +232,11 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
                 self.nxDiskUrl = panel.url
             } else {
                 let nxDocument = self.document as! LowResNXDocument
-                self.nxDiskUrl = nxDocument.fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nx")
+                let nxDiskUrl = nxDocument.fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nx")
+                if !FileManager.default.fileExists(atPath: nxDiskUrl.path) {
+                    FileManager.default.createFile(atPath: nxDiskUrl.path, contents: nil, attributes: nil)
+                }
+                self.nxDiskUrl = nxDiskUrl
             }
             
             self.loadDisk(diskDataManager: diskDataManager)
