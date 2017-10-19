@@ -75,7 +75,6 @@ struct Interpreter {
     struct Tokenizer tokenizer;
     
     struct DataManager romDataManager;
-    bool romIncludesDefaultCharacters;
     
     struct LabelStackItem labelStackItems[MAX_LABEL_STACK_ITEMS];
     int numLabelStackItems;

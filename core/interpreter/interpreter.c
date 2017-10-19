@@ -71,10 +71,10 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     if (error.code != ErrorNone) return error;
 
     // add default characters if ROM entry 0 is unused
-    if (romDataManager->entries[0].length == 0 && (DATA_SIZE - data_currentSize(romDataManager)) >= 1024)
+    struct DataEntry *entry0 = &romDataManager->entries[0];
+    if (entry0->length == 0 && (DATA_SIZE - data_currentSize(romDataManager)) >= 1024)
     {
-        data_setEntry(romDataManager, 0, "DEFAULT CHARACTERS", (uint8_t *)DefaultCharacters, 1024);
-        interpreter->romIncludesDefaultCharacters = true;
+        data_setEntry(romDataManager, 0, "FONT", (uint8_t *)DefaultCharacters, 1024);
     }
     
     // Prepare

@@ -32,15 +32,21 @@ void runStartupSequence(struct Core *core)
     txtlib_clearScreen(core);
     
     // default characters/font
-    if (core->interpreter->romIncludesDefaultCharacters)
+    if (strcmp(entries[0].comment, "FONT") == 0)
     {
         memcpy(&core->machine->videoRam.characters[FONT_CHAR_OFFSET], &core->machine->cartridgeRom[entries[0].start], entries[0].length);
     }
     
     // main palettes
-    core->machine->colorRegisters.colors[1] = (3 << 4) | (3 << 2) | 3;
-    core->machine->colorRegisters.colors[2] = (2 << 4) | (2 << 2) | 2;
-    core->machine->colorRegisters.colors[3] = (1 << 4) | (1 << 2) | 1;
+    uint8_t *colors = core->machine->colorRegisters.colors;
+    colors[0] = (0 << 4) | (1 << 2) | 1;
+    colors[1] = (3 << 4) | (3 << 2) | 3;
+    colors[2] = (2 << 4) | (3 << 2) | 3;
+    colors[3] = (0 << 4) | (0 << 2) | 0;
+    colors[4] = (0 << 4) | (1 << 2) | 1;
+    colors[5] = (3 << 4) | (2 << 2) | 0;
+    colors[6] = (3 << 4) | (1 << 2) | 0;
+    colors[7] = (0 << 4) | (0 << 2) | 0;
     memcpy(core->machine->colorRegisters.colors, &core->machine->cartridgeRom[entries[1].start], entries[1].length);
     
     // main characters
