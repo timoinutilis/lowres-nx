@@ -55,18 +55,23 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
     struct TypedValue aValue = itp_evaluateNumericExpression(core, 0, 0xFFFF);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
-    // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-    ++interpreter->pc;
-    
-    // width value
-    struct TypedValue wValue = itp_evaluateNumericExpression(core, 1, 0xFFFF);
-    if (wValue.type == ValueTypeError) return wValue.v.errorCode;
+    int w = PLANE_COLUMNS;
+    if (interpreter->pc->type == TokenComma)
+    {
+        // comma
+        ++interpreter->pc;
+        
+        // width value
+        struct TypedValue wValue = itp_evaluateNumericExpression(core, 1, 0xFFFF);
+        if (wValue.type == ValueTypeError) return wValue.v.errorCode;
+        
+        w = wValue.v.floatValue;
+    }
     
     if (interpreter->pass == PassRun)
     {
         core->interpreter->textLib.sourceAddress = aValue.v.floatValue;
-        core->interpreter->textLib.sourceWidth = wValue.v.floatValue;
+        core->interpreter->textLib.sourceWidth = w;
     }
     
     return itp_endOfCommand(interpreter);

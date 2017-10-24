@@ -561,11 +561,11 @@ BG FILL
 
 BG SOURCE
 
-    BG SOURCE a,w
+    BG SOURCE a[,w]
 
     Sets the current source for the BG COPY statement. The two-
     dimensional map starts at memory address "a" and has a width of w
-    cells.
+    cells. If the parameter w is omitted, the value is set to 32.
 
 
 BG COPY
@@ -606,9 +606,9 @@ NUMBER
 
 FONT
     
-    FONT (pal,fx,fy,pri,s),c
+    FONT c,(pal,fx,fy,pri,s)
 
-    Sets the current attributes and character range used for text
+    Sets the current character range and attributes used for text
     output. c is the character where the font starts (space).
     All parameters can be omitted to keep their current settings.
 
@@ -618,7 +618,7 @@ FONT
     pri     priority flag (0/1)
     s       unused (0-3)
 
-    FONT a,c
+    FONT c,a
 
     Allows setting the attributes as a single 8-bit value.
 

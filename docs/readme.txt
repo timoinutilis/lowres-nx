@@ -8,19 +8,13 @@
 
 - Read the docs, especially the introduction!
 
-- The tools' data is saved to "disk.nx". Copy and paste between this
-  file and your program file.
-
 - "Character Designer" and "Background Designer" currently use these
   data entries (no selection yet):
 
-  #1: Characters
-  #2: Background
-  #15: Palettes
-
-- The designer tools' buttons don't show feedback yet. Believe your
-  clicks and be careful (there is no undo).
-
+  #1: Palettes
+  #2: Characters
+  #3: Background
+  
 - There's no real gamepad support yet. Use the keyboard.
 
 	Button  Player 1    Player 2
@@ -39,11 +33,8 @@
 
 - BASIC commands to list files, LOAD/SAVE may be changed
 - File lists for designer tools
-- Improve UI of designer tools (merge Character and Background Designer to one program)
-- Reserve keywords for planned features
 - Implement persistent RAM
-- Make any nx file selectable as virtual disk (for direct editing)
-- Keep source code when using nx files as virtual disks
+- Improve UI of designer tools (merge Character and Background Designer to one program)
 - Final app icon
 - Later: Sound
 - Later: Drawing commands
