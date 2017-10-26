@@ -77,10 +77,9 @@ get the exact address of each entry.
 **********************
 
 The BASIC statements LOAD and SAVE can be used to store data on a
-virtual disk, which can contain up to 16 files. Usually all programs
-in a folder share the same virtual disk. Its format is the same as the
-ROM entries part in a program file, so data can be easily transferred
-between disks and programs.
+virtual disk, which can contain up to 16 files. Its format is the same
+as the ROM entries part in a program file. This makes it possible to
+use any NX program directly as a virtual disk to edit its data.
 
 Virtual disks are meant to be used for development tools only, for
 example image and map editors or music programs. Games should use

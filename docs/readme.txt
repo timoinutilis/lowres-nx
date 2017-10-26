@@ -2,11 +2,11 @@
 * Notes *
 *********
 
+- Read the docs, especially the introduction!
+
 - Send your programs, bug reports and questions to timo@inutilis.com.
 
 - Development news on Twitter: @timo_inutilis. Tweet with #LowResNX.
-
-- Read the docs, especially the introduction!
 
 - "Character Designer" and "Background Designer" currently use these
   data entries (no selection yet):

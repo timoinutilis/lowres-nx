@@ -44,7 +44,8 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2017 Inutilis Software.</string>
+	<string>Copyright © 2017 Timo Kloss.
+This program is released under the GNU Lesser General Public License.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
