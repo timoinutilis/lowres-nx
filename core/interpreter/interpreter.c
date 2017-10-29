@@ -336,8 +336,6 @@ void itp_freeProgram(struct Core *core)
     {
         rcstring_release(interpreter->nullString);
     }
-    
-    assert(rcstring_count == 0);
 }
 
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode)

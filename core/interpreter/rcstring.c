@@ -21,8 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-int rcstring_count = 0;
-
 struct RCString *rcstring_new(const char *chars, size_t len)
 {
     size_t size = sizeof(struct RCString) + len;
@@ -35,7 +33,6 @@ struct RCString *rcstring_new(const char *chars, size_t len)
             memcpy(string->chars, chars, len);
         }
         string->chars[len] = 0; // end of string
-        rcstring_count++;
     }
     return string;
 }
@@ -51,6 +48,5 @@ void rcstring_release(struct RCString *string)
     if (string->refCount == 0)
     {
         free((void *)string);
-        rcstring_count--;
     }
 }

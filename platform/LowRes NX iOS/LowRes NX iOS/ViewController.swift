@@ -95,7 +95,7 @@ class ViewController: UIViewController, UIKeyInput {
         widthConstraint.constant = (maxWidthFactor < maxHeightFactor) ? maxWidthFactor * CGFloat(SCREEN_WIDTH) : maxHeightFactor * CGFloat(SCREEN_WIDTH)
     }
     
-    func update(displaylink: CADisplayLink) {
+    @objc func update(displaylink: CADisplayLink) {
         updateGameControllers()
         
         if let coreWrapper = coreWrapper {
@@ -145,7 +145,7 @@ class ViewController: UIViewController, UIKeyInput {
         }
     }
     
-    func handleTap(sender: UITapGestureRecognizer) {
+    @objc func handleTap(sender: UITapGestureRecognizer) {
         if let coreWrapper = coreWrapper {
             if sender.state == .ended {
                 if core_getKeyboardEnabled(&coreWrapper.core) {
@@ -162,7 +162,7 @@ class ViewController: UIViewController, UIKeyInput {
         return false
     }
     
-    func keyboardWillShow(_ notification: NSNotification) {
+    @objc func keyboardWillShow(_ notification: NSNotification) {
         if let frameValue = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue {
             let frame = frameValue.cgRectValue
             keyboardConstraint.constant = view.bounds.size.height - frame.origin.y
@@ -172,18 +172,18 @@ class ViewController: UIViewController, UIKeyInput {
         }
     }
 
-    func keyboardWillHide(_ notification: NSNotification) {
+    @objc func keyboardWillHide(_ notification: NSNotification) {
         keyboardConstraint.constant = 0
         UIView.animate(withDuration: 0.3, animations: {
             self.view.layoutIfNeeded()
         })
     }
     
-    func controllerDidConnect(_ notification: NSNotification) {
+    @objc func controllerDidConnect(_ notification: NSNotification) {
         configureGameControllers()
     }
 
-    func controllerDidDisconnect(_ notification: NSNotification) {
+    @objc func controllerDidDisconnect(_ notification: NSNotification) {
         configureGameControllers()
     }
     

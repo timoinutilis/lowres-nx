@@ -24,7 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let cString = programSourceCode.cString(using: .ascii)
                 let error = itp_compileProgram(&coreWrapper.core, cString)
                 if error.code != ErrorNone {
-                    print("compiler error:", err_getString(error.code))
+                    let errorString = String(cString:err_getString(error.code))
+                    print("compiler error:", errorString)
                 }
             } catch {
                 print("file error:", error.localizedDescription)

@@ -39,6 +39,8 @@ void core_init(struct Core *core)
 
 void core_deinit(struct Core *core)
 {
+    itp_freeProgram(core);
+    
     disk_deinit(core);
     
     free(core->machine);

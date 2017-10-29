@@ -51,6 +51,7 @@
 		9286A71C1F8FCE1A005C9EC1 /* core_delegate.c in Sources */ = {isa = PBXBuildFile; fileRef = 9286A71B1F8FCE1A005C9EC1 /* core_delegate.c */; };
 		92AE47D41F6D94A1008BD49C /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47D01F6D94A1008BD49C /* overlay.c */; };
 		92AE47D51F6D94A1008BD49C /* overlay_data.c in Sources */ = {isa = PBXBuildFile; fileRef = 92AE47D21F6D94A1008BD49C /* overlay_data.c */; };
+		92ED99731FA4F7B90073559B /* startup_sequence.c in Sources */ = {isa = PBXBuildFile; fileRef = 92ED99711FA4F7B80073559B /* startup_sequence.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -139,6 +140,8 @@
 		92AE47D11F6D94A1008BD49C /* overlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
 		92AE47D21F6D94A1008BD49C /* overlay_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay_data.c; sourceTree = "<group>"; };
 		92AE47D31F6D94A1008BD49C /* overlay_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay_data.h; sourceTree = "<group>"; };
+		92ED99711FA4F7B80073559B /* startup_sequence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = startup_sequence.c; sourceTree = "<group>"; };
+		92ED99721FA4F7B80073559B /* startup_sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = startup_sequence.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -272,6 +275,8 @@
 		9205E91E1F599FE000927A3F /* libraries */ = {
 			isa = PBXGroup;
 			children = (
+				92ED99711FA4F7B80073559B /* startup_sequence.c */,
+				92ED99721FA4F7B80073559B /* startup_sequence.h */,
 				9205E91F1F599FE000927A3F /* default_characters.c */,
 				9205E9201F599FE000927A3F /* default_characters.h */,
 				9205E9211F599FE000927A3F /* sprites_lib.c */,
@@ -343,12 +348,13 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Inutilis Software";
 				TargetAttributes = {
 					9205E8D51F599F7300927A3F = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = BZ4VC623NH;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -395,6 +401,7 @@
 				9205E9351F599FE000927A3F /* cmd_memory.c in Sources */,
 				9286A71C1F8FCE1A005C9EC1 /* core_delegate.c in Sources */,
 				9205E92E1F599FE000927A3F /* core.c in Sources */,
+				92ED99731FA4F7B90073559B /* startup_sequence.c in Sources */,
 				9205E8DC1F599F7300927A3F /* ViewController.swift in Sources */,
 				92AE47D51F6D94A1008BD49C /* overlay_data.c in Sources */,
 				9205E9321F599FE000927A3F /* cmd_files.c in Sources */,
@@ -465,7 +472,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -473,7 +482,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -516,7 +529,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -524,7 +539,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -560,7 +579,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.ios.LowRes-NX";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "LowRes NX iOS/LowResNX-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -574,7 +594,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.ios.LowRes-NX";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "LowRes NX iOS/LowResNX-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};

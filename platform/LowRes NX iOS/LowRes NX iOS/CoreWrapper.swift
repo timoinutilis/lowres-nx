@@ -18,7 +18,7 @@ class CoreWrapper: NSObject {
     }
     
     deinit {
-        itp_freeProgram(&core)
+        core_deinit(&core)
     }
     
 }
