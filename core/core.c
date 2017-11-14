@@ -63,7 +63,7 @@ void core_setDelegate(struct Core *core, struct CoreDelegate *delegate)
 
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
 {
-    core->interpreter->timer = (float)(secondsSincePowerOn * 30 % TIMER_WRAP_VALUE);
+    core->interpreter->timer = (float)(secondsSincePowerOn * 60 % TIMER_WRAP_VALUE);
 }
 
 void core_update(struct Core *core)

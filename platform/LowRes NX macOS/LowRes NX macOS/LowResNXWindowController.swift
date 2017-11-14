@@ -43,7 +43,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
             // keyboard counts as physical gamepads
             core_setNumPhysicalGamepads(&coreWrapper.core, 2)
             
-            timer = Timer.scheduledTimer(timeInterval: 1.0/30.0, target: self, selector: #selector(LowResNXWindowController.update), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 1.0/60.0, target: self, selector: #selector(LowResNXWindowController.update), userInfo: nil, repeats: true)
         }
     }
     

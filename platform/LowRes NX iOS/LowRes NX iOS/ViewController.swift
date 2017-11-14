@@ -52,11 +52,6 @@ class ViewController: UIViewController, UIKeyInput {
         view.addGestureRecognizer(recognizer)
         
         let displayLink = CADisplayLink(target: self, selector: #selector(update))
-        if #available(iOS 10.0, *) {
-            displayLink.preferredFramesPerSecond = 30
-        } else {
-            displayLink.frameInterval = 2
-        }
         self.displayLink = displayLink
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)

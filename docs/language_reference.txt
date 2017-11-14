@@ -787,16 +787,16 @@ WAIT VBL
 
     WAIT VBL
 
-    Waits for the next frame. This should be the last statement in
-    all loops which do animations and/or handle input, like the main
-    game loop.
+    Waits for the next frame. This (or WAIT n) should be the last
+    statement in all loops which do animations and/or handle input,
+    like the main game loop.
 
 
 WAIT
 
     WAIT n
 
-    Waits n frames (n/30 seconds).
+    Waits n frames more than WAIT VBL (n/60 seconds).
 
 
 ON RASTER GOSUB
@@ -839,7 +839,7 @@ ON VBL GOSUB
     TIMER
 
     Returns the number of frames shown since LowRes NX was started.
-    The value wraps to 0 when 2592000 is reached, which is about 24
+    The value wraps to 0 when 5184000 is reached, which is about 24
     hours.
 
 

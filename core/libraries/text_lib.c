@@ -84,7 +84,13 @@ void txtlib_scrollWindowIfNeeded(struct Core *core)
         }
         
         lib->cursorY = lib->windowHeight - 1;
-        core->interpreter->exitEvaluation = true;
+        
+        if (core->interpreter->state == StateEvaluate)
+        {
+            core->interpreter->state = StateWait;
+            core->interpreter->waitCount = 1;
+            core->interpreter->exitEvaluation = true;
+        }
     }
 }
 
@@ -252,9 +258,9 @@ bool txtlib_inputUpdate(struct Core *core)
     {
         struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
         cell->attr.value = lib->fontCharAttr.value;
-        cell->character = lib->fontCharOffset + (lib->blink++ < 15 ? 63 : 0);
+        cell->character = lib->fontCharOffset + (lib->blink++ < 30 ? 63 : 0);
         
-        if (lib->blink == 30)
+        if (lib->blink == 60)
         {
             lib->blink = 0;
         }

@@ -26,6 +26,7 @@ buttons and a little rubber keyboard below a slidable touchscreen.
 - Working RAM: 16 KB
 - Persistent RAM: 256 B per cartridge
 - Screen resolution: 160x128
+- 60 FPS
 - Characters: 256, used for sprites and backgrounds (incl. fonts)
 - Character size: 8x8-pixel
 - Character depth: 2 bits (3 colors + transparency)

@@ -178,7 +178,7 @@ void overlay_draw(struct Core *core)
         lib->fontCharAttr.priority = 1;
         lib->fontCharAttr.palette = 1;
         lib->fontCharOffset = 64;
-        if (core->overlay->timer % 30 < 20)
+        if (core->overlay->timer % 60 < 40)
         {
             txtlib_writeText(core, "PAUSED", 7, 7);
         }

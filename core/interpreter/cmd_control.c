@@ -496,7 +496,7 @@ enum ErrorCode cmd_WAIT(struct Core *core)
         if (interpreter->pass == PassRun)
         {
             interpreter->state = StateWait;
-            interpreter->waitCount = value.v.floatValue;
+            interpreter->waitCount = value.v.floatValue - 1;
         }
     }
     

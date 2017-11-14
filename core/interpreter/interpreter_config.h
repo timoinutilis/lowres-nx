@@ -32,6 +32,6 @@
 #define MAX_CYCLES_PER_FRAME 4096
 #define MAX_CYCLES_PER_RASTER 128
 #define MAX_CYCLES_PER_VBL 128
-#define TIMER_WRAP_VALUE 2592000
+#define TIMER_WRAP_VALUE 5184000
 
 #endif /* interpreter_config_h */
