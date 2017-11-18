@@ -12,26 +12,9 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var coreWrapper = CoreWrapper()
-    var programSourceCode: String?
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
                 
-        if let filePath = Bundle.main.path(forResource: "program", ofType: "nx") {
-            do {
-                let programSourceCode = try String(contentsOfFile: filePath, encoding: .ascii)
-                
-                let cString = programSourceCode.cString(using: .ascii)
-                let error = itp_compileProgram(&coreWrapper.core, cString)
-                if error.code != ErrorNone {
-                    let errorString = String(cString:err_getString(error.code))
-                    print("compiler error:", errorString)
-                }
-            } catch {
-                print("file error:", error.localizedDescription)
-            }
-        }
-        
         return true
     }
 
