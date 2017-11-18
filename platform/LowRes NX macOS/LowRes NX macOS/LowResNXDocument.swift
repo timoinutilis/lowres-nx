@@ -8,23 +8,6 @@
 
 import Cocoa
 
-class ProgramError: NSError {
-    
-    init(error: CoreError, lineNumber: Int, line: String) {
-        let errorString = String(cString:err_getString(error.code))
-        let errorText = "Error in line \(lineNumber): \(errorString)\n\(line)"
-        super.init(domain: "LowResNX", code: Int(error.code.rawValue), userInfo: [
-            NSLocalizedFailureReasonErrorKey: "There was a program error.",
-            NSLocalizedRecoverySuggestionErrorKey: errorText
-            ])
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-}
-
 class LowResNXDocument: NSDocument {
     var sourceCode = ""
     var coreWrapper = CoreWrapper()
@@ -42,16 +25,8 @@ class LowResNXDocument: NSDocument {
         let cString = sourceCode.cString(using: .ascii)
         let error = itp_compileProgram(&coreWrapper.core, cString)
         if error.code != ErrorNone {
-            throw getProgramError(error: error)
+            throw LowResNXError(error: error, sourceCode: sourceCode)
         }
-    }
-    
-    func getProgramError(error: CoreError) -> ProgramError {
-        let index = sourceCode.index(sourceCode.startIndex, offsetBy: String.IndexDistance(error.sourcePosition))
-        let lineRange = sourceCode.lineRange(for: index ..< index)
-        let lineString = sourceCode[lineRange]
-        let lineNumber = sourceCode.countLines(index: index)
-        return ProgramError(error: error, lineNumber: lineNumber, line: String(lineString))
     }
     
     override func makeWindowControllers() {
@@ -61,15 +36,3 @@ class LowResNXDocument: NSDocument {
     
 }
 
-extension String {
-    func countLines(index: String.Index) -> Int {
-        var count = 1
-        var searchRange = startIndex ..< endIndex
-        while let foundRange = rangeOfCharacter(from: CharacterSet.newlines, options: .literal, range: searchRange), index >= foundRange.upperBound {
-            searchRange = characters.index(after: foundRange.lowerBound) ..< endIndex
-            count += 1
-        }
-        return count;
-    }
-    
-}

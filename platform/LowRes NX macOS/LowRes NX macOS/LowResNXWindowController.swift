@@ -8,14 +8,13 @@
 
 import Cocoa
 
-class LowResNXWindowController: NSWindowController, NSWindowDelegate {
+class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrapperDelegate {
     @IBOutlet weak var lowResNXView: LowResNXView!
     @IBOutlet weak var backgroundView: NSView!
     @IBOutlet weak var widthConstraint: NSLayoutConstraint!
     
     var timer: Timer?
     var coreWrapper: CoreWrapper?
-    var coreDelegate = CoreDelegate()
     var nxDiskUrl: URL?
     var nxDiskDate: Date?
 
@@ -30,12 +29,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         coreWrapper = lowResNXDocument.coreWrapper
         
         if let coreWrapper = coreWrapper {
-            coreDelegate.context = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-            coreDelegate.interpreterDidFail = interpreterDidFail
-            coreDelegate.diskDriveWillAccess = diskDriveWillAccess
-            coreDelegate.diskDriveDidSave = diskDriveDidSave
-            coreDelegate.controlsDidChange = controlsDidChange
-            core_setDelegate(&coreWrapper.core, &coreDelegate)
+            coreWrapper.delegate = self
             
             let secondsSincePowerOn = -(NSApp.delegate as! AppDelegate).launchDate.timeIntervalSinceNow
             core_willRunProgram(&coreWrapper.core, Int(secondsSincePowerOn))
@@ -196,7 +190,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
             let error = data_import(diskDataManager, chars, true)
             if error.code != ErrorNone {
                 let nxDocument = document as! LowResNXDocument
-                presentError(nxDocument.getProgramError(error: error))
+                throw LowResNXError(error: error, sourceCode: nxDocument.sourceCode)
             }
         } catch let error as NSError {
             presentError(error)
@@ -208,11 +202,12 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         return attrs?.fileModificationDate()
     }
     
-    // MARK: - Core Delegate
+    // MARK: - Core Wrapper Delegate
     
     func coreInterpreterDidFail(coreError: CoreError) -> Void {
-        let nxDocument = document as! LowResNXDocument
-        presentError(nxDocument.getProgramError(error: coreError))
+        if let nxDocument = document as? LowResNXDocument {
+            presentError(LowResNXError(error: coreError, sourceCode: nxDocument.sourceCode))
+        }
     }
     
     func coreDiskDriveWillAccess(diskDataManager: UnsafeMutablePointer<DataManager>?) -> Bool {
@@ -266,22 +261,10 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate {
         }
     }
     
+    func coreControlsDidChange(controlsInfo: ControlsInfo) -> Void {
+        
+    }
+    
 }
 
-func interpreterDidFail(context: UnsafeMutableRawPointer?, coreError: CoreError) -> Void {
-    let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
-    windowController.coreInterpreterDidFail(coreError: coreError)
-}
 
-func diskDriveWillAccess(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Bool {
-    let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
-    return windowController.coreDiskDriveWillAccess(diskDataManager: diskDataManager)
-}
-
-func diskDriveDidSave(context: UnsafeMutableRawPointer?, diskDataManager: UnsafeMutablePointer<DataManager>?) -> Void {
-    let windowController = Unmanaged<LowResNXWindowController>.fromOpaque(context!).takeUnretainedValue()
-    windowController.coreDiskDriveDidSave(diskDataManager: diskDataManager)
-}
-
-func controlsDidChange(context: UnsafeMutableRawPointer?, controlsInfo: ControlsInfo) -> Void {
-}
