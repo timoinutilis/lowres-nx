@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<title>LowRes NX Manual</title>
+<style>
+body {
+	font-family: sans-serif;
+}
+h1 {
+	margin-top: 3em;
+}
+h2 {
+	margin-top: 2em;
+}
+h3 {
+    margin-top: 1.5em;
+}
+td, th {
+    padding-right: 1em;
+    vertical-align: top;
+}
+th {
+    text-align: left;
+}
+a {
+    text-decoration: none;
+}
+li {
+    margin-bottom: 0.5em;
+}
+</style>
+
+<body>
+
+<h1 id="Introduction">Introduction</h1>
+
+<h2 id="What-is-LowRes-NX">What is LowRes NX?</h2>
+
+<p>LowRes NX is a simulated retro game console, which can be programmed
+in the classic BASIC language. It has its own technical
+specifications, but it's very much inspired by actual 8-bit and 16-bit
+game consoles. It doesn't only look and sound retro, but actually
+works like classic hardware.</p>
+
+<p>LowRes NX simulates graphics, sound and I/O chips and makes their
+hardware registers accessable in its memory map. Although most of the
+features are available via simple BASIC commands, it's possible to
+program video, audio and I/O directly by accessing the memory.</p>
+
+<p>Imagine LowRes NX as a handheld game console with a d-pad, two action
+buttons and a little rubber keyboard below a slidable touchscreen.</p>
+
+<h2 id="Specifications">Specifications</h2>
+
+<ul>
+<li>Cartridge ROM: 32 KB</li>
+<li>Video RAM: 8 KB</li>
+<li>Working RAM: 16 KB</li>
+<li>Persistent RAM: 256 B per cartridge</li>
+<li>Screen resolution: 160x128</li>
+<li>60 FPS</li>
+<li>Characters: 256, used for sprites and backgrounds (incl. fonts)</li>
+<li>Character size: 8x8-pixel</li>
+<li>Character depth: 2 bits (3 colors + transparency)</li>
+<li>Colors: 8 programmable palettes + backdrop color</li>
+<li>Backgrounds: Two with each 32x32 cells, scrollable, wrap around edges</li>
+<li>Sprites: 64</li>
+<li>Sprite sizes: 8x8, 16x16, 24x24, 32x32</li>
+<li>Cell/sprite attributes: palette index, flip X, flip Y, priority</li>
+<li>Input: Two game controllers with d-pad and two buttons + pause</li>
+<li>Optional input: Keyboard and touch/mouse</li>
+</ul>
+
+<p>Note: The number of characters, sprites and backgrounds are
+limitations for what NX can show on screen simultaneously. In total
+your game can have as many as you can fit into the cartridge ROM.</p>
+
+<h2 id="Program-Files">Program Files</h2>
+
+<p>A program file contains a complete game or application, including all
+its data, stored as simple text. When a program file is opened in
+LowRes NX, it converts the data to the cartridge ROM and runs the
+program.</p>
+
+<p>The first part is the BASIC source code. Please read the programming
+chapters for further explaination.</p>
+
+<p>The second part are the cartridge ROM entries. These are up to 16
+numbered data blocks, which can contain any kind of binary data, for
+example graphics, level maps, music, etc. Each entry starts with a
+line with the following format:</p>
+
+<code>#N:COMMENT</code>
+
+<p>N is the entry number (0-15), COMMENT can be any text with up to 31
+characters, for example "MAIN SPRITES" or "MAP LEVEL 1". This line is
+followed by the actual data, byte by byte as hexadecimal values, until
+the next ROM entry or the end of the file.</p>
+
+<p>When the program is running, all ROM entries are accessable in the
+first 32 KB of the memory. Use the BASIC functions START and LENGTH to
+get the exact address of each entry.</p>
+
+<h2 id="Virtual-Disk-Files">Virtual Disk Files</h2>
+
+<p>The BASIC commands LOAD and SAVE can be used to store data on a
+virtual disk, which can contain up to 16 files. Its format is the same
+as the ROM entries part in a program file. This makes it possible to
+use any NX program directly as a virtual disk to edit its data.</p>
+
+<p>Virtual disks are meant to be used for development tools only, for
+example image and map editors or music programs. Games should use
+persistent memory instead. Imagine that the standard LowRes NX console
+wouldn't have a disk drive.</p>
+
+<h2 id="Graphics">Graphics</h2>
+
+<p>All graphics in LowRes NX are based on characters. A character is an
+8x8-pixel image with 3 colors plus transparency. They are usually
+designed in black and white, but are displayed with one of the 8
+programmable color palettes applied.</p>
+
+<p>The display is composed of 4 layers, which are from back to front:</p>
+<ul>
+<li>Backdrop</li>
+<li>Background 1 (BG 1)</li>
+<li>Background 0 (BG 0)</li>
+<li>Sprites</li>
+</ul>
+
+<h3>Backdrop</h3>
+<p>The backdrop is a plain color (color 0 in palette 0) which is visible
+wherever there isn't anything else on the screen.</p>
+
+<h3>Backgrounds</h3>
+<p>A background is a map of 32x32 character cells, which is used for text
+and tile based maps or images. Each cell has the information of which
+character it contains and additional attributes (color palette, flip
+X/Y, priority).</p>
+<p>As a character has the size of 8x8 pixels, the resulting background
+size is 256x256 pixels, which is larger than the actual screen
+(160x128). By modifying the scroll offset of a background, the visible
+area can be moved.</p>
+<p>If the visible area moves out of the borders of the background, the
+display wraps around the edges. This can be used to achieve endless
+scrolling.</p>
+
+<h3>Sprites</h3>
+<p>Sprites are independent objects, which can be freely moved on the
+screen. They can have a size of 8x8 pixels (one character) or up to
+32x32 pixels by grouping several characters. Each sprite has the same
+attributes as a background cell and additionally its size.</p>
+
+<h3>Priorities</h3>
+<p>One important attribute is "priority". By setting it, its cell or
+sprite will appear on a higher display layer. Actually there are 7
+layers (not 4 as mentioned before):</p>
+<ul>
+<li>Backdrop</li>
+<li>Background 1 (BG 1) - prio 0</li>
+<li>Background 0 (BG 0) - prio 0</li>
+<li>Sprites - prio 0</li>
+<li>Background 1 (BG 1) - prio 1</li>
+<li>Background 0 (BG 0) - prio 1</li>
+<li>Sprites - prio 1</li>
+</ul>
+
+<h2 id="Default Font">Default Font</h2>
+
+<p>If cartridge ROM entry 0 is not used by a program, the compiler adds
+character data for the default font. It occupies the characters
+192-255 and is automatically copied to video RAM on program start.
+If you want to use the default font, make sure to keep ROM entry 0
+unused.</p>
+
+<h2 id="Startup-Sequence">Startup Sequence</h2>
+
+<p>To simplify programming, the interpreter assumes default ROM
+entries and automatically executes some actions on program start:</p>
+<ul>
+<li>Copy default font to end of character RAM.</li>
+<li>Set font start to character 192.</li>
+<li>Set some default color palettes.</li>
+<li>Copy ROM entry 1 to color registers.</li>
+<li>Copy ROM entry 2 to character RAM.</li>
+<li>Set ROM entry 3 as BG source.</li>
+</ul>
+
+
+<h1 id="Language-Basics">Language Basics</h1>
+
+<p>The programming language of LowRes NX is based on the classic BASIC,
+but with labels instead of line numbers.</p>
+
+<h2 id="Types-and-Variables">Types and Variables</h2>
+
+<p>Available data types are strings and numbers (floating point).
+Variable names can contain letters (A-Z), digits (0-9) and underscores
+(_), but cannot begin with a digit. Reserved keywords cannot be used
+as names, but they can contain them, for example:</p>
+<p>
+Valid: <code>ENDING</code><br>
+Invalid: <code>END</code>
+</p>
+
+<p>String variable names must end with a $ symbol, for example:</p>
+<p><code>NAME$</code></p>
+
+<p>Variables are not be explicitly declared, they start to exist
+automatically when first used. Values are assigned to variables using
+the equal symbol:</p>
+<code><pre>
+NAME$="LOWRES NX"
+LIVES=3
+</pre></code>
+
+<p>Hexadecimal and binary notation can be used for number values:</p>
+<code><pre>
+$FF02
+%11001011
+</pre></code>
+
+<h2 id="Operators">Operators</h2>
+
+<h3>Mathematical</h3>
+
+<pre>
+Symbol  Example Purpose
+-       -B      Negation
+^       X^3     Exponentiation
+*       2*Y     Multiplication
+/       X/2     Division
++       C+2     Addition
+-       100-D   Subtraction
+MOD     X MOD 2 Modulo
+</pre>
+
+<p>Operations are performed in mathematical order, for example
+multiplications and divisions are performed before additions and
+subtractions. The order can be specified explicitly through the use of
+parentheses, for example: (3+4*3)/5</p>
+
+<h3>Relational</h3>
+
+<pre>
+Symbol  Example Purpose
+=       A=10    Equal
+&lt;&gt;      A&lt;&gt;100  Not equal
+&gt;       B&gt;C     Greater than
+&lt;       5&lt;X     Less than
+&gt;=      X&gt;=20   Greater than or equal
+&lt;=      X&lt;=30   Less than or equal
+</pre>
+
+<p>Relational operator expressions have a value of true (-1) or
+false (0). For example: (2=3)=0, (4=4)=-1, (1&lt;3)=-1</p>
+
+<h3>Logical</h3>
+
+<pre>
+Symbol  Example         Purpose
+NOT     NOT (X=15)      Logical and bitwise "Not"
+        NOT 0
+
+AND     A=1 AND B=12    Logical and bitwise "And"
+        170 AND 15
+
+OR      X=10 OR Y=0     Logical and bitwise "Or"
+        128 OR 2
+
+XOR     A XOR B         Logical and bitwise "Exclusive Or"
+</pre>
+
+<p>All operators are available for numbers. Relational and addition
+operators are usable with strings, too:</p>
+<code><pre>
+SUM=1+3
+IF SUM&lt;5 THEN PRINT "SUM IS LESS THAN 5"
+NAME$="LOWRES NX"
+GREET$="HELLO "+NAME$+"!"
+IF NAME$&gt;"LOWRES CODER" THEN PRINT GREET$
+</pre></code>
+
+
+<h1 id="Program-Flow-Control">Program Flow Control</h1>
+
+<h3 id="_REM" name="REM">REM</h3>
+<code><pre>
+REM remark
+' remark
+</pre></code>
+
+<p>Allows you to put comments into your program. REM lines are not
+executed. You can use an apostrophe (') in place of the word REM.</p>
+
+
+<h3 id="_IF-THEN-ELSE" name="IF,THEN,ELSE">IF...THEN...ELSE</h3>
+<code><pre>
+IF expression THEN command [ELSE command]
+
+IF expression THEN
+    commands
+ELSE IF expression THEN
+    commands
+ELSE
+    commands
+END IF
+</pre></code>
+
+<h3 id="_GOTO" name="GOTO">GOTO</h3>
+
+<code><pre>GOTO label</pre></code>
+
+<p>Jumps to the given label.</p>
+
+
+<h3 id="_GOSUB-RETURN" name="GOSUB,RETURN">GOSUB...RETURN</h3>
+
+<code><pre>GOSUB label</pre></code>
+
+<p>Adds the current program position to a stack and jumps to the
+given label.</p>
+
+<code><pre>RETURN</pre></code>
+
+<p>Jumps back to the position of the last call of GOSUB and removes
+it from the stack.</p>
+
+<code><pre>RETURN label</pre></code>
+
+<p>Works like GOTO, but clears the whole stack. Use this to exit from
+a subroutine, if you want to continue your program somewhere else.</p>
+
+
+<h3 id="_FOR-NEXT" name="FOR,NEXT">FOR...NEXT</h3>
+<code><pre>
+FOR var=a TO b [STEP s]
+    commands
+NEXT var
+</pre></code>
+
+<h3 id="_DO-LOOP" name="DO,LOOP">DO...LOOP</h3>
+<code><pre>
+DO
+  commands
+LOOP
+</pre></code>
+
+<h3 id="_REPEAT-UNTIL" name="REPEAT,UNTIL">REPEAT...UNTIL</h3>
+<code><pre>
+REPEAT
+    commands
+UNTIL expression
+</pre></code>
+
+<h3 id="_WHILE-WEND" name="WHILE,WEND">WHILE...WEND</h3>
+<code><pre>
+WHILE expression
+    commands
+WEND
+</pre></code>
+
+<h3 id="_END" name="END">END</h3>
+
+<code><pre>END</pre></code>
+
+
+<h1 id="Text-Commands">Text Commands</h1>
+
+<h3 id="_PRINT" name="PRINT">PRINT</h3>
+
+<code><pre>PRINT expression-list</pre></code>
+
+<p>Outputs text to the current window. Expressions can be strings or
+numbers, separated by commas or semicolons. A comma separates the
+output with a space, a semicolon outputs without space.
+End the list with a comma or semicolon to keep the cursor at the
+end of the output, otherwise a new line is started.</p>
+
+
+<h3 id="_INPUT" name="INPUT">INPUT</h3>
+
+<code><pre>INPUT ["prompt";]var</pre></code>
+
+<p>Lets the user enter a text or number on the keyboard and stores it
+in the variable var. Optionally it can show a prompt text before
+(cannot be a variable).
+This enables automatically the keyboard.</p>
+
+
+<h3 id="_LOCATE" name="LOCATE">LOCATE</h3>
+
+<code><pre>LOCATE x,y</pre></code>
+
+<p>Moves the text cursor to column x and row y inside the current
+window.</p>
+
+
+<h3 id="_WINDOW" name="WINDOW">WINDOW</h3>
+
+<code><pre>WINDOW x,y,w,h,b</pre></code>
+
+<p>Sets the text output window to cell position x,y and sets the size
+to w columns and h rows. Text will be written to background b (0
+or 1).</p>
+
+<h3 id="_CLW" name="CLW">CLW</h3>
+
+<code><pre>CLW</pre></code>
+
+<p>Clears the window with spaces.</p>
+
+
+<h1 id="Sprite-Commands">Sprite Commands</h1>
+
+<h3 id="_SPRITE" name="SPRITE">SPRITE</h3>
+
+<code><pre>SPRITE n,x,y,c</pre></code>
+
+<p>Sets the position (x,y) and character (c) of sprite n (0-63).
+The top left corner of the screen is sprite position 32,32. Set
+the position to 0,0 to hide the sprite.
+All parameters can be omitted to keep their current settings.</p>
+
+
+<h3 id="_SPRITE.A" name="SPRITE.A">SPRITE.A</h3>
+
+<code><pre>SPRITE.A n,(pal,fx,fy,pri,s)</pre></code>
+
+<p>Sets the attributes of sprite n (0-63). All attribute parameters
+can be omitted to keep their current settings.</p>
+
+<pre>
+pal     palette number (0-7)
+fx      flip horizontally (0/1)
+fy      flip vertically (0/1)
+pri     priority flag (0/1)
+s       size (0-3):
+        0: 1 character (8x8 pixels)
+        1: 2x2 characters (16x16 pixels)
+        2: 3x3 characters (24x24 pixels)
+        3: 4x4 characters (32x32 pixels)
+</pre>
+
+<code><pre>SPRITE.A n,a</pre></code>
+
+<p>Allows setting the attributes as a single 8-bit value.</p>
+
+
+<h3 id="_=SPRITE.X-Y" name="SPRITE.X,SPRITE.Y">=SPRITE.X/Y</h3>
+
+<code><pre>
+SPRITE.X(n)
+SPRITE.Y(n)
+</pre></code>
+
+<p>Return the position of sprite n.</p>
+
+
+<h3 id="_=SPRITE.C" name="SPRITE.C">=SPRITE.C</h3>
+
+<code><pre>SPRITE.C(n)</pre></code>
+
+<p>Returns the character of sprite n.</p>
+
+
+<h3 id="_=SPRITE.A" name="SPRITE.A">=SPRITE.A</h3>
+
+<code><pre>SPRITE.A(n)</pre></code>
+
+<p>Returns the attributes of sprite n as an 8-bit value.</p>
+
+
+<h3 id="_=SPRITE HIT" name="SPRITE HIT,SPRITE,HIT">=SPRITE HIT</h3>
+
+<code><pre>SPRITE HIT(n[,a [TO b]])</pre></code>
+
+<p>Returns true if sprite n collides with another sprite (which means
+that pixels overlap). If no more parameters are given, it will
+check with all other visible sprites. If the a parameter is added,
+it will check only with that sprite a. If all parameters are
+given, it will check with all sprites from number a to number b.</p>
+
+
+<h3 id="_=HIT" name="HIT">=HIT</h3>
+
+<code><pre>HIT</pre></code>
+
+<p>Returns the number of the sprite which collided with the sprite of
+the last call of SPRITE HIT.</p>
+
+
+<h1 id="User-Control-Functions">User Control Functions</h1>
+
+<h3 id="_GAMEPAD" name="GAMEPAD">GAMEPAD</h3>
+    
+<code><pre>GAMEPAD n</pre></code>
+
+<p>Enables gamepads for n players. A maximum of 2 players are
+supported. This disables touchscreen/mouse support.</p>
+
+<code><pre>GAMEPAD OFF</pre></code>
+
+<p>Disables all gamepads and enables touchscreen/mouse support.</p>
+
+
+<h3 id="_UP-DOWN-LEFT-RIGHT" name="=UP,DOWN,LEFT,RIGHT">=UP/DOWN/LEFT/RIGHT</h3>
+
+<code><pre>
+UP(p)
+DOWN(p)
+LEFT(p)
+RIGHT(p)
+</pre></code>
+
+<p>Returns true if the given direction is currently pressed on the
+direction pad of player p (0/1).</p>
+
+<code><pre>
+UP TAP(p)
+DOWN TAP(p)
+LEFT TAP(p)
+RIGHT TAP(p)
+</pre></code>
+
+<p>With the optional TAP keyword, this function returns true only for
+the first frame the button is pressed.</p>
+
+
+<h3 id="_BUTTON" name="BUTTON,TAP">=BUTTON</h3>
+
+<code><pre>BUTTON(p,n)</pre></code>
+
+<p>Returns true if button A (n=0) or B (n=1) is currently pressed by
+player p (0/1).</p>
+
+<code><pre>BUTTON TAP(p,n)</pre></code>
+
+<p>With the optional TAP keyword, this function returns true only for
+the first frame the button is pressed.</p>
+
+
+<h3 id="_TOUCH.X-TOUCH.Y" name="TOUCH.X,TOUCH.Y">=TOUCH.X/Y</h3>
+<code><pre>
+TOUCH.X
+TOUCH.Y
+</pre></code>
+
+<p>Returns the current X or Y pixel position where the user touches
+the screen, or where it was touched the last time.</p>
+
+
+<h3 id="_TOUCH" name="TOUCH">=TOUCH</h3>
+
+<code><pre>TOUCH</pre></code>
+
+<p>Returns true if the screen is currently touched.</p>
+
+
+<h3 id="_TAP" name="TAP">=TAP</h3>
+
+<code><pre>TAP</pre></code>
+
+<p>Returns true if the screen is currently touched and was not
+touched the last frame.</p>
+
+
+<h3 id="_KEYBOARD-ON-OFF" name="KEYBOARD ON,KEYBOARD OFF,KEYBOARD,ON,OFF">KEYBOARD ON/OFF</h3>
+
+<code><pre>
+KEYBOARD ON
+KEYBOARD OFF
+</pre></code>
+
+<p>Enables or disables the keyboard.</p>
+
+
+<h3 id="_INKEY$" name="INKEY$">=INKEY$</h3>
+
+<code><pre>INKEY$</pre></code>
+
+<p>Returns the last pressed key as a string. If no key was pressed,
+it returns an empty string (""). After calling this function its
+value is cleared, so it returns each pressed key only once.
+The keyboard needs to be enabled for this function.</p>
+
+
+<h1 id="Background-Commands">Background Commands</h1>
+
+<h3 id="_BG" name="BG">BG</h3>
+
+<code><pre>BG n</pre></code>
+
+<p>Sets the current background (0 or 1).</p>
+
+
+<h3 id="_CLS" name="CLS">CLS</h3>
+    
+<code><pre>CLS</pre></code>
+
+<p>Clears both backgrounds with character 0 and resets the current
+window to the default one.</p>
+
+<code><pre>CLS b</pre></code>
+
+<p>Clears background b with character 0.</p>
+
+
+<h3 id="_CHAR" name="CHAR">CHAR</h3>
+
+<code><pre>CHAR n,(pal,fx,fy,pri,s)</pre></code>
+
+<p>Sets the current character and attributes. All parameters can be
+omitted to keep their current settings.</p>
+<pre>
+pal     palette number (0-7)
+fx      flip horizontally (0/1)
+fy      flip vertically (0/1)
+pri     priority flag (0/1)
+s       unused (0-3)
+</pre>
+
+<code><pre>CHAR n,a</pre></code>
+
+<p>Allows setting the attributes as a single 8-bit value.</p>
+
+
+<h3 id="_CELL" name="CELL">CELL</h3>
+
+<code><pre>CELL x,y</pre></code>
+
+<p>Sets the cell at position x,y of the current background to the
+current character.</p>
+
+
+<h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
+
+<code><pre>CELL.C(x,y)</pre></code>
+
+<p>Returns the character of the cell at position x,y of the current
+background.</p>
+
+
+<h3 id="_CELL.A" name="CELL.A">=CELL.A</h3>
+
+<code><pre>CELL.A(x,y)</pre></code>
+
+<p>Returns the attributes of the cell at position x,y of the current
+background as an 8-bit value.</p>
+
+
+<h3 id="_BG-FILL" name="BG FILL,BG,FILL">BG FILL</h3>
+
+<code><pre>BG FILL x1,y1 TO x2,y2</pre></code>
+
+<p>Sets all cells in the area from x1,y1 to x2,y2 of the current
+background to the current character.</p>
+
+
+<h3 id="_BG-SOURCE" name="BG SOURCE,BG,SOURCE">BG SOURCE</h3>
+
+<code><pre>BG SOURCE a[,w]</pre></code>
+
+<p>Sets the current source for the BG COPY command. The two-
+dimensional map starts at memory address "a" and has a width of w
+cells. If the parameter w is omitted, the value is set to 32.</p>
+
+
+<h3 id="_BG-COPY" name="BG COPY,BG,COPY">BG COPY</h3>
+
+<code><pre>BG COPY x1,y1,w,h TO x2,y2</pre></code>
+
+<p>Copies a two-dimensional part of the current source to the
+current background. The destination co-ordinates can be outside of
+the background size (32x32), but they will be wrapped around the
+edges (32->0, 33->1, etc.).</p>
+
+
+<h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL">BG SCROLL</h3>
+
+<code><pre>BG SCROLL x1,y1 TO x2,y2,dx,dy</pre></code>
+
+<p>Moves the content of all cells in the area from x1,y1 to x2,y2
+horizontally by dx and vertically by dy cells.</p>
+
+
+<h3 id="_TEXT" name="TEXT">TEXT</h3>
+
+<code><pre>TEXT x,y,s$</pre></code>
+
+<p>Outputs the string s$ to the current background at cell position
+x,y.</p>
+
+
+<h3 id="_NUMBER" name="NUMBER">NUMBER</h3>
+
+<code><pre>NUMBER x,y,n,d</pre></code>
+
+<p>Outputs the number n to the current background at cell position
+x,y. The number is formatted to show always d digits.
+This command is preferred over TEXT to show numbers, as it
+doesn't need to convert numbers to strings.</p>
+
+
+<h3 id="_FONT" name="FONT">FONT</h3>
+    
+<code><pre>FONT c,(pal,fx,fy,pri,s)</pre></code>
+
+<p>Sets the current character range and attributes used for text
+output. c is the character where the font starts (space).
+All parameters can be omitted to keep their current settings.</p>
+<pre>
+pal     palette number (0-7)
+fx      flip horizontally (0/1)
+fy      flip vertically (0/1)
+pri     priority flag (0/1)
+s       unused (0-3)
+</pre>
+
+<code><pre>FONT c,a</pre></code>
+
+<p>Allows setting the attributes as a single 8-bit value.</p>
+
+
+<h1 id="Screen-Commands">Screen Commands</h1>
+
+<h3 id="_DISPLAY" name="DISPLAY">DISPLAY</h3>
+
+<code><pre>DISPLAY b,x,y</pre></code>
+
+<p>Sets the scroll offset of background b (0/1) to pixel
+co-ordinates x,y.</p>
+
+
+<h3 id="_DISPLAY.A" name="DISPLAY.A">DISPLAY.A</h3>
+
+<code><pre>DISPLAY.A (s,b0,b1)</pre></code>
+
+<p>Sets the display attributes.</p>
+
+<pre>
+s   sprites enabled (0/1)
+b0  background 0 enabled (0/1)
+b1  background 1 enabled (0/1)
+</pre>
+
+<code><pre>DISPLAY.A a</pre></code>
+
+<p>Allows setting the attributes as a single 8-bit value.</p>
+
+
+<h3 id="_DISPLAY.X-DISPLAY.Y" name="DISPLAY.X,DISPLAY.Y">=DISPLAY.X/Y</h3>
+
+<code><pre>
+DISPLAY.X(b)
+DISPLAY.Y(b)
+</pre></code>
+
+<p>Return the scroll offset of background b.</p>
+
+
+<h3 id="_=DISPLAY.A" name="DISPLAY.A">=DISPLAY.A</h3>
+
+<code><pre>DISPLAY.A</pre></code>
+
+<p>Returns the display attributes as an 8-bit value.</p>
+
+
+<h3 id="_PALETTE" name="PALETTE">PALETTE</h3>
+
+<code><pre>PALETTE n,c0,c1,c2,c3</pre></code>
+
+<p>Sets all four colors of palette n (0-7). Color 0 is only used for
+palette 0 and shown as the screen's backdrop color. The color
+parameters can be omitted to keep their current settings.
+Valid color values are 0-63 and can be calculated like this:</p>
+<code><pre>
+VALUE = RED * 16 + GREEN * 4 + BLUE
+</pre></code>
+<p>RED, GREEN and BLUE are values from 0 to 3.</p>
+
+
+<h3 id="_=COLOR" name="COLOR">=COLOR</h3>
+
+<code><pre>COLOR(p,n)</pre></code>
+
+<p>Returns the value of color n (0-3) from palette p (0-7).
+You can get the RED, GREEN and BLUE values like this:</p>
+<code><pre>
+RED = INT(VALUE / 16)
+GREEN = INT(VALUE / 4) MOD 4
+BLUE = VALUE MOD 4
+</pre></code>
+
+
+<h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
+
+<code><pre>WAIT VBL</pre></code>
+
+<p>Waits for the next frame. This (or WAIT n) should be the last
+command in all loops which do animations and/or handle input,
+like the main game loop.</p>
+
+
+<h3 id="_WAIT" name="WAIT">WAIT</h3>
+
+<code><pre>WAIT n</pre></code>
+
+<p>Waits n frames more than WAIT VBL (n/60 seconds).</p>
+
+
+<h3 id="_ON-RASTER-GOSUB" name="ON RASTER GOSUB,ON RASTER,RASTER GOSUB,ON,RASTER,GOSUB">ON RASTER GOSUB</h3>
+
+<code><pre>ON RASTER GOSUB label</pre></code>
+
+<p>Sets a subroutine which is executed for every screen line before
+it's drawn. Usually used to change color palettes or scroll
+offsets to achieve graphical effects. Raster subroutines must be
+short.</p>
+
+<code><pre>ON RASTER</pre></code>
+
+<p>Removes the current subroutine.</p>
+
+
+<h3 id="_=RASTER" name="RASTER">=RASTER</h3>
+
+<code><pre>RASTER</pre></code>
+
+<p>Returns the current screen line (y position). Use this in a raster
+subroutine.</p>
+
+
+<h3 id="_ON-VBL-GOSUB" name="ON VBL GOSUB,ON VBL,VBL GOSUB,ON,VBL,GOSUB">ON VBL GOSUB</h3>
+
+<code><pre>ON VBL GOSUB label</pre></code>
+
+<p>Sets a subroutine which is executed after each frame. Can be used
+to update animations or sounds, even if the main program is
+blocked by WAIT or INPUT.</p>
+
+<code><pre>ON VBL</pre></code>
+
+<p>Removes the current subroutine.</p>
+
+
+<h3 id="_=TIMER" name="TIMER">=TIMER</h3>
+
+<code><pre>TIMER</pre></code>
+
+<p>Returns the number of frames shown since LowRes NX was started.
+The value wraps to 0 when 5184000 is reached, which is about 24
+hours.</p>
+
+
+<h1 id="Value-Commands">Value Commands</h1>
+
+<h3 id="_DIM" name="DIM">DIM</h3>
+
+<code><pre>DIM var-list</pre></code>
+
+<p>Defines arrays with the highest index for each dimension:</p>
+<code><pre>
+DIM A(100)
+DIM MAP(31,23,1),NAMES$(9),SCORES(9)
+</pre></code>
+
+<p>Access elements from arrays, indices start from 0:</p>
+<code><pre>
+SCORES(0)=100
+SCORES(9)=5
+PRINT SCORES(0),SCORES(9)
+</pre></code>
+
+<h3 id="_SWAP" name="SWAP">SWAP</h3>
+
+<code><pre>SWAP var1,var2</pre></code>
+
+<p>Swaps the data between any two variables of the same type.</p>
+
+
+<h3 id="_DATA" name="DATA">DATA</h3>
+
+<code><pre>DATA constant-list</pre></code>
+
+<p>Stores comma separated numeric and string constants (values, but
+no variables or expressions) that are accessed by the READ
+command. DATA commands are not executed and may be placed
+anywhere in the program.</p>
+<p>READ commands access DATA in order, from the top of a program
+until the bottom. All constants of all DATA commands are read as
+one continuous list of items.</p>
+
+
+<h3 id="_READ" name="READ">READ</h3>
+
+<code><pre>READ var-list</pre></code>
+
+<p>Reads values from DATA commands and assigns them to the
+comma separated variables in var-list. The program has an internal
+pointer to the current DATA value. With each value read, the
+pointer will move to the next DATA value.</p>
+
+
+<h3 id="_RESTORE" name="RESTORE">RESTORE</h3>
+
+<code><pre>RESTORE [label]</pre></code>
+
+<p>Changes the internal read pointer to another position. This allows
+to reread data or to select specific data. If the label parameter
+is omitted, READ will start again from the top of the program.
+Otherwise the pointer will be set to the jump label.</p>
+
+
+<h1 id="Memory-Commands">Memory Commands</h1>
+
+<h3 id="_=PEEK" name="PEEK">=PEEK</h3>
+
+<code><pre>PEEK(a)</pre></code>
+
+<p>Returns the current 8-bit value (0-255) at memory address a.</p>
+
+
+<h3 id="_POKE" name="POKE">POKE</h3>
+
+<code><pre>POKE a,v</pre></code>
+
+<p>Sets the memory at address a to value v. v can be any integer
+number, but only the lowest 8 bits are written to memory.</p>
+
+
+<h3 id="_COPY" name="COPY">COPY</h3>
+
+<code><pre>COPY a,n TO d</pre></code>
+
+<p>Copies n bytes starting from memory address a to address d.</p>
+
+
+<h3 id="_FILL" name="FILL">FILL</h3>
+
+<code><pre>FILL a,n[,v]</pre></code>
+
+<p>Sets n bytes starting from memory address a to value v, or 0 if
+the parameter is omitted.</p>
+
+
+<h3 id="_=START" name="START">=START</h3>
+
+<code><pre>START(n)</pre></code>
+
+<p>Returns the memory address of ROM entry n.</p>
+
+
+<h3 id="_=LENGTH" name="LENGTH">=LENGTH</h3>
+
+<code><pre>LENGTH(n)</pre></code>
+
+<p>Returns the number of bytes of ROM entry n.</p>
+
+
+<h1 id="File-Commands">File Commands</h1>
+
+<h3 id="_LOAD" name="LOAD">LOAD</h3>
+
+<code><pre>LOAD f$,a</pre></code>
+
+<p>Loads the file f$ from the current virtual disk to memory starting
+at address a. Only the entry number in the file name is actually
+used, the rest of the name can be omitted (for example "#0").</p>
+
+<p>LOAD is meant to be used for tools only. Use ROM entries for game
+data.</p>
+
+
+<h3 id="_SAVE" name="SAVE">SAVE</h3>
+
+<code><pre>SAVE f$,a,n</pre></code>
+
+<p>Saves n bytes starting at memory address a to the current virtual
+disk as a file with name f$.</p>
+
+<p>File names are formatted as follows:</p>
+<code><pre>#N:COMMENT</pre></code>
+<p>N is the entry number (0-15) and the actual file identifier.
+COMMENT can be any text up to 31 characters and serves as
+information only. Example:</p>
+<code><pre>#0:MAIN SPRITES</pre></code>
+
+<p>SAVE is meant to be used for tools only. Use persistent memory to
+store game states.</p>
+
+
+<h1 id="Math-Functions">Math Functions</h1>
+
+<h3 id="_PI" name="PI">=PI</h3>
+
+<code><pre>PI</pre></code>
+
+<p>PI is the ratio of the circumference of a circle to its diameter:
+3.1415926535...</p>
+
+
+<h3 id="_SIN" name="SIN">=SIN</h3>
+
+<code><pre>SIN(x)</pre></code>
+
+<p>The sine of x, where x is in radians.</p>
+
+
+<h3 id="_COS" name="COS">=COS</h3>
+
+<code><pre>COS(x)</pre></code>
+
+<p>The cosine of x, where x is in radians.</p>
+
+
+<h3 id="_TAN" name="TAN">=TAN</h3>
+
+<code><pre>TAN(x)</pre></code>
+
+<p>The tangent of x, where x is in radians.</p>
+
+
+<h3 id="_ATN" name="ATN">=ATN</h3>
+
+<code><pre>ATN(x)</pre></code>
+
+<p>The arctangent of x in radians, i.e. the angle whose tangent is x.
+The range of the function is -(PI/2) &lt; ATN(X) &lt; (PI/2).</p>
+
+
+<h3 id="_ABS" name="ABS">=ABS</h3>
+
+<code><pre>ABS(x)</pre></code>
+
+<p>The absolute value of x.</p>
+
+
+<h3 id="_SGN" name="SGN">=SGN</h3>
+
+<code><pre>SGN(x)</pre></code>
+
+<p>The sign of x: -1 if x &lt; 0, 0 if x = 0 and +1 if x &gt; 0.</p>
+
+
+<h3 id="_INT" name="INT">=INT</h3>
+
+<code><pre>INT(x)</pre></code>
+
+<p>The largest integer not greater than x; e.g. INT(1.3) = 1 and
+INT(-1.3) = -2.</p>
+
+
+<h3 id="_EXP" name="EXP">=EXP</h3>
+
+<code><pre>EXP(x)</pre></code>
+
+<p>The exponential of x, i.e. the value of the base of natural
+logarithms (e = 2,71828...) raised to the power x.</p>
+
+
+<h3 id="_LOG" name="LOG">=LOG</h3>
+
+<code><pre>LOG(x)</pre></code>
+
+<p>The natural logarithm of x; x must be greater than zero.</p>
+
+
+<h3 id="_SQR" name="SQR">=SQR</h3>
+
+<code><pre>SQR(x)</pre></code>
+
+<p>The nonnegative square root of x; x must be nonnegative.</p>
+
+
+<h3 id="_MIN" name="MIN">=MIN</h3>
+
+<code><pre>MIN(x,y)</pre></code>
+
+<p>The MIN function returns the smallest value of two expressions.</p>
+
+
+<h3 id="_MAX" name="MAX">=MAX</h3>
+
+<code><pre>MAX(x,y)</pre></code>
+
+<p>The MAX function returns the largest value of two expressions.</p>
+
+
+<h3 id="_RND" name="RND">=RND</h3>
+
+<code><pre>RND</pre></code>
+
+<p>The next number in a sequence of random numbers uniformly
+distributed in the range 0 &lt;= RND &lt; 1.</p>
+
+
+<h3 id="_RANDOMIZE" name="RANDOMIZE,TIMER">RANDOMIZE</h3>
+<code><pre>RANDOMIZE x</pre></code>
+
+<code><pre>RANDOMIZE TIMER</pre></code>
+
+
+<h1 id="String-Functions">String Functions</h1>
+
+<h3 id="_LEFT$" name="LEFT$">=LEFT$=</h3>
+
+<code><pre>LEFT$(s$,n)</pre></code>
+
+<p>Returns a new string with the first n characters of s$.</p>
+
+<code><pre>LEFT$(s$,n)=a$</pre></code>
+
+<p>Overwrites the first characters in the variable s$ with the first
+n characters of a$.</p>
+
+
+<h3 id="_RIGHT$" name="RIGHT$">=RIGHT$=</h3>
+
+<code><pre>RIGHT$(s$,n)</pre></code>
+
+<p>Returns a new string with the last n characters of s$.</p>
+
+<code><pre>RIGHT$(s$,n)=a$</pre></code>
+
+<p>Overwrites the last characters in the variable s$ with the last n
+characters of a$.</p>
+
+
+<h3 id="_MID$" name="MID$">=MID$=</h3>
+
+<code><pre>MID$(s$,p,n)</pre></code>
+
+<p>Returns a new string with n characters of s$, starting at
+character p. The first character has the position 1.</p>
+
+<code><pre>MID$(s$,p,n)=a$</pre></code>
+
+<p>Overwrites the given text range in the variable s$ with the first
+n characters of a$.</p>
+
+
+<h3 id="_INSTR" name="INSTR">=INSTR</h3>
+
+<code><pre>INSTR(d$,s$[,p])</pre></code>
+
+<p>Searches the first occurrence of s$ inside of d$ and returns its
+start position. If it's not found, the function returns 0.
+Usually the function starts searching at the beginning of the
+string. Optionally it can start searching at position p.</p>
+
+
+<h3 id="_CHR$" name="CHR$">=CHR$</h3>
+
+<code><pre>CHR$(n)</pre></code>
+
+<p>Returns a string containing one character with ASCII code n.</p>
+
+
+<h3 id="_ASC" name="ASC">=ASC</h3>
+
+<code><pre>ASC(a$)</pre></code>
+
+<p>Supplies you with the ASCII code of the first character of a$.</p>
+
+
+<h3 id="_LEN" name="LEN">=LEN</h3>
+
+<code><pre>LEN(a$)</pre></code>
+
+<p>Returns the number of characters in a$.</p>
+
+
+<h3 id="_VAL" name="VAL">=VAL</h3>
+
+<code><pre>VAL(a$)</pre></code>
+
+<p>Converts a number written in a$ into a numeric value.</p>
+
+
+<h3 id="_STR$" name="STR$">=STR$</h3>
+
+<code><pre>STR$(n)</pre></code>
+
+<p>Converts the number n into a string.</p>
+
+
+<h3 id="_BIN$" name="BIN$">=BIN$</h3>
+
+<code><pre>BIN$(n)</pre></code>
+
+<p>Converts the number n into a binary string.</p>
+
+
+<h3 id="_HEX$" name="HEX$">=HEX$</h3>
+
+<code><pre>HEX$(n)</pre></code>
+
+<p>Converts the number n into a hexadecimal string.</p>
+
+
+<h1 id="Hardware-Reference">Hardware Reference</h1>
+
+<h2 id="Memory-Map">Memory Map</h2>
+
+<pre>
+$0000 - Cartridge ROM (32 KB)
+
+$8000 - Character Data (4 KB)
+$9000 - BG0 Data (2 KB)
+$9800 - BG1 Data (2 KB)
+
+$A000 - Working RAM (16 KB)
+
+$E000 - Persistent RAM (256 B)
+
+$FE00 - Sprite Registers (256 B)
+$FF00 - Color Registers (32 B)
+$FF20 - Video Registers
+$FF40 - Audio Registers
+$FF60 - I/O Registers
+</pre>
+
+<h2 id="Character-Data">Character Data</h2>
+
+<p>A character is an 8x8-pixel image with 2 bits per pixel, with a
+resulting size of 16 bytes. The video RAM has space for 256
+characters.</p>
+
+<p>The first 8 bytes of a character contain the low bits of all its
+pixels, followed by 8 more bytes containing the high bits of all
+pixels.</p>
+
+<h2 id="BG-Data">BG Data</h2>
+
+<p>A background is a map of 32x32 character cells. Each cell occupies two
+bytes:</p>
+<pre>
+- Character number
+- Attributes:
+    Bit     Purpose
+    0-2     Palette number
+    3       Flip X
+    4       Flip Y
+    5       Priority
+    6-7     Unused
+</pre>
+
+<h2 id="Sprite-Registers">Sprite Registers</h2>
+
+<p>There are 64 sprites available, each occupies 4 bytes:</p>
+<pre>
+- X position
+- Y position
+- Character number
+- Attributes:
+    Bit     Purpose
+    0-2     Palette number
+    3       Flip X
+    4       Flip Y
+    5       Priority
+    6-7     Size:
+            0: 1 character (8x8 pixels)
+            1: 2x2 characters (16x16 pixels)
+            2: 3x3 characters (24x24 pixels)
+            3: 4x4 characters (32x32 pixels)
+</pre>
+
+<h2 id="Color-Registers">Color Registers</h2>
+
+<p>There are 8 palettes of each 4 colors. One color is one byte:</p>
+<pre>
+Bits    Component
+0-1     Blue
+2-3     Green
+4-5     Red
+</pre>
+
+<h2 id="Video-Registers">Video Registers</h2>
+
+<pre>
+$FF20 - Attributes:
+    Bit     Purpose
+    0       Sprites enabled
+    1       BG0 enabled
+    2       BG1 enabled
+
+$FF21 - BG0 scroll offset X
+$FF22 - BG0 scroll offset Y
+$FF23 - BG1 scroll offset X
+$FF24 - BG1 scroll offset Y
+$FF25 - Raster line
+</pre>
+
+<h2 id="Audio-Registers">Audio Registers</h2>
+
+<p>- Not yet defined -</p>
+
+<h2 id="I-O-Registers">I/O Registers</h2>
+
+<pre>
+$FF60 - Gamepad 0 status
+$FF61 - Gamepad 1 status
+
+Gamepad status:
+    Bit     Purpose
+    0       Up
+    1       Down
+    2       Left
+    3       Right
+    4       Button A
+    5       Button B
+
+$FF62 - Last touch X position
+$FF63 - Last touch Y position
+$FF64 - Last pressed key (ASCII code)
+$FF65 - Status:
+    Bit     Purpose
+    0       Pause button
+    1       Touch
+
+$FF66 - Attributes:
+    Bit     Purpose
+    0-1     Gamepads enabled:
+            0: off (touchscreen enabled)
+            1: 1 player (touchscreen disabled)
+            2: 2 players (touchscreen disabled)
+    2       Keyboard enabled
+</pre>
+
+</body>
+</html>
