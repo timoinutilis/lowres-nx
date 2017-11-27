@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8" />
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <title>LowRes NX Manual</title>
 <style>
@@ -30,6 +31,7 @@ li {
     margin-bottom: 0.5em;
 }
 </style>
+</head>
 
 <body>
 
@@ -91,7 +93,7 @@ numbered data blocks, which can contain any kind of binary data, for
 example graphics, level maps, music, etc. Each entry starts with a
 line with the following format:</p>
 
-<code>#N:COMMENT</code>
+<pre>#N:COMMENT</pre>
 
 <p>N is the entry number (0-15), COMMENT can be any text with up to 31
 characters, for example "MAIN SPRITES" or "MAP LEVEL 1". This line is
@@ -129,31 +131,31 @@ programmable color palettes applied.</p>
 <li>Sprites</li>
 </ul>
 
-<h3>Backdrop</h3>
-<p>The backdrop is a plain color (color 0 in palette 0) which is visible
+<p>Backdrop:<br/>
+The backdrop is a plain color (color 0 in palette 0) which is visible
 wherever there isn't anything else on the screen.</p>
 
-<h3>Backgrounds</h3>
-<p>A background is a map of 32x32 character cells, which is used for text
+<p>Backgrounds:<br/>
+A background is a map of 32x32 character cells, which is used for text
 and tile based maps or images. Each cell has the information of which
 character it contains and additional attributes (color palette, flip
-X/Y, priority).</p>
-<p>As a character has the size of 8x8 pixels, the resulting background
+X/Y, priority).<br/>
+As a character has the size of 8x8 pixels, the resulting background
 size is 256x256 pixels, which is larger than the actual screen
 (160x128). By modifying the scroll offset of a background, the visible
-area can be moved.</p>
-<p>If the visible area moves out of the borders of the background, the
+area can be moved.<br/>
+If the visible area moves out of the borders of the background, the
 display wraps around the edges. This can be used to achieve endless
 scrolling.</p>
 
-<h3>Sprites</h3>
-<p>Sprites are independent objects, which can be freely moved on the
+<p>Sprites:<br/>
+Sprites are independent objects, which can be freely moved on the
 screen. They can have a size of 8x8 pixels (one character) or up to
 32x32 pixels by grouping several characters. Each sprite has the same
 attributes as a background cell and additionally its size.</p>
 
-<h3>Priorities</h3>
-<p>One important attribute is "priority". By setting it, its cell or
+<p>Priorities:<br/>
+One important attribute is "priority". By setting it, its cell or
 sprite will appear on a higher display layer. Actually there are 7
 layers (not 4 as mentioned before):</p>
 <ul>
@@ -166,7 +168,7 @@ layers (not 4 as mentioned before):</p>
 <li>Sprites - prio 1</li>
 </ul>
 
-<h2 id="Default Font">Default Font</h2>
+<h2 id="Default-Font">Default Font</h2>
 
 <p>If cartridge ROM entry 0 is not used by a program, the compiler adds
 character data for the default font. It occupies the characters
@@ -200,26 +202,26 @@ Variable names can contain letters (A-Z), digits (0-9) and underscores
 (_), but cannot begin with a digit. Reserved keywords cannot be used
 as names, but they can contain them, for example:</p>
 <p>
-Valid: <code>ENDING</code><br>
-Invalid: <code>END</code>
+Valid: ENDING<br/>
+Invalid: END
 </p>
 
 <p>String variable names must end with a $ symbol, for example:</p>
-<p><code>NAME$</code></p>
+<pre>NAME$</pre>
 
 <p>Variables are not be explicitly declared, they start to exist
 automatically when first used. Values are assigned to variables using
 the equal symbol:</p>
-<code><pre>
+<pre>
 NAME$="LOWRES NX"
 LIVES=3
-</pre></code>
+</pre>
 
 <p>Hexadecimal and binary notation can be used for number values:</p>
-<code><pre>
+<pre>
 $FF02
 %11001011
-</pre></code>
+</pre>
 
 <h2 id="Operators">Operators</h2>
 
@@ -274,29 +276,29 @@ XOR     A XOR B         Logical and bitwise "Exclusive Or"
 
 <p>All operators are available for numbers. Relational and addition
 operators are usable with strings, too:</p>
-<code><pre>
+<pre>
 SUM=1+3
 IF SUM&lt;5 THEN PRINT "SUM IS LESS THAN 5"
 NAME$="LOWRES NX"
 GREET$="HELLO "+NAME$+"!"
 IF NAME$&gt;"LOWRES CODER" THEN PRINT GREET$
-</pre></code>
+</pre>
 
 
 <h1 id="Program-Flow-Control">Program Flow Control</h1>
 
 <h3 id="_REM" name="REM">REM</h3>
-<code><pre>
+<pre>
 REM remark
 ' remark
-</pre></code>
+</pre>
 
 <p>Allows you to put comments into your program. REM lines are not
 executed. You can use an apostrophe (') in place of the word REM.</p>
 
 
 <h3 id="_IF-THEN-ELSE" name="IF,THEN,ELSE">IF...THEN...ELSE</h3>
-<code><pre>
+<pre>
 IF expression THEN command [ELSE command]
 
 IF expression THEN
@@ -306,71 +308,71 @@ ELSE IF expression THEN
 ELSE
     commands
 END IF
-</pre></code>
+</pre>
 
 <h3 id="_GOTO" name="GOTO">GOTO</h3>
 
-<code><pre>GOTO label</pre></code>
+<pre>GOTO label</pre>
 
 <p>Jumps to the given label.</p>
 
 
 <h3 id="_GOSUB-RETURN" name="GOSUB,RETURN">GOSUB...RETURN</h3>
 
-<code><pre>GOSUB label</pre></code>
+<pre>GOSUB label</pre>
 
 <p>Adds the current program position to a stack and jumps to the
 given label.</p>
 
-<code><pre>RETURN</pre></code>
+<pre>RETURN</pre>
 
 <p>Jumps back to the position of the last call of GOSUB and removes
 it from the stack.</p>
 
-<code><pre>RETURN label</pre></code>
+<pre>RETURN label</pre>
 
 <p>Works like GOTO, but clears the whole stack. Use this to exit from
 a subroutine, if you want to continue your program somewhere else.</p>
 
 
 <h3 id="_FOR-NEXT" name="FOR,NEXT">FOR...NEXT</h3>
-<code><pre>
+<pre>
 FOR var=a TO b [STEP s]
     commands
 NEXT var
-</pre></code>
+</pre>
 
 <h3 id="_DO-LOOP" name="DO,LOOP">DO...LOOP</h3>
-<code><pre>
+<pre>
 DO
   commands
 LOOP
-</pre></code>
+</pre>
 
 <h3 id="_REPEAT-UNTIL" name="REPEAT,UNTIL">REPEAT...UNTIL</h3>
-<code><pre>
+<pre>
 REPEAT
     commands
 UNTIL expression
-</pre></code>
+</pre>
 
 <h3 id="_WHILE-WEND" name="WHILE,WEND">WHILE...WEND</h3>
-<code><pre>
+<pre>
 WHILE expression
     commands
 WEND
-</pre></code>
+</pre>
 
 <h3 id="_END" name="END">END</h3>
 
-<code><pre>END</pre></code>
+<pre>END</pre>
 
 
 <h1 id="Text-Commands">Text Commands</h1>
 
 <h3 id="_PRINT" name="PRINT">PRINT</h3>
 
-<code><pre>PRINT expression-list</pre></code>
+<pre>PRINT expression-list</pre>
 
 <p>Outputs text to the current window. Expressions can be strings or
 numbers, separated by commas or semicolons. A comma separates the
@@ -381,7 +383,7 @@ end of the output, otherwise a new line is started.</p>
 
 <h3 id="_INPUT" name="INPUT">INPUT</h3>
 
-<code><pre>INPUT ["prompt";]var</pre></code>
+<pre>INPUT ["prompt";]var</pre>
 
 <p>Lets the user enter a text or number on the keyboard and stores it
 in the variable var. Optionally it can show a prompt text before
@@ -391,7 +393,7 @@ This enables automatically the keyboard.</p>
 
 <h3 id="_LOCATE" name="LOCATE">LOCATE</h3>
 
-<code><pre>LOCATE x,y</pre></code>
+<pre>LOCATE x,y</pre>
 
 <p>Moves the text cursor to column x and row y inside the current
 window.</p>
@@ -399,7 +401,7 @@ window.</p>
 
 <h3 id="_WINDOW" name="WINDOW">WINDOW</h3>
 
-<code><pre>WINDOW x,y,w,h,b</pre></code>
+<pre>WINDOW x,y,w,h,b</pre>
 
 <p>Sets the text output window to cell position x,y and sets the size
 to w columns and h rows. Text will be written to background b (0
@@ -407,7 +409,7 @@ or 1).</p>
 
 <h3 id="_CLW" name="CLW">CLW</h3>
 
-<code><pre>CLW</pre></code>
+<pre>CLW</pre>
 
 <p>Clears the window with spaces.</p>
 
@@ -416,7 +418,7 @@ or 1).</p>
 
 <h3 id="_SPRITE" name="SPRITE">SPRITE</h3>
 
-<code><pre>SPRITE n,x,y,c</pre></code>
+<pre>SPRITE n,x,y,c</pre>
 
 <p>Sets the position (x,y) and character (c) of sprite n (0-63).
 The top left corner of the screen is sprite position 32,32. Set
@@ -426,7 +428,7 @@ All parameters can be omitted to keep their current settings.</p>
 
 <h3 id="_SPRITE.A" name="SPRITE.A">SPRITE.A</h3>
 
-<code><pre>SPRITE.A n,(pal,fx,fy,pri,s)</pre></code>
+<pre>SPRITE.A n,(pal,fx,fy,pri,s)</pre>
 
 <p>Sets the attributes of sprite n (0-63). All attribute parameters
 can be omitted to keep their current settings.</p>
@@ -443,38 +445,38 @@ s       size (0-3):
         3: 4x4 characters (32x32 pixels)
 </pre>
 
-<code><pre>SPRITE.A n,a</pre></code>
+<pre>SPRITE.A n,a</pre>
 
 <p>Allows setting the attributes as a single 8-bit value.</p>
 
 
 <h3 id="_=SPRITE.X-Y" name="SPRITE.X,SPRITE.Y">=SPRITE.X/Y</h3>
 
-<code><pre>
+<pre>
 SPRITE.X(n)
 SPRITE.Y(n)
-</pre></code>
+</pre>
 
 <p>Return the position of sprite n.</p>
 
 
 <h3 id="_=SPRITE.C" name="SPRITE.C">=SPRITE.C</h3>
 
-<code><pre>SPRITE.C(n)</pre></code>
+<pre>SPRITE.C(n)</pre>
 
 <p>Returns the character of sprite n.</p>
 
 
 <h3 id="_=SPRITE.A" name="SPRITE.A">=SPRITE.A</h3>
 
-<code><pre>SPRITE.A(n)</pre></code>
+<pre>SPRITE.A(n)</pre>
 
 <p>Returns the attributes of sprite n as an 8-bit value.</p>
 
 
-<h3 id="_=SPRITE HIT" name="SPRITE HIT,SPRITE,HIT">=SPRITE HIT</h3>
+<h3 id="_=SPRITE-HIT" name="SPRITE HIT,SPRITE,HIT">=SPRITE HIT</h3>
 
-<code><pre>SPRITE HIT(n[,a [TO b]])</pre></code>
+<pre>SPRITE HIT(n[,a [TO b]])</pre>
 
 <p>Returns true if sprite n collides with another sprite (which means
 that pixels overlap). If no more parameters are given, it will
@@ -485,7 +487,7 @@ given, it will check with all sprites from number a to number b.</p>
 
 <h3 id="_=HIT" name="HIT">=HIT</h3>
 
-<code><pre>HIT</pre></code>
+<pre>HIT</pre>
 
 <p>Returns the number of the sprite which collided with the sprite of
 the last call of SPRITE HIT.</p>
@@ -495,34 +497,34 @@ the last call of SPRITE HIT.</p>
 
 <h3 id="_GAMEPAD" name="GAMEPAD">GAMEPAD</h3>
     
-<code><pre>GAMEPAD n</pre></code>
+<pre>GAMEPAD n</pre>
 
 <p>Enables gamepads for n players. A maximum of 2 players are
 supported. This disables touchscreen/mouse support.</p>
 
-<code><pre>GAMEPAD OFF</pre></code>
+<pre>GAMEPAD OFF</pre>
 
 <p>Disables all gamepads and enables touchscreen/mouse support.</p>
 
 
 <h3 id="_UP-DOWN-LEFT-RIGHT" name="=UP,DOWN,LEFT,RIGHT">=UP/DOWN/LEFT/RIGHT</h3>
 
-<code><pre>
+<pre>
 UP(p)
 DOWN(p)
 LEFT(p)
 RIGHT(p)
-</pre></code>
+</pre>
 
 <p>Returns true if the given direction is currently pressed on the
 direction pad of player p (0/1).</p>
 
-<code><pre>
+<pre>
 UP TAP(p)
 DOWN TAP(p)
 LEFT TAP(p)
 RIGHT TAP(p)
-</pre></code>
+</pre>
 
 <p>With the optional TAP keyword, this function returns true only for
 the first frame the button is pressed.</p>
@@ -530,22 +532,22 @@ the first frame the button is pressed.</p>
 
 <h3 id="_BUTTON" name="BUTTON,TAP">=BUTTON</h3>
 
-<code><pre>BUTTON(p,n)</pre></code>
+<pre>BUTTON(p,n)</pre>
 
 <p>Returns true if button A (n=0) or B (n=1) is currently pressed by
 player p (0/1).</p>
 
-<code><pre>BUTTON TAP(p,n)</pre></code>
+<pre>BUTTON TAP(p,n)</pre>
 
 <p>With the optional TAP keyword, this function returns true only for
 the first frame the button is pressed.</p>
 
 
 <h3 id="_TOUCH.X-TOUCH.Y" name="TOUCH.X,TOUCH.Y">=TOUCH.X/Y</h3>
-<code><pre>
+<pre>
 TOUCH.X
 TOUCH.Y
-</pre></code>
+</pre>
 
 <p>Returns the current X or Y pixel position where the user touches
 the screen, or where it was touched the last time.</p>
@@ -553,14 +555,14 @@ the screen, or where it was touched the last time.</p>
 
 <h3 id="_TOUCH" name="TOUCH">=TOUCH</h3>
 
-<code><pre>TOUCH</pre></code>
+<pre>TOUCH</pre>
 
 <p>Returns true if the screen is currently touched.</p>
 
 
 <h3 id="_TAP" name="TAP">=TAP</h3>
 
-<code><pre>TAP</pre></code>
+<pre>TAP</pre>
 
 <p>Returns true if the screen is currently touched and was not
 touched the last frame.</p>
@@ -568,17 +570,17 @@ touched the last frame.</p>
 
 <h3 id="_KEYBOARD-ON-OFF" name="KEYBOARD ON,KEYBOARD OFF,KEYBOARD,ON,OFF">KEYBOARD ON/OFF</h3>
 
-<code><pre>
+<pre>
 KEYBOARD ON
 KEYBOARD OFF
-</pre></code>
+</pre>
 
 <p>Enables or disables the keyboard.</p>
 
 
 <h3 id="_INKEY$" name="INKEY$">=INKEY$</h3>
 
-<code><pre>INKEY$</pre></code>
+<pre>INKEY$</pre>
 
 <p>Returns the last pressed key as a string. If no key was pressed,
 it returns an empty string (""). After calling this function its
@@ -590,26 +592,26 @@ The keyboard needs to be enabled for this function.</p>
 
 <h3 id="_BG" name="BG">BG</h3>
 
-<code><pre>BG n</pre></code>
+<pre>BG n</pre>
 
 <p>Sets the current background (0 or 1).</p>
 
 
 <h3 id="_CLS" name="CLS">CLS</h3>
     
-<code><pre>CLS</pre></code>
+<pre>CLS</pre>
 
 <p>Clears both backgrounds with character 0 and resets the current
 window to the default one.</p>
 
-<code><pre>CLS b</pre></code>
+<pre>CLS b</pre>
 
 <p>Clears background b with character 0.</p>
 
 
 <h3 id="_CHAR" name="CHAR">CHAR</h3>
 
-<code><pre>CHAR n,(pal,fx,fy,pri,s)</pre></code>
+<pre>CHAR n,(pal,fx,fy,pri,s)</pre>
 
 <p>Sets the current character and attributes. All parameters can be
 omitted to keep their current settings.</p>
@@ -621,14 +623,14 @@ pri     priority flag (0/1)
 s       unused (0-3)
 </pre>
 
-<code><pre>CHAR n,a</pre></code>
+<pre>CHAR n,a</pre>
 
 <p>Allows setting the attributes as a single 8-bit value.</p>
 
 
 <h3 id="_CELL" name="CELL">CELL</h3>
 
-<code><pre>CELL x,y</pre></code>
+<pre>CELL x,y</pre>
 
 <p>Sets the cell at position x,y of the current background to the
 current character.</p>
@@ -636,7 +638,7 @@ current character.</p>
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
 
-<code><pre>CELL.C(x,y)</pre></code>
+<pre>CELL.C(x,y)</pre>
 
 <p>Returns the character of the cell at position x,y of the current
 background.</p>
@@ -644,7 +646,7 @@ background.</p>
 
 <h3 id="_CELL.A" name="CELL.A">=CELL.A</h3>
 
-<code><pre>CELL.A(x,y)</pre></code>
+<pre>CELL.A(x,y)</pre>
 
 <p>Returns the attributes of the cell at position x,y of the current
 background as an 8-bit value.</p>
@@ -652,7 +654,7 @@ background as an 8-bit value.</p>
 
 <h3 id="_BG-FILL" name="BG FILL,BG,FILL">BG FILL</h3>
 
-<code><pre>BG FILL x1,y1 TO x2,y2</pre></code>
+<pre>BG FILL x1,y1 TO x2,y2</pre>
 
 <p>Sets all cells in the area from x1,y1 to x2,y2 of the current
 background to the current character.</p>
@@ -660,7 +662,7 @@ background to the current character.</p>
 
 <h3 id="_BG-SOURCE" name="BG SOURCE,BG,SOURCE">BG SOURCE</h3>
 
-<code><pre>BG SOURCE a[,w]</pre></code>
+<pre>BG SOURCE a[,w]</pre>
 
 <p>Sets the current source for the BG COPY command. The two-
 dimensional map starts at memory address "a" and has a width of w
@@ -669,7 +671,7 @@ cells. If the parameter w is omitted, the value is set to 32.</p>
 
 <h3 id="_BG-COPY" name="BG COPY,BG,COPY">BG COPY</h3>
 
-<code><pre>BG COPY x1,y1,w,h TO x2,y2</pre></code>
+<pre>BG COPY x1,y1,w,h TO x2,y2</pre>
 
 <p>Copies a two-dimensional part of the current source to the
 current background. The destination co-ordinates can be outside of
@@ -679,7 +681,7 @@ edges (32->0, 33->1, etc.).</p>
 
 <h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL">BG SCROLL</h3>
 
-<code><pre>BG SCROLL x1,y1 TO x2,y2,dx,dy</pre></code>
+<pre>BG SCROLL x1,y1 TO x2,y2,dx,dy</pre>
 
 <p>Moves the content of all cells in the area from x1,y1 to x2,y2
 horizontally by dx and vertically by dy cells.</p>
@@ -687,7 +689,7 @@ horizontally by dx and vertically by dy cells.</p>
 
 <h3 id="_TEXT" name="TEXT">TEXT</h3>
 
-<code><pre>TEXT x,y,s$</pre></code>
+<pre>TEXT x,y,s$</pre>
 
 <p>Outputs the string s$ to the current background at cell position
 x,y.</p>
@@ -695,7 +697,7 @@ x,y.</p>
 
 <h3 id="_NUMBER" name="NUMBER">NUMBER</h3>
 
-<code><pre>NUMBER x,y,n,d</pre></code>
+<pre>NUMBER x,y,n,d</pre>
 
 <p>Outputs the number n to the current background at cell position
 x,y. The number is formatted to show always d digits.
@@ -705,7 +707,7 @@ doesn't need to convert numbers to strings.</p>
 
 <h3 id="_FONT" name="FONT">FONT</h3>
     
-<code><pre>FONT c,(pal,fx,fy,pri,s)</pre></code>
+<pre>FONT c,(pal,fx,fy,pri,s)</pre>
 
 <p>Sets the current character range and attributes used for text
 output. c is the character where the font starts (space).
@@ -718,7 +720,7 @@ pri     priority flag (0/1)
 s       unused (0-3)
 </pre>
 
-<code><pre>FONT c,a</pre></code>
+<pre>FONT c,a</pre>
 
 <p>Allows setting the attributes as a single 8-bit value.</p>
 
@@ -727,7 +729,7 @@ s       unused (0-3)
 
 <h3 id="_DISPLAY" name="DISPLAY">DISPLAY</h3>
 
-<code><pre>DISPLAY b,x,y</pre></code>
+<pre>DISPLAY b,x,y</pre>
 
 <p>Sets the scroll offset of background b (0/1) to pixel
 co-ordinates x,y.</p>
@@ -735,7 +737,7 @@ co-ordinates x,y.</p>
 
 <h3 id="_DISPLAY.A" name="DISPLAY.A">DISPLAY.A</h3>
 
-<code><pre>DISPLAY.A (s,b0,b1)</pre></code>
+<pre>DISPLAY.A (s,b0,b1)</pre>
 
 <p>Sets the display attributes.</p>
 
@@ -745,58 +747,58 @@ b0  background 0 enabled (0/1)
 b1  background 1 enabled (0/1)
 </pre>
 
-<code><pre>DISPLAY.A a</pre></code>
+<pre>DISPLAY.A a</pre>
 
 <p>Allows setting the attributes as a single 8-bit value.</p>
 
 
 <h3 id="_DISPLAY.X-DISPLAY.Y" name="DISPLAY.X,DISPLAY.Y">=DISPLAY.X/Y</h3>
 
-<code><pre>
+<pre>
 DISPLAY.X(b)
 DISPLAY.Y(b)
-</pre></code>
+</pre>
 
 <p>Return the scroll offset of background b.</p>
 
 
 <h3 id="_=DISPLAY.A" name="DISPLAY.A">=DISPLAY.A</h3>
 
-<code><pre>DISPLAY.A</pre></code>
+<pre>DISPLAY.A</pre>
 
 <p>Returns the display attributes as an 8-bit value.</p>
 
 
 <h3 id="_PALETTE" name="PALETTE">PALETTE</h3>
 
-<code><pre>PALETTE n,c0,c1,c2,c3</pre></code>
+<pre>PALETTE n,c0,c1,c2,c3</pre>
 
 <p>Sets all four colors of palette n (0-7). Color 0 is only used for
 palette 0 and shown as the screen's backdrop color. The color
 parameters can be omitted to keep their current settings.
 Valid color values are 0-63 and can be calculated like this:</p>
-<code><pre>
+<pre>
 VALUE = RED * 16 + GREEN * 4 + BLUE
-</pre></code>
+</pre>
 <p>RED, GREEN and BLUE are values from 0 to 3.</p>
 
 
 <h3 id="_=COLOR" name="COLOR">=COLOR</h3>
 
-<code><pre>COLOR(p,n)</pre></code>
+<pre>COLOR(p,n)</pre>
 
 <p>Returns the value of color n (0-3) from palette p (0-7).
 You can get the RED, GREEN and BLUE values like this:</p>
-<code><pre>
+<pre>
 RED = INT(VALUE / 16)
 GREEN = INT(VALUE / 4) MOD 4
 BLUE = VALUE MOD 4
-</pre></code>
+</pre>
 
 
 <h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
 
-<code><pre>WAIT VBL</pre></code>
+<pre>WAIT VBL</pre>
 
 <p>Waits for the next frame. This (or WAIT n) should be the last
 command in all loops which do animations and/or handle input,
@@ -805,28 +807,28 @@ like the main game loop.</p>
 
 <h3 id="_WAIT" name="WAIT">WAIT</h3>
 
-<code><pre>WAIT n</pre></code>
+<pre>WAIT n</pre>
 
 <p>Waits n frames more than WAIT VBL (n/60 seconds).</p>
 
 
 <h3 id="_ON-RASTER-GOSUB" name="ON RASTER GOSUB,ON RASTER,RASTER GOSUB,ON,RASTER,GOSUB">ON RASTER GOSUB</h3>
 
-<code><pre>ON RASTER GOSUB label</pre></code>
+<pre>ON RASTER GOSUB label</pre>
 
 <p>Sets a subroutine which is executed for every screen line before
 it's drawn. Usually used to change color palettes or scroll
 offsets to achieve graphical effects. Raster subroutines must be
 short.</p>
 
-<code><pre>ON RASTER</pre></code>
+<pre>ON RASTER</pre>
 
 <p>Removes the current subroutine.</p>
 
 
 <h3 id="_=RASTER" name="RASTER">=RASTER</h3>
 
-<code><pre>RASTER</pre></code>
+<pre>RASTER</pre>
 
 <p>Returns the current screen line (y position). Use this in a raster
 subroutine.</p>
@@ -834,20 +836,20 @@ subroutine.</p>
 
 <h3 id="_ON-VBL-GOSUB" name="ON VBL GOSUB,ON VBL,VBL GOSUB,ON,VBL,GOSUB">ON VBL GOSUB</h3>
 
-<code><pre>ON VBL GOSUB label</pre></code>
+<pre>ON VBL GOSUB label</pre>
 
 <p>Sets a subroutine which is executed after each frame. Can be used
 to update animations or sounds, even if the main program is
 blocked by WAIT or INPUT.</p>
 
-<code><pre>ON VBL</pre></code>
+<pre>ON VBL</pre>
 
 <p>Removes the current subroutine.</p>
 
 
 <h3 id="_=TIMER" name="TIMER">=TIMER</h3>
 
-<code><pre>TIMER</pre></code>
+<pre>TIMER</pre>
 
 <p>Returns the number of frames shown since LowRes NX was started.
 The value wraps to 0 when 5184000 is reached, which is about 24
@@ -858,31 +860,31 @@ hours.</p>
 
 <h3 id="_DIM" name="DIM">DIM</h3>
 
-<code><pre>DIM var-list</pre></code>
+<pre>DIM var-list</pre>
 
 <p>Defines arrays with the highest index for each dimension:</p>
-<code><pre>
+<pre>
 DIM A(100)
 DIM MAP(31,23,1),NAMES$(9),SCORES(9)
-</pre></code>
+</pre>
 
 <p>Access elements from arrays, indices start from 0:</p>
-<code><pre>
+<pre>
 SCORES(0)=100
 SCORES(9)=5
 PRINT SCORES(0),SCORES(9)
-</pre></code>
+</pre>
 
 <h3 id="_SWAP" name="SWAP">SWAP</h3>
 
-<code><pre>SWAP var1,var2</pre></code>
+<pre>SWAP var1,var2</pre>
 
 <p>Swaps the data between any two variables of the same type.</p>
 
 
 <h3 id="_DATA" name="DATA">DATA</h3>
 
-<code><pre>DATA constant-list</pre></code>
+<pre>DATA constant-list</pre>
 
 <p>Stores comma separated numeric and string constants (values, but
 no variables or expressions) that are accessed by the READ
@@ -895,7 +897,7 @@ one continuous list of items.</p>
 
 <h3 id="_READ" name="READ">READ</h3>
 
-<code><pre>READ var-list</pre></code>
+<pre>READ var-list</pre>
 
 <p>Reads values from DATA commands and assigns them to the
 comma separated variables in var-list. The program has an internal
@@ -905,7 +907,7 @@ pointer will move to the next DATA value.</p>
 
 <h3 id="_RESTORE" name="RESTORE">RESTORE</h3>
 
-<code><pre>RESTORE [label]</pre></code>
+<pre>RESTORE [label]</pre>
 
 <p>Changes the internal read pointer to another position. This allows
 to reread data or to select specific data. If the label parameter
@@ -917,14 +919,14 @@ Otherwise the pointer will be set to the jump label.</p>
 
 <h3 id="_=PEEK" name="PEEK">=PEEK</h3>
 
-<code><pre>PEEK(a)</pre></code>
+<pre>PEEK(a)</pre>
 
 <p>Returns the current 8-bit value (0-255) at memory address a.</p>
 
 
 <h3 id="_POKE" name="POKE">POKE</h3>
 
-<code><pre>POKE a,v</pre></code>
+<pre>POKE a,v</pre>
 
 <p>Sets the memory at address a to value v. v can be any integer
 number, but only the lowest 8 bits are written to memory.</p>
@@ -932,14 +934,14 @@ number, but only the lowest 8 bits are written to memory.</p>
 
 <h3 id="_COPY" name="COPY">COPY</h3>
 
-<code><pre>COPY a,n TO d</pre></code>
+<pre>COPY a,n TO d</pre>
 
 <p>Copies n bytes starting from memory address a to address d.</p>
 
 
 <h3 id="_FILL" name="FILL">FILL</h3>
 
-<code><pre>FILL a,n[,v]</pre></code>
+<pre>FILL a,n[,v]</pre>
 
 <p>Sets n bytes starting from memory address a to value v, or 0 if
 the parameter is omitted.</p>
@@ -947,14 +949,14 @@ the parameter is omitted.</p>
 
 <h3 id="_=START" name="START">=START</h3>
 
-<code><pre>START(n)</pre></code>
+<pre>START(n)</pre>
 
 <p>Returns the memory address of ROM entry n.</p>
 
 
 <h3 id="_=LENGTH" name="LENGTH">=LENGTH</h3>
 
-<code><pre>LENGTH(n)</pre></code>
+<pre>LENGTH(n)</pre>
 
 <p>Returns the number of bytes of ROM entry n.</p>
 
@@ -963,7 +965,7 @@ the parameter is omitted.</p>
 
 <h3 id="_LOAD" name="LOAD">LOAD</h3>
 
-<code><pre>LOAD f$,a</pre></code>
+<pre>LOAD f$,a</pre>
 
 <p>Loads the file f$ from the current virtual disk to memory starting
 at address a. Only the entry number in the file name is actually
@@ -975,17 +977,17 @@ data.</p>
 
 <h3 id="_SAVE" name="SAVE">SAVE</h3>
 
-<code><pre>SAVE f$,a,n</pre></code>
+<pre>SAVE f$,a,n</pre>
 
 <p>Saves n bytes starting at memory address a to the current virtual
 disk as a file with name f$.</p>
 
 <p>File names are formatted as follows:</p>
-<code><pre>#N:COMMENT</pre></code>
+<pre>#N:COMMENT</pre>
 <p>N is the entry number (0-15) and the actual file identifier.
 COMMENT can be any text up to 31 characters and serves as
 information only. Example:</p>
-<code><pre>#0:MAIN SPRITES</pre></code>
+<pre>#0:MAIN SPRITES</pre>
 
 <p>SAVE is meant to be used for tools only. Use persistent memory to
 store game states.</p>
@@ -995,7 +997,7 @@ store game states.</p>
 
 <h3 id="_PI" name="PI">=PI</h3>
 
-<code><pre>PI</pre></code>
+<pre>PI</pre>
 
 <p>PI is the ratio of the circumference of a circle to its diameter:
 3.1415926535...</p>
@@ -1003,28 +1005,28 @@ store game states.</p>
 
 <h3 id="_SIN" name="SIN">=SIN</h3>
 
-<code><pre>SIN(x)</pre></code>
+<pre>SIN(x)</pre>
 
 <p>The sine of x, where x is in radians.</p>
 
 
 <h3 id="_COS" name="COS">=COS</h3>
 
-<code><pre>COS(x)</pre></code>
+<pre>COS(x)</pre>
 
 <p>The cosine of x, where x is in radians.</p>
 
 
 <h3 id="_TAN" name="TAN">=TAN</h3>
 
-<code><pre>TAN(x)</pre></code>
+<pre>TAN(x)</pre>
 
 <p>The tangent of x, where x is in radians.</p>
 
 
 <h3 id="_ATN" name="ATN">=ATN</h3>
 
-<code><pre>ATN(x)</pre></code>
+<pre>ATN(x)</pre>
 
 <p>The arctangent of x in radians, i.e. the angle whose tangent is x.
 The range of the function is -(PI/2) &lt; ATN(X) &lt; (PI/2).</p>
@@ -1032,21 +1034,21 @@ The range of the function is -(PI/2) &lt; ATN(X) &lt; (PI/2).</p>
 
 <h3 id="_ABS" name="ABS">=ABS</h3>
 
-<code><pre>ABS(x)</pre></code>
+<pre>ABS(x)</pre>
 
 <p>The absolute value of x.</p>
 
 
 <h3 id="_SGN" name="SGN">=SGN</h3>
 
-<code><pre>SGN(x)</pre></code>
+<pre>SGN(x)</pre>
 
 <p>The sign of x: -1 if x &lt; 0, 0 if x = 0 and +1 if x &gt; 0.</p>
 
 
 <h3 id="_INT" name="INT">=INT</h3>
 
-<code><pre>INT(x)</pre></code>
+<pre>INT(x)</pre>
 
 <p>The largest integer not greater than x; e.g. INT(1.3) = 1 and
 INT(-1.3) = -2.</p>
@@ -1054,7 +1056,7 @@ INT(-1.3) = -2.</p>
 
 <h3 id="_EXP" name="EXP">=EXP</h3>
 
-<code><pre>EXP(x)</pre></code>
+<pre>EXP(x)</pre>
 
 <p>The exponential of x, i.e. the value of the base of natural
 logarithms (e = 2,71828...) raised to the power x.</p>
@@ -1062,55 +1064,55 @@ logarithms (e = 2,71828...) raised to the power x.</p>
 
 <h3 id="_LOG" name="LOG">=LOG</h3>
 
-<code><pre>LOG(x)</pre></code>
+<pre>LOG(x)</pre>
 
 <p>The natural logarithm of x; x must be greater than zero.</p>
 
 
 <h3 id="_SQR" name="SQR">=SQR</h3>
 
-<code><pre>SQR(x)</pre></code>
+<pre>SQR(x)</pre>
 
 <p>The nonnegative square root of x; x must be nonnegative.</p>
 
 
 <h3 id="_MIN" name="MIN">=MIN</h3>
 
-<code><pre>MIN(x,y)</pre></code>
+<pre>MIN(x,y)</pre>
 
 <p>The MIN function returns the smallest value of two expressions.</p>
 
 
 <h3 id="_MAX" name="MAX">=MAX</h3>
 
-<code><pre>MAX(x,y)</pre></code>
+<pre>MAX(x,y)</pre>
 
 <p>The MAX function returns the largest value of two expressions.</p>
 
 
 <h3 id="_RND" name="RND">=RND</h3>
 
-<code><pre>RND</pre></code>
+<pre>RND</pre>
 
 <p>The next number in a sequence of random numbers uniformly
 distributed in the range 0 &lt;= RND &lt; 1.</p>
 
 
 <h3 id="_RANDOMIZE" name="RANDOMIZE,TIMER">RANDOMIZE</h3>
-<code><pre>RANDOMIZE x</pre></code>
+<pre>RANDOMIZE x</pre>
 
-<code><pre>RANDOMIZE TIMER</pre></code>
+<pre>RANDOMIZE TIMER</pre>
 
 
 <h1 id="String-Functions">String Functions</h1>
 
 <h3 id="_LEFT$" name="LEFT$">=LEFT$=</h3>
 
-<code><pre>LEFT$(s$,n)</pre></code>
+<pre>LEFT$(s$,n)</pre>
 
 <p>Returns a new string with the first n characters of s$.</p>
 
-<code><pre>LEFT$(s$,n)=a$</pre></code>
+<pre>LEFT$(s$,n)=a$</pre>
 
 <p>Overwrites the first characters in the variable s$ with the first
 n characters of a$.</p>
@@ -1118,11 +1120,11 @@ n characters of a$.</p>
 
 <h3 id="_RIGHT$" name="RIGHT$">=RIGHT$=</h3>
 
-<code><pre>RIGHT$(s$,n)</pre></code>
+<pre>RIGHT$(s$,n)</pre>
 
 <p>Returns a new string with the last n characters of s$.</p>
 
-<code><pre>RIGHT$(s$,n)=a$</pre></code>
+<pre>RIGHT$(s$,n)=a$</pre>
 
 <p>Overwrites the last characters in the variable s$ with the last n
 characters of a$.</p>
@@ -1130,12 +1132,12 @@ characters of a$.</p>
 
 <h3 id="_MID$" name="MID$">=MID$=</h3>
 
-<code><pre>MID$(s$,p,n)</pre></code>
+<pre>MID$(s$,p,n)</pre>
 
 <p>Returns a new string with n characters of s$, starting at
 character p. The first character has the position 1.</p>
 
-<code><pre>MID$(s$,p,n)=a$</pre></code>
+<pre>MID$(s$,p,n)=a$</pre>
 
 <p>Overwrites the given text range in the variable s$ with the first
 n characters of a$.</p>
@@ -1143,7 +1145,7 @@ n characters of a$.</p>
 
 <h3 id="_INSTR" name="INSTR">=INSTR</h3>
 
-<code><pre>INSTR(d$,s$[,p])</pre></code>
+<pre>INSTR(d$,s$[,p])</pre>
 
 <p>Searches the first occurrence of s$ inside of d$ and returns its
 start position. If it's not found, the function returns 0.
@@ -1153,49 +1155,49 @@ string. Optionally it can start searching at position p.</p>
 
 <h3 id="_CHR$" name="CHR$">=CHR$</h3>
 
-<code><pre>CHR$(n)</pre></code>
+<pre>CHR$(n)</pre>
 
 <p>Returns a string containing one character with ASCII code n.</p>
 
 
 <h3 id="_ASC" name="ASC">=ASC</h3>
 
-<code><pre>ASC(a$)</pre></code>
+<pre>ASC(a$)</pre>
 
 <p>Supplies you with the ASCII code of the first character of a$.</p>
 
 
 <h3 id="_LEN" name="LEN">=LEN</h3>
 
-<code><pre>LEN(a$)</pre></code>
+<pre>LEN(a$)</pre>
 
 <p>Returns the number of characters in a$.</p>
 
 
 <h3 id="_VAL" name="VAL">=VAL</h3>
 
-<code><pre>VAL(a$)</pre></code>
+<pre>VAL(a$)</pre>
 
 <p>Converts a number written in a$ into a numeric value.</p>
 
 
 <h3 id="_STR$" name="STR$">=STR$</h3>
 
-<code><pre>STR$(n)</pre></code>
+<pre>STR$(n)</pre>
 
 <p>Converts the number n into a string.</p>
 
 
 <h3 id="_BIN$" name="BIN$">=BIN$</h3>
 
-<code><pre>BIN$(n)</pre></code>
+<pre>BIN$(n)</pre>
 
 <p>Converts the number n into a binary string.</p>
 
 
 <h3 id="_HEX$" name="HEX$">=HEX$</h3>
 
-<code><pre>HEX$(n)</pre></code>
+<pre>HEX$(n)</pre>
 
 <p>Converts the number n into a hexadecimal string.</p>
 
