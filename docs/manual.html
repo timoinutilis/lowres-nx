@@ -2,20 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <title>LowRes NX Manual</title>
 <style>
 body {
 	font-family: sans-serif;
 }
 h1 {
-	margin-top: 3em;
-}
-h2 {
-	margin-top: 2em;
-}
-h3 {
-    margin-top: 1.5em;
+	margin-top: 1em;
 }
 td, th {
     padding-right: 1em;
@@ -26,6 +19,9 @@ th {
 }
 a {
     text-decoration: none;
+}
+ul {
+    padding-left: 25px;
 }
 li {
     margin-bottom: 0.5em;
@@ -60,12 +56,11 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 <li>Video RAM: 8 KB</li>
 <li>Working RAM: 16 KB</li>
 <li>Persistent RAM: 256 B per cartridge</li>
-<li>Screen resolution: 160x128</li>
-<li>60 FPS</li>
+<li>Screen: 160x128, 60 Hz</li>
 <li>Characters: 256, used for sprites and backgrounds (incl. fonts)</li>
-<li>Character size: 8x8-pixel</li>
-<li>Character depth: 2 bits (3 colors + transparency)</li>
-<li>Colors: 8 programmable palettes + backdrop color</li>
+<li>Character size: 8x8 pixels</li>
+<li>Character depth: 2 bits (3 colors + transparent)</li>
+<li>Colors: 8 programmable palettes</li>
 <li>Backgrounds: Two with each 32x32 cells, scrollable, wrap around edges</li>
 <li>Sprites: 64</li>
 <li>Sprite sizes: 8x8, 16x16, 24x24, 32x32</li>
@@ -119,9 +114,9 @@ wouldn't have a disk drive.</p>
 <h2 id="Graphics">Graphics</h2>
 
 <p>All graphics in LowRes NX are based on characters. A character is an
-8x8-pixel image with 3 colors plus transparency. They are usually
+8x8-pixel image with 3 colors plus transparent. They are usually
 designed in black and white, but are displayed with one of the 8
-programmable color palettes applied.</p>
+programmable color palettes.</p>
 
 <p>The display is composed of 4 layers, which are from back to front:</p>
 <ul>
@@ -202,8 +197,8 @@ Variable names can contain letters (A-Z), digits (0-9) and underscores
 (_), but cannot begin with a digit. Reserved keywords cannot be used
 as names, but they can contain them, for example:</p>
 <p>
-Valid: ENDING<br/>
-Invalid: END
+Valid: <code>ENDING</code><br/>
+Invalid: <code>END</code>
 </p>
 
 <p>String variable names must end with a $ symbol, for example:</p>
@@ -225,54 +220,50 @@ $FF02
 
 <h2 id="Operators">Operators</h2>
 
-<h3>Mathematical</h3>
+<h3 id="Operators-Math">Mathematical</h3>
 
-<pre>
-Symbol  Example Purpose
--       -B      Negation
-^       X^3     Exponentiation
-*       2*Y     Multiplication
-/       X/2     Division
-+       C+2     Addition
--       100-D   Subtraction
-MOD     X MOD 2 Modulo
-</pre>
+<table>
+<tr><th>Symbol</th> <th>Example</th> <th>Purpose</th></tr>
+<tr><td>-</td> <td><code>-B</code></td> <td>Negation</td></tr>
+<tr><td>^</td> <td><code>X^3</code></td> <td>Exponentiation</td></tr>
+<tr><td>*</td> <td><code>2*Y</code></td> <td>Multiplication</td></tr>
+<tr><td>/</td> <td><code>X/2</code></td> <td>Division</td></tr>
+<tr><td>+</td> <td><code>C+2</code></td> <td>Addition</td></tr>
+<tr><td>-</td> <td><code>100-D</code></td> <td>Subtraction</td></tr>
+<tr><td>MOD</td> <td><code>X MOD 2</code></td> <td>Modulo</td></tr>
+</table>
 
 <p>Operations are performed in mathematical order, for example
 multiplications and divisions are performed before additions and
 subtractions. The order can be specified explicitly through the use of
 parentheses, for example: (3+4*3)/5</p>
 
-<h3>Relational</h3>
+<h3 id="Operators-Rel">Relational</h3>
 
-<pre>
-Symbol  Example Purpose
-=       A=10    Equal
-&lt;&gt;      A&lt;&gt;100  Not equal
-&gt;       B&gt;C     Greater than
-&lt;       5&lt;X     Less than
-&gt;=      X&gt;=20   Greater than or equal
-&lt;=      X&lt;=30   Less than or equal
-</pre>
+<table>
+<tr><th>Symbol</th> <th>Example</th> <th>Purpose</th></tr>
+<tr><td>=</td> <td><code>A=10</code></td> <td>Equal</td></tr>
+<tr><td>&lt;&gt;</td> <td><code>A&lt;&gt;100</code></td> <td>Not equal</td></tr>
+<tr><td>&gt;</td> <td><code>B&gt;C</code></td> <td>Greater than</td></tr>
+<tr><td>&lt;</td> <td><code>5&lt;X</code></td> <td>Less than</td></tr>
+<tr><td>&gt;=</td> <td><code>X&gt;=20</code></td> <td>Greater than or equal</td></tr>
+<tr><td>&lt;=</td> <td><code>X&lt;=30</code></td> <td>Less than or equal</td></tr>
+</table>
 
 <p>Relational operator expressions have a value of true (-1) or
 false (0). For example: (2=3)=0, (4=4)=-1, (1&lt;3)=-1</p>
 
-<h3>Logical</h3>
+<h3 id="Operators-Log">Logical/Binary</h3>
 
-<pre>
-Symbol  Example         Purpose
-NOT     NOT (X=15)      Logical and bitwise "Not"
-        NOT 0
+<table>
+<tr><th>Symbol</th> <th>Example</th> <th>Purpose</th></tr>
+<tr><td>NOT</td> <td><code>NOT&#160;(X=15)<br/>NOT&#160;0</code></td> <td>"Not"</td></tr>
+<tr><td>AND</td> <td><code>A=1&#160;AND&#160;B=12<br/>170&#160;AND&#160;15</code></td> <td>"And"</td></tr>
+<tr><td>OR</td> <td><code>X=10&#160;OR&#160;Y=0<br/>128&#160;OR&#160;2</code></td> <td>"Or"</td></tr>
+<tr><td>XOR</td> <td><code>A&#160;XOR&#160;B</code></td> <td>"Exclusive Or"</td></tr>
+</table>
 
-AND     A=1 AND B=12    Logical and bitwise "And"
-        170 AND 15
-
-OR      X=10 OR Y=0     Logical and bitwise "Or"
-        128 OR 2
-
-XOR     A XOR B         Logical and bitwise "Exclusive Or"
-</pre>
+<h3 id="Operators-String">String</h3>
 
 <p>All operators are available for numbers. Relational and addition
 operators are usable with strings, too:</p>
@@ -366,6 +357,21 @@ WEND
 <h3 id="_END" name="END">END</h3>
 
 <pre>END</pre>
+
+<h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
+
+<pre>WAIT VBL</pre>
+
+<p>Waits for the next frame. This (or WAIT n) should be the last
+command in all loops which do animations and/or handle input,
+like the main game loop.</p>
+
+
+<h3 id="_WAIT" name="WAIT">WAIT</h3>
+
+<pre>WAIT n</pre>
+
+<p>Waits n frames more than WAIT VBL (n/60 seconds).</p>
 
 
 <h1 id="Text-Commands">Text Commands</h1>
@@ -794,22 +800,6 @@ RED = INT(VALUE / 16)
 GREEN = INT(VALUE / 4) MOD 4
 BLUE = VALUE MOD 4
 </pre>
-
-
-<h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
-
-<pre>WAIT VBL</pre>
-
-<p>Waits for the next frame. This (or WAIT n) should be the last
-command in all loops which do animations and/or handle input,
-like the main game loop.</p>
-
-
-<h3 id="_WAIT" name="WAIT">WAIT</h3>
-
-<pre>WAIT n</pre>
-
-<p>Waits n frames more than WAIT VBL (n/60 seconds).</p>
 
 
 <h3 id="_ON-RASTER-GOSUB" name="ON RASTER GOSUB,ON RASTER,RASTER GOSUB,ON,RASTER,GOSUB">ON RASTER GOSUB</h3>
