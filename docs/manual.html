@@ -56,7 +56,7 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 <li>Video RAM: 8 KB</li>
 <li>Working RAM: 16 KB</li>
 <li>Persistent RAM: 256 B per cartridge</li>
-<li>Screen: 160x128, 60 Hz</li>
+<li>Screen: 160x128 pixels, 60 Hz</li>
 <li>Characters: 256, used for sprites and backgrounds (incl. fonts)</li>
 <li>Character size: 8x8 pixels</li>
 <li>Character depth: 2 bits (3 colors + transparent)</li>
@@ -220,7 +220,7 @@ $FF02
 
 <h2 id="Operators">Operators</h2>
 
-<h3 id="Operators-Math">Mathematical</h3>
+<h3 id="Operators-Ari">Arithmetic</h3>
 
 <table>
 <tr><th>Symbol</th> <th>Example</th> <th>Purpose</th></tr>
@@ -230,7 +230,7 @@ $FF02
 <tr><td>/</td> <td><code>X/2</code></td> <td>Division</td></tr>
 <tr><td>+</td> <td><code>C+2</code></td> <td>Addition</td></tr>
 <tr><td>-</td> <td><code>100-D</code></td> <td>Subtraction</td></tr>
-<tr><td>MOD</td> <td><code>X MOD 2</code></td> <td>Modulo</td></tr>
+<tr><td>MOD</td> <td><code>X&#160;MOD&#160;2</code></td> <td>Modulo</td></tr>
 </table>
 
 <p>Operations are performed in mathematical order, for example
@@ -253,7 +253,7 @@ parentheses, for example: (3+4*3)/5</p>
 <p>Relational operator expressions have a value of true (-1) or
 false (0). For example: (2=3)=0, (4=4)=-1, (1&lt;3)=-1</p>
 
-<h3 id="Operators-Log">Logical/Binary</h3>
+<h3 id="Operators-Log">Logical/Bitwise</h3>
 
 <table>
 <tr><th>Symbol</th> <th>Example</th> <th>Purpose</th></tr>
@@ -263,16 +263,16 @@ false (0). For example: (2=3)=0, (4=4)=-1, (1&lt;3)=-1</p>
 <tr><td>XOR</td> <td><code>A&#160;XOR&#160;B</code></td> <td>"Exclusive Or"</td></tr>
 </table>
 
-<h3 id="Operators-String">String</h3>
+<h3 id="Operators-How">How to Use</h3>
 
 <p>All operators are available for numbers. Relational and addition
 operators are usable with strings, too:</p>
 <pre>
 SUM=1+3
-IF SUM&lt;5 THEN PRINT "SUM IS LESS THAN 5"
+IF SUM&lt;5 THEN PRINT "LESS THAN 5"
 NAME$="LOWRES NX"
 GREET$="HELLO "+NAME$+"!"
-IF NAME$&gt;"LOWRES CODER" THEN PRINT GREET$
+IF NAME$&gt;"LOWRES" THEN PRINT GREET$
 </pre>
 
 
@@ -290,13 +290,13 @@ executed. You can use an apostrophe (') in place of the word REM.</p>
 
 <h3 id="_IF-THEN-ELSE" name="IF,THEN,ELSE">IF...THEN...ELSE</h3>
 <pre>
-IF expression THEN command [ELSE command]
+IF expr THEN command [ELSE command]
 
 IF expression THEN
     commands
-ELSE IF expression THEN
+[ELSE IF expression THEN]
     commands
-ELSE
+[ELSE]
     commands
 END IF
 </pre>
@@ -439,17 +439,17 @@ All parameters can be omitted to keep their current settings.</p>
 <p>Sets the attributes of sprite n (0-63). All attribute parameters
 can be omitted to keep their current settings.</p>
 
-<pre>
-pal     palette number (0-7)
-fx      flip horizontally (0/1)
-fy      flip vertically (0/1)
-pri     priority flag (0/1)
-s       size (0-3):
-        0: 1 character (8x8 pixels)
-        1: 2x2 characters (16x16 pixels)
-        2: 3x3 characters (24x24 pixels)
-        3: 4x4 characters (32x32 pixels)
-</pre>
+<table>
+<tr><td>pal</td> <td>palette number (0-7)</td></tr>
+<tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
+<tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
+<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
+<tr><td>s</td> <td>size (0-3):<br/>
+0: 1 character (8x8 px)<br/>
+1: 2x2 characters (16x16 px)<br/>
+2: 3x3 characters (24x24 px)<br/>
+3: 4x4 characters (32x32 px)</td></tr>
+</table>
 
 <pre>SPRITE.A n,a</pre>
 
@@ -621,13 +621,15 @@ window to the default one.</p>
 
 <p>Sets the current character and attributes. All parameters can be
 omitted to keep their current settings.</p>
-<pre>
-pal     palette number (0-7)
-fx      flip horizontally (0/1)
-fy      flip vertically (0/1)
-pri     priority flag (0/1)
-s       unused (0-3)
-</pre>
+
+<table>
+<tr><td>pal</td> <td>palette number (0-7)</td></tr>
+<tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
+<tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
+<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
+<tr><td>s</td> <td>unused (0-3)</td></tr>
+</table>
+
 
 <pre>CHAR n,a</pre>
 
@@ -718,13 +720,14 @@ doesn't need to convert numbers to strings.</p>
 <p>Sets the current character range and attributes used for text
 output. c is the character where the font starts (space).
 All parameters can be omitted to keep their current settings.</p>
-<pre>
-pal     palette number (0-7)
-fx      flip horizontally (0/1)
-fy      flip vertically (0/1)
-pri     priority flag (0/1)
-s       unused (0-3)
-</pre>
+
+<table>
+<tr><td>pal</td> <td>palette number (0-7)</td></tr>
+<tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
+<tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
+<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
+<tr><td>s</td> <td>unused (0-3)</td></tr>
+</table>
 
 <pre>FONT c,a</pre>
 
@@ -747,11 +750,11 @@ co-ordinates x,y.</p>
 
 <p>Sets the display attributes.</p>
 
-<pre>
-s   sprites enabled (0/1)
-b0  background 0 enabled (0/1)
-b1  background 1 enabled (0/1)
-</pre>
+<table>
+<tr><td>s</td> <td>sprites enabled (0/1)</td></tr>
+<tr><td>b0</td> <td>background 0 enabled (0/1)</td></tr>
+<tr><td>b1</td> <td>background 1 enabled (0/1)</td></tr>
+</table>
 
 <pre>DISPLAY.A a</pre>
 
@@ -1231,12 +1234,12 @@ bytes:</p>
 <pre>
 - Character number
 - Attributes:
-    Bit     Purpose
-    0-2     Palette number
-    3       Flip X
-    4       Flip Y
-    5       Priority
-    6-7     Unused
+    Bit  Purpose
+    0-2  Palette number
+    3    Flip X
+    4    Flip Y
+    5    Priority
+    6-7  Unused
 </pre>
 
 <h2 id="Sprite-Registers">Sprite Registers</h2>
@@ -1247,36 +1250,36 @@ bytes:</p>
 - Y position
 - Character number
 - Attributes:
-    Bit     Purpose
-    0-2     Palette number
-    3       Flip X
-    4       Flip Y
-    5       Priority
-    6-7     Size:
-            0: 1 character (8x8 pixels)
-            1: 2x2 characters (16x16 pixels)
-            2: 3x3 characters (24x24 pixels)
-            3: 4x4 characters (32x32 pixels)
+    Bit  Purpose
+    0-2  Palette number
+    3    Flip X
+    4    Flip Y
+    5    Priority
+    6-7  Size:
+         0: 1 character (8x8 px)
+         1: 2x2 characters (16x16 px)
+         2: 3x3 characters (24x24 px)
+         3: 4x4 characters (32x32 px)
 </pre>
 
 <h2 id="Color-Registers">Color Registers</h2>
 
 <p>There are 8 palettes of each 4 colors. One color is one byte:</p>
 <pre>
-Bits    Component
-0-1     Blue
-2-3     Green
-4-5     Red
+Bits  Component
+0-1   Blue
+2-3   Green
+4-5   Red
 </pre>
 
 <h2 id="Video-Registers">Video Registers</h2>
 
 <pre>
 $FF20 - Attributes:
-    Bit     Purpose
-    0       Sprites enabled
-    1       BG0 enabled
-    2       BG1 enabled
+    Bit  Purpose
+    0    Sprites enabled
+    1    BG0 enabled
+    2    BG1 enabled
 
 $FF21 - BG0 scroll offset X
 $FF22 - BG0 scroll offset Y
@@ -1296,29 +1299,29 @@ $FF60 - Gamepad 0 status
 $FF61 - Gamepad 1 status
 
 Gamepad status:
-    Bit     Purpose
-    0       Up
-    1       Down
-    2       Left
-    3       Right
-    4       Button A
-    5       Button B
+    Bit  Purpose
+    0    Up
+    1    Down
+    2    Left
+    3    Right
+    4    Button A
+    5    Button B
 
 $FF62 - Last touch X position
 $FF63 - Last touch Y position
 $FF64 - Last pressed key (ASCII code)
 $FF65 - Status:
-    Bit     Purpose
-    0       Pause button
-    1       Touch
+    Bit  Purpose
+    0    Pause button
+    1    Touch
 
 $FF66 - Attributes:
-    Bit     Purpose
-    0-1     Gamepads enabled:
-            0: off (touchscreen enabled)
-            1: 1 player (touchscreen disabled)
-            2: 2 players (touchscreen disabled)
-    2       Keyboard enabled
+    Bit  Purpose
+    0-1  Gamepads enabled:
+         0: off (touchscreen enabled)
+         1: 1 player (touch disabled)
+         2: 2 players (touch disabled)
+    2    Keyboard enabled
 </pre>
 
 </body>
