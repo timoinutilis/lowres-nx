@@ -103,15 +103,19 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
                 
             case LabelTypeFOR:
                 errorCode =  ErrorForWithoutNext;
+                break;
                 
             case LabelTypeDO:
                 errorCode =  ErrorDoWithoutLoop;
+                break;
                 
             case LabelTypeREPEAT:
                 errorCode =  ErrorRepeatWithoutUntil;
+                break;
                 
             case LabelTypeWHILE:
                 errorCode =  ErrorWhileWithoutWend;
+                break;
                 
             case LabelTypeFORVar:
             case LabelTypeFORLimit:
@@ -123,7 +127,6 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
         }
         if (errorCode != ErrorNone)
         {
-            interpreter->pc = item->token;
             return err_makeCoreError(errorCode, item->token->sourcePosition);
         }
     }
