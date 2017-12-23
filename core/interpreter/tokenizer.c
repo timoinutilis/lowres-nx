@@ -227,12 +227,12 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
                 // REM comment, skip until end of line
                 while (*character)
                 {
-                    character++;
                     if (*character == '\n')
                     {
                         character++;
                         break;
                     }
+                    character++;
                 }
             }
             else if (foundKeywordToken > Token_reserved)

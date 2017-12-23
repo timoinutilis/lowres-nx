@@ -167,6 +167,7 @@ enum TokenType {
     
     // Reserved Keywords
     Token_reserved,
+    TokenANIM,
     TokenBANK,
     TokenBAR,
     TokenBOX,
@@ -176,8 +177,10 @@ enum TokenType {
     TokenCLOSE,
     TokenDECLARE,
     TokenDEF,
+    TokenEXIT,
     TokenFILE,
     TokenFILES,
+    TokenFLASH,
     TokenFUNCTION,
     TokenLBOUND,
     TokenLINE,
@@ -186,6 +189,7 @@ enum TokenType {
     TokenOUTPUT,
     TokenPAINT,
     TokenPAUSE,
+    TokenPEN,
     TokenPLAY,
     TokenPLOT,
     TokenPOINT,

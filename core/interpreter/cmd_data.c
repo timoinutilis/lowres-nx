@@ -41,8 +41,24 @@ enum ErrorCode cmd_DATA(struct Core *core)
     {
         ++interpreter->pc; // DATA at first, then comma
         
-        if (interpreter->pc->type != TokenFloat && interpreter->pc->type != TokenString) return ErrorUnexpectedToken;
-        ++interpreter->pc;
+        if (interpreter->pc->type == TokenString)
+        {
+            ++interpreter->pc;
+        }
+        else if (interpreter->pc->type == TokenFloat)
+        {
+            ++interpreter->pc;
+        }
+        else if (interpreter->pc->type == TokenMinus)
+        {
+            ++interpreter->pc;
+            if (interpreter->pc->type != TokenFloat) return ErrorUnexpectedToken;
+            ++interpreter->pc;
+        }
+        else
+        {
+            return ErrorUnexpectedToken;
+        }
     }
     while (interpreter->pc->type == TokenComma);
     
@@ -77,6 +93,12 @@ enum ErrorCode cmd_READ(struct Core *core)
             {
                 if (varType != ValueTypeFloat) return ErrorTypeMismatch;
                 varValue->floatValue = dataValueToken->floatValue;
+            }
+            else if (dataValueToken->type == TokenMinus)
+            {
+                if (varType != ValueTypeFloat) return ErrorTypeMismatch;
+                interpreter->currentDataValueToken++;
+                varValue->floatValue = -interpreter->currentDataValueToken->floatValue;
             }
             else if (dataValueToken->type == TokenString)
             {

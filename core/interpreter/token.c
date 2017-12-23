@@ -163,6 +163,7 @@ const char *TokenStrings[] = {
     
     // Reserved Keywords
     NULL,
+    "ANIM",
     "BANK",
     "BAR",
     "BOX",
@@ -172,8 +173,10 @@ const char *TokenStrings[] = {
     "CLOSE",
     "DECLARE",
     "DEF",
+    "EXIT",
     "FILE$",
     "FILES",
+    "FLASH",
     "FUNCTION",
     "LBOUND",
     "LINE",
@@ -182,6 +185,7 @@ const char *TokenStrings[] = {
     "OUTPUT",
     "PAINT",
     "PAUSE",
+    "PEN",
     "PLAY",
     "PLOT",
     "POINT",

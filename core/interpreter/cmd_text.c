@@ -68,9 +68,13 @@ enum ErrorCode cmd_PRINT(struct Core *core)
             ++interpreter->pc;
             newLine = false;
         }
-        else
+        else if (itp_isEndOfCommand(interpreter))
         {
             newLine = true;
+        }
+        else
+        {
+            return ErrorUnexpectedToken;
         }
     }
     
