@@ -33,7 +33,8 @@ struct DiskDrive {
 void disk_init(struct Core *core);
 void disk_deinit(struct Core *core);
 
-bool disk_saveFile(struct Core *core, char *name, int address, int length);
-bool disk_loadFile(struct Core *core, char *name, int address);
+bool disk_prepare(struct Core *core);
+bool disk_saveFile(struct Core *core, int index, char *comment, int address, int length);
+bool disk_loadFile(struct Core *core, int index, int address);
 
 #endif /* disk_drive_h */

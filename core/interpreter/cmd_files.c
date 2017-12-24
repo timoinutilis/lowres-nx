@@ -20,17 +20,19 @@
 #include "cmd_files.h"
 #include "core.h"
 #include <assert.h>
+#include <string.h>
 
 enum ErrorCode cmd_LOAD(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
-    
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
+
     // LOAD
     struct Token *startPc = interpreter->pc;
     ++interpreter->pc;
     
     // file value
-    struct TypedValue fileValue = itp_evaluateExpression(core, TypeClassString);
+    struct TypedValue fileValue = itp_evaluateNumericExpression(core, 0, MAX_ENTRIES - 1);
     if (fileValue.type == ValueTypeError) return fileValue.v.errorCode;
     
     // comma
@@ -43,8 +45,7 @@ enum ErrorCode cmd_LOAD(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        bool ready = disk_loadFile(core, fileValue.v.stringValue->chars, addressValue.v.floatValue);
-        rcstring_release(fileValue.v.stringValue);
+        bool ready = disk_loadFile(core, fileValue.v.floatValue, addressValue.v.floatValue);
         
         interpreter->exitEvaluation = true;
         if (!ready)
@@ -62,15 +63,24 @@ enum ErrorCode cmd_LOAD(struct Core *core)
 enum ErrorCode cmd_SAVE(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
     // SAVE
     struct Token *startPc = interpreter->pc;
     ++interpreter->pc;
     
     // file value
-    struct TypedValue fileValue = itp_evaluateExpression(core, TypeClassString);
+    struct TypedValue fileValue = itp_evaluateNumericExpression(core, 0, MAX_ENTRIES - 1);
     if (fileValue.type == ValueTypeError) return fileValue.v.errorCode;
     
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // comment value
+    struct TypedValue commentValue = itp_evaluateExpression(core, TypeClassString);
+    if (commentValue.type == ValueTypeError) return commentValue.v.errorCode;
+
     // comma
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
@@ -89,8 +99,8 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        bool ready = disk_saveFile(core, fileValue.v.stringValue->chars, addressValue.v.floatValue, lengthValue.v.floatValue);
-        rcstring_release(fileValue.v.stringValue);
+        bool ready = disk_saveFile(core, fileValue.v.floatValue, commentValue.v.stringValue->chars, addressValue.v.floatValue, lengthValue.v.floatValue);
+        rcstring_release(commentValue.v.stringValue);
         
         interpreter->exitEvaluation = true;
         if (!ready)
@@ -105,50 +115,62 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-struct TypedValue fnc_FIRST(struct Core *core)
+enum ErrorCode cmd_FILES(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
+    
+    // FILES
+    struct Token *startPc = interpreter->pc;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        bool ready = disk_prepare(core);
+        
+        interpreter->exitEvaluation = true;
+        if (!ready)
+        {
+            // disk not ready
+            interpreter->pc = startPc;
+            interpreter->state = StateWaitForDisk;
+            return ErrorNone;
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+struct TypedValue fnc_FILE(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // FIRST$
+    // FILE$
     ++interpreter->pc;
     
     // bracket open
     if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
     ++interpreter->pc;
     
-    // filter expression
-    struct TypedValue filterValue = itp_evaluateExpression(core, TypeClassString);
-    if (filterValue.type == ValueTypeError) return filterValue;
-    
+    // file value
+    struct TypedValue fileValue = itp_evaluateNumericExpression(core, 0, MAX_ENTRIES - 1);
+    if (fileValue.type == ValueTypeError) return fileValue;
+
     // bracket close
     if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
     ++interpreter->pc;
-    
-    struct TypedValue resultValue;
-    resultValue.type = ValueTypeString;
-    
-    if (interpreter->pass == PassRun)
-    {
-        resultValue.v.stringValue = core->interpreter->nullString;
-        rcstring_retain(resultValue.v.stringValue);
-        rcstring_release(filterValue.v.stringValue);
-    }
-    return resultValue;
-}
 
-struct TypedValue fnc_NEXT(struct Core *core)
-{
-    struct Interpreter *interpreter = core->interpreter;
-    
-    // NEXT$
-    ++interpreter->pc;
-    
     struct TypedValue resultValue;
     resultValue.type = ValueTypeString;
     
     if (interpreter->pass == PassRun)
     {
-        resultValue.v.stringValue = core->interpreter->nullString;
+        if (core->diskDrive->dataManager.data == NULL) return val_makeError(ErrorDirectoryNotLoaded);
+        
+        int index = fileValue.v.floatValue;
+        struct DataEntry *entry = &core->diskDrive->dataManager.entries[index];
+        
+        resultValue.v.stringValue = rcstring_new(entry->comment, strlen(entry->comment));
         rcstring_retain(resultValue.v.stringValue);
     }
     return resultValue;

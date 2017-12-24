@@ -28,7 +28,7 @@ struct Core;
 
 enum ErrorCode cmd_LOAD(struct Core *core);
 enum ErrorCode cmd_SAVE(struct Core *core);
-struct TypedValue fnc_FIRST(struct Core *core);
-struct TypedValue fnc_NEXT(struct Core *core);
+enum ErrorCode cmd_FILES(struct Core *core);
+struct TypedValue fnc_FILE(struct Core *core);
 
 #endif /* cmd_files_h */

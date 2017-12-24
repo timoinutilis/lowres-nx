@@ -958,11 +958,10 @@ the parameter is omitted.</p>
 
 <h3 id="_LOAD" name="LOAD">LOAD</h3>
 
-<pre>LOAD f$,a</pre>
+<pre>LOAD f,a</pre>
 
-<p>Loads the file f$ from the current virtual disk to memory starting
-at address a. Only the entry number in the file name is actually
-used, the rest of the name can be omitted (for example "#0").</p>
+<p>Loads the file number f from the current virtual disk to memory starting
+at address a.</p>
 
 <p>LOAD is meant to be used for tools only. Use ROM entries for game
 data.</p>
@@ -970,20 +969,31 @@ data.</p>
 
 <h3 id="_SAVE" name="SAVE">SAVE</h3>
 
-<pre>SAVE f$,a,n</pre>
+<pre>SAVE f,c$,a,n</pre>
 
 <p>Saves n bytes starting at memory address a to the current virtual
-disk as a file with name f$.</p>
+disk as a file number f (0-15) with comment c$ (up to 31 characters).</p>
 
-<p>File names are formatted as follows:</p>
-<pre>#N:COMMENT</pre>
-<p>N is the entry number (0-15) and the actual file identifier.
-COMMENT can be any text up to 31 characters and serves as
-information only. Example:</p>
-<pre>#0:MAIN SPRITES</pre>
+<p>If this file was loaded before, consider keeping its original comment or
+allow the user to edit it before saving. If the file is new, the comment
+should contain at least the type of data, e.g. "CHARACTERS" or "MUSIC".
 
 <p>SAVE is meant to be used for tools only. Use persistent memory to
 store game states.</p>
+
+
+<h3 id="_FILES" name="FILES">FILES</h3>
+
+<pre>FILES</pre>
+
+<p>Loads the current file directory for use with FILES$.</p>
+
+
+<h3 id="_FILE" name="FILE$">=FILE$</h3>
+
+<pre>FILE$(f)</pre>
+
+<p>Returns the comment string of file number f. Call FILES before accessing the file directory to update its content, or use FILE$ directly after LOAD or SAVE.</p>
 
 
 <h1 id="Math-Functions">Math Functions</h1>

@@ -49,58 +49,39 @@ bool disk_prepare(struct Core *core)
     return delegate_diskDriveWillAccess(core);
 }
 
-bool disk_saveFile(struct Core *core, char *name, int address, int length)
+bool disk_saveFile(struct Core *core, int index, char *comment, int address, int length)
 {
     if (!disk_prepare(core))
     {
         return false;
     }
     
-    int index;
-    char comment[ENTRY_COMMENT_SIZE];
-    int result = sscanf(name, "#%d:%[^\n]", &index, comment);
-    if (result != 2)
-    {
-        assert(0);
-    }
-    else
-    {
-        assert(address >= 0 && address < sizeof(struct Machine));
-        struct DataManager *dataManager = &core->diskDrive->dataManager;
-        uint8_t *source = &((uint8_t *)core->machine)[address];
-        data_setEntry(dataManager, index, comment, source, length);
-        
-        core->delegate->diskDriveDidSave(core->delegate->context, dataManager);
-    }
+    assert(address >= 0 && address < sizeof(struct Machine));
+    struct DataManager *dataManager = &core->diskDrive->dataManager;
+    uint8_t *source = &((uint8_t *)core->machine)[address];
+    data_setEntry(dataManager, index, comment, source, length);
+    
+    core->delegate->diskDriveDidSave(core->delegate->context, dataManager);
     return true;
 }
 
-bool disk_loadFile(struct Core *core, char *name, int address)
+bool disk_loadFile(struct Core *core, int index, int address)
 {
     if (!disk_prepare(core))
     {
         return false;
     }
     
-    int index;
-    int result = sscanf(name, "#%d", &index);
-    if (result != 1)
+    struct DataEntry *entry = &core->diskDrive->dataManager.entries[index];
+    uint8_t *data = core->diskDrive->dataManager.data;
+    
+    // read file
+    int start = entry->start;
+    int length = entry->length;
+    for (int i = 0; i < length; i++)
     {
-        assert(0);
-    }
-    else
-    {
-        struct DataEntry *entry = &core->diskDrive->dataManager.entries[index];
-        uint8_t *data = core->diskDrive->dataManager.data;
-        
-        // read file
-        int start = entry->start;
-        int length = entry->length;
-        for (int i = 0; i < length; i++)
-        {
-            bool poke = machine_poke(core, address + i, data[i + start]);
-            assert(poke);
-        }
+        bool poke = machine_poke(core, address + i, data[i + start]);
+        assert(poke);
     }
     return true;
 }

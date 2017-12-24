@@ -998,6 +998,9 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenTOUCHY:
             return fnc_TOUCH_X_Y(core);
             
+        case TokenFILE:
+            return fnc_FILE(core);
+            
         default:
             break;
     }
@@ -1198,6 +1201,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenLOAD:
             return cmd_LOAD(core);
+            
+        case TokenFILES:
+            return cmd_FILES(core);
             
         case TokenGAMEPAD:
             return cmd_GAMEPAD(core);
