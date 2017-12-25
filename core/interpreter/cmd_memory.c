@@ -152,12 +152,25 @@ enum ErrorCode cmd_COPY(struct Core *core)
         int source = sourceValue.v.floatValue;
         int length = lengthValue.v.floatValue;
         int destination = destinationValue.v.floatValue;
-        for (int i = 0; i < length; i++)
+        if (source < destination)
         {
-            int peek = machine_peek(core, source + i);
-            if (peek == -1) return ErrorIllegalMemoryAccess;
-            bool poke = machine_poke(core, destination + i, peek);
-            if (!poke) return ErrorIllegalMemoryAccess;
+            for (int i = length - 1; i >= 0; i--)
+            {
+                int peek = machine_peek(core, source + i);
+                if (peek == -1) return ErrorIllegalMemoryAccess;
+                bool poke = machine_poke(core, destination + i, peek);
+                if (!poke) return ErrorIllegalMemoryAccess;
+            }
+        }
+        else if (source > destination)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                int peek = machine_peek(core, source + i);
+                if (peek == -1) return ErrorIllegalMemoryAccess;
+                bool poke = machine_poke(core, destination + i, peek);
+                if (!poke) return ErrorIllegalMemoryAccess;
+            }
         }
     }
     

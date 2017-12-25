@@ -389,3 +389,49 @@ enum ErrorCode cmd_CLW(struct Core *core)
     
     return itp_endOfCommand(interpreter);
 }
+
+enum ErrorCode cmd_TRACE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    do
+    {
+        // TRACE or comma
+        bool separate = (interpreter->pc->type == TokenComma);
+        ++interpreter->pc;
+        
+        struct TypedValue value = itp_evaluateExpression(core, TypeClassAny);
+        if (value.type == ValueTypeError) return value.v.errorCode;
+        
+        if (interpreter->pass == PassRun)
+        {
+            if (separate)
+            {
+//                txtlib_printText(core, " ");
+                printf(" ");
+            }
+            if (value.type == ValueTypeString)
+            {
+//                txtlib_printText(core, value.v.stringValue->chars);
+                printf("%s", value.v.stringValue->chars);
+                rcstring_release(value.v.stringValue);
+            }
+            else if (value.type == ValueTypeFloat)
+            {
+//                char buffer[20];
+//                snprintf(buffer, 20, "%0.7g", value.v.floatValue);
+//                txtlib_printText(core, buffer);
+                printf("%0.7g", value.v.floatValue);
+            }
+        }
+    }
+    while (interpreter->pc->type == TokenComma);
+    
+    if (interpreter->pass == PassRun)
+    {
+//        txtlib_printText(core, "\n");
+        printf("\n");
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
