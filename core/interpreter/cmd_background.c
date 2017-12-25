@@ -55,7 +55,7 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
     struct TypedValue aValue = itp_evaluateNumericExpression(core, 0, 0xFFFF);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
-    int w = PLANE_COLUMNS;
+    int w = 0;
     if (interpreter->pc->type == TokenComma)
     {
         // comma
@@ -70,8 +70,18 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        core->interpreter->textLib.sourceAddress = aValue.v.floatValue;
-        core->interpreter->textLib.sourceWidth = w;
+        int address = aValue.v.floatValue;
+        if (w > 0)
+        {
+            core->interpreter->textLib.sourceAddress = address;
+            core->interpreter->textLib.sourceWidth = w;
+        }
+        else
+        {
+            // data with preceding size (W x H)
+            core->interpreter->textLib.sourceAddress = address + 2;
+            core->interpreter->textLib.sourceWidth = machine_peek(core, address);
+        }
     }
     
     return itp_endOfCommand(interpreter);

@@ -53,6 +53,7 @@ void runStartupSequence(struct Core *core)
     memcpy(core->machine->videoRam.characters, &core->machine->cartridgeRom[entries[2].start], entries[2].length);
 
     // main background source
-    core->interpreter->textLib.sourceAddress = entries[3].start;
-    core->interpreter->textLib.sourceWidth = PLANE_COLUMNS;
+    int bgStart = entries[3].start;
+    core->interpreter->textLib.sourceAddress = bgStart + 2;
+    core->interpreter->textLib.sourceWidth = core->machine->cartridgeRom[bgStart];
 }

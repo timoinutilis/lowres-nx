@@ -2,11 +2,14 @@
 * Notes *
 *********
 
-- Read the docs, especially the introduction!
+- Read the manual, especially the introduction!
 
 - Send your programs, bug reports and questions to timo@inutilis.com.
 
 - Development news on Twitter: @timo_inutilis. Tweet with #LowResNX.
+
+- To-do and bug list at:
+  https://github.com/timoinutilis/lowres-nx/issues
 
 - "Character Designer" and "Background Designer" currently use these
   data entries (no selection yet):
@@ -25,16 +28,3 @@
 	RIGHT   Arrow Right G
 	A       Z/,         A
 	B       X/.         S
-
-
-*********
-* To Do *
-*********
-
-- BASIC commands to list files, LOAD/SAVE may be changed
-- File lists for designer tools
-- Implement persistent RAM
-- Improve UI of designer tools (merge Character and Background Designer to one program)
-- Final app icon
-- Later: Sound
-- Later: Drawing commands

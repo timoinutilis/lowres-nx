@@ -674,8 +674,11 @@ background to the current character.</p>
 
 <p>Sets the current source for the BG COPY command. The two-
 dimensional map starts at memory address "a" and has a width of w
-cells. If the parameter w is omitted, the value is set to 32.</p>
+cells.</p>
 
+<p>Without the width parameter, Background Designer's data
+format is assumed: The width is read from address "a" and
+the actual map data starts at a+2.</p>
 
 <h3 id="_BG-COPY" name="BG COPY,BG,COPY">BG COPY</h3>
 
