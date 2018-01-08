@@ -227,7 +227,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
                 self.nxDiskUrl = panel.url
             } else {
                 let nxDocument = self.document as! LowResNXDocument
-                let nxDiskUrl = nxDocument.fileURL!.deletingLastPathComponent().appendingPathComponent("disk.nx")
+                let nxDiskUrl = nxDocument.fileURL!.deletingLastPathComponent().appendingPathComponent("Disk.nx")
                 if !FileManager.default.fileExists(atPath: nxDiskUrl.path) {
                     FileManager.default.createFile(atPath: nxDiskUrl.path, contents: nil, attributes: nil)
                 }
