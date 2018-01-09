@@ -209,7 +209,21 @@ void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
     struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getCurrentBackground(core);
     
-    x += digits;
+    if (number < 0)
+    {
+        // negative number
+        number *= -1;
+        struct Cell *cell = &plane->cells[y][x];
+        cell->attr.value = lib->fontCharAttr.value;
+        cell->character = lib->fontCharOffset + 13; // "-"
+        x += digits;
+        digits--;
+    }
+    else
+    {
+        x += digits;
+    }
+    
     int div = 1;
     for (int i = 0; i < digits; i++)
     {
