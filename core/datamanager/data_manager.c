@@ -40,6 +40,9 @@ void data_deinit(struct DataManager *manager)
 void data_resetEntries(struct DataManager *manager)
 {
     memset(manager->entries, 0, sizeof(struct DataEntry) * MAX_ENTRIES);
+    strcpy(manager->entries[1].comment, "MAIN PALETTES");
+    strcpy(manager->entries[2].comment, "MAIN CHARACTERS");
+    strcpy(manager->entries[3].comment, "MAIN BG");
 }
 
 struct CoreError data_import(struct DataManager *manager, const char *input, bool keepSourceCode)
@@ -198,8 +201,19 @@ char *data_export(struct DataManager *manager)
             
             if (manager->diskSourceCode)
             {
-                strcpy(current, manager->diskSourceCode);
-                current += strlen(manager->diskSourceCode);
+                size_t len = strlen(manager->diskSourceCode);
+                if (len > 0)
+                {
+                    strcpy(current, manager->diskSourceCode);
+                    char endChar = current[len - 1];
+                    current += len;
+                    if (endChar != '\n')
+                    {
+                        // add new line after end of program
+                        current[0] = '\n';
+                        current++;
+                    }
+                }
             }
             
             for (int i = 0; i < MAX_ENTRIES; i++)
@@ -227,10 +241,6 @@ char *data_export(struct DataManager *manager)
                             sprintf(current, "\n");
                             valuesInLine = 0;
                         }
-                        else
-                        {
-                            sprintf(current, " ");
-                        }
                         current += strlen(current);
                     }
                     
@@ -251,13 +261,14 @@ int data_calcOutputSize(struct DataManager *manager)
         if (entry->length > 0)
         {
             size += (i >= 10 ? 4 : 3) + strlen(entry->comment) + 1; // #10:comment\n
-            size += entry->length * 3; // 2x hex letters + space or new line
+            size += entry->length * 2; // 2x hex letters
+            size += entry->length / 16 + 1; // new line every 16 values
             size += 1; // new line
         }
     }
     if (manager->diskSourceCode)
     {
-        size += strlen(manager->diskSourceCode);
+        size += strlen(manager->diskSourceCode) + 1; // possible new line between program and data
     }
     size += 1; // 0-byte
     return size;
