@@ -28,6 +28,7 @@ struct Core;
 
 enum ErrorCode cmd_SPRITE(struct Core *core);
 enum ErrorCode cmd_SPRITE_A(struct Core *core);
+enum ErrorCode cmd_SPRITE_OFF(struct Core *core);
 struct TypedValue fnc_SPRITE(struct Core *core);
 struct TypedValue fnc_SPRITE_HIT(struct Core *core);
 struct TypedValue fnc_HIT(struct Core *core);

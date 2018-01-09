@@ -116,6 +116,53 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_SPRITE_OFF(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // SPRITE
+    ++interpreter->pc;
+    
+    // OFF
+    if (interpreter->pc->type != TokenOFF) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    int from = 0;
+    int to = NUM_SPRITES - 1;
+    
+    if (!itp_isEndOfCommand(interpreter))
+    {
+        // from value
+        struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
+        if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+        from = nValue.v.floatValue;
+        to = from;
+        
+        // TO
+        if (interpreter->pc->type == TokenTO)
+        {
+            ++interpreter->pc;
+        
+            // to value
+            struct TypedValue mValue = itp_evaluateNumericExpression(core, 0, NUM_SPRITES - 1);
+            if (mValue.type == ValueTypeError) return mValue.v.errorCode;
+            to = mValue.v.floatValue;
+        }
+    }
+    
+    if (interpreter->pass == PassRun)
+    {
+        struct Sprite *sprites = core->machine->spriteRegisters.sprites;
+        for (int i = from; i <= to; i++)
+        {
+            sprites[i].x = 0;
+            sprites[i].y = 0;
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
 struct TypedValue fnc_SPRITE(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;

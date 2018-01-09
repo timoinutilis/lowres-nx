@@ -871,7 +871,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
     return value;
 }
 
-int itp_isEndOfCommand(struct Interpreter *interpreter)
+bool itp_isEndOfCommand(struct Interpreter *interpreter)
 {
     enum TokenType type = interpreter->pc->type;
     return (type == TokenEol || type == TokenELSE);
@@ -1201,7 +1201,15 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_SPRITE_A(core);
             
         case TokenSPRITE:
-            return cmd_SPRITE(core);
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenOFF:
+                    return cmd_SPRITE_OFF(core);
+                    
+                default:
+                    return cmd_SPRITE(core);
+            }
+            break;
             
         case TokenSAVE:
             return cmd_SAVE(core);
