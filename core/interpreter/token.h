@@ -52,6 +52,7 @@ enum TokenType {
     TokenMinus,
     TokenMul,
     TokenDiv,
+    TokenDivInt,
     TokenPow,
     TokenAND,
     TokenNOT,

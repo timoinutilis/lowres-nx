@@ -547,10 +547,12 @@ bool itp_isTokenLevel(enum TokenType token, int level)
         case 5:
             return token == TokenMOD;
         case 6:
+            return token == TokenDivInt;
+        case 7:
             return token == TokenMul || token == TokenDiv;
-//        case 7:
+//        case 8:
 //            return token == TokenPlus || token == TokenMinus; // unary
-        case 8:
+        case 9:
             return token == TokenPow;
     }
     return false;
@@ -578,7 +580,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         }
         return value;
     }
-    if (level == 7 && (type == TokenPlus || type == TokenMinus)) // unary
+    if (level == 8 && (type == TokenPlus || type == TokenMinus)) // unary
     {
         ++interpreter->pc;
         struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
@@ -595,7 +597,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         }
         return value;
     }
-    if (level == 9)
+    if (level == 10)
     {
         return itp_evaluatePrimaryExpression(core);
     }
@@ -685,6 +687,10 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     newValue.v.floatValue = value.v.floatValue / rightValue.v.floatValue;
                     break;
                 }
+                case TokenDivInt: {
+                    newValue.v.floatValue = (int)value.v.floatValue / (int)rightValue.v.floatValue;
+                    break;
+                }
                 case TokenPow: {
                     newValue.v.floatValue = powf(value.v.floatValue, rightValue.v.floatValue);
                     break;
@@ -766,6 +772,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                 case TokenMOD:
                 case TokenMul:
                 case TokenDiv:
+                case TokenDivInt:
                 case TokenPow: {
                     newValue.type = ValueTypeError;
                     newValue.v.errorCode = ErrorTypeMismatch;

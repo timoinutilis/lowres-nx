@@ -48,6 +48,7 @@ const char *TokenStrings[] = {
     "-",
     "*",
     "/",
+    "\\",
     "^",
     "AND",
     "NOT",
