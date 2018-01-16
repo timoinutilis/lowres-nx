@@ -73,6 +73,7 @@ const char *ErrorStrings[] = {
     "REPEAT Without UNTIL",
     "WHILE Without WEND",
     "Directory Not Loaded",
+    "Division By Zero",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

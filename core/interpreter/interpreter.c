@@ -676,7 +676,19 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     break;
                 }
                 case TokenMOD: {
-                    newValue.v.floatValue = (int)value.v.floatValue % (int)rightValue.v.floatValue;
+                    if (interpreter->pass == PassRun)
+                    {
+                        int rightInt = (int)rightValue.v.floatValue;
+                        if (rightInt == 0)
+                        {
+                            newValue.type = ValueTypeError;
+                            newValue.v.errorCode = ErrorDivisionByZero;
+                        }
+                        else
+                        {
+                            newValue.v.floatValue = (int)value.v.floatValue % rightInt;
+                        }
+                    }
                     break;
                 }
                 case TokenMul: {
@@ -684,11 +696,34 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                     break;
                 }
                 case TokenDiv: {
-                    newValue.v.floatValue = value.v.floatValue / rightValue.v.floatValue;
+                    if (interpreter->pass == PassRun)
+                    {
+                        if (rightValue.v.floatValue == 0.0f)
+                        {
+                            newValue.type = ValueTypeError;
+                            newValue.v.errorCode = ErrorDivisionByZero;
+                        }
+                        else
+                        {
+                            newValue.v.floatValue = value.v.floatValue / rightValue.v.floatValue;
+                        }
+                    }
                     break;
                 }
                 case TokenDivInt: {
-                    newValue.v.floatValue = (int)value.v.floatValue / (int)rightValue.v.floatValue;
+                    if (interpreter->pass == PassRun)
+                    {
+                        int rightInt = (int)rightValue.v.floatValue;
+                        if (rightInt == 0)
+                        {
+                            newValue.type = ValueTypeError;
+                            newValue.v.errorCode = ErrorDivisionByZero;
+                        }
+                        else
+                        {
+                            newValue.v.floatValue = (int)value.v.floatValue / rightInt;
+                        }
+                    }
                     break;
                 }
                 case TokenPow: {
