@@ -327,7 +327,7 @@ it from the stack.</p>
 a subroutine, if you want to continue your program somewhere else.</p>
 
 
-<h3 id="_FOR-NEXT" name="FOR,NEXT">FOR...NEXT</h3>
+<h3 id="_FOR-NEXT" name="FOR,TO,STEP,NEXT">FOR...NEXT</h3>
 <pre>
 FOR var=a TO b [STEP s]
     commands
@@ -626,12 +626,12 @@ window to the default one.</p>
 <p>Clears background b with character 0.</p>
 
 
-<h3 id="_CHAR" name="CHAR">CHAR</h3>
+<h3 id="_ATTR" name="ATTR">ATTR</h3>
 
-<pre>CHAR n,(pal,fx,fy,pri,s)</pre>
+<pre>ATTR (pal,fx,fy,pri,s)</pre>
 
-<p>Sets the current character and attributes. All parameters can be
-omitted to keep their current settings.</p>
+<p>Sets the current attributes for cell and text commands.
+All parameters can be omitted to keep their current settings.</p>
 
 <table>
 <tr><td>pal</td> <td>palette number (0-7)</td></tr>
@@ -642,17 +642,17 @@ omitted to keep their current settings.</p>
 </table>
 
 
-<pre>CHAR n,a</pre>
+<pre>ATTR a</pre>
 
 <p>Allows setting the attributes as a single 8-bit value.</p>
 
 
 <h3 id="_CELL" name="CELL">CELL</h3>
 
-<pre>CELL x,y</pre>
+<pre>CELL x,y,c</pre>
 
-<p>Sets the cell at position x,y of the current background to the
-current character.</p>
+<p>Sets the cell at position x,y of the current background to
+character c.</p>
 
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
@@ -671,12 +671,12 @@ background.</p>
 background as an 8-bit value.</p>
 
 
-<h3 id="_BG-FILL" name="BG FILL,BG,FILL">BG FILL</h3>
+<h3 id="_BG-FILL" name="BG FILL,BG,FILL,TO,CHAR">BG FILL</h3>
 
-<pre>BG FILL x1,y1 TO x2,y2</pre>
+<pre>BG FILL x1,y1 TO x2,y2 CHAR c</pre>
 
 <p>Sets all cells in the area from x1,y1 to x2,y2 of the current
-background to the current character.</p>
+background to character c.</p>
 
 
 <h3 id="_BG-SOURCE" name="BG SOURCE,BG,SOURCE">BG SOURCE</h3>
@@ -701,9 +701,9 @@ the background size (32x32), but they will be wrapped around the
 edges (32->0, 33->1, etc.).</p>
 
 
-<h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL">BG SCROLL</h3>
+<h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL,STEP">BG SCROLL</h3>
 
-<pre>BG SCROLL x1,y1 TO x2,y2,dx,dy</pre>
+<pre>BG SCROLL x1,y1 TO x2,y2 STEP dx,dy</pre>
 
 <p>Moves the content of all cells in the area from x1,y1 to x2,y2
 horizontally by dx and vertically by dy cells.</p>
@@ -729,23 +729,10 @@ doesn't need to convert numbers to strings.</p>
 
 <h3 id="_FONT" name="FONT">FONT</h3>
     
-<pre>FONT c,(pal,fx,fy,pri,s)</pre>
+<pre>FONT c</pre>
 
-<p>Sets the current character range and attributes used for text
-output. c is the character where the font starts (space).
-All parameters can be omitted to keep their current settings.</p>
-
-<table>
-<tr><td>pal</td> <td>palette number (0-7)</td></tr>
-<tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
-<tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
-<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
-<tr><td>s</td> <td>unused (0-3)</td></tr>
-</table>
-
-<pre>FONT c,a</pre>
-
-<p>Allows setting the attributes as a single 8-bit value.</p>
+<p>Sets the current character range used for text output.
+c is the character where the font starts (space).</p>
 
 
 <h1 id="Screen-Commands">Screen Commands</h1>

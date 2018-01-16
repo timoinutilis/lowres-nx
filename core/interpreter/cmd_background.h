@@ -30,7 +30,7 @@ enum ErrorCode cmd_BG(struct Core *core);
 enum ErrorCode cmd_BG_SOURCE(struct Core *core);
 enum ErrorCode cmd_BG_COPY(struct Core *core);
 enum ErrorCode cmd_BG_SCROLL(struct Core *core);
-enum ErrorCode cmd_CHAR(struct Core *core);
+enum ErrorCode cmd_ATTR(struct Core *core);
 enum ErrorCode cmd_BG_FILL(struct Core *core);
 enum ErrorCode cmd_CELL(struct Core *core);
 struct TypedValue fnc_CELL(struct Core *core);

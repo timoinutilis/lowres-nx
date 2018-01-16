@@ -325,21 +325,12 @@ enum ErrorCode cmd_FONT(struct Core *core)
     ++interpreter->pc;
     
     // char value
-    struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
+    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, NUM_CHARACTERS - 1);
     if (cValue.type == ValueTypeError) return cValue.v.errorCode;
-    
-    // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-    ++interpreter->pc;
-    
-    // attributes value
-    struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.fontCharAttr, true);
-    if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        if (cValue.type != ValueTypeNull) interpreter->textLib.fontCharOffset = cValue.v.floatValue;
-        if (aValue.type != ValueTypeNull) interpreter->textLib.fontCharAttr.value = aValue.v.floatValue;
+        interpreter->textLib.fontCharOffset = cValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);

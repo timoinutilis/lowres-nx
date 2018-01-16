@@ -34,7 +34,7 @@ ALIEN=0
 
 'HUD
 BG 0
-FONT ,(0,,,1,)
+ATTR (0,,,1,)
 TEXT 0,0,"BETA"
 
 'GAME LOOP

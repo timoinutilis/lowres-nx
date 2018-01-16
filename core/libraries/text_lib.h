@@ -29,8 +29,8 @@
 struct Core;
 
 struct TextLib {
+    union CharacterAttributes charAttr;
     int fontCharOffset;
-    union CharacterAttributes fontCharAttr;
     int windowX;
     int windowY;
     int windowWidth;
@@ -39,8 +39,6 @@ struct TextLib {
     int cursorX;
     int cursorY;
     int bg;
-    int cellChar;
-    union CharacterAttributes cellCharAttr;
     int sourceAddress;
     int sourceWidth;
     char inputBuffer[INPUT_BUFFER_SIZE];
@@ -58,8 +56,8 @@ void txtlib_clearWindow(struct Core *core);
 void txtlib_clearScreen(struct Core *core);
 void txtlib_clearBackground(struct Core *core, int bg);
 struct Cell *txtlib_getCell(struct Core *core, int x, int y);
-void txtlib_setCell(struct Core *core, int x, int y);
-void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY);
+void txtlib_setCell(struct Core *core, int x, int y, int character);
+void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY, int character);
 void txtlib_scrollBackground(struct Core *core, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY);
 void txtlib_copyBackground(struct Core *core, int srcX, int srcY, int width, int height, int dstX, int dstY);
 

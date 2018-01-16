@@ -60,6 +60,7 @@ const char *TokenStrings[] = {
     "ABS",
     "ASC",
     "ATN",
+    "ATTR",
     "BG",
     "BIN$",
     "BUTTON",

@@ -64,6 +64,7 @@ enum TokenType {
     TokenABS,
     TokenASC,
     TokenATN,
+    TokenATTR,
     TokenBG,
     TokenBIN,
     TokenBUTTON,

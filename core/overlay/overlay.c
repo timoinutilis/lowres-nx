@@ -175,8 +175,8 @@ void overlay_draw(struct Core *core)
         struct TextLib *lib = &core->interpreter->textLib;
         struct TextLib userTextLib = *lib;
         lib->bg = 2;
-        lib->fontCharAttr.priority = 1;
-        lib->fontCharAttr.palette = 1;
+        lib->charAttr.priority = 1;
+        lib->charAttr.palette = 1;
         lib->fontCharOffset = 64;
         if (core->overlay->timer % 60 < 40)
         {

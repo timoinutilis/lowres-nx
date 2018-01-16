@@ -1217,8 +1217,8 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             }
             break;
             
-        case TokenCHAR:
-            return cmd_CHAR(core);
+        case TokenATTR:
+            return cmd_ATTR(core);
             
         case TokenCELL:
             return cmd_CELL(core);

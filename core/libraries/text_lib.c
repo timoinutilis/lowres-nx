@@ -105,7 +105,7 @@ void txtlib_scrollWindowIfNeeded(struct Core *core)
             int px = x + lib->windowX;
             struct Cell *cell = &plane->cells[py][px];
             cell->character = lib->fontCharOffset; // space
-            cell->attr = lib->fontCharAttr;
+            cell->attr = lib->charAttr;
         }
         
         lib->cursorY = lib->windowHeight - 1;
@@ -131,7 +131,7 @@ void txtlib_printText(struct Core *core, const char *text)
         if (*letter >= 32)
         {
             struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
-            cell->attr.value = lib->fontCharAttr.value;
+            cell->attr.value = lib->charAttr.value;
             cell->character = lib->fontCharOffset + (*letter - 32);
         
             lib->cursorX++;
@@ -159,7 +159,7 @@ bool txtlib_deleteBackward(struct Core *core)
     
     // clear cursor
     struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
-    cell->attr.value = lib->fontCharAttr.value;
+    cell->attr.value = lib->charAttr.value;
     cell->character = lib->fontCharOffset;
     
     // move back cursor
@@ -179,7 +179,7 @@ bool txtlib_deleteBackward(struct Core *core)
     
     // clear cell
     cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
-    cell->attr.value = lib->fontCharAttr.value;
+    cell->attr.value = lib->charAttr.value;
     cell->character = lib->fontCharOffset;
     
     return true;
@@ -195,7 +195,7 @@ void txtlib_writeText(struct Core *core, const char *text, int x, int y)
         if (*letter >= 32)
         {
             struct Cell *cell = &plane->cells[y][x];
-            cell->attr.value = lib->fontCharAttr.value;
+            cell->attr.value = lib->charAttr.value;
             cell->character = lib->fontCharOffset + (*letter - 32);
             
             x++;
@@ -214,7 +214,7 @@ void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
         // negative number
         number *= -1;
         struct Cell *cell = &plane->cells[y][x];
-        cell->attr.value = lib->fontCharAttr.value;
+        cell->attr.value = lib->charAttr.value;
         cell->character = lib->fontCharOffset + 13; // "-"
         x += digits;
         digits--;
@@ -229,7 +229,7 @@ void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y)
     {
         x--;
         struct Cell *cell = &plane->cells[y][x];
-        cell->attr.value = lib->fontCharAttr.value;
+        cell->attr.value = lib->charAttr.value;
         cell->character = lib->fontCharOffset + ((number / div) % 10 + 16);
         div *= 10;
     }
@@ -272,7 +272,7 @@ bool txtlib_inputUpdate(struct Core *core)
         {
             // clear cursor
             struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
-            cell->attr.value = lib->fontCharAttr.value;
+            cell->attr.value = lib->charAttr.value;
             cell->character = lib->fontCharOffset;
             
             txtlib_printText(core, "\n");
@@ -296,7 +296,7 @@ bool txtlib_inputUpdate(struct Core *core)
     if (!done)
     {
         struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
-        cell->attr.value = lib->fontCharAttr.value;
+        cell->attr.value = lib->charAttr.value;
         cell->character = lib->fontCharOffset + (lib->blink++ < 30 ? 63 : 0);
         
         if (lib->blink == 60)
@@ -322,7 +322,7 @@ void txtlib_clearWindow(struct Core *core)
             int px = x + lib->windowX;
             struct Cell *cell = &plane->cells[py][px];
             cell->character = lib->fontCharOffset;
-            cell->attr = lib->fontCharAttr;
+            cell->attr = lib->charAttr;
         }
     }
 }
@@ -370,16 +370,16 @@ struct Cell *txtlib_getCell(struct Core *core, int x, int y)
     return &plane->cells[y][x];
 }
 
-void txtlib_setCell(struct Core *core, int x, int y)
+void txtlib_setCell(struct Core *core, int x, int y, int character)
 {
     struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getCurrentBackground(core);
     struct Cell *cell = &plane->cells[y][x];
-    cell->character = lib->cellChar;
-    cell->attr = lib->cellCharAttr;
+    cell->character = character;
+    cell->attr = lib->charAttr;
 }
 
-void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY)
+void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY, int character)
 {
     struct TextLib *lib = &core->interpreter->textLib;
     struct Plane *plane = txtlib_getCurrentBackground(core);
@@ -388,8 +388,8 @@ void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY)
         for (int x = fromX; x <= toX; x++)
         {
             struct Cell *cell = &plane->cells[y][x];
-            cell->character = lib->cellChar;
-            cell->attr = lib->cellCharAttr;
+            cell->character = character;
+            cell->attr = lib->charAttr;
         }
     }
 }
