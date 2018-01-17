@@ -70,6 +70,11 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         core->machine->ioRegisters.attr.gamepadsEnabled = num;
+        core->machine->ioRegisters.status.touch = 0;
+        for (int i = 0; i < NUM_GAMEPADS; i++)
+        {
+            core->machine->ioRegisters.gamepads[i].value = 0;
+        }
         delegate_controlsDidChange(core);
         overlay_updateButtonConfiguration(core);
     }

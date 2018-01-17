@@ -56,7 +56,14 @@ void txtlib_scrollRow(struct Plane *plane, int fromX, int toX, int y, int deltaX
 {
     if (deltaX > 0)
     {
-        for (int x = toX; x >= fromX; x--)
+        for (int x = toX; x > fromX; x--)
+        {
+            plane->cells[y][x] = plane->cells[(y - deltaY) & 0x1F][(x - deltaX) & 0x1F];
+        }
+    }
+    else if (deltaX < 0)
+    {
+        for (int x = fromX; x < toX; x++)
         {
             plane->cells[y][x] = plane->cells[(y - deltaY) & 0x1F][(x - deltaX) & 0x1F];
         }
@@ -74,7 +81,14 @@ void txtlib_scroll(struct Plane *plane, int fromX, int fromY, int toX, int toY, 
 {
     if (deltaY > 0)
     {
-        for (int y = toY; y >= fromY; y--)
+        for (int y = toY; y > fromY; y--)
+        {
+            txtlib_scrollRow(plane, fromX, toX, y, deltaX, deltaY);
+        }
+    }
+    else if (deltaY < 0)
+    {
+        for (int y = fromY; y < toY; y++)
         {
             txtlib_scrollRow(plane, fromX, toX, y, deltaX, deltaY);
         }
