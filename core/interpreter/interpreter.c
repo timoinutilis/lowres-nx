@@ -154,6 +154,7 @@ void itp_resetProgram(struct Core *core)
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
     
+    srandom(0);
     runStartupSequence(core);
 }
 
