@@ -74,6 +74,7 @@ const char *ErrorStrings[] = {
     "WHILE Without WEND",
     "Directory Not Loaded",
     "Division By Zero",
+    "Variable Not Initialized",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

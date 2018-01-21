@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type)
+struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type, bool forWriting)
 {
     struct SimpleVariable *variable = NULL;
     for (int i = 0; i < interpreter->numSimpleVariables; i++)
@@ -35,24 +35,32 @@ struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, en
         }
     }
     
-    // create new variable
-    if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
+    if (forWriting)
     {
-        *errorCode = ErrorOutOfMemory;
+        // create new variable
+        if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
+        {
+            *errorCode = ErrorOutOfMemory;
+            return NULL;
+        }
+        variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
+        interpreter->numSimpleVariables++;
+        memset(variable, 0, sizeof(struct SimpleVariable));
+        variable->symbolIndex = symbolIndex;
+        variable->type = type;
+        if (type == ValueTypeString)
+        {
+            // assign global NullString
+            variable->v.stringValue = interpreter->nullString;
+            rcstring_retain(variable->v.stringValue);
+        }
+        return variable;
+    }
+    else
+    {
+        *errorCode = ErrorVariableNotInitialized;
         return NULL;
     }
-    variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
-    interpreter->numSimpleVariables++;
-    memset(variable, 0, sizeof(struct SimpleVariable));
-    variable->symbolIndex = symbolIndex;
-    variable->type = type;
-    if (type == ValueTypeString)
-    {
-        // assign global NullString
-        variable->v.stringValue = interpreter->nullString;
-        rcstring_retain(variable->v.stringValue);
-    }
-    return variable;
 }
 
 void var_freeSimpleVariables(struct Interpreter *interpreter)

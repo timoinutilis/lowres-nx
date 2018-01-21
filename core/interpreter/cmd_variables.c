@@ -34,7 +34,7 @@ enum ErrorCode cmd_LET(struct Core *core)
     // identifier
     enum ErrorCode errorCode = ErrorNone;
     enum ValueType valueType = ValueTypeNull;
-    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, true);
     if (!varValue) return errorCode;
     if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
     ++interpreter->pc;
@@ -125,7 +125,7 @@ enum ErrorCode cmd_SWAP(struct Core *core)
     
     // x identifier
     enum ValueType xValueType = ValueTypeNull;
-    union Value *xVarValue = itp_readVariable(core, &xValueType, &errorCode);
+    union Value *xVarValue = itp_readVariable(core, &xValueType, &errorCode, false);
     if (!xVarValue) return errorCode;
     
     // comma
@@ -134,7 +134,7 @@ enum ErrorCode cmd_SWAP(struct Core *core)
     
     // y identifier
     enum ValueType yValueType = ValueTypeNull;
-    union Value *yVarValue = itp_readVariable(core, &yValueType, &errorCode);
+    union Value *yVarValue = itp_readVariable(core, &yValueType, &errorCode, false);
     if (!yVarValue) return errorCode;
     
     if (xValueType != yValueType) return ErrorTypeMismatch;

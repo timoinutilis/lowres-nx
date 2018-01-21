@@ -77,6 +77,7 @@ enum ErrorCode {
     ErrorWhileWithoutWend,
     ErrorDirectoryNotLoaded,
     ErrorDivisionByZero,
+    ErrorVariableNotInitialized,
 };
 
 struct CoreError {

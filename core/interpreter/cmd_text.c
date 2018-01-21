@@ -127,7 +127,7 @@ enum ErrorCode cmd_endINPUT(struct Core *core)
     // identifier
     enum ErrorCode errorCode = ErrorNone;
     enum ValueType valueType = ValueTypeNull;
-    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, true);
     if (!varValue) return errorCode;
     
     if (interpreter->pass == PassRun)

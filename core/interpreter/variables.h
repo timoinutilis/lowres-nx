@@ -21,6 +21,7 @@
 #define variables_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "interpreter_config.h"
 #include "value.h"
 
@@ -41,7 +42,7 @@ struct ArrayVariable {
     union Value *values;
 };
 
-struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type);
+struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type, bool forWriting);
 void var_freeSimpleVariables(struct Interpreter *interpreter);
 
 struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int symbolIndex);

@@ -113,7 +113,7 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type);
 void itp_didFinishVBL(struct Core *core);
 void itp_freeProgram(struct Core *core);
 
-union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode);
+union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode, bool forWriting);
 struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass);
 struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int max);
 struct TypedValue itp_evaluateOptionalExpression(struct Core *core, enum TypeClass typeClass);

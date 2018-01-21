@@ -485,7 +485,7 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
     // variable
     enum ErrorCode errorCode = ErrorNone;
     enum ValueType valueType = ValueTypeNull;
-    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, true);
     if (!varValue) return errorCode;
     if (valueType != ValueTypeString) return ErrorTypeMismatch;
     
@@ -573,7 +573,7 @@ enum ErrorCode cmd_MID(struct Core *core)
     // variable
     enum ErrorCode errorCode = ErrorNone;
     enum ValueType valueType = ValueTypeNull;
-    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, true);
     if (!varValue) return errorCode;
     if (valueType != ValueTypeString) return ErrorTypeMismatch;
     

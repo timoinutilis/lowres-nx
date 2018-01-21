@@ -342,7 +342,7 @@ void itp_freeProgram(struct Core *core)
     }
 }
 
-union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode)
+union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode, bool forWriting)
 {
     struct Interpreter *interpreter = core->interpreter;
     
@@ -444,7 +444,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
         // simple variable
         if (interpreter->pass == PassRun)
         {
-            struct SimpleVariable *variable = var_getSimpleVariable(interpreter, errorCode, symbolIndex, varType);
+            struct SimpleVariable *variable = var_getSimpleVariable(interpreter, errorCode, symbolIndex, varType, forWriting);
             if (!variable) return NULL;
             return &variable->v;
         }
@@ -471,11 +471,14 @@ enum ErrorCode itp_checkTypeClass(struct Interpreter *interpreter, enum ValueTyp
 struct TypedValue itp_evaluateExpression(struct Core *core, enum TypeClass typeClass)
 {
     struct TypedValue value = itp_evaluateExpressionLevel(core, 0);
-    enum ErrorCode errorCode = itp_checkTypeClass(core->interpreter, value.type, typeClass);
-    if (errorCode != ErrorNone)
+    if (value.type != ValueTypeError)
     {
-        value.type = ValueTypeError;
-        value.v.errorCode = errorCode;
+        enum ErrorCode errorCode = itp_checkTypeClass(core->interpreter, value.type, typeClass);
+        if (errorCode != ErrorNone)
+        {
+            value.type = ValueTypeError;
+            value.v.errorCode = errorCode;
+        }
     }
     return value;
 }
@@ -868,7 +871,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
         case TokenStringIdentifier: {
             enum ErrorCode errorCode = ErrorNone;
             enum ValueType valueType = ValueTypeNull;
-            union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+            union Value *varValue = itp_readVariable(core, &valueType, &errorCode, false);
             if (varValue)
             {
                 value.type = valueType;
@@ -888,6 +891,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
         case TokenBracketOpen: {
             ++interpreter->pc;
             value = itp_evaluateExpression(core, TypeClassAny);
+            if (value.type == ValueTypeError) return value;
             if (interpreter->pc->type != TokenBracketClose)
             {
                 value.type = ValueTypeError;

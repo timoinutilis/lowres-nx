@@ -204,7 +204,7 @@ enum ErrorCode cmd_FOR(struct Core *core)
     struct Token *tokenFORVar = interpreter->pc;
     enum ErrorCode errorCode = ErrorNone;
     enum ValueType valueType = ValueTypeNull;
-    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, true);
     if (!varValue) return errorCode;
     if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
     
@@ -293,7 +293,7 @@ enum ErrorCode cmd_NEXT(struct Core *core)
     enum ErrorCode errorCode = ErrorNone;
     struct Token *tokenVar = interpreter->pc;
     enum ValueType valueType = ValueTypeNull;
-    union Value *varValue = itp_readVariable(core, &valueType, &errorCode);
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, true);
     if (!varValue) return errorCode;
     if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
     

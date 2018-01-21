@@ -81,7 +81,7 @@ enum ErrorCode cmd_READ(struct Core *core)
         // variable
         enum ValueType varType = ValueTypeNull;
         enum ErrorCode errorCode = ErrorNone;
-        union Value *varValue = itp_readVariable(core, &varType, &errorCode);
+        union Value *varValue = itp_readVariable(core, &varType, &errorCode, true);
         if (!varValue) return errorCode;
             
         if (interpreter->pass == PassRun)
