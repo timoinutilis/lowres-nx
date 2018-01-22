@@ -75,6 +75,13 @@ const char *ErrorStrings[] = {
     "Directory Not Loaded",
     "Division By Zero",
     "Variable Not Initialized",
+    "END SUB Without SUB",
+    "SUB Without END SUB",
+    "SUB Within SUB",
+    "Undefined Subprogram",
+    "Expected Subprogram Name",
+    "Argument Count Mismatch",
+    "SUB Already Defined",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

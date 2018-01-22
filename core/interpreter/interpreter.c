@@ -36,6 +36,7 @@
 #include "cmd_sprites.h"
 #include "cmd_io.h"
 #include "cmd_files.h"
+#include "cmd_subs.h"
 #include "string_utils.h"
 #include "startup_sequence.h"
 
@@ -115,6 +116,10 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
                 
             case LabelTypeWHILE:
                 errorCode =  ErrorWhileWithoutWend;
+                break;
+                
+            case LabelTypeSUB:
+                errorCode = ErrorSubWithoutEndSub;
                 break;
                 
             case LabelTypeFORVar:
@@ -1085,11 +1090,18 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             break;
             
         case TokenEND:
-            if (itp_getNextTokenType(interpreter) == TokenIF)
+            switch (itp_getNextTokenType(interpreter))
             {
-                return cmd_END_IF(core);
+                case TokenIF:
+                    return cmd_END_IF(core);
+                    
+                case TokenSUB:
+                    return cmd_END_SUB(core);
+                    
+                default:
+                    return cmd_END(core);
             }
-            return cmd_END(core);
+            break;
             
         case TokenLET:
         case TokenIdentifier:
@@ -1268,6 +1280,12 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenTRACE:
             return cmd_TRACE(core);
+            
+        case TokenCALL:
+            return cmd_CALL(core);
+            
+        case TokenSUB:
+            return cmd_SUB(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

@@ -78,6 +78,13 @@ enum ErrorCode {
     ErrorDirectoryNotLoaded,
     ErrorDivisionByZero,
     ErrorVariableNotInitialized,
+    ErrorEndSubWithoutSub,
+    ErrorSubWithoutEndSub,
+    ErrorSubWithinSub,
+    ErrorUndefinedSubprogram,
+    ErrorExpectedSubprogramName,
+    ErrorArgumentCountMismatch,
+    ErrorSubAlreadyDefined,
 };
 
 struct CoreError {

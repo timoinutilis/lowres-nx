@@ -21,6 +21,7 @@
 #define labels_h
 
 #include <stdio.h>
+#include <stdbool.h>
 
 struct Interpreter;
 struct Token;
@@ -36,7 +37,8 @@ enum LabelType {
     LabelTypeONGOSUB,
     LabelTypeDO,
     LabelTypeREPEAT,
-    LabelTypeWHILE
+    LabelTypeWHILE,
+    LabelTypeSUB
 };
 
 struct LabelStackItem {
@@ -47,5 +49,6 @@ struct LabelStackItem {
 enum ErrorCode lab_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
 struct LabelStackItem *lab_popLabelStackItem(struct Interpreter *interpreter);
 struct LabelStackItem *lab_peekLabelStackItem(struct Interpreter *interpreter);
+bool lab_containsLabelStackItem(struct Interpreter *interpreter, enum LabelType type);
 
 #endif /* labels_h */
