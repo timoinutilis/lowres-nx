@@ -49,14 +49,3 @@ struct LabelStackItem *lab_peekLabelStackItem(struct Interpreter *interpreter)
     return NULL;
 }
 
-bool lab_containsLabelStackItem(struct Interpreter *interpreter, enum LabelType type)
-{
-    for (int i = 0; i < interpreter->numLabelStackItems; i++)
-    {
-        if (interpreter->labelStackItems[i].type == type)
-        {
-            return true;
-        }
-    }
-    return false;
-}

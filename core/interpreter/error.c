@@ -77,11 +77,12 @@ const char *ErrorStrings[] = {
     "Variable Not Initialized",
     "END SUB Without SUB",
     "SUB Without END SUB",
-    "SUB Within SUB",
+    "SUB Cannot Be Nested",
     "Undefined Subprogram",
     "Expected Subprogram Name",
     "Argument Count Mismatch",
     "SUB Already Defined",
+    "Too Many Subprograms",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

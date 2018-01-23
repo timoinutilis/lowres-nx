@@ -127,6 +127,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
             case LabelTypeELSE:
             case LabelTypeGOSUB:
             case LabelTypeONGOSUB:
+            case LabelTypeCALL:
                 // should not happen in compile time
                 break;
         }

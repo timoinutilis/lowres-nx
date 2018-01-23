@@ -33,6 +33,11 @@ struct JumpLabelItem {
     struct Token *token;
 };
 
+struct SubItem {
+    int symbolIndex;
+    struct Token *token;
+};
+
 struct Tokenizer
 {
     struct Token tokens[MAX_TOKENS];
@@ -42,6 +47,8 @@ struct Tokenizer
     
     struct JumpLabelItem jumpLabelItems[MAX_JUMP_LABEL_ITEMS];
     int numJumpLabelItems;
+    struct SubItem subItems[MAX_SUB_ITEMS];
+    int numSubItems;
 };
 
 struct CoreError tok_tokenizeProgram(struct Tokenizer *tokenizer, const char *sourceCode);
@@ -49,5 +56,7 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
 void tok_freeTokens(struct Tokenizer *tokenizer);
 struct JumpLabelItem *tok_getJumpLabel(struct Tokenizer *tokenizer, int symbolIndex);
 enum ErrorCode tok_setJumpLabel(struct Tokenizer *tokenizer, int symbolIndex, struct Token *token);
+struct SubItem *tok_getSub(struct Tokenizer *tokenizer, int symbolIndex);
+enum ErrorCode tok_setSub(struct Tokenizer *tokenizer, int symbolIndex, struct Token *token);
 
 #endif /* tokenizer_h */

@@ -80,11 +80,12 @@ enum ErrorCode {
     ErrorVariableNotInitialized,
     ErrorEndSubWithoutSub,
     ErrorSubWithoutEndSub,
-    ErrorSubWithinSub,
+    ErrorSubCannotBeNested,
     ErrorUndefinedSubprogram,
     ErrorExpectedSubprogramName,
     ErrorArgumentCountMismatch,
     ErrorSubAlreadyDefined,
+    ErrorTooManySubprograms,
 };
 
 struct CoreError {

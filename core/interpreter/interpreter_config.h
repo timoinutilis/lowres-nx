@@ -21,9 +21,10 @@
 #define interpreter_config_h
 
 #define MAX_TOKENS 8192
-#define MAX_SYMBOLS 128
+#define MAX_SYMBOLS 1024
 #define MAX_LABEL_STACK_ITEMS 128
 #define MAX_JUMP_LABEL_ITEMS 128
+#define MAX_SUB_ITEMS 128
 #define MAX_SIMPLE_VARIABLES 128
 #define MAX_ARRAY_VARIABLES 128
 #define SYMBOL_NAME_SIZE 21

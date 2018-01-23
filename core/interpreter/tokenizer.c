@@ -307,6 +307,11 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
             else
             {
                 token->type = TokenIdentifier;
+                if (tokenizer->numTokens > 0 && tokenizer->tokens[tokenizer->numTokens - 1].type == TokenSUB)
+                {
+                    enum ErrorCode errorCode = tok_setSub(tokenizer, symbolIndex, token + 1);
+                    if (errorCode != ErrorNone) return err_makeCoreError(errorCode, tokenSourcePosition);
+                }
             }
             token->symbolIndex = symbolIndex;
             tokenizer->numTokens++;
@@ -367,5 +372,36 @@ enum ErrorCode tok_setJumpLabel(struct Tokenizer *tokenizer, int symbolIndex, st
     item->symbolIndex = symbolIndex;
     item->token = token;
     tokenizer->numJumpLabelItems++;
+    return ErrorNone;
+}
+
+struct SubItem *tok_getSub(struct Tokenizer *tokenizer, int symbolIndex)
+{
+    struct SubItem *item;
+    for (int i = 0; i < tokenizer->numSubItems; i++)
+    {
+        item = &tokenizer->subItems[i];
+        if (item->symbolIndex == symbolIndex)
+        {
+            return item;
+        }
+    }
+    return NULL;
+}
+
+enum ErrorCode tok_setSub(struct Tokenizer *tokenizer, int symbolIndex, struct Token *token)
+{
+    if (tok_getSub(tokenizer, symbolIndex) != NULL)
+    {
+        return ErrorSubAlreadyDefined;
+    }
+    if (tokenizer->numSubItems >= MAX_SUB_ITEMS)
+    {
+        return ErrorTooManySubprograms;
+    }
+    struct SubItem *item = &tokenizer->subItems[tokenizer->numSubItems];
+    item->symbolIndex = symbolIndex;
+    item->token = token;
+    tokenizer->numSubItems++;
     return ErrorNone;
 }

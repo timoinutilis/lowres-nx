@@ -25,6 +25,7 @@ enum ErrorCode cmd_CALL(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     
     // CALL
+    struct Token *tokenCALL = interpreter->pc;
     ++interpreter->pc;
     
     // Identifier
@@ -32,11 +33,23 @@ enum ErrorCode cmd_CALL(struct Core *core)
     struct Token *tokenIdentifier = interpreter->pc;
     ++interpreter->pc;
     
-    if (interpreter->pass == PassRun)
+    if (interpreter->pass == PassPrepare)
     {
+        struct SubItem *item = tok_getSub(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
+        if (!item) return ErrorUndefinedSubprogram;
+        tokenCALL->jumpToken = item->token;
+        
+        return itp_endOfCommand(interpreter);
+    }
+    else if (interpreter->pass == PassRun)
+    {
+        enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeCALL, interpreter->pc);
+        if (errorCode != ErrorNone) return errorCode;
+        
+        interpreter->pc = tokenCALL->jumpToken; // after sub name
     }
     
-    return itp_endOfCommand(interpreter);
+    return ErrorNone;
 }
 
 enum ErrorCode cmd_SUB(struct Core *core)
@@ -49,7 +62,6 @@ enum ErrorCode cmd_SUB(struct Core *core)
     
     // Identifier
     if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedSubprogramName;
-    struct Token *tokenIdentifier = interpreter->pc;
     ++interpreter->pc;
     
     // Eol
@@ -58,9 +70,9 @@ enum ErrorCode cmd_SUB(struct Core *core)
     
     if (interpreter->pass == PassPrepare)
     {
-        if (lab_containsLabelStackItem(interpreter, LabelTypeSUB))
+        if (interpreter->numLabelStackItems > 0)
         {
-            return ErrorSubWithinSub;
+            return ErrorSubCannotBeNested;
         }
         enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeSUB, tokenSUB);
         if (errorCode != ErrorNone) return errorCode;
@@ -95,6 +107,21 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
         else if (item->type == LabelTypeSUB)
         {
             item->token->jumpToken = interpreter->pc;
+        }
+        else
+        {
+            return ErrorEndSubWithoutSub;
+        }
+    }
+    else if (interpreter->pass == PassRun)
+    {
+        struct LabelStackItem *itemCALL = lab_popLabelStackItem(interpreter);
+        if (!itemCALL) return ErrorEndSubWithoutSub;
+        
+        if (itemCALL->type == LabelTypeCALL)
+        {
+            // jump back
+            interpreter->pc = itemCALL->token; // after CALL
         }
         else
         {
