@@ -71,6 +71,7 @@ struct Interpreter {
     enum State state;
     enum Mode mode;
     struct Token *pc;
+    int subLevel;
     
     struct Tokenizer tokenizer;
     

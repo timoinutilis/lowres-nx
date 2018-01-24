@@ -25,10 +25,14 @@
 struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type, bool forWriting)
 {
     struct SimpleVariable *variable = NULL;
-    for (int i = 0; i < interpreter->numSimpleVariables; i++)
+    for (int i = interpreter->numSimpleVariables - 1; i >= 0; i--)
     {
         variable = &interpreter->simpleVariables[i];
-        if (variable->symbolIndex == symbolIndex)
+        if (variable->subLevel < interpreter->subLevel)
+        {
+            break;
+        }
+        if (variable->symbolIndex == symbolIndex && variable->subLevel == interpreter->subLevel)
         {
             // variable found
             return variable;
@@ -47,6 +51,7 @@ struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, en
         interpreter->numSimpleVariables++;
         memset(variable, 0, sizeof(struct SimpleVariable));
         variable->symbolIndex = symbolIndex;
+        variable->subLevel = interpreter->subLevel;
         variable->type = type;
         if (type == ValueTypeString)
         {
@@ -63,14 +68,22 @@ struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, en
     }
 }
 
-void var_freeSimpleVariables(struct Interpreter *interpreter)
+void var_freeSimpleVariables(struct Interpreter *interpreter, int minSubLevel)
 {
-    for (int i = 0; i < interpreter->numSimpleVariables; i++)
+    for (int i = interpreter->numSimpleVariables - 1; i >= 0; i--)
     {
         struct SimpleVariable *variable = &interpreter->simpleVariables[i];
-        if (variable->type == ValueTypeString)
+        if (variable->subLevel < minSubLevel)
         {
-            rcstring_release(variable->v.stringValue);
+            break;
+        }
+        else
+        {
+            if (variable->type == ValueTypeString)
+            {
+                rcstring_release(variable->v.stringValue);
+            }
+            interpreter->numSimpleVariables--;
         }
     }
 }
@@ -78,10 +91,14 @@ void var_freeSimpleVariables(struct Interpreter *interpreter)
 struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int symbolIndex)
 {
     struct ArrayVariable *variable = NULL;
-    for (int i = 0; i < interpreter->numArrayVariables; i++)
+    for (int i = interpreter->numArrayVariables - 1; i >= 0; i--)
     {
         variable = &interpreter->arrayVariables[i];
-        if (variable->symbolIndex == symbolIndex)
+        if (variable->subLevel < interpreter->subLevel)
+        {
+            break;
+        }
+        if (variable->symbolIndex == symbolIndex && variable->subLevel == interpreter->subLevel)
         {
             // variable found
             return variable;
@@ -125,6 +142,7 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
     interpreter->numArrayVariables++;
     memset(variable, 0, sizeof(struct ArrayVariable));
     variable->symbolIndex = symbolIndex;
+    variable->subLevel = interpreter->subLevel;
     variable->numDimensions = numDimensions;
     size_t size = 1;
     for (int i = 0; i < numDimensions; i++)
@@ -141,26 +159,35 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
     return variable;
 }
 
-void var_freeArrayVariables(struct Interpreter *interpreter)
+void var_freeArrayVariables(struct Interpreter *interpreter, int minSubLevel)
 {
-    for (int i = 0; i < interpreter->numArrayVariables; i++)
+    for (int i = interpreter->numArrayVariables - 1; i >= 0; i--)
     {
         struct ArrayVariable *variable = &interpreter->arrayVariables[i];
-        if (variable->type == ValueTypeString)
+        if (variable->subLevel < minSubLevel)
         {
-            int numElements = 1;
-            for (int di = 0; di < variable->numDimensions; di++)
+            break;
+        }
+        else
+        {
+            if (variable->type == ValueTypeString)
             {
-                numElements *= variable->dimensionSizes[di];
-            }
-            for (int ei = 0; ei < numElements; ei++)
-            {
-                union Value *value = &variable->values[ei];
-                if (value->stringValue)
+                int numElements = 1;
+                for (int di = 0; di < variable->numDimensions; di++)
                 {
-                    rcstring_release(value->stringValue);
+                    numElements *= variable->dimensionSizes[di];
+                }
+                for (int ei = 0; ei < numElements; ei++)
+                {
+                    union Value *value = &variable->values[ei];
+                    if (value->stringValue)
+                    {
+                        rcstring_release(value->stringValue);
+                    }
                 }
             }
+            free(variable->values);
+            interpreter->numArrayVariables--;
         }
     }
 }

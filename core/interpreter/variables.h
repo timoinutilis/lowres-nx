@@ -30,12 +30,14 @@ struct Interpreter;
 
 struct SimpleVariable {
     int symbolIndex;
+    int subLevel;
     enum ValueType type;
     union Value v;
 };
 
 struct ArrayVariable {
     int symbolIndex;
+    int subLevel;
     enum ValueType type;
     int numDimensions;
     int dimensionSizes[MAX_ARRAY_DIMENSIONS];
@@ -43,11 +45,11 @@ struct ArrayVariable {
 };
 
 struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type, bool forWriting);
-void var_freeSimpleVariables(struct Interpreter *interpreter);
+void var_freeSimpleVariables(struct Interpreter *interpreter, int minSubLevel);
 
 struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int symbolIndex);
 union Value *var_getArrayValue(struct Interpreter *interpreter, struct ArrayVariable *variable, int *indices);
 struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes);
-void var_freeArrayVariables(struct Interpreter *interpreter);
+void var_freeArrayVariables(struct Interpreter *interpreter, int minSubLevel);
 
 #endif /* variables_h */

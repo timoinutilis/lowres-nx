@@ -46,6 +46,7 @@ enum ErrorCode cmd_CALL(struct Core *core)
         enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeCALL, interpreter->pc);
         if (errorCode != ErrorNone) return errorCode;
         
+        interpreter->subLevel++;
         interpreter->pc = tokenCALL->jumpToken; // after sub name
     }
     
@@ -120,7 +121,12 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
         
         if (itemCALL->type == LabelTypeCALL)
         {
+            // clean local variables
+            var_freeSimpleVariables(interpreter, interpreter->subLevel);
+            var_freeArrayVariables(interpreter, interpreter->subLevel);
+            
             // jump back
+            interpreter->subLevel--;
             interpreter->pc = itemCALL->token; // after CALL
         }
         else

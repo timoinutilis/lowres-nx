@@ -150,6 +150,7 @@ void itp_resetProgram(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     
     interpreter->pc = interpreter->tokenizer.tokens;
+    interpreter->subLevel = 0;
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
@@ -337,8 +338,8 @@ void itp_freeProgram(struct Core *core)
     
     interpreter->state = StateNoProgram;
     
-    var_freeSimpleVariables(interpreter);
-    var_freeArrayVariables(interpreter);
+    var_freeSimpleVariables(interpreter, 0);
+    var_freeArrayVariables(interpreter, 0);
     tok_freeTokens(&interpreter->tokenizer);
     
     // Free null string
