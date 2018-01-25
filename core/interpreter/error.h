@@ -86,6 +86,7 @@ enum ErrorCode {
     ErrorArgumentCountMismatch,
     ErrorSubAlreadyDefined,
     ErrorTooManySubprograms,
+    ErrorSharedOutsideOfASubprogram,
 };
 
 struct CoreError {

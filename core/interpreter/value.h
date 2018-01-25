@@ -34,6 +34,7 @@ enum ValueType {
 union Value {
     float floatValue;
     struct RCString *stringValue;
+    union Value *reference;
     enum ErrorCode errorCode;
 };
 

@@ -386,7 +386,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
         struct ArrayVariable *variable = NULL;
         if (interpreter->pass == PassRun)
         {
-            variable = var_getArrayVariable(interpreter, symbolIndex);
+            variable = var_getArrayVariable(interpreter, symbolIndex, interpreter->subLevel);
             if (!variable)
             {
                 *errorCode = ErrorArrayNotDimensionized;
@@ -451,8 +451,21 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
         // simple variable
         if (interpreter->pass == PassRun)
         {
-            struct SimpleVariable *variable = var_getSimpleVariable(interpreter, errorCode, symbolIndex, varType, forWriting);
-            if (!variable) return NULL;
+            struct SimpleVariable *variable = var_getSimpleVariable(interpreter, symbolIndex, interpreter->subLevel);
+            if (!variable)
+            {
+                if (!forWriting)
+                {
+                    *errorCode = ErrorVariableNotInitialized;
+                    return NULL;
+                }
+                variable = var_createSimpleVariable(interpreter, errorCode, symbolIndex, interpreter->subLevel, varType, NULL);
+                if (!variable) return NULL;
+            }
+            if (variable->isReference)
+            {
+                return variable->v.reference;
+            }
             return &variable->v;
         }
     }
@@ -1288,6 +1301,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenSUB:
             return cmd_SUB(core);
+            
+        case TokenSHARED:
+            return cmd_SHARED(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

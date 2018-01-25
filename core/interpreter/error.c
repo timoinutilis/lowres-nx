@@ -83,6 +83,7 @@ const char *ErrorStrings[] = {
     "Argument Count Mismatch",
     "SUB Already Defined",
     "Too Many Subprograms",
+    "SHARED Outside Of A Subprogram",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

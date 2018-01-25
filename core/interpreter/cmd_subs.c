@@ -77,6 +77,8 @@ enum ErrorCode cmd_SUB(struct Core *core)
         }
         enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeSUB, tokenSUB);
         if (errorCode != ErrorNone) return errorCode;
+        
+        interpreter->subLevel++;
     }
     else if (interpreter->pass == PassRun)
     {
@@ -126,7 +128,6 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
             var_freeArrayVariables(interpreter, interpreter->subLevel);
             
             // jump back
-            interpreter->subLevel--;
             interpreter->pc = itemCALL->token; // after CALL
         }
         else
@@ -134,5 +135,66 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
             return ErrorEndSubWithoutSub;
         }
     }
+    interpreter->subLevel--;
+    
     return ErrorNone;
+}
+
+enum ErrorCode cmd_SHARED(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    if (interpreter->pass == PassPrepare && interpreter->subLevel == 0) return ErrorSharedOutsideOfASubprogram;
+    
+    do
+    {
+        // SHARED or comma
+        ++interpreter->pc;
+        
+        // identifier
+        struct Token *tokenIdentifier = interpreter->pc;
+        if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+        ++interpreter->pc;
+        
+        enum ValueType varType = ValueTypeNull;
+        if (tokenIdentifier->type == TokenIdentifier)
+        {
+            varType = ValueTypeFloat;
+        }
+        else if (tokenIdentifier->type == TokenStringIdentifier)
+        {
+            varType = ValueTypeString;
+        }
+        
+        int symbolIndex = tokenIdentifier->symbolIndex;
+        
+        if (interpreter->pc->type == TokenBracketOpen)
+        {
+            // array
+            ++interpreter->pc;
+            
+            if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+            ++interpreter->pc;
+            
+            if (interpreter->pass == PassRun)
+            {
+                //TODO: mirror array
+            }
+        }
+        else
+        {
+            // simple variable
+            if (interpreter->pass == PassRun)
+            {
+                struct SimpleVariable *globalVariable = var_getSimpleVariable(interpreter, symbolIndex, 0);
+                if (!globalVariable) return ErrorVariableNotInitialized;
+                
+                enum ErrorCode errorCode = ErrorNone;
+                var_createSimpleVariable(interpreter, &errorCode, symbolIndex, interpreter->subLevel, varType, &globalVariable->v);
+                if (errorCode != ErrorNone) return errorCode;
+            }
+        }
+    }
+    while (interpreter->pc->type == TokenComma);
+    
+    return itp_endOfCommand(interpreter);
 }

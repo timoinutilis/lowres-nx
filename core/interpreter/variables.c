@@ -22,50 +22,54 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, enum ValueType type, bool forWriting)
+struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, int symbolIndex, int subLevel)
 {
     struct SimpleVariable *variable = NULL;
     for (int i = interpreter->numSimpleVariables - 1; i >= 0; i--)
     {
         variable = &interpreter->simpleVariables[i];
-        if (variable->subLevel < interpreter->subLevel)
+        if (variable->subLevel < subLevel)
         {
             break;
         }
-        if (variable->symbolIndex == symbolIndex && variable->subLevel == interpreter->subLevel)
+        if (variable->symbolIndex == symbolIndex && variable->subLevel == subLevel)
         {
             // variable found
             return variable;
         }
     }
-    
-    if (forWriting)
+    return NULL;
+}
+
+struct SimpleVariable *var_createSimpleVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int subLevel, enum ValueType type, union Value *valueReference)
+{
+    if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
     {
-        // create new variable
-        if (interpreter->numSimpleVariables >= MAX_SIMPLE_VARIABLES)
-        {
-            *errorCode = ErrorOutOfMemory;
-            return NULL;
-        }
-        variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
-        interpreter->numSimpleVariables++;
-        memset(variable, 0, sizeof(struct SimpleVariable));
-        variable->symbolIndex = symbolIndex;
-        variable->subLevel = interpreter->subLevel;
-        variable->type = type;
+        *errorCode = ErrorOutOfMemory;
+        return NULL;
+    }
+    struct SimpleVariable *variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
+    interpreter->numSimpleVariables++;
+    memset(variable, 0, sizeof(struct SimpleVariable));
+    variable->symbolIndex = symbolIndex;
+    variable->subLevel = subLevel;
+    variable->type = type;
+    if (valueReference)
+    {
+        variable->isReference = 1;
+        variable->v.reference = valueReference;
+    }
+    else
+    {
+        variable->isReference = 0;
         if (type == ValueTypeString)
         {
             // assign global NullString
             variable->v.stringValue = interpreter->nullString;
             rcstring_retain(variable->v.stringValue);
         }
-        return variable;
     }
-    else
-    {
-        *errorCode = ErrorVariableNotInitialized;
-        return NULL;
-    }
+    return variable;
 }
 
 void var_freeSimpleVariables(struct Interpreter *interpreter, int minSubLevel)
@@ -79,7 +83,7 @@ void var_freeSimpleVariables(struct Interpreter *interpreter, int minSubLevel)
         }
         else
         {
-            if (variable->type == ValueTypeString)
+            if (!variable->isReference && variable->type == ValueTypeString)
             {
                 rcstring_release(variable->v.stringValue);
             }
@@ -88,17 +92,17 @@ void var_freeSimpleVariables(struct Interpreter *interpreter, int minSubLevel)
     }
 }
 
-struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int symbolIndex)
+struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int symbolIndex, int subLevel)
 {
     struct ArrayVariable *variable = NULL;
     for (int i = interpreter->numArrayVariables - 1; i >= 0; i--)
     {
         variable = &interpreter->arrayVariables[i];
-        if (variable->subLevel < interpreter->subLevel)
+        if (variable->subLevel < subLevel)
         {
             break;
         }
-        if (variable->symbolIndex == symbolIndex && variable->subLevel == interpreter->subLevel)
+        if (variable->symbolIndex == symbolIndex && variable->subLevel == subLevel)
         {
             // variable found
             return variable;
@@ -128,7 +132,7 @@ union Value *var_getArrayValue(struct Interpreter *interpreter, struct ArrayVari
 
 struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int numDimensions, int *dimensionSizes)
 {
-    if (var_getArrayVariable(interpreter, symbolIndex))
+    if (var_getArrayVariable(interpreter, symbolIndex, interpreter->subLevel))
     {
         *errorCode = ErrorArrayAlreadyDimensionized;
         return NULL;
@@ -143,6 +147,7 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
     memset(variable, 0, sizeof(struct ArrayVariable));
     variable->symbolIndex = symbolIndex;
     variable->subLevel = interpreter->subLevel;
+    variable->isReference = 0;
     variable->numDimensions = numDimensions;
     size_t size = 1;
     for (int i = 0; i < numDimensions; i++)
