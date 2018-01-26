@@ -164,6 +164,29 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
     return variable;
 }
 
+struct ArrayVariable *var_createArrayVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, struct ArrayVariable *arrayReference)
+{
+    if (interpreter->numArrayVariables >= MAX_ARRAY_VARIABLES)
+    {
+        *errorCode = ErrorOutOfMemory;
+        return NULL;
+    }
+    struct ArrayVariable *variable = &interpreter->arrayVariables[interpreter->numArrayVariables];
+    interpreter->numArrayVariables++;
+    memset(variable, 0, sizeof(struct ArrayVariable));
+    variable->symbolIndex = arrayReference->symbolIndex;
+    variable->subLevel = interpreter->subLevel;
+    variable->isReference = 1;
+    int numDimensions = arrayReference->numDimensions;
+    variable->numDimensions = numDimensions;
+    for (int i = 0; i < numDimensions; i++)
+    {
+        variable->dimensionSizes[i] = arrayReference->dimensionSizes[i];
+    }
+    variable->values = arrayReference->values;
+    return variable;
+}
+
 void var_freeArrayVariables(struct Interpreter *interpreter, int minSubLevel)
 {
     for (int i = interpreter->numArrayVariables - 1; i >= 0; i--)
@@ -175,23 +198,26 @@ void var_freeArrayVariables(struct Interpreter *interpreter, int minSubLevel)
         }
         else
         {
-            if (variable->type == ValueTypeString)
+            if (!variable->isReference)
             {
-                int numElements = 1;
-                for (int di = 0; di < variable->numDimensions; di++)
+                if (variable->type == ValueTypeString)
                 {
-                    numElements *= variable->dimensionSizes[di];
-                }
-                for (int ei = 0; ei < numElements; ei++)
-                {
-                    union Value *value = &variable->values[ei];
-                    if (value->stringValue)
+                    int numElements = 1;
+                    for (int di = 0; di < variable->numDimensions; di++)
                     {
-                        rcstring_release(value->stringValue);
+                        numElements *= variable->dimensionSizes[di];
+                    }
+                    for (int ei = 0; ei < numElements; ei++)
+                    {
+                        union Value *value = &variable->values[ei];
+                        if (value->stringValue)
+                        {
+                            rcstring_release(value->stringValue);
+                        }
                     }
                 }
+                free(variable->values);
             }
-            free(variable->values);
             interpreter->numArrayVariables--;
         }
     }

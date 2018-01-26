@@ -177,7 +177,12 @@ enum ErrorCode cmd_SHARED(struct Core *core)
             
             if (interpreter->pass == PassRun)
             {
-                //TODO: mirror array
+                struct ArrayVariable *globalVariable = var_getArrayVariable(interpreter, symbolIndex, 0);
+                if (!globalVariable) return ErrorArrayNotDimensionized;
+                
+                enum ErrorCode errorCode = ErrorNone;
+                var_createArrayVariable(interpreter, &errorCode, globalVariable);
+                if (errorCode != ErrorNone) return errorCode;
             }
         }
         else
