@@ -38,19 +38,95 @@ enum ErrorCode cmd_CALL(struct Core *core)
         struct SubItem *item = tok_getSub(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedSubprogram;
         tokenCALL->jumpToken = item->token;
-        
-        return itp_endOfCommand(interpreter);
     }
-    else if (interpreter->pass == PassRun)
+    
+    // optional arguments
+    int numArguments = 0;
+    if (interpreter->pc->type == TokenBracketOpen)
+    {
+        do
+        {
+            // bracket or comma
+            ++interpreter->pc;
+            
+            // argument
+            struct TypedValue value = itp_evaluateExpression(core, TypeClassAny);
+            if (value.type == ValueTypeError) return value.v.errorCode;
+            
+            if (interpreter->pass == PassRun)
+            {
+                enum ErrorCode errorCode = ErrorNone;
+                struct SimpleVariable *variable = var_createSimpleVariable(interpreter, &errorCode, numArguments + 1, interpreter->subLevel + 1, value.type, NULL);
+                if (!variable) return errorCode;
+                
+                variable->v = value.v;
+            }
+            ++numArguments;
+        }
+        while (interpreter->pc->type == TokenComma);
+        
+        if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+        ++interpreter->pc;
+    }
+
+    if (interpreter->pass == PassRun)
     {
         enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeCALL, interpreter->pc);
         if (errorCode != ErrorNone) return errorCode;
         
-        interpreter->subLevel++;
         interpreter->pc = tokenCALL->jumpToken; // after sub name
+        interpreter->subLevel++;
+        
+        // parameters
+        if (interpreter->pc->type == TokenBracketOpen)
+        {
+            int parameterIndex = 0;
+            do
+            {
+                if (parameterIndex >= numArguments) return ErrorArgumentCountMismatch;
+                
+                // bracket or comma
+                ++interpreter->pc;
+                
+                // get argument
+                struct SimpleVariable *variable = var_getSimpleVariable(interpreter, parameterIndex + 1, interpreter->subLevel);
+                
+                // parameter
+                struct Token *tokenIdentifier = interpreter->pc;
+                if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+                
+                enum ValueType varType = ValueTypeNull;
+                if (tokenIdentifier->type == TokenIdentifier)
+                {
+                    varType = ValueTypeFloat;
+                }
+                else if (tokenIdentifier->type == TokenStringIdentifier)
+                {
+                    varType = ValueTypeString;
+                }
+                
+                if (variable->type != varType) return ErrorTypeMismatch;
+                
+                variable->symbolIndex = tokenIdentifier->symbolIndex;
+                
+                ++interpreter->pc;
+                ++parameterIndex;
+            }
+            while (interpreter->pc->type == TokenComma);
+            
+            if (parameterIndex < numArguments) return ErrorArgumentCountMismatch;
+            
+            if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+            ++interpreter->pc;
+        }
+        else if (numArguments > 0)
+        {
+            return ErrorArgumentCountMismatch;
+        }
+
+        return ErrorNone;
     }
-    
-    return ErrorNone;
+    return itp_endOfCommand(interpreter);
 }
 
 enum ErrorCode cmd_SUB(struct Core *core)
@@ -64,6 +140,26 @@ enum ErrorCode cmd_SUB(struct Core *core)
     // Identifier
     if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedSubprogramName;
     ++interpreter->pc;
+    
+    // parameters
+    if (interpreter->pc->type == TokenBracketOpen)
+    {
+        do
+        {
+            // bracket or comma
+            ++interpreter->pc;
+            
+            // parameter
+            struct Token *tokenIdentifier = interpreter->pc;
+            if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+            
+            ++interpreter->pc;
+        }
+        while (interpreter->pc->type == TokenComma);
+        
+        if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+        ++interpreter->pc;
+    }
     
     // Eol
     if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
