@@ -349,6 +349,19 @@ void itp_freeProgram(struct Core *core)
     }
 }
 
+enum ValueType itp_getIdentifierTokenValueType(struct Token *token)
+{
+    if (token->type == TokenIdentifier)
+    {
+        return ValueTypeFloat;
+    }
+    else if (token->type == TokenStringIdentifier)
+    {
+        return ValueTypeString;
+    }
+    return ValueTypeNull;
+}
+
 union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum ErrorCode *errorCode, bool forWriting)
 {
     struct Interpreter *interpreter = core->interpreter;
@@ -361,15 +374,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
         return NULL;
     }
     
-    enum ValueType varType = ValueTypeNull;
-    if (tokenIdentifier->type == TokenIdentifier)
-    {
-        varType = ValueTypeFloat;
-    }
-    else if (tokenIdentifier->type == TokenStringIdentifier)
-    {
-        varType = ValueTypeString;
-    }
+    enum ValueType varType = itp_getIdentifierTokenValueType(tokenIdentifier);
     if (type)
     {
         *type = varType;

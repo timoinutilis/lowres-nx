@@ -164,7 +164,7 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
     return variable;
 }
 
-struct ArrayVariable *var_createArrayVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, struct ArrayVariable *arrayReference)
+struct ArrayVariable *var_createArrayVariable(struct Interpreter *interpreter, enum ErrorCode *errorCode, int symbolIndex, int subLevel, struct ArrayVariable *arrayReference)
 {
     if (interpreter->numArrayVariables >= MAX_ARRAY_VARIABLES)
     {
@@ -174,9 +174,10 @@ struct ArrayVariable *var_createArrayVariable(struct Interpreter *interpreter, e
     struct ArrayVariable *variable = &interpreter->arrayVariables[interpreter->numArrayVariables];
     interpreter->numArrayVariables++;
     memset(variable, 0, sizeof(struct ArrayVariable));
-    variable->symbolIndex = arrayReference->symbolIndex;
-    variable->subLevel = interpreter->subLevel;
+    variable->symbolIndex = symbolIndex;
+    variable->subLevel = subLevel;
     variable->isReference = 1;
+    variable->type = arrayReference->type;
     int numDimensions = arrayReference->numDimensions;
     variable->numDimensions = numDimensions;
     for (int i = 0; i < numDimensions; i++)
