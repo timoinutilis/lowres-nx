@@ -309,12 +309,15 @@ END IF
 <p>Jumps to the given label.</p>
 
 
-<h3 id="_GOSUB-RETURN" name="GOSUB,RETURN">GOSUB...RETURN</h3>
+<h3 id="_GOSUB" name="GOSUB">GOSUB</h3>
 
 <pre>GOSUB label</pre>
 
 <p>Adds the current program position to a stack and jumps to the
 given label.</p>
+
+
+<h3 id="_RETURN" name="RETURN">RETURN</h3>
 
 <pre>RETURN</pre>
 
@@ -373,6 +376,45 @@ like the main game loop.</p>
 <pre>WAIT n</pre>
 
 <p>Waits n frames more than WAIT VBL (n/60 seconds).</p>
+
+
+<h1 id="Subprograms">Subprograms</h1>
+
+<h3 id="_SUB" name="SUB,END SUB,END">SUB...END SUB</h3>
+<pre>
+SUB name [(parameter-list)]
+  commands
+END SUB
+</pre>
+
+<p>Defines a subprogram with the given name. The optional parameter
+list can contain two types of entries: simple variables and array
+variables (followed by an empty parentheses pair). Entries are
+separated by commas. By default all variables inside the subprogram
+are local.</p>
+
+
+<h3 id="_CALL" name="CALL">CALL</h3>
+<pre>
+CALL name [(argument-list)]
+</pre>
+
+<p>Executes the subprogram with the given name and returns to the
+current position after finishing it. The argument list
+must match the parameters of the SUB definition. Simple variables,
+single array elements and entire arrays (followed by an empty parentheses pair) are passed by reference to the subprogram. Other
+expressions are passed by value.</p>
+
+
+<h3 id="_SHARED" name="SHARED">SHARED</h3>
+<pre>
+SHARED [variable-list]
+</pre>
+
+<p>Makes variables from the main program available in a subprogram.
+The list can contain simple variables and array variables (followed
+by an empty parentheses pair). This command can only be used within
+a subprogram.</p>
 
 
 <h1 id="Text-Commands">Text Commands</h1>
