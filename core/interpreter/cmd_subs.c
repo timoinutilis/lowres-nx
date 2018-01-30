@@ -30,12 +30,12 @@ enum ErrorCode cmd_CALL(struct Core *core)
     
     // Identifier
     if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedSubprogramName;
-    struct Token *tokenIdentifier = interpreter->pc;
+    struct Token *tokenSubIdentifier = interpreter->pc;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
     {
-        struct SubItem *item = tok_getSub(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
+        struct SubItem *item = tok_getSub(&interpreter->tokenizer, tokenSubIdentifier->symbolIndex);
         if (!item) return ErrorUndefinedSubprogram;
         tokenCALL->jumpToken = item->token;
     }
@@ -50,67 +50,47 @@ enum ErrorCode cmd_CALL(struct Core *core)
             ++interpreter->pc;
             
             // argument
-            bool isExpression = true;
-            if (interpreter->pc->type == TokenIdentifier || interpreter->pc->type == TokenStringIdentifier)
+            struct Token *tokens = interpreter->pc;
+            if ((interpreter->pc->type == TokenIdentifier || interpreter->pc->type == TokenStringIdentifier)
+                && tokens[1].type == TokenBracketOpen
+                && tokens[2].type == TokenBracketClose)
             {
-                struct Token *tokenIdentifier = interpreter->pc;
-                struct Token *tokens = interpreter->pc;
-                if (tokens[1].type == TokenComma || tokens[1].type == TokenBracketClose)
+                // pass array by reference
+                if (interpreter->pass == PassRun)
                 {
-                    // simple variable, pass by reference
-                    if (interpreter->pass == PassRun)
-                    {
-                        struct SimpleVariable *variable = var_getSimpleVariable(interpreter, tokenIdentifier->symbolIndex, interpreter->subLevel);
-                        if (!variable) return ErrorVariableNotInitialized;
-                        
-                        enum ValueType varType = itp_getIdentifierTokenValueType(tokenIdentifier);
-                        
-                        enum ErrorCode errorCode = ErrorNone;
-                        var_createSimpleVariable(interpreter, &errorCode, numArguments + 1, interpreter->subLevel + 1, varType, &variable->v);
-                        if (errorCode != ErrorNone) return errorCode;
-                    }
+                    struct ArrayVariable *variable = var_getArrayVariable(interpreter, interpreter->pc->symbolIndex, interpreter->subLevel);
+                    if (!variable) return ErrorArrayNotDimensionized;
                     
-                    isExpression = false;
-                    ++interpreter->pc;
+                    enum ErrorCode errorCode = ErrorNone;
+                    var_createArrayVariable(interpreter, &errorCode, numArguments + 1, interpreter->subLevel + 1, variable);
+                    if (errorCode != ErrorNone) return errorCode;
                 }
-                if (tokens[1].type == TokenBracketOpen)
-                {
-                    // array
-                    if (tokens[2].type == TokenBracketClose)
-                    {
-                        // pass array by reference
-                        if (interpreter->pass == PassRun)
-                        {
-                            struct ArrayVariable *variable = var_getArrayVariable(interpreter, tokenIdentifier->symbolIndex, interpreter->subLevel);
-                            if (!variable) return ErrorArrayNotDimensionized;
-                            
-                            enum ErrorCode errorCode = ErrorNone;
-                            var_createArrayVariable(interpreter, &errorCode, numArguments + 1, interpreter->subLevel + 1, variable);
-                            if (errorCode != ErrorNone) return errorCode;
-                        }
-                        
-                        isExpression = false;
-                        interpreter->pc += 3;
-                    }
-                    else
-                    {
-                        //TODO: one array element
-                    }
-                }
+                interpreter->pc += 3;
             }
-            if (isExpression)
+            else
             {
-                // expression, pass by value
+                // expression
                 struct TypedValue value = itp_evaluateExpression(core, TypeClassAny);
                 if (value.type == ValueTypeError) return value.v.errorCode;
                 
                 if (interpreter->pass == PassRun)
                 {
                     enum ErrorCode errorCode = ErrorNone;
-                    struct SimpleVariable *variable = var_createSimpleVariable(interpreter, &errorCode, numArguments + 1, interpreter->subLevel + 1, value.type, NULL);
-                    if (!variable) return errorCode;
-                    
-                    variable->v = value.v;
+                    if (interpreter->lastVariableValue)
+                    {
+                        // pass by reference (simple variable or array element)
+                        enum ErrorCode errorCode = ErrorNone;
+                        var_createSimpleVariable(interpreter, &errorCode, numArguments + 1, interpreter->subLevel + 1, value.type, interpreter->lastVariableValue);
+                        if (errorCode != ErrorNone) return errorCode;
+                    }
+                    else
+                    {
+                        // pass by value
+                        struct SimpleVariable *variable = var_createSimpleVariable(interpreter, &errorCode, numArguments + 1, interpreter->subLevel + 1, value.type, NULL);
+                        if (!variable) return errorCode;
+                        
+                        variable->v = value.v;
+                    }
                 }
             }
             ++numArguments;

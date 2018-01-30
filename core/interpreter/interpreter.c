@@ -160,6 +160,7 @@ void itp_resetProgram(struct Core *core)
     interpreter->numArrayVariables = 0;
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
+    interpreter->lastVariableValue = NULL;
     
     srandom(0);
     runStartupSequence(core);
@@ -607,6 +608,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         {
             value.v.floatValue = ~((int)value.v.floatValue);
         }
+        interpreter->lastVariableValue = NULL;
         return value;
     }
     if (level == 8 && (type == TokenPlus || type == TokenMinus)) // unary
@@ -624,6 +626,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         {
             value.v.floatValue = -value.v.floatValue;
         }
+        interpreter->lastVariableValue = NULL;
         return value;
     }
     if (level == 10)
@@ -860,6 +863,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         }
         
         value = newValue;
+        interpreter->lastVariableValue = NULL;
         if (value.type == ValueTypeError) break;
     }
     return value;
@@ -868,6 +872,8 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
+    
+    interpreter->lastVariableValue = NULL;
     
     // check for function
     struct TypedValue value = itp_evaluateFunction(core);
@@ -901,6 +907,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
             {
                 value.type = valueType;
                 value.v = *varValue;
+                interpreter->lastVariableValue = varValue;
                 if (interpreter->pass == PassRun && valueType == ValueTypeString)
                 {
                     rcstring_retain(varValue->stringValue);
@@ -925,6 +932,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
             else
             {
                 ++interpreter->pc;
+                interpreter->lastVariableValue = NULL;
             }
             break;
         }
