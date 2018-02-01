@@ -406,15 +406,22 @@ single array elements and entire arrays (followed by an empty parentheses pair) 
 expressions are passed by value.</p>
 
 
-<h3 id="_SHARED" name="SHARED">SHARED</h3>
+<h3 id="_EXIT-SUB" name="EXIT SUB,EXIT,SUB">EXIT SUB</h3>
 <pre>
-SHARED [variable-list]
+EXIT SUB
 </pre>
 
-<p>Makes variables from the main program available in a subprogram.
-The list can contain simple variables and array variables (followed
-by an empty parentheses pair). This command can only be used within
-a subprogram.</p>
+<p>Exits a subprogram before END SUB is reached.</p>
+
+
+<h3 id="_GLOBAL" name="GLOBAL">GLOBAL</h3>
+<pre>
+GLOBAL [variable-list]
+</pre>
+
+<p>Makes variables from the main program available to all subprograms.
+The list can contain simple variables only. For arrays you should use
+DIM GLOBAL. This command cannot be used within a subprogram.</p>
 
 
 <h1 id="Text-Commands">Text Commands</h1>
@@ -848,18 +855,18 @@ BLUE = VALUE MOD 4
 </pre>
 
 
-<h3 id="_ON-RASTER-GOSUB" name="ON RASTER GOSUB,ON RASTER,RASTER GOSUB,ON,RASTER,GOSUB">ON RASTER GOSUB</h3>
+<h3 id="_ON-RASTER-CALL" name="ON RASTER CALL,ON RASTER,RASTER CALL,ON,RASTER,CALL">ON RASTER CALL</h3>
 
-<pre>ON RASTER GOSUB label</pre>
+<pre>ON RASTER CALL name</pre>
 
-<p>Sets a subroutine which is executed for every screen line before
+<p>Sets a subprogram which is executed for every screen line before
 it's drawn. Usually used to change color palettes or scroll
-offsets to achieve graphical effects. Raster subroutines must be
+offsets to achieve graphical effects. Raster subprograms must be
 short.</p>
 
 <pre>ON RASTER</pre>
 
-<p>Removes the current subroutine.</p>
+<p>Removes the current subprogram.</p>
 
 
 <h3 id="_=RASTER" name="RASTER">=RASTER</h3>
@@ -867,20 +874,20 @@ short.</p>
 <pre>RASTER</pre>
 
 <p>Returns the current screen line (y position). Use this in a raster
-subroutine.</p>
+subprogram.</p>
 
 
-<h3 id="_ON-VBL-GOSUB" name="ON VBL GOSUB,ON VBL,VBL GOSUB,ON,VBL,GOSUB">ON VBL GOSUB</h3>
+<h3 id="_ON-VBL-CALL" name="ON VBL CALL,ON VBL,VBL CALL,ON,VBL,CALL">ON VBL CALL</h3>
 
-<pre>ON VBL GOSUB label</pre>
+<pre>ON VBL CALL name</pre>
 
-<p>Sets a subroutine which is executed after each frame. Can be used
+<p>Sets a subprogram which is executed after each frame. Can be used
 to update animations or sounds, even if the main program is
 blocked by WAIT or INPUT.</p>
 
 <pre>ON VBL</pre>
 
-<p>Removes the current subroutine.</p>
+<p>Removes the current subprogram.</p>
 
 
 <h3 id="_=TIMER" name="TIMER">=TIMER</h3>
@@ -896,7 +903,7 @@ hours.</p>
 
 <h3 id="_DIM" name="DIM">DIM</h3>
 
-<pre>DIM var-list</pre>
+<pre>DIM [GLOBAL] var-list</pre>
 
 <p>Defines arrays with the highest index for each dimension:</p>
 <pre>
@@ -910,6 +917,10 @@ SCORES(0)=100
 SCORES(9)=5
 PRINT SCORES(0),SCORES(9)
 </pre>
+
+<p>With the optional GLOBAL keyword the arrays will be accessable
+from all subprograms.</p>
+
 
 <h3 id="_SWAP" name="SWAP">SWAP</h3>
 

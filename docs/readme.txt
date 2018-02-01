@@ -10,13 +10,6 @@
 
 - To-do and bug list at:
   https://github.com/timoinutilis/lowres-nx/issues
-
-- "Character Designer" and "Background Designer" currently use these
-  data entries (no selection yet):
-
-  #1: Palettes
-  #2: Characters
-  #3: Background
   
 - There's no real gamepad support yet. Use the keyboard.
 
