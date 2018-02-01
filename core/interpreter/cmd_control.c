@@ -443,13 +443,7 @@ enum ErrorCode cmd_RETURN(struct Core *core)
         struct LabelStackItem *itemGOSUB = lab_popLabelStackItem(interpreter);
         if (!itemGOSUB) return ErrorReturnWithoutGosub;
         
-        if (itemGOSUB->type == LabelTypeONGOSUB)
-        {
-            // exit from interrupt
-            if (tokenRETURN->jumpToken) return ErrorNotAllowedInInterrupt;
-            interpreter->exitEvaluation = true;
-        }
-        else if (itemGOSUB->type == LabelTypeGOSUB)
+        if (itemGOSUB->type == LabelTypeGOSUB)
         {
             if (tokenRETURN->jumpToken)
             {
@@ -536,31 +530,31 @@ enum ErrorCode cmd_ON(struct Core *core)
     }
     else
     {
-        // GOSUB
-        if (interpreter->pc->type != TokenGOSUB) return ErrorUnexpectedToken;
-        struct Token *tokenGOSUB = interpreter->pc;
+        // CALL
+        if (interpreter->pc->type != TokenCALL) return ErrorUnexpectedToken;
+        struct Token *tokenCALL = interpreter->pc;
         ++interpreter->pc;
         
         // Identifier
-        if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedLabel;
+        if (interpreter->pc->type != TokenIdentifier) return ErrorExpectedSubprogramName;
         struct Token *tokenIdentifier = interpreter->pc;
         ++interpreter->pc;
         
         if (interpreter->pass == PassPrepare)
         {
-            struct JumpLabelItem *item = tok_getJumpLabel(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
-            if (!item) return ErrorUndefinedLabel;
-            tokenGOSUB->jumpToken = item->token;
+            struct SubItem *item = tok_getSub(&interpreter->tokenizer, tokenIdentifier->symbolIndex);
+            if (!item) return ErrorUndefinedSubprogram;
+            tokenCALL->jumpToken = item->token;
         }
         else if (interpreter->pass == PassRun)
         {
             if (type == TokenRASTER)
             {
-                interpreter->currentOnRasterToken = tokenGOSUB->jumpToken; // after label
+                interpreter->currentOnRasterToken = tokenCALL->jumpToken;
             }
             else if (type == TokenVBL)
             {
-                interpreter->currentOnVBLToken = tokenGOSUB->jumpToken; // after label
+                interpreter->currentOnVBLToken = tokenCALL->jumpToken;
             }
         }
     }

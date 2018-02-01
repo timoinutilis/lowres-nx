@@ -30,5 +30,6 @@ enum ErrorCode cmd_SUB(struct Core *core);
 enum ErrorCode cmd_END_SUB(struct Core *core);
 //enum ErrorCode cmd_SHARED(struct Core *core);
 enum ErrorCode cmd_GLOBAL(struct Core *core);
+enum ErrorCode cmd_EXIT_SUB(struct Core *core);
 
 #endif /* cmd_subs_h */

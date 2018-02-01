@@ -85,6 +85,7 @@ const char *ErrorStrings[] = {
     "Too Many Subprograms",
     "SHARED Outside Of A Subprogram",
     "GLOBAL Inside Of A Subprogram",
+    "EXIT SUB Outside Of A Subprogram",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

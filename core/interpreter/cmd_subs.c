@@ -263,12 +263,17 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
         struct LabelStackItem *itemCALL = lab_popLabelStackItem(interpreter);
         if (!itemCALL) return ErrorEndSubWithoutSub;
         
-        if (itemCALL->type == LabelTypeCALL)
+        // clean local variables
+        var_freeSimpleVariables(interpreter, interpreter->subLevel);
+        var_freeArrayVariables(interpreter, interpreter->subLevel);
+        
+        if (itemCALL->type == LabelTypeONCALL)
         {
-            // clean local variables
-            var_freeSimpleVariables(interpreter, interpreter->subLevel);
-            var_freeArrayVariables(interpreter, interpreter->subLevel);
-            
+            // exit from interrupt
+            interpreter->exitEvaluation = true;
+        }
+        else if (itemCALL->type == LabelTypeCALL)
+        {
             // jump back
             interpreter->pc = itemCALL->token; // after CALL
         }
@@ -375,4 +380,48 @@ enum ErrorCode cmd_GLOBAL(struct Core *core)
     while (interpreter->pc->type == TokenComma);
     
     return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_EXIT_SUB(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // EXIT
+    ++interpreter->pc;
+    
+    // SUB
+    if (interpreter->pc->type != TokenSUB) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassPrepare)
+    {
+        if (interpreter->subLevel == 0) return ErrorExitSubOutsideOfASubprogram;
+        return itp_endOfCommand(interpreter);
+    }
+    else if (interpreter->pass == PassRun)
+    {
+        struct LabelStackItem *itemCALL = lab_popLabelStackItem(interpreter);
+        if (!itemCALL) return ErrorExitSubOutsideOfASubprogram;
+        
+        // clean local variables
+        var_freeSimpleVariables(interpreter, interpreter->subLevel);
+        var_freeArrayVariables(interpreter, interpreter->subLevel);
+        
+        if (itemCALL->type == LabelTypeONCALL)
+        {
+            // exit from interrupt
+            interpreter->exitEvaluation = true;
+        }
+        else if (itemCALL->type == LabelTypeCALL)
+        {
+            // jump back
+            interpreter->pc = itemCALL->token; // after CALL
+        }
+        else
+        {
+            return ErrorExitSubOutsideOfASubprogram;
+        }
+        interpreter->subLevel--;
+    }
+    return ErrorNone;
 }

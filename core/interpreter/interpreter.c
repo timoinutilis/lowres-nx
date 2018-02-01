@@ -126,8 +126,8 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
             case LabelTypeFORLimit:
             case LabelTypeELSE:
             case LabelTypeGOSUB:
-            case LabelTypeONGOSUB:
             case LabelTypeCALL:
+            case LabelTypeONCALL:
                 // should not happen in compile time
                 break;
         }
@@ -263,8 +263,9 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 interpreter->exitEvaluation = false;
                 struct Token *pc = interpreter->pc;
                 interpreter->pc = startToken;
+                interpreter->subLevel++;
                 
-                enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONGOSUB, NULL);
+                enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONCALL, NULL);
                 int cycles = 0;
                 
                 while (errorCode == ErrorNone && cycles < maxCycles && !interpreter->exitEvaluation)
@@ -1320,6 +1321,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenGLOBAL:
             return cmd_GLOBAL(core);
+            
+        case TokenEXIT:
+            return cmd_EXIT_SUB(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

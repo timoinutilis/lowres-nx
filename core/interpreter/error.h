@@ -88,6 +88,7 @@ enum ErrorCode {
     ErrorTooManySubprograms,
     ErrorSharedOutsideOfASubprogram,
     ErrorGlobalInsideOfASubprogram,
+    ErrorExitSubOutsideOfASubprogram,
 };
 
 struct CoreError {
