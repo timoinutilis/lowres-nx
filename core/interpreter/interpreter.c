@@ -339,8 +339,8 @@ void itp_freeProgram(struct Core *core)
     
     interpreter->state = StateNoProgram;
     
-    var_freeSimpleVariables(interpreter, 0);
-    var_freeArrayVariables(interpreter, 0);
+    var_freeSimpleVariables(interpreter, SUB_LEVEL_GLOBAL);
+    var_freeArrayVariables(interpreter, SUB_LEVEL_GLOBAL);
     tok_freeTokens(&interpreter->tokenizer);
     
     // Free null string
@@ -1315,8 +1315,8 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenSUB:
             return cmd_SUB(core);
             
-        case TokenSHARED:
-            return cmd_SHARED(core);
+//        case TokenSHARED:
+//            return cmd_SHARED(core);
             
         case TokenGLOBAL:
             return cmd_GLOBAL(core);

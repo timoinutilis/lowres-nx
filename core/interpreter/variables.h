@@ -25,23 +25,23 @@
 #include "interpreter_config.h"
 #include "value.h"
 
-#define SUB_LEVEL_GLOBAL 255
+#define SUB_LEVEL_GLOBAL -1
 
 struct Core;
 struct Interpreter;
 
 struct SimpleVariable {
     int symbolIndex;
-    uint8_t subLevel;
-    uint8_t isReference:1;
+    int8_t subLevel;
+    int8_t isReference:1;
     enum ValueType type;
     union Value v;
 };
 
 struct ArrayVariable {
     int symbolIndex;
-    uint8_t subLevel;
-    uint8_t isReference:1;
+    int8_t subLevel;
+    int8_t isReference:1;
     enum ValueType type;
     int numDimensions;
     int dimensionSizes[MAX_ARRAY_DIMENSIONS];

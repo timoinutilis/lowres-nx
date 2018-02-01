@@ -282,6 +282,7 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
     return ErrorNone;
 }
 
+/*
 enum ErrorCode cmd_SHARED(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
@@ -336,6 +337,7 @@ enum ErrorCode cmd_SHARED(struct Core *core)
     
     return itp_endOfCommand(interpreter);
 }
+*/
 
 enum ErrorCode cmd_GLOBAL(struct Core *core)
 {

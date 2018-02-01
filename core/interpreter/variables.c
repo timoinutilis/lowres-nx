@@ -73,7 +73,7 @@ void var_freeSimpleVariables(struct Interpreter *interpreter, int minSubLevel)
     for (int i = interpreter->numSimpleVariables - 1; i >= 0; i--)
     {
         struct SimpleVariable *variable = &interpreter->simpleVariables[i];
-        if (variable->subLevel < minSubLevel || (variable->subLevel == SUB_LEVEL_GLOBAL && minSubLevel > 0))
+        if (variable->subLevel < minSubLevel)
         {
             break;
         }
@@ -185,7 +185,7 @@ void var_freeArrayVariables(struct Interpreter *interpreter, int minSubLevel)
     for (int i = interpreter->numArrayVariables - 1; i >= 0; i--)
     {
         struct ArrayVariable *variable = &interpreter->arrayVariables[i];
-        if (variable->subLevel < minSubLevel || (variable->subLevel == SUB_LEVEL_GLOBAL && minSubLevel > 0))
+        if (variable->subLevel < minSubLevel)
         {
             break;
         }
