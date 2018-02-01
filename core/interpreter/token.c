@@ -92,6 +92,7 @@ const char *TokenStrings[] = {
     "FONT",
     "FOR",
     "GAMEPAD",
+    "GLOBAL",
     "GOSUB",
     "GOTO",
     "HEX$",

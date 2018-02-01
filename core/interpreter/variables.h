@@ -25,6 +25,8 @@
 #include "interpreter_config.h"
 #include "value.h"
 
+#define SUB_LEVEL_GLOBAL 255
+
 struct Core;
 struct Interpreter;
 

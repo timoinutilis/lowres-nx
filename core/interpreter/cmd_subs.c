@@ -336,3 +336,41 @@ enum ErrorCode cmd_SHARED(struct Core *core)
     
     return itp_endOfCommand(interpreter);
 }
+
+enum ErrorCode cmd_GLOBAL(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    if (interpreter->pass == PassPrepare && interpreter->subLevel > 0) return ErrorGlobalInsideOfASubprogram;
+    
+    do
+    {
+        // GLOBAL or comma
+        ++interpreter->pc;
+        
+        // identifier
+        struct Token *tokenIdentifier = interpreter->pc;
+        if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+        ++interpreter->pc;
+        
+        int symbolIndex = tokenIdentifier->symbolIndex;
+        
+        if (interpreter->pass == PassRun)
+        {
+            struct SimpleVariable *variable = var_getSimpleVariable(interpreter, symbolIndex, 0);
+            if (variable)
+            {
+                variable->subLevel = SUB_LEVEL_GLOBAL;
+            }
+            else
+            {
+                enum ValueType varType = itp_getIdentifierTokenValueType(tokenIdentifier);
+                enum ErrorCode errorCode = ErrorNone;
+                variable = var_createSimpleVariable(interpreter, &errorCode, symbolIndex, SUB_LEVEL_GLOBAL, varType, NULL);
+                if (!variable) return errorCode;
+            }
+        }
+    }
+    while (interpreter->pc->type == TokenComma);
+    
+    return itp_endOfCommand(interpreter);
+}

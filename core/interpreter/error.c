@@ -84,6 +84,7 @@ const char *ErrorStrings[] = {
     "SUB Already Defined",
     "Too Many Subprograms",
     "SHARED Outside Of A Subprogram",
+    "GLOBAL Inside Of A Subprogram",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

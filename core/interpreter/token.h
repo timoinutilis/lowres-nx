@@ -96,6 +96,7 @@ enum TokenType {
     TokenFONT,
     TokenFOR,
     TokenGAMEPAD,
+    TokenGLOBAL,
     TokenGOSUB,
     TokenGOTO,
     TokenHEX,

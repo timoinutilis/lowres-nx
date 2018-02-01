@@ -61,9 +61,18 @@ enum ErrorCode cmd_DIM(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
+    bool isGlobal = false;
+    struct Token *nextToken = interpreter->pc + 1;
+    if (nextToken->type == TokenGLOBAL)
+    {
+        ++interpreter->pc;
+        if (interpreter->pass == PassPrepare && interpreter->subLevel > 0) return ErrorGlobalInsideOfASubprogram;
+        isGlobal = true;
+    }
+    
     do
     {
-        // DIM or comma
+        // DIM, GLOBAL or comma
         ++interpreter->pc;
         
         // identifier
@@ -107,6 +116,10 @@ enum ErrorCode cmd_DIM(struct Core *core)
             struct ArrayVariable *variable = var_dimVariable(interpreter, &errorCode, tokenIdentifier->symbolIndex, numDimensions, dimensionSizes);
             if (!variable) return errorCode;
             variable->type = (tokenIdentifier->type == TokenStringIdentifier) ? ValueTypeString : ValueTypeFloat;
+            if (isGlobal)
+            {
+                variable->subLevel = SUB_LEVEL_GLOBAL;
+            }
         }
     }
     while (interpreter->pc->type == TokenComma);

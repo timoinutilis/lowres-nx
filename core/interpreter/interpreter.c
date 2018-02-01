@@ -1318,6 +1318,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenSHARED:
             return cmd_SHARED(core);
             
+        case TokenGLOBAL:
+            return cmd_GLOBAL(core);
+            
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;

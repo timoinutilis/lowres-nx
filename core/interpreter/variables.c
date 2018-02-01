@@ -28,11 +28,7 @@ struct SimpleVariable *var_getSimpleVariable(struct Interpreter *interpreter, in
     for (int i = interpreter->numSimpleVariables - 1; i >= 0; i--)
     {
         variable = &interpreter->simpleVariables[i];
-        if (variable->subLevel < subLevel)
-        {
-            break;
-        }
-        if (variable->symbolIndex == symbolIndex && variable->subLevel == subLevel)
+        if (variable->symbolIndex == symbolIndex && (variable->subLevel == subLevel || variable->subLevel == SUB_LEVEL_GLOBAL))
         {
             // variable found
             return variable;
@@ -77,7 +73,7 @@ void var_freeSimpleVariables(struct Interpreter *interpreter, int minSubLevel)
     for (int i = interpreter->numSimpleVariables - 1; i >= 0; i--)
     {
         struct SimpleVariable *variable = &interpreter->simpleVariables[i];
-        if (variable->subLevel < minSubLevel)
+        if (variable->subLevel < minSubLevel || (variable->subLevel == SUB_LEVEL_GLOBAL && minSubLevel > 0))
         {
             break;
         }
@@ -98,11 +94,7 @@ struct ArrayVariable *var_getArrayVariable(struct Interpreter *interpreter, int 
     for (int i = interpreter->numArrayVariables - 1; i >= 0; i--)
     {
         variable = &interpreter->arrayVariables[i];
-        if (variable->subLevel < subLevel)
-        {
-            break;
-        }
-        if (variable->symbolIndex == symbolIndex && variable->subLevel == subLevel)
+        if (variable->symbolIndex == symbolIndex && (variable->subLevel == subLevel || variable->subLevel == SUB_LEVEL_GLOBAL))
         {
             // variable found
             return variable;
@@ -193,7 +185,7 @@ void var_freeArrayVariables(struct Interpreter *interpreter, int minSubLevel)
     for (int i = interpreter->numArrayVariables - 1; i >= 0; i--)
     {
         struct ArrayVariable *variable = &interpreter->arrayVariables[i];
-        if (variable->subLevel < minSubLevel)
+        if (variable->subLevel < minSubLevel || (variable->subLevel == SUB_LEVEL_GLOBAL && minSubLevel > 0))
         {
             break;
         }

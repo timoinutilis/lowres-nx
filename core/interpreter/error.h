@@ -87,6 +87,7 @@ enum ErrorCode {
     ErrorSubAlreadyDefined,
     ErrorTooManySubprograms,
     ErrorSharedOutsideOfASubprogram,
+    ErrorGlobalInsideOfASubprogram,
 };
 
 struct CoreError {
