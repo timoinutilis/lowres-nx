@@ -29,6 +29,7 @@ void runStartupSequence(struct Core *core)
     
     // init font and window
     core->interpreter->textLib.fontCharOffset = FONT_CHAR_OFFSET;
+    core->interpreter->textLib.charAttrFilter = 0xFF;
     txtlib_clearScreen(core);
     
     // default characters/font
@@ -39,14 +40,35 @@ void runStartupSequence(struct Core *core)
     
     // main palettes
     uint8_t *colors = core->machine->colorRegisters.colors;
+    
     colors[0] = (0 << 4) | (1 << 2) | 1;
     colors[1] = (3 << 4) | (3 << 2) | 3;
     colors[2] = (2 << 4) | (3 << 2) | 3;
     colors[3] = (0 << 4) | (0 << 2) | 0;
-    colors[4] = (0 << 4) | (1 << 2) | 1;
+
+    colors[4] = 0;
     colors[5] = (3 << 4) | (2 << 2) | 0;
     colors[6] = (3 << 4) | (1 << 2) | 0;
     colors[7] = (0 << 4) | (0 << 2) | 0;
+    
+    colors[8] = 0;
+    colors[9] = (3 << 4) | (3 << 2) | 0;
+    colors[10] = (0 << 4) | (3 << 2) | 0;
+    colors[11] = (0 << 4) | (0 << 2) | 0;
+
+    colors[12] = 0;
+    colors[13] = (3 << 4) | (3 << 2) | 3;
+    colors[14] = (3 << 4) | (3 << 2) | 0;
+    colors[15] = (0 << 4) | (0 << 2) | 0;
+    
+    for (int i = 0; i < 16; i += 4)
+    {
+        colors[16 + i] = 0;
+        colors[17 + i] = (3 << 4) | (3 << 2) | 3;
+        colors[18 + i] = (2 << 4) | (2 << 2) | 2;
+        colors[19 + i] = (1 << 4) | (1 << 2) | 1;
+    }
+    
     memcpy(core->machine->colorRegisters.colors, &core->machine->cartridgeRom[entries[1].start], entries[1].length);
     
     // main characters

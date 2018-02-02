@@ -30,6 +30,7 @@ struct Core;
 
 struct TextLib {
     union CharacterAttributes charAttr;
+    uint8_t charAttrFilter;
     int fontCharOffset;
     int windowX;
     int windowY;

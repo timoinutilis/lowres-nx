@@ -1,0 +1,24 @@
+RANDOMIZE TIMER
+
+PRINT "++++++++++++++++++++";
+PRINT "....................";
+PRINT "////////////////////";
+PRINT
+PRINT "        HELLO!"
+PRINT " THIS HAPPENDS WHEN"
+PRINT "   YOU PRINT SOME "
+PRINT " TEXT ON SCREEN AND"
+PRINT "  THEN CHANGE THE"
+PRINT "  CELL ATTRIBUTES"
+PRINT "      RANDOMLY."
+PRINT
+PRINT
+PRINT "////////////////////";
+PRINT ".....LOWRES  NX.....";
+PRINT "++++++++++++++++++++";
+
+DO
+  ATTR (RND*4,RND*2,RND*2,0,0)
+  BG FILL RND*10,RND*8 TO 10+RND*10,8+RND*8
+  WAIT 4
+LOOP

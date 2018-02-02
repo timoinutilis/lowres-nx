@@ -218,9 +218,21 @@ enum ErrorCode cmd_ATTR(struct Core *core)
     struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.charAttr, false);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
+    // filter value
+    int filter = 0xFF;
+    if (interpreter->pc->type == TokenComma)
+    {
+        ++interpreter->pc;
+        
+        struct TypedValue fValue = itp_evaluateNumericExpression(core, 0, 0xFF);
+        if (fValue.type == ValueTypeError) return fValue.v.errorCode;
+        filter = fValue.v.floatValue;
+    }
+    
     if (interpreter->pass == PassRun)
     {
         interpreter->textLib.charAttr.value = aValue.v.floatValue;
+        interpreter->textLib.charAttrFilter = filter;
     }
     
     return itp_endOfCommand(interpreter);
@@ -263,16 +275,20 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     if (y2Value.type == ValueTypeError) return y2Value.v.errorCode;
 
     // CHAR
-    if (interpreter->pc->type != TokenCHAR) return ErrorUnexpectedToken;
-    ++interpreter->pc;
+    int character = -1;
+    if (interpreter->pc->type == TokenCHAR)
+    {
+        ++interpreter->pc;
     
-    // character value
-    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, NUM_CHARACTERS - 1);
-    if (cValue.type == ValueTypeError) return cValue.v.errorCode;
+        // character value
+        struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, NUM_CHARACTERS - 1);
+        if (cValue.type == ValueTypeError) return cValue.v.errorCode;
+        character = cValue.v.floatValue;
+    }
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_setCells(core, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, cValue.v.floatValue);
+        txtlib_setCells(core, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, character);
     }
     
     return itp_endOfCommand(interpreter);
@@ -302,12 +318,17 @@ enum ErrorCode cmd_CELL(struct Core *core)
     ++interpreter->pc;
     
     // character value
-    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, NUM_CHARACTERS - 1);
+    int character = -1;
+    struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
     if (cValue.type == ValueTypeError) return cValue.v.errorCode;
+    if (cValue.type == ValueTypeFloat)
+    {
+        character = cValue.v.floatValue;
+    }
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_setCell(core, xValue.v.floatValue, yValue.v.floatValue, cValue.v.floatValue);
+        txtlib_setCell(core, xValue.v.floatValue, yValue.v.floatValue, character);
     }
     
     return itp_endOfCommand(interpreter);
