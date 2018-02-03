@@ -151,6 +151,7 @@ void itp_resetProgram(struct Core *core)
     
     interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->subLevel = 0;
+    interpreter->cycles = 0;
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
@@ -170,6 +171,12 @@ void itp_runProgram(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
+    interpreter->cycles = interpreter->cycles - MAX_CYCLES_PER_FRAME;
+    if (interpreter->cycles < 0)
+    {
+        interpreter->cycles = 0;
+    }
+    
     switch (interpreter->state)
     {
         case StateEvaluate:
@@ -177,17 +184,15 @@ void itp_runProgram(struct Core *core)
             interpreter->mode = ModeMain;
             interpreter->exitEvaluation = false;
             enum ErrorCode errorCode = ErrorNone;
-            int cycles = 0;
             
             do
             {
                 errorCode = itp_evaluateCommand(core);
-                cycles++;
             }
-            while (errorCode == ErrorNone && cycles < MAX_CYCLES_PER_FRAME && interpreter->state == StateEvaluate && !interpreter->exitEvaluation);
+            while (errorCode == ErrorNone && interpreter->cycles < MAX_CYCLES_PER_FRAME && interpreter->state == StateEvaluate && !interpreter->exitEvaluation);
             
             interpreter->mode = ModeNone;
-            if (cycles == MAX_CYCLES_PER_FRAME)
+            if (interpreter->cycles >= MAX_CYCLES_PER_FRAME)
             {
                 printf("Warning: Max cycles per frame reached.\n");
             }
@@ -266,16 +271,16 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 interpreter->subLevel++;
                 
                 enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONCALL, NULL);
-                int cycles = 0;
+                int mainCycles = interpreter->cycles;
+                interpreter->cycles = 0;
                 
-                while (errorCode == ErrorNone && cycles < maxCycles && !interpreter->exitEvaluation)
+                while (errorCode == ErrorNone && interpreter->cycles < maxCycles && !interpreter->exitEvaluation)
                 {
                     errorCode = itp_evaluateCommand(core);
-                    cycles++;
                 }
                 
                 interpreter->mode = ModeNone;
-                if (cycles == maxCycles)
+                if (interpreter->cycles >= maxCycles)
                 {
                     interpreter->state = StateEnd;
                     delegate_interpreterDidFail(core, err_makeCoreError(ErrorTooManyCommandCycles, interpreter->pc->sourcePosition));
@@ -289,6 +294,8 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 {
                     interpreter->pc = pc;
                 }
+                
+                interpreter->cycles = mainCycles;
             }
             break;
         }
@@ -384,6 +391,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
     
     int symbolIndex = tokenIdentifier->symbolIndex;
     ++interpreter->pc;
+    ++interpreter->cycles;
     
     if (interpreter->pc->type == TokenBracketOpen)
     {
@@ -597,6 +605,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
     if (level == 2 && type == TokenNOT)
     {
         ++interpreter->pc;
+        ++interpreter->cycles;
         struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
         if (value.type == ValueTypeError) return value;
         enum ErrorCode errorCode = itp_checkTypeClass(core->interpreter, value.type, TypeClassNumeric);
@@ -615,6 +624,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
     if (level == 8 && (type == TokenPlus || type == TokenMinus)) // unary
     {
         ++interpreter->pc;
+        ++interpreter->cycles;
         struct TypedValue value = itp_evaluateExpressionLevel(core, level + 1);
         if (value.type == ValueTypeError) return value;
         enum ErrorCode errorCode = itp_checkTypeClass(core->interpreter, value.type, TypeClassNumeric);
@@ -642,6 +652,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
     {
         enum TokenType type = interpreter->pc->type;
         ++interpreter->pc;
+        ++interpreter->cycles;
         struct TypedValue rightValue = itp_evaluateExpressionLevel(core, level + 1);
         if (rightValue.type == ValueTypeError) return rightValue;
         
@@ -878,7 +889,11 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
     
     // check for function
     struct TypedValue value = itp_evaluateFunction(core);
-    if (value.type != ValueTypeNull) return value;
+    if (value.type != ValueTypeNull)
+    {
+        ++interpreter->cycles;
+        return value;
+    }
     
     // native types
     switch (interpreter->pc->type)
@@ -887,6 +902,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
             value.type = ValueTypeFloat;
             value.v.floatValue = interpreter->pc->floatValue;
             ++interpreter->pc;
+            ++interpreter->cycles;
             break;
         }
         case TokenString: {
@@ -897,6 +913,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
                 rcstring_retain(interpreter->pc->stringValue);
             }
             ++interpreter->pc;
+            ++interpreter->cycles;
             break;
         }
         case TokenIdentifier:
@@ -1093,7 +1110,12 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
 enum ErrorCode itp_evaluateCommand(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
-    switch (interpreter->pc->type)
+    enum TokenType type = interpreter->pc->type;
+    if (type != TokenREM && type != TokenApostrophe && type != TokenEol && type != TokenUndefined)
+    {
+        ++interpreter->cycles;
+    }
+    switch (type)
     {
         case TokenUndefined:
             if (interpreter->pass == PassRun)

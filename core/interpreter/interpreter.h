@@ -72,6 +72,7 @@ struct Interpreter {
     enum Mode mode;
     struct Token *pc;
     int subLevel;
+    int cycles;
     
     struct Tokenizer tokenizer;
     
