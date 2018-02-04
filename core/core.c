@@ -68,8 +68,9 @@ void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
 
 void core_update(struct Core *core)
 {
-    itp_runProgram(core);
+    itp_didStartVBL(core);
     itp_runInterrupt(core, InterruptTypeVBL);
+    itp_runProgram(core);
     itp_didFinishVBL(core);
     overlay_draw(core);
 }

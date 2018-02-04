@@ -171,12 +171,6 @@ void itp_runProgram(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    interpreter->cycles = interpreter->cycles - MAX_CYCLES_PER_FRAME;
-    if (interpreter->cycles < 0)
-    {
-        interpreter->cycles = 0;
-    }
-    
     switch (interpreter->state)
     {
         case StateEvaluate:
@@ -185,14 +179,16 @@ void itp_runProgram(struct Core *core)
             interpreter->exitEvaluation = false;
             enum ErrorCode errorCode = ErrorNone;
             
-            do
+            while (   errorCode == ErrorNone
+                   && interpreter->cycles < MAX_CYCLES_PER_VBL
+                   && interpreter->state == StateEvaluate
+                   && !interpreter->exitEvaluation)
             {
                 errorCode = itp_evaluateCommand(core);
             }
-            while (errorCode == ErrorNone && interpreter->cycles < MAX_CYCLES_PER_FRAME && interpreter->state == StateEvaluate && !interpreter->exitEvaluation);
             
             interpreter->mode = ModeNone;
-            if (interpreter->cycles >= MAX_CYCLES_PER_FRAME)
+            if (interpreter->cycles >= MAX_CYCLES_PER_VBL)
             {
                 printf("Warning: Max cycles per frame reached.\n");
             }
@@ -264,6 +260,9 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
             
             if (startToken)
             {
+                int mainCycles = interpreter->cycles;
+                interpreter->cycles = 0;
+                
                 interpreter->mode = ModeInterrupt;
                 interpreter->exitEvaluation = false;
                 struct Token *pc = interpreter->pc;
@@ -271,10 +270,10 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 interpreter->subLevel++;
                 
                 enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONCALL, NULL);
-                int mainCycles = interpreter->cycles;
-                interpreter->cycles = 0;
                 
-                while (errorCode == ErrorNone && interpreter->cycles < maxCycles && !interpreter->exitEvaluation)
+                while (   errorCode == ErrorNone
+                       && interpreter->cycles < maxCycles
+                       && !interpreter->exitEvaluation)
                 {
                     errorCode = itp_evaluateCommand(core);
                 }
@@ -295,7 +294,18 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                     interpreter->pc = pc;
                 }
                 
-                interpreter->cycles = mainCycles;
+                switch (type)
+                {
+                    case InterruptTypeRaster:
+                        // reset to main cycle count
+                        interpreter->cycles = mainCycles;
+                        break;
+                        
+                    case InterruptTypeVBL:
+                        // sum of interrupt's and main cycle count
+                        interpreter->cycles += mainCycles;
+                        break;
+                }
             }
             break;
         }
@@ -305,6 +315,17 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
             break;
     }
 
+}
+
+void itp_didStartVBL(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    interpreter->cycles = interpreter->cycles - MAX_CYCLES_PER_VBL;
+    if (interpreter->cycles < 0)
+    {
+        interpreter->cycles = 0;
+    }
 }
 
 void itp_didFinishVBL(struct Core *core)
@@ -325,6 +346,7 @@ void itp_didFinishVBL(struct Core *core)
         interpreter->timer = 0;
     }
     
+    // pause
     if (core->machine->ioRegisters.status.pause)
     {
         if (interpreter->state == StateEvaluate || interpreter->state == StateWait)
@@ -338,6 +360,20 @@ void itp_didFinishVBL(struct Core *core)
             overlay_updateState(core);
         }
         core->machine->ioRegisters.status.pause = 0;
+    }
+    
+    // CPU load
+    int currentCpuLoad = interpreter->cycles * 100 / MAX_CYCLES_PER_VBL;
+    if (currentCpuLoad > interpreter->cpuLoadMax)
+    {
+        interpreter->cpuLoadMax = currentCpuLoad;
+    }
+    ++interpreter->cpuLoadTimer;
+    if (interpreter->cpuLoadTimer >= 30)
+    {
+        interpreter->cpuLoadTimer = 0;
+        interpreter->cpuLoadDisplay = interpreter->cpuLoadMax;
+        interpreter->cpuLoadMax = currentCpuLoad;
     }
 }
 

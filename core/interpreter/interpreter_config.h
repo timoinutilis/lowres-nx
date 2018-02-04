@@ -30,10 +30,8 @@
 #define SYMBOL_NAME_SIZE 21
 #define MAX_ARRAY_DIMENSIONS 4
 #define MAX_ARRAY_SIZE 32768
-// max cycles: MacBook: 50000
-#define MAX_CYCLES_PER_FRAME 4096
-#define MAX_CYCLES_PER_RASTER 128
-#define MAX_CYCLES_PER_VBL 128
+#define MAX_CYCLES_PER_VBL 4000
+#define MAX_CYCLES_PER_RASTER 100
 #define TIMER_WRAP_VALUE 5184000
 
 #endif /* interpreter_config_h */
