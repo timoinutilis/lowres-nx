@@ -170,8 +170,10 @@ struct TypedValue fnc_FILE(struct Core *core)
         int index = fileValue.v.floatValue;
         struct DataEntry *entry = &core->diskDrive->dataManager.entries[index];
         
-        resultValue.v.stringValue = rcstring_new(entry->comment, strlen(entry->comment));
+        size_t len = strlen(entry->comment);
+        resultValue.v.stringValue = rcstring_new(entry->comment, len);
         rcstring_retain(resultValue.v.stringValue);
+        interpreter->cycles += len;
     }
     return resultValue;
 }

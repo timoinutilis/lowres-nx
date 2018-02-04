@@ -20,6 +20,7 @@
 #include "cmd_text.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "core.h"
 #include "text_lib.h"
 #include "interpreter_utils.h"
@@ -45,12 +46,14 @@ enum ErrorCode cmd_PRINT(struct Core *core)
             {
                 txtlib_printText(core, value.v.stringValue->chars);
                 rcstring_release(value.v.stringValue);
+                interpreter->cycles += strlen(value.v.stringValue->chars) * 2;
             }
             else if (value.type == ValueTypeFloat)
             {
                 char buffer[20];
                 snprintf(buffer, 20, "%0.7g", value.v.floatValue);
                 txtlib_printText(core, buffer);
+                interpreter->cycles += strlen(buffer) * 2;
             }
         }
         
@@ -59,6 +62,7 @@ enum ErrorCode cmd_PRINT(struct Core *core)
             if (interpreter->pass == PassRun)
             {
                 txtlib_printText(core, " ");
+                interpreter->cycles += 2;
             }
             ++interpreter->pc;
             newLine = false;
@@ -181,6 +185,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         txtlib_writeText(core, stringValue.v.stringValue->chars, xValue.v.floatValue, yValue.v.floatValue);
+        interpreter->cycles += strlen(stringValue.v.stringValue->chars) * 2;
     }
     
     return itp_endOfCommand(interpreter);
@@ -223,7 +228,9 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_writeNumber(core, numberValue.v.floatValue, digitsValue.v.floatValue, xValue.v.floatValue, yValue.v.floatValue);
+        int digits = digitsValue.v.floatValue;
+        txtlib_writeNumber(core, numberValue.v.floatValue, digits, xValue.v.floatValue, yValue.v.floatValue);
+        interpreter->cycles += digits * 2;
     }
     
     return itp_endOfCommand(interpreter);
@@ -243,6 +250,7 @@ enum ErrorCode cmd_CLS(struct Core *core)
         {
             // clear all
             txtlib_clearScreen(core);
+            interpreter->cycles += PLANE_COLUMNS * PLANE_ROWS * 2 * 2;
         }
     }
     else
@@ -255,6 +263,7 @@ enum ErrorCode cmd_CLS(struct Core *core)
         {
             // clear bg
             txtlib_clearBackground(core, bgValue.v.floatValue);
+            interpreter->cycles += PLANE_COLUMNS * PLANE_ROWS * 2;
         }
     }
     
@@ -376,6 +385,7 @@ enum ErrorCode cmd_CLW(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         txtlib_clearWindow(core);
+        interpreter->cycles += interpreter->textLib.windowWidth * interpreter->textLib.windowHeight * 2;
     }
     
     return itp_endOfCommand(interpreter);

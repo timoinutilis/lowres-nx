@@ -72,6 +72,7 @@ void core_update(struct Core *core)
     itp_runInterrupt(core, InterruptTypeVBL);
     itp_runProgram(core);
     itp_didFinishVBL(core);
+//    printf("cycles: %d\n", core->interpreter->cycles);
     overlay_draw(core);
 }
 

@@ -45,6 +45,7 @@ struct ArrayVariable {
     enum ValueType type;
     int numDimensions;
     int dimensionSizes[MAX_ARRAY_DIMENSIONS];
+    int numValues;
     union Value *values;
 };
 

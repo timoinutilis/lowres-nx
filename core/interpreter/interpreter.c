@@ -877,6 +877,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
                         newValue.v.stringValue = rcstring_new(NULL, len1 + len2);
                         strcpy(newValue.v.stringValue->chars, value.v.stringValue->chars);
                         strcpy(&newValue.v.stringValue->chars[len1], rightValue.v.stringValue->chars);
+                        interpreter->cycles += len1 + len2;
                     }
                     break;
                 }

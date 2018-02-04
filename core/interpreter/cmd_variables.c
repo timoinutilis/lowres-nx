@@ -120,6 +120,7 @@ enum ErrorCode cmd_DIM(struct Core *core)
             {
                 variable->subLevel = SUB_LEVEL_GLOBAL;
             }
+            interpreter->cycles += variable->numValues;
         }
     }
     while (interpreter->pc->type == TokenComma);

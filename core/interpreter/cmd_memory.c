@@ -117,6 +117,7 @@ enum ErrorCode cmd_FILL(struct Core *core)
             bool poke = machine_poke(core, start + i, fill);
             if (!poke) return ErrorIllegalMemoryAccess;
         }
+        interpreter->cycles += length;
     }
     
     return itp_endOfCommand(interpreter);
@@ -172,6 +173,7 @@ enum ErrorCode cmd_COPY(struct Core *core)
                 if (!poke) return ErrorIllegalMemoryAccess;
             }
         }
+        interpreter->cycles += length;
     }
     
     return itp_endOfCommand(interpreter);

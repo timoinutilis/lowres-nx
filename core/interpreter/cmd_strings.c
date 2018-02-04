@@ -110,6 +110,7 @@ struct TypedValue fnc_BIN_HEX(struct Core *core)
             snprintf(rcstring->chars, maxLen + 1, "%0*X", width, x);
         }
         resultValue.v.stringValue = rcstring;
+        interpreter->cycles += maxLen;
     }
     return resultValue;
 }
@@ -143,6 +144,7 @@ struct TypedValue fnc_CHR(struct Core *core)
         if (!rcstring) return val_makeError(ErrorOutOfMemory);
         
         resultValue.v.stringValue = rcstring;
+        interpreter->cycles += 1;
     }
     return resultValue;
 }
@@ -168,6 +170,7 @@ struct TypedValue fnc_INKEY(struct Core *core)
             if (!rcstring) return val_makeError(ErrorOutOfMemory);
             
             resultValue.v.stringValue = rcstring;
+            interpreter->cycles += 1;
         }
         else
         {
@@ -292,6 +295,7 @@ struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core)
             if (!rcstring) return val_makeError(ErrorOutOfMemory);
             
             resultValue.v.stringValue = rcstring;
+            interpreter->cycles += number;
         }
         else
         {
@@ -395,6 +399,7 @@ struct TypedValue fnc_MID(struct Core *core)
             if (!rcstring) return val_makeError(ErrorOutOfMemory);
             
             resultValue.v.stringValue = rcstring;
+            interpreter->cycles += number;
         }
         else
         {
@@ -436,6 +441,7 @@ struct TypedValue fnc_STR(struct Core *core)
         
         snprintf(rcstring->chars, 20, "%0.7g", numericValue.v.floatValue);
         resultValue.v.stringValue = rcstring;
+        interpreter->cycles += strlen(rcstring->chars);
     }
     return resultValue;
 }
@@ -552,6 +558,7 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
                 resultString[resultLen - 1 - i] = replaceString[replaceLen - 1 - i];
             }
         }
+        interpreter->cycles += number;
         
         rcstring_release(replaceValue.v.stringValue);
     }
@@ -639,6 +646,7 @@ enum ErrorCode cmd_MID(struct Core *core)
         {
             resultString[index + i] = replaceString[i];
         }
+        interpreter->cycles += number;
         
         rcstring_release(replaceValue.v.stringValue);
     }
