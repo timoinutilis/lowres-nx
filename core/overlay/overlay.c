@@ -27,6 +27,20 @@ void overlay_clear(struct Core *core);
 
 void overlay_init(struct Core *core)
 {
+    struct TextLib *lib = &core->overlay->textLib;
+    lib->bg = OVERLAY_BG;
+    lib->windowBg = OVERLAY_BG;
+    lib->charAttr.priority = 1;
+    lib->charAttr.palette = 1;
+    lib->charAttrFilter = 0xFF;
+    lib->fontCharOffset = 64;
+    lib->windowX = 0;
+    lib->windowY = 0;
+    lib->windowWidth = 20;
+    lib->windowHeight = 16;
+    lib->cursorX = 0;
+    lib->cursorY = 0;
+    
     overlay_updateButtonConfiguration(core);
 }
 
@@ -106,15 +120,22 @@ void overlay_updateButtonConfiguration(struct Core *core)
 
 void overlay_updateState(struct Core *core)
 {
+    overlay_clear(core);
+    
     if (core->interpreter->state == StatePaused)
     {
         core->overlay->numButtons = 0;
-        overlay_clear(core);
         core->overlay->timer = 0;
     }
     else
     {
         overlay_updateButtonConfiguration(core);
+    }
+    
+    if (!core->interpreter->debug)
+    {
+        core->overlay->textLib.cursorX = 0;
+        core->overlay->textLib.cursorY = 0;
     }
 }
 
@@ -170,28 +191,38 @@ void overlay_drawButtons(struct Core *core)
 
 void overlay_draw(struct Core *core)
 {
+    struct TextLib *lib = &core->overlay->textLib;
     if (core->interpreter->state == StatePaused)
     {
-        struct TextLib *lib = &core->interpreter->textLib;
-        struct TextLib userTextLib = *lib;
-        lib->bg = 2;
-        lib->charAttr.priority = 1;
-        lib->charAttr.palette = 1;
-        lib->fontCharOffset = 64;
         if (core->overlay->timer % 60 < 40)
         {
-            txtlib_writeText(core, "PAUSED", 7, 7);
+            txtlib_writeText(core, "PAUSED", 7, 7, lib);
         }
         else
         {
-            txtlib_writeText(core, "      ", 7, 7);
+            txtlib_writeText(core, "      ", 7, 7, lib);
         }
-        core->interpreter->textLib = userTextLib;
     }
     else
     {
         overlay_drawButtons(core);
     }
+    
+    if (core->interpreter->debug)
+    {
+        txtlib_writeText(core, "CPU", 17, 0, lib);
+        int cpuLoad = core->interpreter->cpuLoadDisplay;
+        if (cpuLoad < 100)
+        {
+            txtlib_writeNumber(core, cpuLoad, 2, 17, 1, lib);
+            txtlib_writeText(core, "%", 19, 1, lib);
+        }
+        else
+        {
+            txtlib_writeNumber(core, cpuLoad, 3, 17, 1, lib);
+        }
+    }
+    
     core->overlay->timer++;
 }
 

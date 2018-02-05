@@ -25,6 +25,7 @@
 #include "video_chip.h"
 
 #define INPUT_BUFFER_SIZE 256
+#define OVERLAY_BG 2
 
 struct Core;
 
@@ -47,10 +48,10 @@ struct TextLib {
     int blink;
 };
 
-void txtlib_printText(struct Core *core, const char *text);
+void txtlib_printText(struct Core *core, const char *text, struct TextLib *lib);
 bool txtlib_deleteBackward(struct Core *core);
-void txtlib_writeText(struct Core *core, const char *text, int x, int y);
-void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y);
+void txtlib_writeText(struct Core *core, const char *text, int x, int y, struct TextLib *lib);
+void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y, struct TextLib *lib);
 void txtlib_inputBegin(struct Core *core);
 bool txtlib_inputUpdate(struct Core *core);
 void txtlib_clearWindow(struct Core *core);

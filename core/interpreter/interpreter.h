@@ -73,6 +73,7 @@ struct Interpreter {
     struct Token *pc;
     int subLevel;
     int cycles;
+    bool debug;
     int cpuLoadDisplay;
     int cpuLoadMax;
     int cpuLoadTimer;

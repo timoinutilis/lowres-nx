@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include "video_chip.h"
 #include "overlay_data.h"
+#include "text_lib.h"
 
 #define MAX_BUTTONS 7
 #define MAX_TOUCHES 4
@@ -54,6 +55,7 @@ struct OverlayButton {
 
 struct Overlay {
     struct Plane plane;
+    struct TextLib textLib;
     struct OverlayTouch touch[MAX_TOUCHES];
     struct OverlayButton buttons[MAX_BUTTONS];
     int numButtons;
