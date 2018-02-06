@@ -117,7 +117,6 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode);
 void itp_resetProgram(struct Core *core);
 void itp_runProgram(struct Core *core);
 void itp_runInterrupt(struct Core *core, enum InterruptType type);
-void itp_didStartVBL(struct Core *core);
 void itp_didFinishVBL(struct Core *core);
 void itp_freeProgram(struct Core *core);
 

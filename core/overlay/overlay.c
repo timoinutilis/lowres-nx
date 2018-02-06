@@ -219,7 +219,7 @@ void overlay_draw(struct Core *core)
         }
         else
         {
-            txtlib_writeNumber(core, cpuLoad, 3, 17, 1, lib);
+            txtlib_writeText(core, "MAX", 17, 1, lib);
         }
     }
     

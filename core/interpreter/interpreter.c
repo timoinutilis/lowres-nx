@@ -181,7 +181,7 @@ void itp_runProgram(struct Core *core)
             enum ErrorCode errorCode = ErrorNone;
             
             while (   errorCode == ErrorNone
-                   && interpreter->cycles < MAX_CYCLES_PER_VBL
+                   && interpreter->cycles < MAX_CYCLES_TOTAL_PER_FRAME
                    && interpreter->state == StateEvaluate
                    && !interpreter->exitEvaluation)
             {
@@ -291,18 +291,8 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                     interpreter->pc = pc;
                 }
                 
-                switch (type)
-                {
-                    case InterruptTypeRaster:
-                        // reset to main cycle count
-                        interpreter->cycles = mainCycles;
-                        break;
-                        
-                    case InterruptTypeVBL:
-                        // sum of interrupt's and main cycle count
-                        interpreter->cycles += mainCycles;
-                        break;
-                }
+                // sum of interrupt's and main cycle count
+                interpreter->cycles += mainCycles;
             }
             break;
         }
@@ -312,17 +302,6 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
             break;
     }
 
-}
-
-void itp_didStartVBL(struct Core *core)
-{
-    struct Interpreter *interpreter = core->interpreter;
-    
-    interpreter->cycles = interpreter->cycles - MAX_CYCLES_PER_VBL;
-    if (interpreter->cycles < 0)
-    {
-        interpreter->cycles = 0;
-    }
 }
 
 void itp_didFinishVBL(struct Core *core)
@@ -359,8 +338,8 @@ void itp_didFinishVBL(struct Core *core)
         core->machine->ioRegisters.status.pause = 0;
     }
     
-    // CPU load
-    int currentCpuLoad = interpreter->cycles * 100 / MAX_CYCLES_PER_VBL;
+    // CPU load (rounded up)
+    int currentCpuLoad = (interpreter->cycles * 100 + MAX_CYCLES_TOTAL_PER_FRAME - 1) / MAX_CYCLES_TOTAL_PER_FRAME;
     if (currentCpuLoad > interpreter->cpuLoadMax)
     {
         interpreter->cpuLoadMax = currentCpuLoad;
@@ -371,6 +350,13 @@ void itp_didFinishVBL(struct Core *core)
         interpreter->cpuLoadTimer = 0;
         interpreter->cpuLoadDisplay = interpreter->cpuLoadMax;
         interpreter->cpuLoadMax = currentCpuLoad;
+    }
+    
+    // reset CPU cycles
+    interpreter->cycles = interpreter->cycles - MAX_CYCLES_TOTAL_PER_FRAME;
+    if (interpreter->cycles < 0)
+    {
+        interpreter->cycles = 0;
     }
 }
 
