@@ -141,10 +141,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        int w = wValue.v.floatValue;
-        int h = hValue.v.floatValue;
-        txtlib_copyBackground(core, srcXValue.v.floatValue, srcYValue.v.floatValue, w, h, dstXValue.v.floatValue, dstYValue.v.floatValue);
-        interpreter->cycles += w * h * 2;
+        txtlib_copyBackground(core, srcXValue.v.floatValue, srcYValue.v.floatValue, wValue.v.floatValue, hValue.v.floatValue, dstXValue.v.floatValue, dstYValue.v.floatValue);
     }
     
     return itp_endOfCommand(interpreter);
@@ -204,12 +201,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        int x1 = x1Value.v.floatValue;
-        int y1 = y1Value.v.floatValue;
-        int x2 = x2Value.v.floatValue;
-        int y2 = y2Value.v.floatValue;
-        txtlib_scrollBackground(core, x1, y1, x2, y2, dxValue.v.floatValue, dyValue.v.floatValue);
-        interpreter->cycles += (x2 - x1 + 1) * (y2 - y1 + 1) * 2;
+        txtlib_scrollBackground(core, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, dxValue.v.floatValue, dyValue.v.floatValue);
     }
     
     return itp_endOfCommand(interpreter);
@@ -296,12 +288,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        int x1 = x1Value.v.floatValue;
-        int y1 = y1Value.v.floatValue;
-        int x2 = x2Value.v.floatValue;
-        int y2 = y2Value.v.floatValue;
-        txtlib_setCells(core, x1, y1, x2, y2, character);
-        interpreter->cycles += (x2 - x1 + 1) * (y2 - y1 + 1) * 2;
+        txtlib_setCells(core, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, character);
     }
     
     return itp_endOfCommand(interpreter);
