@@ -76,7 +76,6 @@ const char *TokenStrings[] = {
     "COPY",
     "COS",
     "DATA",
-    "DEBUG",
     "DIM",
     "DISPLAY.X",
     "DISPLAY.Y",

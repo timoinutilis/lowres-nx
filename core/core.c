@@ -74,6 +74,17 @@ void core_update(struct Core *core)
     overlay_draw(core);
 }
 
+void core_setDebug(struct Core *core, bool enabled)
+{
+    core->interpreter->debug = enabled;
+    overlay_updateState(core);
+}
+
+bool core_getDebug(struct Core *core)
+{
+    return core->interpreter->debug;
+}
+
 void core_keyPressed(struct Core *core, char key)
 {
     if (core->machine->ioRegisters.attr.keyboardEnabled)

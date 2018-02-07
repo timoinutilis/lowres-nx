@@ -51,6 +51,8 @@ void core_deinit(struct Core *core);
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn);
 void core_update(struct Core *core);
+void core_setDebug(struct Core *core, bool enabled);
+bool core_getDebug(struct Core *core);
 
 void core_keyPressed(struct Core *core, char key);
 void core_backspacePressed(struct Core *core);

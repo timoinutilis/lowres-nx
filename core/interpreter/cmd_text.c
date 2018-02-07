@@ -437,29 +437,3 @@ enum ErrorCode cmd_TRACE(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_DEBUG(struct Core *core)
-{
-    struct Interpreter *interpreter = core->interpreter;
-    
-    // DEBUG
-    ++interpreter->pc;
-    
-    // ON/OFF
-    enum TokenType type = interpreter->pc->type;
-    if (type != TokenON && type != TokenOFF) return ErrorUnexpectedToken;
-    ++interpreter->pc;
-    
-    if (interpreter->pass == PassRun)
-    {
-        bool debug = (type == TokenON);
-        core->interpreter->debug = debug;
-        if (!debug)
-        {
-            // clears screen and resets cursor
-            overlay_updateState(core);
-        }
-    }
-    
-    return itp_endOfCommand(interpreter);
-}
-

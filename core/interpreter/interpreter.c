@@ -152,7 +152,6 @@ void itp_resetProgram(struct Core *core)
     interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->subLevel = 0;
     interpreter->cycles = 0;
-    interpreter->debug = false;
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
@@ -1366,9 +1365,6 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenEXIT:
             return cmd_EXIT_SUB(core);
-            
-        case TokenDEBUG:
-            return cmd_DEBUG(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

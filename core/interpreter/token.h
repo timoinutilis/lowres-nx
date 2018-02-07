@@ -80,7 +80,6 @@ enum TokenType {
     TokenCOPY,
     TokenCOS,
     TokenDATA,
-    TokenDEBUG,
     TokenDIM,
     TokenDISPLAYX,
     TokenDISPLAYY,

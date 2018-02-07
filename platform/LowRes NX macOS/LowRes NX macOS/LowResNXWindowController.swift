@@ -202,6 +202,12 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
         return attrs?.fileModificationDate()
     }
     
+    @IBAction func toggleDebug(_ sender: Any) {
+        if let coreWrapper = coreWrapper {
+            core_setDebug(&coreWrapper.core, !core_getDebug(&coreWrapper.core))
+        }
+    }
+    
     // MARK: - Core Wrapper Delegate
     
     func coreInterpreterDidFail(coreError: CoreError) -> Void {
