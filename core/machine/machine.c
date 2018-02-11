@@ -60,7 +60,6 @@ bool machine_poke(struct Core *core, int address, int value)
     {
         // IO attributes
         delegate_controlsDidChange(core);
-        overlay_updateButtonConfiguration(core);
     }
     return true;
 }

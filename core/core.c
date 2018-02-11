@@ -22,6 +22,9 @@
 #include <math.h>
 #include <string.h>
 
+void core_handleInput(struct Core *core, struct CoreInput *input);
+
+
 void core_init(struct Core *core)
 {
     memset(core, 0, sizeof(struct Core));
@@ -66,12 +69,99 @@ void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
     core->interpreter->timer = (float)(secondsSincePowerOn * 60 % TIMER_WRAP_VALUE);
 }
 
-void core_update(struct Core *core)
+void core_update(struct Core *core, struct CoreInput *input)
 {
+    core_handleInput(core, input);
     itp_runInterrupt(core, InterruptTypeVBL);
     itp_runProgram(core);
     itp_didFinishVBL(core);
     overlay_draw(core);
+}
+
+void core_handleInput(struct Core *core, struct CoreInput *input)
+{
+    if (input->key != 0)
+    {
+        char key = input->key;
+        if (core->machine->ioRegisters.attr.keyboardEnabled)
+        {
+            if ((key >= 32 && key < 127) || key == '\b' || key == '\n')
+            {
+                core->machine->ioRegisters.key = key;
+            }
+        }
+        else
+        {
+            if (key == 'p' || key == 'P')
+            {
+                if (core->interpreter->state == StatePaused)
+                {
+                    core->interpreter->state = StateEvaluate;
+                    overlay_updateState(core);
+                }
+                else
+                {
+                    core->machine->ioRegisters.status.pause = 1;
+                }
+            }
+        }
+        input->key = 0;
+    }
+    
+    if (input->touch)
+    {
+        if (core->interpreter->state == StatePaused)
+        {
+            core->interpreter->state = StateEvaluate;
+            overlay_updateState(core);
+        }
+        else if (core->machine->ioRegisters.attr.gamepadsEnabled == 0)
+        {
+            core->machine->ioRegisters.status.touch = 1;
+            int x = input->touchX;
+            int y = input->touchY;
+            if (x < 0) x = 0; else if (x >= SCREEN_WIDTH) x = SCREEN_WIDTH - 1;
+            if (y < 0) y = 0; else if (y >= SCREEN_HEIGHT) y = SCREEN_HEIGHT - 1;
+            core->machine->ioRegisters.touchX = x;
+            core->machine->ioRegisters.touchY = y;
+        }
+    }
+    else
+    {
+        core->machine->ioRegisters.status.touch = 0;
+    }
+    
+    for (int i = 0; i < NUM_GAMEPADS; i++)
+    {
+        union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[i];
+        if (core->machine->ioRegisters.attr.gamepadsEnabled > i)
+        {
+            struct CoreInputGamepad *inputGamepad = &input->gamepads[i];
+            gamepad->up = inputGamepad->up;
+            gamepad->down = inputGamepad->down;
+            gamepad->left = inputGamepad->left;
+            gamepad->right = inputGamepad->right;
+            gamepad->buttonA = inputGamepad->buttonA;
+            gamepad->buttonB = inputGamepad->buttonB;
+        }
+        else
+        {
+            gamepad->value = 0;
+        }
+    }
+    
+    if (input->pause)
+    {
+        if (core->interpreter->state == StatePaused)
+        {
+            core->interpreter->state = StateEvaluate;
+            overlay_updateState(core);
+        }
+        else if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) {
+            core->machine->ioRegisters.status.pause = 1;
+        }
+        input->pause = false;
+    }
 }
 
 void core_setDebug(struct Core *core, bool enabled)
@@ -85,173 +175,25 @@ bool core_getDebug(struct Core *core)
     return core->interpreter->debug;
 }
 
-void core_keyPressed(struct Core *core, char key)
+bool core_getKeyboardEnabled(struct Core *core)
 {
-    if (core->machine->ioRegisters.attr.keyboardEnabled)
-    {
-        if (key >= 32 && key < 127)
-        {
-            core->machine->ioRegisters.key = key;
-        }
-    }
-    else
-    {
-        if (key == 'p' || key == 'P')
-        {
-            if (core->interpreter->state == StatePaused)
-            {
-                core->interpreter->state = StateEvaluate;
-                overlay_updateState(core);
-            }
-            else
-            {
-                core->machine->ioRegisters.status.pause = 1;
-            }
-        }
-    }
+    return core->machine->ioRegisters.attr.keyboardEnabled;
 }
 
-void core_backspacePressed(struct Core *core)
+int core_getNumGamepads(struct Core *core)
 {
-    if (core->machine->ioRegisters.attr.keyboardEnabled)
-    {
-        core->machine->ioRegisters.key = '\b';
-    }
+    return core->machine->ioRegisters.attr.gamepadsEnabled;
 }
 
-void core_returnPressed(struct Core *core)
+void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB)
 {
-    if (core->machine->ioRegisters.attr.keyboardEnabled)
-    {
-        core->machine->ioRegisters.key = '\n';
-    }
-}
-
-void core_touchPressed(struct Core *core, int x, int y, const void *touchReference)
-{
-    if (core->interpreter->state == StatePaused)
-    {
-        core->interpreter->state = StateEvaluate;
-        overlay_updateState(core);
-    }
-    else if (core->machine->ioRegisters.attr.gamepadsEnabled)
-    {
-        overlay_touchPressed(core, x, y, touchReference);
-    }
-    else
-    {
-        core->machine->ioRegisters.status.touch = 1;
-        core_touchDragged(core, x, y, touchReference);
-    }
-}
-
-void core_touchDragged(struct Core *core, int x, int y, const void *touchReference)
-{
-    if (core->machine->ioRegisters.attr.gamepadsEnabled)
-    {
-        overlay_touchDragged(core, x, y, touchReference);
-    }
-    else if (core->machine->ioRegisters.status.touch)
-    {
-        if (x < 0) x = 0; else if (x >= SCREEN_WIDTH) x = SCREEN_WIDTH - 1;
-        if (y < 0) y = 0; else if (y >= SCREEN_HEIGHT) y = SCREEN_HEIGHT - 1;
-        core->machine->ioRegisters.touchX = x;
-        core->machine->ioRegisters.touchY = y;
-    }
-}
-
-void core_touchReleased(struct Core *core, const void *touchReference)
-{
-    if (core->machine->ioRegisters.attr.gamepadsEnabled)
-    {
-        overlay_touchReleased(core, touchReference);
-    }
-    else
-    {
-        core->machine->ioRegisters.status.touch = 0;
-    }
-}
-
-void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button)
-{
-    if (core->machine->ioRegisters.attr.gamepadsEnabled > player)
-    {
-        switch (button)
-        {
-            case GamepadButtonUp:
-                core->machine->ioRegisters.gamepads[player].up = 1;
-                break;
-            case GamepadButtonDown:
-                core->machine->ioRegisters.gamepads[player].down = 1;
-                break;
-            case GamepadButtonLeft:
-                core->machine->ioRegisters.gamepads[player].left = 1;
-                break;
-            case GamepadButtonRight:
-                core->machine->ioRegisters.gamepads[player].right = 1;
-                break;
-            case GamepadButtonA:
-                core->machine->ioRegisters.gamepads[player].buttonA = 1;
-                break;
-            case GamepadButtonB:
-                core->machine->ioRegisters.gamepads[player].buttonB = 1;
-                break;
-        }
-    }
-}
-
-void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button)
-{
-    if (core->machine->ioRegisters.attr.gamepadsEnabled > player)
-    {
-        switch (button)
-        {
-            case GamepadButtonUp:
-                core->machine->ioRegisters.gamepads[player].up = 0;
-                break;
-            case GamepadButtonDown:
-                core->machine->ioRegisters.gamepads[player].down = 0;
-                break;
-            case GamepadButtonLeft:
-                core->machine->ioRegisters.gamepads[player].left = 0;
-                break;
-            case GamepadButtonRight:
-                core->machine->ioRegisters.gamepads[player].right = 0;
-                break;
-            case GamepadButtonA:
-                core->machine->ioRegisters.gamepads[player].buttonA = 0;
-                break;
-            case GamepadButtonB:
-                core->machine->ioRegisters.gamepads[player].buttonB = 0;
-                break;
-        }
-    }
-}
-
-void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB)
-{
-    if (core->machine->ioRegisters.attr.gamepadsEnabled > player)
-    {
-        union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[player];
-        gamepad->up = up;
-        gamepad->down = down;
-        gamepad->left = left;
-        gamepad->right = right;
-        gamepad->buttonA = buttonA;
-        gamepad->buttonB = buttonB;
-    }
-}
-
-void core_pausePressed(struct Core *core)
-{
-    if (core->interpreter->state == StatePaused)
-    {
-        core->interpreter->state = StateEvaluate;
-        overlay_updateState(core);
-    }
-    else if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) {
-        core->machine->ioRegisters.status.pause = 1;
-    }
+    struct CoreInputGamepad *gamepad = &input->gamepads[player];
+    gamepad->up = up;
+    gamepad->down = down;
+    gamepad->left = left;
+    gamepad->right = right;
+    gamepad->buttonA = buttonA;
+    gamepad->buttonB = buttonB;
 }
 
 void core_diskLoaded(struct Core *core)
@@ -259,13 +201,3 @@ void core_diskLoaded(struct Core *core)
     core->interpreter->state = StateEvaluate;
 }
 
-void core_setNumPhysicalGamepads(struct Core *core, int num)
-{
-    core->numPhysicalGamepads = num;
-    overlay_updateButtonConfiguration(core);
-}
-
-bool core_getKeyboardEnabled(struct Core *core)
-{
-    return core->machine->ioRegisters.attr.keyboardEnabled;
-}

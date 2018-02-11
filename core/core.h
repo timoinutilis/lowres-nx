@@ -34,40 +34,38 @@ struct Core {
     struct DiskDrive *diskDrive;
     struct Overlay *overlay;
     struct CoreDelegate *delegate;
-    int numPhysicalGamepads;
 };
 
-enum GamepadButton {
-    GamepadButtonUp,
-    GamepadButtonDown,
-    GamepadButtonLeft,
-    GamepadButtonRight,
-    GamepadButtonA,
-    GamepadButtonB
+struct CoreInputGamepad {
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+    bool buttonA;
+    bool buttonB;
+};
+
+struct CoreInput {
+    struct CoreInputGamepad gamepads[NUM_GAMEPADS];
+    bool pause;
+    int touchX;
+    int touchY;
+    bool touch;
+    char key;
 };
 
 void core_init(struct Core *core);
 void core_deinit(struct Core *core);
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn);
-void core_update(struct Core *core);
+void core_update(struct Core *core, struct CoreInput *input);
 void core_setDebug(struct Core *core, bool enabled);
 bool core_getDebug(struct Core *core);
+bool core_getKeyboardEnabled(struct Core *core);
+int core_getNumGamepads(struct Core *core);
 
-void core_keyPressed(struct Core *core, char key);
-void core_backspacePressed(struct Core *core);
-void core_returnPressed(struct Core *core);
-void core_touchPressed(struct Core *core, int x, int y, const void *touchReference);
-void core_touchDragged(struct Core *core, int x, int y, const void *touchReference);
-void core_touchReleased(struct Core *core, const void *touchReference);
-void core_gamepadPressed(struct Core *core, int player, enum GamepadButton button);
-void core_gamepadReleased(struct Core *core, int player, enum GamepadButton button);
-void core_setGamepad(struct Core *core, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
-void core_pausePressed(struct Core *core);
+void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
 
 void core_diskLoaded(struct Core *core);
-
-void core_setNumPhysicalGamepads(struct Core *core, int num);
-bool core_getKeyboardEnabled(struct Core *core);
 
 #endif /* core_h */

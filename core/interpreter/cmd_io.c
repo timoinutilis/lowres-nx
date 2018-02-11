@@ -76,7 +76,6 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
             core->machine->ioRegisters.gamepads[i].value = 0;
         }
         delegate_controlsDidChange(core);
-        overlay_updateButtonConfiguration(core);
     }
     
     return itp_endOfCommand(interpreter);
