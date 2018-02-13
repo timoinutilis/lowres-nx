@@ -278,7 +278,7 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 if (interpreter->cycles >= maxCycles)
                 {
                     interpreter->state = StateEnd;
-                    delegate_interpreterDidFail(core, err_makeCoreError(ErrorTooManyCommandCycles, interpreter->pc->sourcePosition));
+                    delegate_interpreterDidFail(core, err_makeCoreError(ErrorTooManyCPUCyclesInInterrupt, interpreter->pc->sourcePosition));
                 }
                 else if (errorCode != ErrorNone)
                 {

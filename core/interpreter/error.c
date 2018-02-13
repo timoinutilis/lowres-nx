@@ -65,7 +65,7 @@ const char *ErrorStrings[] = {
     "Stack Overflow",
     "Out Of Data",
     "Illegal Memory Access",
-    "Too Many Command Cycles",
+    "Too Many CPU Cycles In Interrupt",
     "Not Allowed In Interrupt",
     "IF Without END IF",
     "FOR Without NEXT",

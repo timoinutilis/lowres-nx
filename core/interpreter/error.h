@@ -68,7 +68,7 @@ enum ErrorCode {
     ErrorStackOverflow,
     ErrorOutOfData,
     ErrorIllegalMemoryAccess,
-    ErrorTooManyCommandCycles,
+    ErrorTooManyCPUCyclesInInterrupt,
     ErrorNotAllowedInInterrupt,
     ErrorIfWithoutEndIf,
     ErrorForWithoutNext,
