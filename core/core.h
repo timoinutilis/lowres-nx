@@ -54,6 +54,9 @@ struct CoreInput {
     char key;
 };
 
+extern const char CoreInputKeyReturn;
+extern const char CoreInputKeyBackspace;
+
 void core_init(struct Core *core);
 void core_deinit(struct Core *core);
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);

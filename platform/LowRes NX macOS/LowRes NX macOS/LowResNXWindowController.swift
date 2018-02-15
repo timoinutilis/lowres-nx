@@ -34,9 +34,6 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
             let secondsSincePowerOn = -(NSApp.delegate as! AppDelegate).launchDate.timeIntervalSinceNow
             core_willRunProgram(&coreWrapper.core, Int(secondsSincePowerOn))
             
-            // keyboard counts as physical gamepads
-            core_setNumPhysicalGamepads(&coreWrapper.core, 2)
-            
             timer = Timer.scheduledTimer(timeInterval: 1.0/60.0, target: self, selector: #selector(LowResNXWindowController.update), userInfo: nil, repeats: true)
         }
     }
@@ -57,7 +54,7 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
     
     @objc func update() {
         if let coreWrapper = coreWrapper {
-            core_update(&coreWrapper.core)
+            core_update(&coreWrapper.core, &coreWrapper.input)
             lowResNXView.render(coreWrapper: coreWrapper)
         }
     }
@@ -69,45 +66,48 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
         
         switch event.keyCode {
         case 123:
-            core_gamepadPressed(&coreWrapper.core, 0, GamepadButtonLeft)
+            coreWrapper.input.gamepads.0.left = true
         case 124:
-            core_gamepadPressed(&coreWrapper.core, 0, GamepadButtonRight)
+            coreWrapper.input.gamepads.0.right = true
         case 125:
-            core_gamepadPressed(&coreWrapper.core, 0, GamepadButtonDown)
+            coreWrapper.input.gamepads.0.down = true
         case 126:
-            core_gamepadPressed(&coreWrapper.core, 0, GamepadButtonUp)
+            coreWrapper.input.gamepads.0.up = true
         case 6, 43: // Z, ,
-            core_gamepadPressed(&coreWrapper.core, 0, GamepadButtonA)
+            coreWrapper.input.gamepads.0.buttonA = true
         case 7, 47: // X, .
-            core_gamepadPressed(&coreWrapper.core, 0, GamepadButtonB)
+            coreWrapper.input.gamepads.0.buttonB = true
         case 2: // D
-            core_gamepadPressed(&coreWrapper.core, 1, GamepadButtonLeft)
+            coreWrapper.input.gamepads.1.left = true
         case 5: // G
-            core_gamepadPressed(&coreWrapper.core, 1, GamepadButtonRight)
+            coreWrapper.input.gamepads.1.right = true
         case 3: // F
-            core_gamepadPressed(&coreWrapper.core, 1, GamepadButtonDown)
+            coreWrapper.input.gamepads.1.down = true
         case 15: // R
-            core_gamepadPressed(&coreWrapper.core, 1, GamepadButtonUp)
+            coreWrapper.input.gamepads.1.up = true
         case 0: // A
-            core_gamepadPressed(&coreWrapper.core, 1, GamepadButtonA)
+            coreWrapper.input.gamepads.1.buttonA = true
         case 1: // S
-            core_gamepadPressed(&coreWrapper.core, 1, GamepadButtonB)
+            coreWrapper.input.gamepads.1.buttonB = true
         default:
             break
         }
         let characters = event.charactersIgnoringModifiers!
         if !characters.isEmpty {
             if characters == "\r" {
-                core_returnPressed(&coreWrapper.core)
+                coreWrapper.input.key = CoreInputKeyReturn
             } else if characters == "\u{7F}" {
-                core_backspacePressed(&coreWrapper.core)
+                coreWrapper.input.key = CoreInputKeyBackspace
             } else {
                 let text = characters.uppercased()
                 let codes = text.unicodeScalars
                 let key = codes[codes.startIndex]
                 if key.value < 127 {
-                    core_keyPressed(&coreWrapper.core, Int8(key.value))
+                    coreWrapper.input.key = Int8(key.value)
                 }
+            }
+            if characters == "p" || characters == "P" {
+                coreWrapper.input.pause = true
             }
         }
     }
@@ -119,29 +119,29 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
         
         switch event.keyCode {
         case 123:
-            core_gamepadReleased(&coreWrapper.core, 0, GamepadButtonLeft)
+            coreWrapper.input.gamepads.0.left = false
         case 124:
-            core_gamepadReleased(&coreWrapper.core, 0, GamepadButtonRight)
+            coreWrapper.input.gamepads.0.right = false
         case 125:
-            core_gamepadReleased(&coreWrapper.core, 0, GamepadButtonDown)
+            coreWrapper.input.gamepads.0.down = false
         case 126:
-            core_gamepadReleased(&coreWrapper.core, 0, GamepadButtonUp)
+            coreWrapper.input.gamepads.0.up = false
         case 6, 43: // Z, ,
-            core_gamepadReleased(&coreWrapper.core, 0, GamepadButtonA)
+            coreWrapper.input.gamepads.0.buttonA = false
         case 7, 47: // X, .
-            core_gamepadReleased(&coreWrapper.core, 0, GamepadButtonB)
+            coreWrapper.input.gamepads.0.buttonB = false
         case 2: // D
-            core_gamepadReleased(&coreWrapper.core, 1, GamepadButtonLeft)
+            coreWrapper.input.gamepads.1.left = false
         case 5: // G
-            core_gamepadReleased(&coreWrapper.core, 1, GamepadButtonRight)
+            coreWrapper.input.gamepads.1.right = false
         case 3: // F
-            core_gamepadReleased(&coreWrapper.core, 1, GamepadButtonDown)
+            coreWrapper.input.gamepads.1.down = false
         case 15: // R
-            core_gamepadReleased(&coreWrapper.core, 1, GamepadButtonUp)
+            coreWrapper.input.gamepads.1.up = false
         case 0: // A
-            core_gamepadReleased(&coreWrapper.core, 1, GamepadButtonA)
+            coreWrapper.input.gamepads.1.buttonA = false
         case 1: // S
-            core_gamepadReleased(&coreWrapper.core, 1, GamepadButtonB)
+            coreWrapper.input.gamepads.1.buttonB = false
         default:
             break
         }
@@ -150,7 +150,8 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
     override func mouseDragged(with event: NSEvent) {
         if let coreWrapper = coreWrapper {
             let point = screenPoint(event: event)
-            core_touchDragged(&coreWrapper.core, Int32(point.x), Int32(point.y), nil)
+            coreWrapper.input.touchX = Int32(point.x)
+            coreWrapper.input.touchY = Int32(point.y)
         }
     }
     
@@ -158,14 +159,16 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
         if let coreWrapper = coreWrapper {
             let point = screenPoint(event: event)
             if point.y >= 0 {
-                core_touchPressed(&coreWrapper.core, Int32(point.x), Int32(point.y), nil)
+                coreWrapper.input.touch = true
+                coreWrapper.input.touchX = Int32(point.x)
+                coreWrapper.input.touchY = Int32(point.y)
             }
         }
     }
     
     override func mouseUp(with event: NSEvent) {
         if let coreWrapper = coreWrapper {
-            core_touchReleased(&coreWrapper.core, nil)
+            coreWrapper.input.touch = false
         }
     }
     

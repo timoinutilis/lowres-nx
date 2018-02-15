@@ -20,6 +20,7 @@ class CoreWrapper: NSObject {
     weak var delegate: CoreWrapperDelegate?
     
     var core = Core()
+    var input = CoreInput()
     private var coreDelegate = CoreDelegate()
     
     override init() {

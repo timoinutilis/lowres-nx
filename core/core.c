@@ -22,6 +22,9 @@
 #include <math.h>
 #include <string.h>
 
+const char CoreInputKeyReturn = '\n';
+const char CoreInputKeyBackspace = '\b';
+
 void core_handleInput(struct Core *core, struct CoreInput *input);
 
 
@@ -90,32 +93,12 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
                 core->machine->ioRegisters.key = key;
             }
         }
-        else
-        {
-            if (key == 'p' || key == 'P')
-            {
-                if (core->interpreter->state == StatePaused)
-                {
-                    core->interpreter->state = StateEvaluate;
-                    overlay_updateState(core);
-                }
-                else
-                {
-                    core->machine->ioRegisters.status.pause = 1;
-                }
-            }
-        }
         input->key = 0;
     }
     
     if (input->touch)
     {
-        if (core->interpreter->state == StatePaused)
-        {
-            core->interpreter->state = StateEvaluate;
-            overlay_updateState(core);
-        }
-        else if (core->machine->ioRegisters.attr.gamepadsEnabled == 0)
+        if (core->machine->ioRegisters.attr.gamepadsEnabled == 0)
         {
             core->machine->ioRegisters.status.touch = 1;
             int x = input->touchX;
@@ -124,6 +107,10 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
             if (y < 0) y = 0; else if (y >= SCREEN_HEIGHT) y = SCREEN_HEIGHT - 1;
             core->machine->ioRegisters.touchX = x;
             core->machine->ioRegisters.touchY = y;
+        }
+        else
+        {
+            core->machine->ioRegisters.status.touch = 0;
         }
     }
     else
