@@ -1078,21 +1078,13 @@ store game states.</p>
 
 <h1 id="Debugging-Commands">Debugging Commands</h1>
 
-<h3 id="_DEBUG" name="DEBUG">DEBUG</h3>
-
-<pre>DEBUG ON/OFF</pre>
-
-<p>Enables or disables a text window showing the CPU load and
-debugging output from the TRACE command.</p>
-
-
 <h3 id="_TRACE" name="TRACE">TRACE</h3>
 
 <pre>TRACE expression-list</pre>
 
 <p>Outputs text to the debugging window. Expressions can be strings or
-numbers, separated by commas. This command only works if the debugging
-mode is currently enabled.
+numbers, separated by commas. This command is ignored if the debugging
+mode is not enabled.
 
 
 <h1 id="Math-Functions">Math Functions</h1>
