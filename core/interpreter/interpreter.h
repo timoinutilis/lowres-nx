@@ -74,6 +74,7 @@ struct Interpreter {
     int subLevel;
     int cycles;
     bool debug;
+    bool handlesPause;
     int cpuLoadDisplay;
     int cpuLoadMax;
     int cpuLoadTimer;

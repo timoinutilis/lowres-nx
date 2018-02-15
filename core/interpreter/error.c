@@ -86,6 +86,8 @@ const char *ErrorStrings[] = {
     "SHARED Outside Of A Subprogram",
     "GLOBAL Inside Of A Subprogram",
     "EXIT SUB Outside Of A Subprogram",
+    "Keyboard Not Enabled",
+    "Automatic Pause Not Disabled",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

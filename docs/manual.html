@@ -673,6 +673,40 @@ value is cleared, so it returns each pressed key only once.
 The keyboard needs to be enabled for this function.</p>
 
 
+<h3 id="_PAUSE-ON-OFF" name="PAUSE ON,PAUSE OFF,PAUSE,ON,OFF">PAUSE ON/OFF</h3>
+
+<pre>
+PAUSE ON
+PAUSE OFF
+</pre>
+
+<p>Enables or disables the automatic pause handling. By default it's
+enabled, so if you press the pause button, the program stops and
+shows "PAUSE" on the screen, until the button is pressed again.</p>
+
+
+<h3 id="_PAUSE" name="PAUSE">PAUSE</h3>
+
+<pre>
+PAUSE
+</pre>
+
+<p>Pauses the program and shows the default "PAUSE" screen, even if
+automatic pause handling is disabled.</p>
+
+
+<h3 id="_=PAUSE" name="PAUSE">=PAUSE</h3>
+
+<pre>
+PAUSE
+</pre>
+
+<p>Returns true if the pause button was pressed, otherwise false.
+After calling this function its value is cleared, so it returns
+each button tap only once. The automatic pause handling needs to
+be disabled for this function.</p>
+
+
 <h1 id="Background-Commands">Background Commands</h1>
 
 <h3 id="_BG" name="BG">BG</h3>

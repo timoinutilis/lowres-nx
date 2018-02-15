@@ -152,6 +152,7 @@ void itp_resetProgram(struct Core *core)
     interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->subLevel = 0;
     interpreter->cycles = 0;
+    interpreter->handlesPause = true;
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
@@ -324,17 +325,18 @@ void itp_didFinishVBL(struct Core *core)
     // pause
     if (core->machine->ioRegisters.status.pause)
     {
-        if (interpreter->state == StateEvaluate || interpreter->state == StateWait)
+        if (interpreter->handlesPause && (interpreter->state == StateEvaluate || interpreter->state == StateWait))
         {
             interpreter->state = StatePaused;
             overlay_updateState(core);
+            core->machine->ioRegisters.status.pause = 0;
         }
         else if (interpreter->state == StatePaused)
         {
             interpreter->state = StateEvaluate;
             overlay_updateState(core);
+            core->machine->ioRegisters.status.pause = 0;
         }
-        core->machine->ioRegisters.status.pause = 0;
     }
     
     // CPU load (rounded up)
@@ -1118,6 +1120,9 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenFILE:
             return fnc_FILE(core);
             
+        case TokenPAUSE:
+            return fnc_PAUSE(core);
+            
         default:
             break;
     }
@@ -1365,6 +1370,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenEXIT:
             return cmd_EXIT_SUB(core);
+            
+        case TokenPAUSE:
+            return cmd_PAUSE(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

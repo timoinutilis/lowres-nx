@@ -89,6 +89,8 @@ enum ErrorCode {
     ErrorSharedOutsideOfASubprogram,
     ErrorGlobalInsideOfASubprogram,
     ErrorExitSubOutsideOfASubprogram,
+    ErrorKeyboardNotEnabled,
+    ErrorAutomaticPauseNotDisabled,
 };
 
 struct CoreError {

@@ -81,6 +81,39 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_PAUSE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // PAUSE
+    ++interpreter->pc;
+    
+    // ON/OFF?
+    enum TokenType type = interpreter->pc->type;
+    if (type == TokenON || type == TokenOFF)
+    {
+        ++interpreter->pc;
+    }
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (type == TokenON)
+        {
+            interpreter->handlesPause = true;
+        }
+        else if (type == TokenOFF)
+        {
+            interpreter->handlesPause = false;
+        }
+        else
+        {
+            interpreter->state = StatePaused;
+            overlay_updateState(core);
+        }
+    }
+    return itp_endOfCommand(interpreter);
+}
+
 struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
@@ -270,6 +303,26 @@ struct TypedValue fnc_TOUCH_X_Y(struct Core *core)
         {
             assert(0);
         }
+    }
+    return value;
+}
+
+struct TypedValue fnc_PAUSE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // PAUSE
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (interpreter->handlesPause) return val_makeError(ErrorAutomaticPauseNotDisabled);
+        
+        value.v.floatValue = core->machine->ioRegisters.status.pause ? BAS_TRUE : BAS_FALSE;
+        core->machine->ioRegisters.status.pause = 0;
     }
     return value;
 }

@@ -161,6 +161,8 @@ struct TypedValue fnc_INKEY(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
+        if (!core->machine->ioRegisters.attr.keyboardEnabled) return val_makeError(ErrorKeyboardNotEnabled);
+        
         char key = core->machine->ioRegisters.key;
         if (key)
         {
