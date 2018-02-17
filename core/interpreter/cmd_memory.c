@@ -179,11 +179,11 @@ enum ErrorCode cmd_COPY(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-struct TypedValue fnc_START_LENGTH(struct Core *core)
+struct TypedValue fnc_ROM_SIZE(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // START/LENGTH
+    // ROM/SIZE
     enum TokenType type = interpreter->pc->type;
     ++interpreter->pc;
     
@@ -205,7 +205,7 @@ struct TypedValue fnc_START_LENGTH(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         int index = indexValue.v.floatValue;
-        if (type == TokenLENGTH)
+        if (type == TokenSIZE)
         {
             value.v.floatValue = interpreter->romDataManager.entries[index].length;
         }

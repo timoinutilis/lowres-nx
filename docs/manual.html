@@ -96,7 +96,7 @@ followed by the actual data, byte by byte as hexadecimal values, until
 the next ROM entry or the end of the file.</p>
 
 <p>When the program is running, all ROM entries are accessable in the
-first 32 KB of the memory. Use the BASIC functions START and LENGTH to
+first 32 KB of the memory. Use the BASIC functions ROM and SIZE to
 get the exact address of each entry.</p>
 
 <h2 id="Virtual-Disk-Files">Virtual Disk Files</h2>
@@ -845,17 +845,27 @@ c is the character where the font starts (space).</p>
 
 <h1 id="Screen-Commands">Screen Commands</h1>
 
-<h3 id="_DISPLAY" name="DISPLAY">DISPLAY</h3>
+<h3 id="_SCROLL" name="SCROLL">SCROLL</h3>
 
-<pre>DISPLAY b,x,y</pre>
+<pre>SCROLL b,x,y</pre>
 
 <p>Sets the scroll offset of background b (0/1) to pixel
 co-ordinates x,y.</p>
 
 
-<h3 id="_DISPLAY.A" name="DISPLAY.A">DISPLAY.A</h3>
+<h3 id="_SCROLL.X-SCROLL.Y" name="SCROLL.X,SCROLL.Y">=SCROLL.X/Y</h3>
 
-<pre>DISPLAY.A (s,b0,b1)</pre>
+<pre>
+SCROLL.X(b)
+SCROLL.Y(b)
+</pre>
+
+<p>Return the scroll offset of background b.</p>
+
+
+<h3 id="_DISPLAY" name="DISPLAY">DISPLAY</h3>
+
+<pre>DISPLAY (s,b0,b1)</pre>
 
 <p>Sets the display attributes.</p>
 
@@ -865,24 +875,14 @@ co-ordinates x,y.</p>
 <tr><td>b1</td> <td>background 1 enabled (0/1)</td></tr>
 </table>
 
-<pre>DISPLAY.A a</pre>
+<pre>DISPLAY a</pre>
 
 <p>Allows setting the attributes as a single 8-bit value.</p>
 
 
-<h3 id="_DISPLAY.X-DISPLAY.Y" name="DISPLAY.X,DISPLAY.Y">=DISPLAY.X/Y</h3>
+<h3 id="_=DISPLAY" name="DISPLAY">=DISPLAY</h3>
 
-<pre>
-DISPLAY.X(b)
-DISPLAY.Y(b)
-</pre>
-
-<p>Return the scroll offset of background b.</p>
-
-
-<h3 id="_=DISPLAY.A" name="DISPLAY.A">=DISPLAY.A</h3>
-
-<pre>DISPLAY.A</pre>
+<pre>DISPLAY</pre>
 
 <p>Returns the display attributes as an 8-bit value.</p>
 
@@ -1054,16 +1054,16 @@ The source and the destination areas may overlap.</p>
 the parameter is omitted.</p>
 
 
-<h3 id="_=START" name="START">=START</h3>
+<h3 id="_=ROM" name="ROM">=ROM</h3>
 
-<pre>START(n)</pre>
+<pre>ROM(n)</pre>
 
 <p>Returns the memory address of ROM entry n.</p>
 
 
-<h3 id="_=LENGTH" name="LENGTH">=LENGTH</h3>
+<h3 id="_=SIZE" name="SIZE">=SIZE</h3>
 
-<pre>LENGTH(n)</pre>
+<pre>SIZE(n)</pre>
 
 <p>Returns the number of bytes of ROM entry n.</p>
 

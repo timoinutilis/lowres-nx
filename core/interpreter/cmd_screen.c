@@ -78,11 +78,11 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_DISPLAY(struct Core *core)
+enum ErrorCode cmd_SCROLL(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // DISPLAY
+    // SCROLL
     ++interpreter->pc;
     
     // bg value
@@ -125,11 +125,11 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_DISPLAY_A(struct Core *core)
+enum ErrorCode cmd_DISPLAY(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // DISPLAY.A
+    // DISPLAY
     ++interpreter->pc;
     
     // atrb value
@@ -206,7 +206,7 @@ struct TypedValue fnc_screen0(struct Core *core)
                 value.v.floatValue = core->machine->videoRegisters.rasterLine;
                 break;
                 
-            case TokenDISPLAYA:
+            case TokenDISPLAY:
                 value.v.floatValue = core->machine->videoRegisters.attr.value;
                 break;
                 
@@ -218,11 +218,11 @@ struct TypedValue fnc_screen0(struct Core *core)
     return value;
 }
 
-struct TypedValue fnc_DISPLAY_X_Y(struct Core *core)
+struct TypedValue fnc_SCROLL_X_Y(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // DISPLAY.?
+    // SCROLL.?
     enum TokenType type = interpreter->pc->type;
     ++interpreter->pc;
     
@@ -246,11 +246,11 @@ struct TypedValue fnc_DISPLAY_X_Y(struct Core *core)
         int bg = bgValue.v.floatValue;
         switch (type)
         {
-            case TokenDISPLAYX:
+            case TokenSCROLLX:
                 value.v.floatValue = (bg == 0) ? core->machine->videoRegisters.scrollAX : core->machine->videoRegisters.scrollBX;
                 break;
                 
-            case TokenDISPLAYY:
+            case TokenSCROLLY:
                 value.v.floatValue = (bg == 0) ? core->machine->videoRegisters.scrollAY : core->machine->videoRegisters.scrollBY;
                 break;
                 

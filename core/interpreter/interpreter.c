@@ -1066,21 +1066,21 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenINKEY:
             return fnc_INKEY(core);
         
-        case TokenSTART:
-        case TokenLENGTH:
-            return fnc_START_LENGTH(core);
+        case TokenROM:
+        case TokenSIZE:
+            return fnc_ROM_SIZE(core);
             
         case TokenCOLOR:
             return fnc_COLOR(core);
             
         case TokenTIMER:
         case TokenRASTER:
-        case TokenDISPLAYA:
+        case TokenDISPLAY:
             return fnc_screen0(core);
             
-        case TokenDISPLAYX:
-        case TokenDISPLAYY:
-            return fnc_DISPLAY_X_Y(core);
+        case TokenSCROLLX:
+        case TokenSCROLLY:
+            return fnc_SCROLL_X_Y(core);
             
         case TokenCELLA:
         case TokenCELLC:
@@ -1318,11 +1318,11 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenPALETTE:
             return cmd_PALETTE(core);
             
+        case TokenSCROLL:
+            return cmd_SCROLL(core);
+
         case TokenDISPLAY:
             return cmd_DISPLAY(core);
-
-        case TokenDISPLAYA:
-            return cmd_DISPLAY_A(core);
             
         case TokenSPRITEA:
             return cmd_SPRITE_A(core);
