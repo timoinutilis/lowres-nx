@@ -64,8 +64,8 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
     {
         int n = nValue.v.floatValue;
         struct Sprite *sprite = &core->machine->spriteRegisters.sprites[n];
-        if (xValue.type != ValueTypeNull) sprite->x = (int)xValue.v.floatValue & 0xFF;
-        if (yValue.type != ValueTypeNull) sprite->y = (int)yValue.v.floatValue & 0xFF;
+        if (xValue.type != ValueTypeNull) sprite->x = ((int)xValue.v.floatValue + SPRITE_OFFSET_X) & 0xFF;
+        if (yValue.type != ValueTypeNull) sprite->y = ((int)yValue.v.floatValue + SPRITE_OFFSET_Y) & 0xFF;
         if (cValue.type != ValueTypeNull) sprite->character = cValue.v.floatValue;
     }
     
@@ -193,11 +193,11 @@ struct TypedValue fnc_SPRITE(struct Core *core)
         switch (type)
         {
             case TokenSPRITEX:
-                value.v.floatValue = sprite->x;
+                value.v.floatValue = sprite->x - SPRITE_OFFSET_X;
                 break;
                 
             case TokenSPRITEY:
-                value.v.floatValue = sprite->y;
+                value.v.floatValue = sprite->y - SPRITE_OFFSET_Y;
                 break;
                 
             case TokenSPRITEC:
