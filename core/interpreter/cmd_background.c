@@ -215,7 +215,7 @@ enum ErrorCode cmd_ATTR(struct Core *core)
     ++interpreter->pc;
     
     // attributes value
-    struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.charAttr, false);
+    struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.charAttr);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
     // filter value

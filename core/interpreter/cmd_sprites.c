@@ -105,7 +105,7 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     }
     
     // atrb value
-    struct TypedValue aValue = itp_evaluateCharAttributes(core, atrb, false);
+    struct TypedValue aValue = itp_evaluateCharAttributes(core, atrb);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
 
     if (interpreter->pass == PassRun)

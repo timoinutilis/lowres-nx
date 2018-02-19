@@ -16,7 +16,7 @@
 
 struct Core;
 
-struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr, bool isOptional);
+struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr);
 struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union DisplayAttributes oldAttr);
 
 #endif /* interpreter_utils_h */

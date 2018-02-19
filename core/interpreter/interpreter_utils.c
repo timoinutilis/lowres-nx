@@ -9,7 +9,7 @@
 #include "interpreter_utils.h"
 #include "core.h"
 
-struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr, bool isOptional)
+struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterAttributes oldAttr)
 {
     struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pc->type == TokenBracketOpen)
@@ -19,41 +19,55 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         
         union CharacterAttributes resultAttr = oldAttr;
         
+        struct TypedValue palValue = {ValueTypeNull, 0};
+        struct TypedValue fxValue = {ValueTypeNull, 0};
+        struct TypedValue fyValue = {ValueTypeNull, 0};
+        struct TypedValue priValue = {ValueTypeNull, 0};
+        struct TypedValue sValue = {ValueTypeNull, 0};
+        
         // palette value
-        struct TypedValue palValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_PALETTES - 1);
+        palValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_PALETTES - 1);
         if (palValue.type == ValueTypeError) return palValue;
         
         // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // flip x value
-        struct TypedValue fxValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-        if (fxValue.type == ValueTypeError) return fxValue;
-        
-        // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // flip y value
-        struct TypedValue fyValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-        if (fyValue.type == ValueTypeError) return fyValue;
-        
-        // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // priority value
-        struct TypedValue priValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-        if (priValue.type == ValueTypeError) return priValue;
+        if (interpreter->pc->type == TokenComma)
+        {
+            ++interpreter->pc;
+            
+            // flip x value
+            fxValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+            if (fxValue.type == ValueTypeError) return fxValue;
+            
+            // comma
+            if (interpreter->pc->type == TokenComma)
+            {
+                ++interpreter->pc;
+                
+                // flip y value
+                fyValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                if (fyValue.type == ValueTypeError) return fyValue;
+                
+                // comma
+                if (interpreter->pc->type == TokenComma)
+                {
+                    ++interpreter->pc;
+                    
+                    // priority value
+                    priValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                    if (priValue.type == ValueTypeError) return priValue;
 
-        // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // size value
-        struct TypedValue sValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
-        if (sValue.type == ValueTypeError) return sValue;
+                    // comma
+                    if (interpreter->pc->type == TokenComma)
+                    {
+                        ++interpreter->pc;
+                        
+                        // size value
+                        sValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
+                        if (sValue.type == ValueTypeError) return sValue;
+                    }
+                }
+            }
+        }
         
         // bracket close
         if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
@@ -73,10 +87,6 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         resultValue.v.floatValue = resultAttr.value;
         return resultValue;
     }
-    else if (isOptional)
-    {
-        return itp_evaluateOptionalNumericExpression(core, 0, 255);
-    }
     else
     {
         return itp_evaluateNumericExpression(core, 0, 255);
@@ -93,25 +103,33 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
         
         union DisplayAttributes resultAttr = oldAttr;
         
+        struct TypedValue sValue = {ValueTypeNull, 0};
+        struct TypedValue bg0Value = {ValueTypeNull, 0};
+        struct TypedValue bg1Value = {ValueTypeNull, 0};
+        
         // sprites value
-        struct TypedValue sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
         if (sValue.type == ValueTypeError) return sValue;
 
         // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // bg0 value
-        struct TypedValue bg0Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
-        if (bg0Value.type == ValueTypeError) return bg0Value;
+        if (interpreter->pc->type == TokenComma)
+        {
+            ++interpreter->pc;
+            
+            // bg0 value
+            bg0Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
+            if (bg0Value.type == ValueTypeError) return bg0Value;
 
-        // comma
-        if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-        ++interpreter->pc;
-        
-        // bg1 value
-        struct TypedValue bg1Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
-        if (bg1Value.type == ValueTypeError) return bg1Value;
+            // comma
+            if (interpreter->pc->type == TokenComma)
+            {
+                ++interpreter->pc;
+                
+                // bg1 value
+                bg1Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                if (bg1Value.type == ValueTypeError) return bg1Value;
+            }
+        }
         
         // bracket close
         if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
