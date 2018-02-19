@@ -513,9 +513,11 @@ enum ErrorCode cmd_ON(struct Core *core)
     if (type != TokenRASTER && type != TokenVBL) return ErrorUnexpectedToken;
     ++interpreter->pc;
     
-    if (itp_isEndOfCommand(interpreter))
+    if (interpreter->pc->type == TokenOFF)
     {
-        // reset
+        // OFF
+        ++interpreter->pc;
+        
         if (interpreter->pass == PassRun)
         {
             if (type == TokenRASTER)

@@ -496,8 +496,6 @@ or 1).</p>
 <pre>SPRITE n,x,y,c</pre>
 
 <p>Sets the position (x,y) and character (c) of sprite n (0-63).
-The top left corner of the screen is sprite position 32,32. Set
-the position to 0,0 to hide the sprite.
 All parameters can be omitted to keep their current settings.</p>
 
 
@@ -508,7 +506,7 @@ SPRITE OFF [n]
 SPRITE OFF a TO b
 </pre>
 
-<p>Hides one or more sprites by setting their positions to 0,0. If all parameters are omitted, all sprites (0 - 63) are hidden. With one parameter only the given sprite is hidden. The last option is to hide sprites in the range from a to b.</p>
+<p>Hides one or more sprites. If all parameters are omitted, all sprites (0 - 63) are hidden. With one parameter only the given sprite is hidden. The last option is to hide sprites in the range from a to b.</p>
 
 
 <h3 id="_SPRITE.A" name="SPRITE.A">SPRITE.A</h3>
@@ -914,7 +912,7 @@ BLUE = VALUE MOD 4
 </pre>
 
 
-<h3 id="_ON-RASTER-CALL" name="ON RASTER CALL,ON RASTER,RASTER CALL,ON,RASTER,CALL">ON RASTER CALL</h3>
+<h3 id="_ON-RASTER-CALL" name="ON RASTER CALL,ON RASTER,RASTER CALL,ON,RASTER,CALL,ON RASTER OFF,RASTER OFF,OFF">ON RASTER CALL/OFF</h3>
 
 <pre>ON RASTER CALL name</pre>
 
@@ -923,7 +921,7 @@ it's drawn. Usually used to change color palettes or scroll
 offsets to achieve graphical effects. Raster subprograms must be
 short.</p>
 
-<pre>ON RASTER</pre>
+<pre>ON RASTER OFF</pre>
 
 <p>Removes the current subprogram.</p>
 
@@ -936,7 +934,7 @@ short.</p>
 subprogram.</p>
 
 
-<h3 id="_ON-VBL-CALL" name="ON VBL CALL,ON VBL,VBL CALL,ON,VBL,CALL">ON VBL CALL</h3>
+<h3 id="_ON-VBL-CALL" name="ON VBL CALL,ON VBL,VBL CALL,ON,VBL,CALL,ON VBL OFF,VBL OFF,OFF">ON VBL CALL/OFF</h3>
 
 <pre>ON VBL CALL name</pre>
 
@@ -944,7 +942,7 @@ subprogram.</p>
 to update animations or sounds, even if the main program is
 blocked by WAIT or INPUT.</p>
 
-<pre>ON VBL</pre>
+<pre>ON VBL OFF</pre>
 
 <p>Removes the current subprogram.</p>
 
@@ -1396,6 +1394,10 @@ bytes:</p>
          2: 3x3 characters (24x24 px)
          3: 4x4 characters (32x32 px)
 </pre>
+<p>Note: X and Y sprite position registers have an offset of 32,
+so they can move out of the top/left screen borders without using
+negative numbers. Using the BASIC commands, this offset is
+removed for convenience.
 
 <h2 id="Color-Registers">Color Registers</h2>
 
