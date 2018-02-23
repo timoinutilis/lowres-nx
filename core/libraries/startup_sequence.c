@@ -76,6 +76,6 @@ void runStartupSequence(struct Core *core)
 
     // main background source
     int bgStart = entries[3].start;
-    core->interpreter->textLib.sourceAddress = bgStart + 2;
-    core->interpreter->textLib.sourceWidth = core->machine->cartridgeRom[bgStart];
+    core->interpreter->textLib.sourceAddress = bgStart + 4;
+    core->interpreter->textLib.sourceWidth = core->machine->cartridgeRom[bgStart + 2];
 }

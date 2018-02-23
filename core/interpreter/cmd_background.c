@@ -79,8 +79,8 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
         else
         {
             // data with preceding size (W x H)
-            core->interpreter->textLib.sourceAddress = address + 2;
-            core->interpreter->textLib.sourceWidth = machine_peek(core, address);
+            core->interpreter->textLib.sourceAddress = address + 4;
+            core->interpreter->textLib.sourceWidth = machine_peek(core, address + 2);
         }
     }
     
