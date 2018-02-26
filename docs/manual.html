@@ -1342,6 +1342,7 @@ $9800 - BG1 Data (2 KB)
 $A000 - Working RAM (16 KB)
 
 $E000 - Persistent RAM (256 B)
+        (not available yet)
 
 $FE00 - Sprite Registers (256 B)
 $FF00 - Color Registers (32 B)
@@ -1417,13 +1418,30 @@ $FF20 - Attributes:
     0    Sprites enabled
     1    BG0 enabled
     2    BG1 enabled
+    3    BG0 cell size,
+    4    BG1 cell size:
+         0: 1 character (8x8 px)
+            (BG 256x256 px)
+         1: 2x2 characters (16x16 px)
+            (BG 512x512 px)
 
 $FF21 - BG0 scroll offset X
 $FF22 - BG0 scroll offset Y
 $FF23 - BG1 scroll offset X
 $FF24 - BG1 scroll offset Y
-$FF25 - Raster line
+$FF25 - Scroll offset MSB
+    (most significant bits)
+    used for big cell size only:
+    Bit  Purpose
+    0    BG0 X+256
+    1    BG0 Y+256
+    2    BG1 X+256
+    3    BG1 Y+256
+
+$FF26 - Raster line
 </pre>
+
+<p>Note: Big cell sizes are not available yet.</p>
 
 <h2 id="Audio-Registers">Audio Registers</h2>
 

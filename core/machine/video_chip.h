@@ -105,6 +105,18 @@ union DisplayAttributes {
         uint8_t spritesEnabled:1;
         uint8_t planeAEnabled:1;
         uint8_t planeBEnabled:1;
+        uint8_t planeACellSize:1;
+        uint8_t planeBCellSize:1;
+    };
+    uint8_t value;
+};
+
+union ScrollMSB {
+    struct {
+        uint8_t aX:1;
+        uint8_t aY:1;
+        uint8_t bX:1;
+        uint8_t bY:1;
     };
     uint8_t value;
 };
@@ -115,6 +127,7 @@ struct VideoRegisters {
     uint8_t scrollAY;
     uint8_t scrollBX;
     uint8_t scrollBY;
+    union ScrollMSB scrollMSB;
     uint8_t rasterLine;
 };
 
