@@ -22,7 +22,7 @@ class LowResNXDocument: NSDocument {
 
     override func read(from data: Data, ofType typeName: String) throws {
         sourceCode = String(data: data, encoding: .ascii)!
-        let cString = sourceCode.cString(using: .ascii)
+        let cString = sourceCode.cString(using: .utf8)
         let error = itp_compileProgram(&coreWrapper.core, cString)
         if error.code != ErrorNone {
             throw LowResNXError(error: error, sourceCode: sourceCode)

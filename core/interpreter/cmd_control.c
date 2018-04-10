@@ -356,8 +356,6 @@ enum ErrorCode cmd_GOTO(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
-    
     // GOTO
     struct Token *tokenGOTO = interpreter->pc;
     ++interpreter->pc;

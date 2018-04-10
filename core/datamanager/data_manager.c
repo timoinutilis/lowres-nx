@@ -129,7 +129,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
             {
                 character++;
             }
-            while (*character && *character != '\n');
+            while (*character && *character != '\n' && *character != '\r');
             size_t commentLen = (character - comment);
             if (commentLen > ENTRY_COMMENT_SIZE) commentLen = ENTRY_COMMENT_SIZE - 1;
             strncpy(entry->comment, comment, commentLen);
@@ -157,7 +157,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
                     }
                     shift = !shift;
                 }
-                else if (*character != ' ' && *character != '\t' && *character != '\n')
+                else if (*character != ' ' && *character != '\t' && *character != '\n' && *character != '\r')
                 {
                     return err_makeCoreError(ErrorUnexpectedCharacter, (int)(character - input));
                 }
@@ -175,7 +175,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
                 manager->entries[i].start = entry->start + entry->length;
             }
         }
-        else if (*character == ' ' || *character == '\t' || *character == '\n')
+        else if (*character == ' ' || *character == '\t' || *character == '\n' || *character == '\r')
         {
             character++;
         }

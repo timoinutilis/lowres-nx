@@ -55,16 +55,12 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
         // OFF
         ++interpreter->pc;
     }
-    else if (interpreter->pc->type == TokenFloat)
+    else
     {
         // number
         struct TypedValue value = itp_evaluateNumericExpression(core, 0, 2);
         if (value.type == ValueTypeError) return value.v.errorCode;
         num = value.v.floatValue;
-    }
-    else
-    {
-        return ErrorUnexpectedToken;
     }
     
     if (interpreter->pass == PassRun)
@@ -99,6 +95,7 @@ enum ErrorCode cmd_PAUSE(struct Core *core)
     {
         if (type == TokenON)
         {
+            core->machine->ioRegisters.status.pause = 0;
             interpreter->handlesPause = true;
         }
         else if (type == TokenOFF)

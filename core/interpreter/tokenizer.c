@@ -51,12 +51,23 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
         struct Token *token = &tokenizer->tokens[tokenizer->numTokens];
         token->sourcePosition = tokenSourcePosition;
         
-        // line break
+        // line break \n or \n\r
         if (*character == '\n')
         {
             token->type = TokenEol;
             tokenizer->numTokens++;
             character++;
+            if (*character == '\r') { character++; }
+            continue;
+        }
+        
+        // line break \r or \r\n
+        if (*character == '\r')
+        {
+            token->type = TokenEol;
+            tokenizer->numTokens++;
+            character++;
+            if (*character == '\n') { character++; }
             continue;
         }
         
@@ -74,11 +85,15 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
             const char *firstCharacter = character;
             while (*character && *character != '"')
             {
-                character++;
                 if (*character == '\n')
                 {
                     return err_makeCoreError(ErrorUnterminatedString, tokenSourcePosition);
                 }
+                else if (*character < 0)
+                {
+                    return err_makeCoreError(ErrorUnexpectedCharacter, tokenSourcePosition);
+                }
+                character++;
             }
             int len = (int)(character - firstCharacter);
             struct RCString *string = rcstring_new(firstCharacter, len);
