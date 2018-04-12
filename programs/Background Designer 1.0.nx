@@ -1,6 +1,5 @@
-'BACKGROUND DESIGNER 0.6 BETA
-'BY TIMO KLOSS
-'2017-2018
+'TITLE:   BACKGROUND DESIGNER
+'AUTHOR:  TIMO KLOSS
 
 '======================
 '** RAM MAP **
@@ -61,111 +60,111 @@ OLDX=-1
 OLDY=-1
 
 DO
-  IF MAPBARST>0 THEN
-    MAPBARST=MAPBARST-1
-    IF MAPBARST=0 THEN SPRITE OFF 0 TO 3
-  END IF
-  IF TOUCH THEN
-    X=TOUCH.X\8
-    Y=TOUCH.Y\8
-    IF X<>OLDX OR Y<>OLDY THEN
+ IF MAPBARST>0 THEN
+  MAPBARST=MAPBARST-1
+  IF MAPBARST=0 THEN SPRITE OFF 0 TO 3
+ END IF
+ IF TOUCH THEN
+  X=TOUCH.X\8
+  Y=TOUCH.Y\8
+  IF X<>OLDX OR Y<>OLDY THEN
 
-      IF Y>=14 THEN
+   IF Y>=14 THEN
         
-        '** MODES **
-        IF X>=0 AND X<=1 THEN
-          EDMODE=0
-          CALL DRAWEDMODE
-        END IF
-        IF X>=2 AND X<=3 THEN
-          EDMODE=1
-          CALL DRAWEDMODE
-        END IF
-        IF X>=4 AND X<=5 THEN
-          EDMODE=2
-          CALL DRAWEDMODE
-        END IF
-        IF X>=6 AND X<=7 THEN
-          EDMODE=3
-          CALL DRAWMAP
-          CALL DRAWTOOLBAR
-        END IF
-        
-        '** TOGGLES **
-        IF X>=9 AND X<=10 THEN
-          IF FLIPMODE<3 THEN FLIPMODE=FLIPMODE+1 ELSE FLIPMODE=0
-          CALL DRAWTOOLBAR
-        END IF
-        IF X>=11 AND X<=12 THEN
-          IF PRIO=0 THEN PRIO=1 ELSE PRIO=0
-          CALL DRAWTOOLBAR
-        END IF
-
-        '** TABS **
-        GOSUB CHECKTABBAR
-
-      ELSE
-
-        '** SCROLL MODE **
-        IF EDMODE=0 THEN
-          IF OLDX>=0 THEN
-            MAPX=MIN(MAX(MAPX-X+DRAGX,0),MAPW-20)
-            MAPY=MIN(MAX(MAPY-Y+DRAGY,0),MAPH-14)
-            CALL DRAWMAP
-          END IF
-          DRAGX=X
-          DRAGY=Y
-        END IF
-
-        '** DRAW MODE **
-        IF EDMODE=1 THEN
-          W=MIN(SELW,19-X)
-          H=MIN(SELH,13-Y)
-          FOR I=0 TO H
-            FOR J=0 TO W
-              C=SELCHAR+I*16+J
-              ATT=SELPAL+FLIPMODE*8+PRIO*32
-              IF FLIPMODE AND %01 THEN CX=X+W-J ELSE CX=X+J
-              IF FLIPMODE AND %10 THEN CY=Y+H-I ELSE CY=Y+I
-              A=$9000+(CY*32+CX)*2
-              POKE A,C
-              POKE A+1,ATT
-              A=USERBG+4+((CY+MAPY)*MAPW+(CX+MAPX))*2
-              POKE A,C
-              POKE A+1,ATT
-            NEXT J
-          NEXT I
-        END IF
-
-        '** COLOR MODE **
-        IF EDMODE=2 THEN
-          A=USERBG+4+((Y+MAPY)*MAPW+(X+MAPX))*2+1
-          POKE A,(PEEK(A) AND %11111000) OR SELPAL
-          A=$9000+(Y*32+X)*2+1
-          POKE A,(PEEK(A) AND %11111000) OR SELPAL
-        END IF
-
-        '** PRIO MODE **
-        IF EDMODE=3 THEN
-          'WRITE TO DATA...
-          A=USERBG+4+((Y+MAPY)*MAPW+(X+MAPX))*2+1
-          ATT=PEEK(A) AND %11011111
-          POKE A,ATT OR PRIO*32
-          'WRITE TO SCREEN...
-          A=$9000+(Y*32+X)*2+1
-          ATT=PEEK(A) AND %11011000
-          POKE A,ATT OR PRIO*32 OR PRIO
-        END IF
-
-      END IF
-
-      OLDX=X
-      OLDY=Y
+    '** MODES **
+    IF X>=0 AND X<=1 THEN
+     EDMODE=0
+     CALL DRAWEDMODE
     END IF
-  ELSE
-    OLDX=-1
+    IF X>=2 AND X<=3 THEN
+     EDMODE=1
+     CALL DRAWEDMODE
+    END IF
+    IF X>=4 AND X<=5 THEN
+     EDMODE=2
+     CALL DRAWEDMODE
+    END IF
+    IF X>=6 AND X<=7 THEN
+     EDMODE=3
+     CALL DRAWMAP
+     CALL DRAWTOOLBAR
+    END IF
+        
+    '** TOGGLES **
+    IF X>=9 AND X<=10 THEN
+     IF FLIPMODE<3 THEN FLIPMODE=FLIPMODE+1 ELSE FLIPMODE=0
+     CALL DRAWTOOLBAR
+    END IF
+    IF X>=11 AND X<=12 THEN
+     IF PRIO=0 THEN PRIO=1 ELSE PRIO=0
+     CALL DRAWTOOLBAR
+    END IF
+
+    '** TABS **
+    GOSUB CHECKTABBAR
+
+   ELSE
+
+    '** SCROLL MODE **
+    IF EDMODE=0 THEN
+     IF OLDX>=0 THEN
+      MAPX=MIN(MAX(MAPX-X+DRAGX,0),MAPW-20)
+      MAPY=MIN(MAX(MAPY-Y+DRAGY,0),MAPH-14)
+      CALL DRAWMAP
+     END IF
+     DRAGX=X
+     DRAGY=Y
+    END IF
+
+    '** DRAW MODE **
+    IF EDMODE=1 THEN
+     W=MIN(SELW,19-X)
+     H=MIN(SELH,13-Y)
+     FOR I=0 TO H
+      FOR J=0 TO W
+       C=SELCHAR+I*16+J
+       ATT=SELPAL+FLIPMODE*8+PRIO*32
+       IF FLIPMODE AND %01 THEN CX=X+W-J ELSE CX=X+J
+       IF FLIPMODE AND %10 THEN CY=Y+H-I ELSE CY=Y+I
+       A=$9000+(CY*32+CX)*2
+       POKE A,C
+       POKE A+1,ATT
+       A=USERBG+4+((CY+MAPY)*MAPW+(CX+MAPX))*2
+       POKE A,C
+       POKE A+1,ATT
+      NEXT J
+     NEXT I
+    END IF
+
+    '** COLOR MODE **
+    IF EDMODE=2 THEN
+     A=USERBG+4+((Y+MAPY)*MAPW+(X+MAPX))*2+1
+     POKE A,(PEEK(A) AND %11111000) OR SELPAL
+     A=$9000+(Y*32+X)*2+1
+     POKE A,(PEEK(A) AND %11111000) OR SELPAL
+    END IF
+
+    '** PRIO MODE **
+    IF EDMODE=3 THEN
+     'WRITE TO DATA...
+     A=USERBG+4+((Y+MAPY)*MAPW+(X+MAPX))*2+1
+     ATT=PEEK(A) AND %11011111
+     POKE A,ATT OR PRIO*32
+     'WRITE TO SCREEN...
+     A=$9000+(Y*32+X)*2+1
+     ATT=PEEK(A) AND %11011000
+     POKE A,ATT OR PRIO*32 OR PRIO
+    END IF
+
+   END IF
+
+   OLDX=X
+   OLDY=Y
   END IF
-  WAIT VBL
+ ELSE
+  OLDX=-1
+ END IF
+ WAIT VBL
 LOOP
 
 SUB MAPEDITORRASTER
@@ -251,129 +250,129 @@ OLDX=-1
 OLDY=-1
 
 DO
-  IF TOUCH THEN
-    X=TOUCH.X\8
-    Y=TOUCH.Y\8
-    IF X<>OLDX OR Y<>OLDY THEN
+ IF TOUCH THEN
+  X=TOUCH.X\8
+  Y=TOUCH.Y\8
+  IF X<>OLDX OR Y<>OLDY THEN
 
-      GOSUB CHECKTABBAR
+   GOSUB CHECKTABBAR
 
-      '** CHAR **
-      IF X>=1 AND X<=16 AND Y>=1 AND Y<=4 THEN
-        IF OLDX=-1 THEN
-          SELCHAR=((Y-1)*16)+(X-1)+SELPAGE*64
-          SELW=0
-          SELH=0
-          CALL DRAWCHARNUM
-          DRAGX=X
-          DRAGY=Y
-        ELSE
-          SELW=MAX(X-DRAGX,0)
-          SELH=MAX(Y-DRAGY,0)
-          CALL DRAWCHARNUM
-        END IF
-      END IF
-
-      '** PAGE **
-      IF X>=17 AND X<=18 THEN
-        IF Y>=1 AND Y<=2 AND SELPAGE>0 THEN
-          SELPAGE=SELPAGE-1
-          CALL READPAGE
-          CALL DRAWCHARNUM
-        END IF
-        IF Y>=3 AND Y<=4 AND SELPAGE<3 THEN
-          SELPAGE=SELPAGE+1
-          CALL READPAGE
-          CALL DRAWCHARNUM
-        END IF
-      END IF
-
-      '** PAL **
-      IF Y>=7 AND Y<=8 THEN
-        IF X>=1 AND X<=3 THEN
-          SELPAL=SELPALPAGE*4+0
-          CALL DRAWPAL
-        END IF
-        IF X>=5 AND X<=7 THEN
-          SELPAL=SELPALPAGE*4+1
-          CALL DRAWPAL
-        END IF
-      END IF
-      IF Y>=9 AND Y<=10 THEN
-        IF X>=1 AND X<=3 THEN
-          SELPAL=SELPALPAGE*4+2
-          CALL DRAWPAL
-        END IF
-        IF X>=5 AND X<=7 THEN
-          SELPAL=SELPALPAGE*4+3
-          CALL DRAWPAL
-        END IF
-      END IF
-
-      '** PAL PAGE **
-      IF Y>=11 AND Y<=12 THEN
-        IF X>=1 AND X<=2 THEN
-          SELPALPAGE=0
-          SELPAL=SELPAL MOD 4
-          CALL READPAL
-          CALL DRAWPAL
-        END IF
-        IF X>=6 AND X<=7 THEN
-          SELPALPAGE=1
-          SELPAL=(SELPAL MOD 4)+4
-          CALL READPAL
-          CALL DRAWPAL
-        END IF
-      END IF
-
-      '** COLOR **
-      IF Y>=7 AND Y<=8 THEN
-        IF X>=11 AND X<=12 THEN
-          SELCOL=0
-          CALL DRAWSLIDERS
-          CALL DRAWSELCOL
-        END IF
-        IF X>=13 AND X<=14 THEN
-          SELCOL=1
-          CALL DRAWSLIDERS
-          CALL DRAWSELCOL
-        END IF
-        IF X>=15 AND X<=16 THEN
-          SELCOL=2
-          CALL DRAWSLIDERS
-          CALL DRAWSELCOL
-        END IF
-        IF X>=17 AND X<=18 THEN
-          SELCOL=3
-          CALL DRAWSLIDERS
-          CALL DRAWSELCOL
-        END IF
-      END IF
-
-      '** RGB SLIDERS **
-      IF Y>=9 AND Y<=12 AND X>=12 AND X<=17 THEN
-        V=12-Y
-        A=USERPALS+SELPAL*4+SELCOL
-        C=PEEK(A)
-        R=INT(C/16)
-        G=INT(C/4) MOD 4
-        B=C MOD 4
-        IF X>=12 AND X<=13 THEN R=V
-        IF X>=14 AND X<=15 THEN G=V
-        IF X>=16 AND X<=17 THEN B=V
-        C=R*16+G*4+B
-        POKE A,C
-        CALL DRAWSLIDERS
-        CALL READPAL
-      END IF
-
-      OLDX=X
-      OLDY=Y
+   '** CHAR **
+   IF X>=1 AND X<=16 AND Y>=1 AND Y<=4 THEN
+    IF OLDX=-1 THEN
+     SELCHAR=((Y-1)*16)+(X-1)+SELPAGE*64
+     SELW=0
+     SELH=0
+     CALL DRAWCHARNUM
+     DRAGX=X
+     DRAGY=Y
+    ELSE
+     SELW=MAX(X-DRAGX,0)
+     SELH=MAX(Y-DRAGY,0)
+     CALL DRAWCHARNUM
     END IF
-  ELSE
-    OLDX=-1
+   END IF
+
+   '** PAGE **
+   IF X>=17 AND X<=18 THEN
+    IF Y>=1 AND Y<=2 AND SELPAGE>0 THEN
+     SELPAGE=SELPAGE-1
+     CALL READPAGE
+     CALL DRAWCHARNUM
+    END IF
+    IF Y>=3 AND Y<=4 AND SELPAGE<3 THEN
+     SELPAGE=SELPAGE+1
+     CALL READPAGE
+     CALL DRAWCHARNUM
+    END IF
+   END IF
+
+   '** PAL **
+   IF Y>=7 AND Y<=8 THEN
+    IF X>=1 AND X<=3 THEN
+     SELPAL=SELPALPAGE*4+0
+     CALL DRAWPAL
+    END IF
+    IF X>=5 AND X<=7 THEN
+     SELPAL=SELPALPAGE*4+1
+     CALL DRAWPAL
+    END IF
+   END IF
+   IF Y>=9 AND Y<=10 THEN
+    IF X>=1 AND X<=3 THEN
+     SELPAL=SELPALPAGE*4+2
+     CALL DRAWPAL
+    END IF
+    IF X>=5 AND X<=7 THEN
+     SELPAL=SELPALPAGE*4+3
+     CALL DRAWPAL
+    END IF
+   END IF
+
+   '** PAL PAGE **
+   IF Y>=11 AND Y<=12 THEN
+    IF X>=1 AND X<=2 THEN
+     SELPALPAGE=0
+     SELPAL=SELPAL MOD 4
+     CALL READPAL
+     CALL DRAWPAL
+    END IF
+    IF X>=6 AND X<=7 THEN
+     SELPALPAGE=1
+     SELPAL=(SELPAL MOD 4)+4
+     CALL READPAL
+     CALL DRAWPAL
+    END IF
+   END IF
+
+   '** COLOR **
+   IF Y>=7 AND Y<=8 THEN
+    IF X>=11 AND X<=12 THEN
+     SELCOL=0
+     CALL DRAWSLIDERS
+     CALL DRAWSELCOL
+    END IF
+    IF X>=13 AND X<=14 THEN
+     SELCOL=1
+     CALL DRAWSLIDERS
+     CALL DRAWSELCOL
+    END IF
+    IF X>=15 AND X<=16 THEN
+     SELCOL=2
+     CALL DRAWSLIDERS
+     CALL DRAWSELCOL
+    END IF
+    IF X>=17 AND X<=18 THEN
+     SELCOL=3
+     CALL DRAWSLIDERS
+     CALL DRAWSELCOL
+    END IF
+   END IF
+
+   '** RGB SLIDERS **
+   IF Y>=9 AND Y<=12 AND X>=12 AND X<=17 THEN
+    V=12-Y
+    A=USERPALS+SELPAL*4+SELCOL
+    C=PEEK(A)
+    R=INT(C/16)
+    G=INT(C/4) MOD 4
+    B=C MOD 4
+    IF X>=12 AND X<=13 THEN R=V
+    IF X>=14 AND X<=15 THEN G=V
+    IF X>=16 AND X<=17 THEN B=V
+    C=R*16+G*4+B
+    POKE A,C
+    CALL DRAWSLIDERS
+    CALL READPAL
+   END IF
+
+   OLDX=X
+   OLDY=Y
   END IF
-  WAIT VBL
+ ELSE
+  OLDX=-1
+ END IF
+ WAIT VBL
 LOOP
 
 SUB DRAWCHARMENU
@@ -509,35 +508,35 @@ CALL DRAWDISKMENU
 WAIT 20
 
 DO
-  IF TAP THEN
-    X=TOUCH.X\8
-    Y=TOUCH.Y\8
+ IF TAP THEN
+  X=TOUCH.X\8
+  Y=TOUCH.Y\8
 
-    GOSUB CHECKTABBAR
+  GOSUB CHECKTABBAR
 
-    IF Y>=3 AND Y<=4 THEN
-      IF X>=2 AND Y<=7 THEN
-        FTYPE$="CHARACTERS"
-        GOTO FILESMENU
-      END IF
-    END IF
-    IF Y>=6 AND Y<=7 THEN
-      IF X>=2 AND X<=7 THEN
-        FTYPE$="PALETTES"
-        GOTO FILESMENU
-      END IF
-    END IF
-    IF Y>=9 AND Y<=10 THEN
-      IF X>=2 AND X<=7 THEN
-        FTYPE$="BACKGROUND"
-        GOTO FILESMENU
-      END IF
-      IF X>=8 AND X<=12 THEN CALL BNEW
-      IF X>=13 AND X<=18 THEN GOTO SIZEMENU
-    END IF
-
+  IF Y>=3 AND Y<=4 THEN
+   IF X>=2 AND Y<=7 THEN
+    FTYPE$="CHARACTERS"
+    GOTO FILESMENU
+   END IF
   END IF
-  WAIT VBL
+  IF Y>=6 AND Y<=7 THEN
+   IF X>=2 AND X<=7 THEN
+    FTYPE$="PALETTES"
+    GOTO FILESMENU
+   END IF
+  END IF
+  IF Y>=9 AND Y<=10 THEN
+   IF X>=2 AND X<=7 THEN
+    FTYPE$="BACKGROUND"
+    GOTO FILESMENU
+   END IF
+   IF X>=8 AND X<=12 THEN CALL BNEW
+   IF X>=13 AND X<=18 THEN GOTO SIZEMENU
+  END IF
+
+ END IF
+ WAIT VBL
 LOOP
 
 SUB DRAWDISKMENU
@@ -579,40 +578,40 @@ CALL DRAWFILESMENU
 WAIT 20
 
 DO
-  IF TAP THEN
-    X=TOUCH.X\8
-    Y=TOUCH.Y\8
-    IF X<=17 AND Y>=2 AND Y<=11 THEN
-      SELFILE=Y-2+FILESOFFS
-      CALL DRAWFILES
-      CALL SEL2FILE
-    END IF
-    IF X>=18 THEN
-      IF Y>=2 AND Y<=3 THEN
-        FILESOFFS=0
-        CALL DRAWFILES
-      END IF
-      IF Y>=10 AND Y<=11 THEN
-        FILESOFFS=6
-        CALL DRAWFILES
-      END IF
-    END IF
-    IF Y>=13 AND Y<=14 THEN
-      IF X>=1 AND X<=2 THEN GOTO DISKMENU
-      IF X>=15 AND X<=16 THEN
-       OK=0
-       CALL BLOAD(OK)
-       IF OK THEN GOTO DISKMENU
-      END IF
-      IF X>=17 AND X<=18 THEN
-       OK=0
-       CALL BSAVE(OK)
-       IF OK THEN GOTO DISKMENU
-      END IF
-    END IF
+ IF TAP THEN
+  X=TOUCH.X\8
+  Y=TOUCH.Y\8
+  IF X<=17 AND Y>=2 AND Y<=11 THEN
+   SELFILE=Y-2+FILESOFFS
+   CALL DRAWFILES
+   CALL SEL2FILE
   END IF
+  IF X>=18 THEN
+   IF Y>=2 AND Y<=3 THEN
+    FILESOFFS=0
+    CALL DRAWFILES
+   END IF
+   IF Y>=10 AND Y<=11 THEN
+    FILESOFFS=6
+    CALL DRAWFILES
+   END IF
+  END IF
+  IF Y>=13 AND Y<=14 THEN
+   IF X>=1 AND X<=2 THEN GOTO DISKMENU
+   IF X>=15 AND X<=16 THEN
+    OK=0
+    CALL BLOAD(OK)
+    IF OK THEN GOTO DISKMENU
+   END IF
+   IF X>=17 AND X<=18 THEN
+    OK=0
+    CALL BSAVE(OK)
+    IF OK THEN GOTO DISKMENU
+   END IF
+  END IF
+ END IF
 
-  WAIT VBL
+ WAIT VBL
 LOOP
 
 SUB DRAWFILESMENU
@@ -721,65 +720,65 @@ CALL DRAWSIZE
 WAIT 20
 
 DO
-  IF TAP THEN
-    X=TOUCH.X\8
-    Y=TOUCH.Y\8
-    IF X>=4 AND X<=9 THEN
-      IF Y>=4 AND Y<=5 THEN
-        NEWW=20
-        CALL DRAWSIZE
-      END IF
-      IF Y>=6 AND Y<=7 THEN
-        NEWW=32
-        CALL DRAWSIZE
-      END IF
-      IF Y>=8 AND Y<=9 THEN
-        NEWW=64
-        CALL DRAWSIZE
-      END IF
-      IF Y>=10 AND Y<=11 THEN
-        NEWW=96
-        CALL DRAWSIZE
-      END IF
-      IF Y>=12 AND Y<=13 THEN
-        NEWW=128
-        CALL DRAWSIZE
-      END IF
-    END IF
-    IF X>=12 AND X<=17 THEN
-      IF Y>=4 AND Y<=5 THEN
-        NEWH=16
-        CALL DRAWSIZE
-      END IF
-      IF Y>=6 AND Y<=7 THEN
-        NEWH=32
-        CALL DRAWSIZE
-      END IF
-      IF Y>=8 AND Y<=9 THEN
-        NEWH=64
-        CALL DRAWSIZE
-      END IF
-      IF Y>=10 AND Y<=11 THEN
-        NEWH=96
-        CALL DRAWSIZE
-      END IF
-      IF Y>=12 AND Y<=13 THEN
-        NEWH=128
-        CALL DRAWSIZE
-      END IF
-    END IF
-
-    IF Y>=14 THEN
-      IF X>=9 AND X<=11 THEN
-        IF NEWW*NEWH*2<=8192 THEN
-         CALL BCHANGESIZE
-         GOTO DISKMENU
-        END IF
-      END IF
-      IF X>=13 THEN GOTO DISKMENU
-    END IF
+ IF TAP THEN
+  X=TOUCH.X\8
+  Y=TOUCH.Y\8
+  IF X>=4 AND X<=9 THEN
+   IF Y>=4 AND Y<=5 THEN
+    NEWW=20
+    CALL DRAWSIZE
+   END IF
+   IF Y>=6 AND Y<=7 THEN
+    NEWW=32
+    CALL DRAWSIZE
+   END IF
+   IF Y>=8 AND Y<=9 THEN
+    NEWW=64
+    CALL DRAWSIZE
+   END IF
+   IF Y>=10 AND Y<=11 THEN
+    NEWW=96
+    CALL DRAWSIZE
+   END IF
+   IF Y>=12 AND Y<=13 THEN
+    NEWW=128
+    CALL DRAWSIZE
+   END IF
   END IF
-  WAIT VBL
+  IF X>=12 AND X<=17 THEN
+   IF Y>=4 AND Y<=5 THEN
+    NEWH=16
+    CALL DRAWSIZE
+   END IF
+   IF Y>=6 AND Y<=7 THEN
+    NEWH=32
+    CALL DRAWSIZE
+   END IF
+   IF Y>=8 AND Y<=9 THEN
+    NEWH=64
+    CALL DRAWSIZE
+   END IF
+   IF Y>=10 AND Y<=11 THEN
+    NEWH=96
+    CALL DRAWSIZE
+   END IF
+   IF Y>=12 AND Y<=13 THEN
+    NEWH=128
+    CALL DRAWSIZE
+   END IF
+  END IF
+
+  IF Y>=14 THEN
+   IF X>=9 AND X<=11 THEN
+    IF NEWW*NEWH*2<=8192 THEN
+     CALL BCHANGESIZE
+     GOTO DISKMENU
+    END IF
+   END IF
+   IF X>=13 THEN GOTO DISKMENU
+  END IF
+ END IF
+ WAIT VBL
 LOOP
 
 SUB DRAWSIZEMENU
