@@ -24,11 +24,13 @@
 #include <stdbool.h>
 
 struct Core;
+struct Sprite;
 
 struct SpritesLib {
     int lastHit;
 };
 
+bool sprlib_isSpriteOnScreen(struct Sprite *sprite);
 bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, int lastIndex);
 
 #endif /* sprites_lib_h */

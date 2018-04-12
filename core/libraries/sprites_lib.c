@@ -20,15 +20,24 @@
 #include "sprites_lib.h"
 #include "core.h"
 
+bool sprlib_isSpriteOnScreen(struct Sprite *sprite)
+{
+    int size = (sprite->attr.size + 1) << 3;
+    return (   sprite->x < SCREEN_WIDTH + SPRITE_OFFSET_X
+            && sprite->y < SCREEN_HEIGHT + SPRITE_OFFSET_Y
+            && sprite->x + size > SPRITE_OFFSET_X
+            && sprite->y + size > SPRITE_OFFSET_Y);
+}
+
 bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struct Sprite *otherSprite)
 {
-    int ax2 = otherSprite->x;
-    int ay2 = otherSprite->y;
-    
-    if (ax2 != 0 || ay2 != 0)
+    if (sprlib_isSpriteOnScreen(otherSprite))
     {
         int ax1 = sprite->x;
         int ay1 = sprite->y;
+        
+        int ax2 = otherSprite->x;
+        int ay2 = otherSprite->y;
         
         int s1 = (sprite->attr.size + 1) << 3;
         int s2 = (otherSprite->attr.size + 1) << 3;
@@ -113,7 +122,7 @@ bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, in
     struct Sprite *sprites = core->machine->spriteRegisters.sprites;
     struct Sprite *sprite = &sprites[checkIndex];
     
-    if (sprite->x != 0 || sprite->y != 0)
+    if (sprlib_isSpriteOnScreen(sprite))
     {
         for (int i = firstIndex; i <= lastIndex; i++)
         {
