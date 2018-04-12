@@ -74,9 +74,20 @@ void video_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int 
                 {
                     charIndex += sprite->attr.size;
                 }
-                struct Character *character = &ram->characters[charIndex];
                 int minX = sprite->x - SPRITE_OFFSET_X;
                 int maxX = minX + size;
+                if (minX < 0)
+                {
+                    int skip = -minX >> 3;
+                    if (sprite->attr.flipX)
+                    {
+                        charIndex -= skip;
+                    }
+                    else
+                    {
+                        charIndex += skip;
+                    }
+                }
                 if (minX < 0) minX = 0;
                 if (maxX > SCREEN_WIDTH) maxX = SCREEN_WIDTH;
                 uint8_t *buffer = &scanlineSpriteBuffer[minX];
@@ -85,6 +96,7 @@ void video_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int 
                 {
                     spriteX = size - spriteX - 1;
                 }
+                struct Character *character = &ram->characters[charIndex];
                 for (int x = minX; x < maxX; x++)
                 {
                     int pixel = video_getCharacterPixel(character, spriteX & 0x07, spriteY & 0x07);
