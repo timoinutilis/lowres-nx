@@ -311,7 +311,16 @@ executed. You can use an apostrophe (') in place of the word REM.</p>
 <h3 id="_IF-THEN-ELSE" name="IF,THEN,ELSE">IF...THEN...ELSE</h3>
 <pre>
 IF expr THEN command [ELSE command]
+</pre>
 
+<p>Checks if the given expression is true or false. If it's true, the
+command after THEN is executed, otherwise the one after ELSE. The ELSE
+part is optional.<p>
+<p>If you want to execute more than one command, you can use the
+block version of the IF command. It must be closed with the line
+END IF.</p>
+
+<pre>
 IF expression THEN
     commands
 [ELSE IF expression THEN]
@@ -325,7 +334,8 @@ END IF
 
 <pre>GOTO label</pre>
 
-<p>Jumps to the given label.</p>
+<p>Jumps to the given label and continues the program execution there.
+</p>
 
 
 <h3 id="_GOSUB" name="GOSUB">GOSUB</h3>
@@ -333,7 +343,8 @@ END IF
 <pre>GOSUB label</pre>
 
 <p>Adds the current program position to a stack and jumps to the
-given label.</p>
+given label. The program after the label is called a subroutine and
+must be finished using RETURN.</p>
 
 
 <h3 id="_RETURN" name="RETURN">RETURN</h3>
@@ -356,12 +367,26 @@ FOR var=a TO b [STEP s]
 NEXT var
 </pre>
 
+<p>Performs a series of commands in a loop a given number of times.
+The FOR command uses the variable var as a counter, starting with the
+value a. All commands until NEXT are executed, then the counter is
+increased by s (or +1 if STEP is omitted). A check is performed to see
+if the counter is now greater than b. If not, the process is repeated.
+If it is greater, the program continues with the lines after NEXT. If
+STEP s is negative, the loop is executed until the counter is less
+than value b.</p>
+
+
 <h3 id="_DO-LOOP" name="DO,LOOP">DO...LOOP</h3>
 <pre>
 DO
   commands
 LOOP
 </pre>
+
+<p>Performs commands in an endless loop. You can use GOTO to exit it.
+</p>
+
 
 <h3 id="_REPEAT-UNTIL" name="REPEAT,UNTIL">REPEAT...UNTIL</h3>
 <pre>
@@ -370,6 +395,10 @@ REPEAT
 UNTIL expression
 </pre>
 
+<p>Executes the commands in a loop until the given expression is true.
+The loop is executed at least once.</p>
+
+
 <h3 id="_WHILE-WEND" name="WHILE,WEND">WHILE...WEND</h3>
 <pre>
 WHILE expression
@@ -377,9 +406,17 @@ WHILE expression
 WEND
 </pre>
 
+<p>Executes the commands in a loop as long as the given expression is
+true.</p>
+
+
 <h3 id="_END" name="END">END</h3>
 
 <pre>END</pre>
+
+<p>Stops the program from any position. There is no need to put an END
+in the last line of a program.</p>
+
 
 <h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
 
@@ -394,7 +431,7 @@ like the main game loop.</p>
 
 <pre>WAIT n</pre>
 
-<p>Waits n frames more than WAIT VBL (n/60 seconds).</p>
+<p>Waits n frames (n/60 seconds).</p>
 
 
 <h1 id="Subprograms">Subprograms</h1>
@@ -1227,7 +1264,14 @@ distributed in the range 0 &lt;= RND &lt; 1.</p>
 <h3 id="_RANDOMIZE" name="RANDOMIZE,TIMER">RANDOMIZE</h3>
 <pre>RANDOMIZE x</pre>
 
+<p>Sets the seed for random numbers to x, which should be an integer
+value. By default a program starts with seed 0, so the sequence of
+random numbers is always the same.</p>
+
 <pre>RANDOMIZE TIMER</pre>
+
+<p>If you want different random numbers each time you run your
+program, you should insert this line at the beginning.</p>
 
 
 <h1 id="String-Functions">String Functions</h1>
