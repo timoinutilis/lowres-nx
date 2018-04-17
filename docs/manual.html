@@ -223,9 +223,9 @@ Invalid: <code>END</code>
 <p>String variable names must end with a $ symbol, for example:</p>
 <pre>NAME$</pre>
 
-<p>Variables are not be explicitly declared, they start to exist
-automatically when first used. Values are assigned to variables using
-the equal symbol:</p>
+<p>Variables are not explicitly declared, but they need to be
+initialized with a value before you can read from them. Values are
+assigned to variables using the equal symbol:</p>
 <pre>
 NAME$="LOWRES NX"
 LIVES=3
@@ -235,6 +235,15 @@ LIVES=3
 <pre>
 $FF02
 %11001011
+</pre>
+
+<h2 id="Jump-Labels">Jump Labels</h2>
+
+<p>A jump label marks a position in a program and is used for commands
+like GOTO. It consists of a name, using the same rules as for
+variables, followed by a colon:</p>
+<pre>
+GAMEOVER:
 </pre>
 
 <h2 id="Operators">Operators</h2>
@@ -283,7 +292,7 @@ false (0). For example: (2=3)=0, (4=4)=-1, (1&lt;3)=-1</p>
 <tr><td>XOR</td> <td><code>A&#160;XOR&#160;B</code></td> <td>"Exclusive Or"</td></tr>
 </table>
 
-<h3 id="Operators-How">How to Use</h3>
+<h3 id="Operators-How">How to Use Operators</h3>
 
 <p>All operators are available for numbers. Relational and addition
 operators are usable with strings, too:</p>
@@ -414,8 +423,8 @@ true.</p>
 
 <pre>END</pre>
 
-<p>Stops the program from any position. There is no need to put an END
-in the last line of a program.</p>
+<p>Stops the program from any position. The program is also stopped
+automatically after the last line of code.</p>
 
 
 <h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
@@ -448,6 +457,8 @@ list can contain two types of entries: simple variables and array
 variables (followed by an empty parentheses pair). Entries are
 separated by commas. By default all variables inside the subprogram
 are local.</p>
+
+<p>NOTE: Don't use GOTO or GOSUB to jump out of a subprogram!</p>
 
 
 <h3 id="_CALL" name="CALL">CALL</h3>
@@ -1011,6 +1022,9 @@ SCORES(0)=100
 SCORES(9)=5
 PRINT SCORES(0),SCORES(9)
 </pre>
+
+<p>All elements of arrays are automatically initialized, using zeros
+(0) or empty strings ("").</p>
 
 <p>With the optional GLOBAL keyword the arrays will be accessable
 from all subprograms.</p>
