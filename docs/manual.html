@@ -8,7 +8,10 @@ body {
 	font-family: sans-serif;
 }
 h1 {
-	margin-top: 1em;
+	margin-top: 2em;
+}
+h2 {
+	margin-top: 2em;
 }
 td, th {
     padding-right: 1em;
@@ -52,118 +55,96 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 <h2 id="Specifications">Specifications</h2>
 
 <ul>
-<li>Cartridge ROM: 32 KB</li>
-<li>Video RAM: 8 KB</li>
-<li>Working RAM: 16 KB</li>
-<li>Persistent RAM: 256 B per cartridge</li>
+<li>Cartridge ROM: 32 KB for gfx, music, any binary data</li>
+<li>Code: BASIC, max 8192 tokens</li>
 <li>Screen: 160x128 pixels, 60 Hz</li>
-<li>Characters: 256, used for sprites and backgrounds (incl. fonts)</li>
-<li>Character size: 8x8 pixels</li>
-<li>Character depth: 2 bits (3 colors + transparent)</li>
-<li>Colors: 8 programmable palettes</li>
-<li>Backgrounds: Two with each 32x32 cells, scrollable, wrap around edges</li>
-<li>Sprites: 64</li>
-<li>Sprite sizes: 8x8, 16x16, 24x24, 32x32</li>
-<li>Cell/sprite attributes: palette index, flip X, flip Y, priority</li>
+<li>Backgrounds: Two layers, tile-based, scrollable</li>
+<li>Sprites: 64, max 32x32 pixels</li>
+<li>Colors: 8 dynamic 6-bit palettes with 4 colors each</li>
 <li>Input: Two game controllers with d-pad and two buttons + pause</li>
 <li>Optional input: Keyboard and touch/mouse</li>
 </ul>
 
-<p>Note: The number of characters, sprites and backgrounds are
-limitations for what NX can show on screen simultaneously. In total
-your game can have as many as you can fit into the cartridge ROM.</p>
 
-<h2 id="Program-Files">Program Files</h2>
+<h2 id="Getting-Started">Getting Started</h2>
+
+<p>Create a new program using the Plus button and type these lines:
+</p>
+
+<pre>
+PRINT "WELCOME!"
+PRINT "WHAT IS YOUR NAME?"
+INPUT ">";N$
+PRINT "HELLO ";N$;"!"
+</pre>
+
+<p>Now tap the Play button to run your program! This is a little
+example using the keyboard. Let's try something with a gamepad. Create
+another new program and type this:</p>
+
+<pre>
+GAMEPAD 1
+X=76
+Y=60
+DO
+ IF UP(0) THEN Y=Y-1
+ IF DOWN(0) THEN Y=Y+1
+ IF LEFT(0) THEN X=X-1
+ IF RIGHT(0) THEN X=X+1
+ SPRITE 0,X,Y,225
+ WAIT VBL
+LOOP
+</pre>
+
+<p>Run this program and you will see an "A" on the screen which you can
+move around using the gamepad. With the program still running, tap the
+menu button on the top right and select "Capture Program Icon".</p>
+
+<p>Now exit the program and return to the "My Programs" screen. There
+you will see your program with a new image. Long tap the icon and
+select "Rename..." to give it a better name.</p>
+
+
+<h1 id="Editing">Editing</h1>
+
+<h2 id="Programs-And-Data">Programs And Data</h2>
 
 <p>A program file contains a complete game or application, including all
-its data, stored as simple text. When a program file is opened in
-LowRes NX, it converts the data to the cartridge ROM and runs the
-program.</p>
-
-<p>The first part is the BASIC source code. Please read the programming
-chapters for further explaination.</p>
+its data, stored as simple text. The first part is the BASIC source code.
+Please read the programming chapters for further explanation.</p>
 
 <p>The second part are the cartridge ROM entries. These are up to 16
 numbered data blocks, which can contain any kind of binary data, for
-example graphics, level maps, music, etc. Each entry starts with a
-line with the following format:</p>
+example graphics, level maps, music, etc. When the program is running,
+all ROM entries are accessable in the first 32 KB of the memory.</p>
 
-<pre>#N:COMMENT</pre>
+<p>To create and edit ROM entries, just open your program, tap the
+Tools button and select a program. It will run and use your current program as a virtual disk to load and save data. Tools don't save
+automatically, so don't forget to save before you exit them.</p>
 
-<p>N is the entry number (0-15), COMMENT can be any text with up to 31
-characters, for example "MAIN SPRITES" or "MAP LEVEL 1". This line is
-followed by the actual data, byte by byte as hexadecimal values, until
-the next ROM entry or the end of the file.</p>
+<p>Open your previous program with the moving "A" and select
+"Character Designer" from the Tools menu. Draw something as character
+#1 (keep #0 empty), then tap on "Disk" and save as file 2 ("Main
+Characters"). Now exit the Character Designer and you will see some
+hexadecimal data below your program. This is your image! To see it,
+change the line</p>
+<pre>SPRITE 0,X,Y,225</pre>
+<p>to</p>
+<pre>SPRITE 0,X,Y,1</pre>
+<p>and run your program. There it is!</p>
 
-<p>When the program is running, all ROM entries are accessable in the
-first 32 KB of the memory. Use the BASIC functions ROM and SIZE to
-get the exact address of each entry.</p>
 
-<h2 id="Virtual-Disk-Files">Virtual Disk Files</h2>
+<h2 id="Standard-ROM-Entries">Standard ROM Entries</h2>
 
-<p>The BASIC commands LOAD and SAVE can be used to store data on a
-virtual disk, which can contain up to 16 files. Its format is the same
-as the ROM entries part in a program file. This makes it possible to
-use any NX program directly as a virtual disk to edit its data.</p>
-
-<p>Virtual disks are meant to be used for development tools only, for
-example image and map editors or music programs. Games should use
-persistent memory instead. Imagine that the standard LowRes NX console
-wouldn't have a disk drive.</p>
-
-<h2 id="Graphics">Graphics</h2>
-
-<p>All graphics in LowRes NX are based on characters. A character is an
-8x8-pixel image with 3 colors plus transparent. They are usually
-designed in black and white, but are displayed with one of the 8
-programmable color palettes.</p>
-
-<p>The display is composed of 4 layers, which are from back to front:</p>
-<ul>
-<li>Backdrop</li>
-<li>Background 1 (BG 1)</li>
-<li>Background 0 (BG 0)</li>
-<li>Sprites</li>
-</ul>
-
-<p>Backdrop:<br/>
-The backdrop is a plain color (color 0 in palette 0) which is visible
-wherever there isn't anything else on the screen.</p>
-
-<p>Backgrounds:<br/>
-A background is a map of 32x32 character cells, which is used for text
-and tile based maps or images. Each cell has the information of which
-character it contains and additional attributes (color palette, flip
-X/Y, priority).<br/>
-As a character has the size of 8x8 pixels, the resulting background
-size is 256x256 pixels, which is larger than the actual screen
-(160x128). By modifying the scroll offset of a background, the visible
-area can be moved.<br/>
-If the visible area moves out of the borders of the background, the
-display wraps around the edges. This can be used to achieve endless
-scrolling.</p>
-
-<p>Sprites:<br/>
-Sprites are independent objects, which can be freely moved on the
-screen. They can have a size of 8x8 pixels (one character) or up to
-32x32 pixels by grouping several characters. Each sprite has the same
-attributes as a background cell and additionally its size.</p>
-
-<p>Priorities:<br/>
-One important attribute is "priority". By setting it, its cell or
-sprite will appear on a higher display layer. Actually there are 7
-layers (not 4 as mentioned before):</p>
-<ul>
-<li>Backdrop</li>
-<li>Background 1 (BG 1) - prio 0</li>
-<li>Background 0 (BG 0) - prio 0</li>
-<li>Sprites - prio 0</li>
-<li>Background 1 (BG 1) - prio 1</li>
-<li>Background 0 (BG 0) - prio 1</li>
-<li>Sprites - prio 1</li>
-</ul>
-
-<h2 id="Default-Font">Default Font</h2>
+<p>For an easy start you should use the ROM entry numbers of the
+following table. Their data is made ready for use automatically.
+</p>
+<table>
+<tr><td>#0</td><td>Keep empty for default font</td></tr>
+<tr><td>#1</td><td>Color palettes</td></tr>
+<tr><td>#2</td><td>Characters (sprites, tiles)</td></tr>
+<tr><td>#3</td><td>Background (tile map)</td></tr>
+</table>
 
 <p>If cartridge ROM entry 0 is not used by a program, the compiler adds
 character data for the default font. It occupies the characters
@@ -171,37 +152,97 @@ character data for the default font. It occupies the characters
 If you want to use the default font, make sure to keep ROM entry 0
 unused.</p>
 
-<h2 id="Startup-Sequence">Startup Sequence</h2>
 
-<p>To simplify programming, the interpreter assumes default ROM
-entries and automatically executes some actions on program start:</p>
-<ul>
-<li>Copy default font to end of character RAM.</li>
-<li>Set font start to character 192.</li>
-<li>Set some default color palettes.</li>
-<li>Copy ROM entry 1 to color registers.</li>
-<li>Copy ROM entry 2 to character RAM.</li>
-<li>Set ROM entry 3 as BG source.</li>
-</ul>
+<h2 id="Character-Designer">Character Designer</h2>
+
+<p>Use the Character Designer to draw your sprites and background
+tiles. It shows images in grayscale only, black is used as
+transparent background. Color palettes can be created later in the
+Background Designer.</p>
+<p>The Character Designer loads file number 2 on startup, but
+keep in mind that it does not save automatically.</p>
 
 
-<h2 id="CPU-Cycles">CPU Cycles</h2>
+<h3 id="CD-Main-Screen">Main Screen</h3>
 
-<p>LowRes NX has a simplified simulation of CPU cycles. There is a
-fixed limit of cycles per frame. This assures the same program
-execution speed on all devices, so if you optimize your program on
-your device to run smoothly, it will run the same on all other
-devices.</p>
+<p>In the bottom part you see the 256 characters split into four pages.
+There you can select the current one for editing. Keep the last page
+empty, if you want to use the default font. Also character #0 should
+be empty for a clean background.</p>
+<p>The top left square is for drawing the current character using the
+selected color.</p>
 
-<p>Each execution of a command, function or operator, as well as
-access to a variable or a constant count 1 cycle. Some operations have
-additional costs:</p>
-<ul>
-<li>String creation and modification count 1 cycle per letter.</li>
-<li>Array initialization counts 1 cycle per element.</li>
-<li>Memory area modification counts 1 cycle per byte (not single byte modifications like POKE).</li>
-<li>BG area modification and text output count 2 cycles per cell (not single cell modifications like CELL).</li>
-</ul>
+<table>
+<tr><td>CLR</td><td>Clear the current character with the selected
+color.</td></tr>
+<tr><td>CUT</td><td>Copy and clear the current character.</td></tr>
+<tr><td>COP</td><td>Copy the current character.</td></tr>
+<tr><td>PAS</td><td>Paste the copied character.</td></tr>
+<tr><td>DISK</td><td>Go to the disk menu.</td></tr>
+<tr><td>FON</td><td>Copy the standard font to the current page. Tap
+several times to toggle between different versions.</td></tr>
+<tr><td>NEW</td><td>Clear all characters.</td></tr>
+</table>
+
+<h3 id="CD-Disk-Menu">Disk Menu</h3>
+
+<p>The list shows all 16 files of the current virtual disk, or in
+other words the ROM entries of the program you are editing. Select one
+(usually number 2) and tap on Load or Save.</p>
+
+
+<h2 id="Background-Designer">Background Designer</h2>
+
+<p>The Background Designer allows you to create tile-based screens or
+level maps of different sizes. Additionally it's for creating color palettes. On the bottom right there are three tabs for the different
+sections of the program: The map editor, the selection screen and
+the disk menu.</p>
+<p>The Background Designer loads the main characters (file 1),
+palettes (file 2) and background (file 3) on startup, but keep in
+mind that it doesn't save automatically.</p>
+
+
+<h3 id="BD-Selection-Screen">Selection Screen</h3>
+
+<p>On the top there is the character selector. Drag to select several
+characters at once. In the box at the left you select the current
+color palette. On the right you can edit each color of the current
+palette using the RGB sliders. The first color is usually transparent
+and unused, except the first color of palette 0, which is used as the
+screen backdrop color.
+</p>
+
+
+<h3 id="BD-Map-Editor">Map Editor</h3>
+
+<p>Here you draw your background using the character and color palette
+currently selected on the selection screen. On the bottom appear some
+tools:</p>
+
+<table>
+<tr><td>Pan</td><td>Drag the visible map area.</td></tr>
+<tr><td>Stamp</td><td>Draw with the selected character and color
+palette, using the selected flip and priority attributes.</td></tr>
+<tr><td>Paint</td><td>Change the color palette only.</td></tr>
+<tr><td>Priority</td><td>Change the priority only. Cells with priority
+1 are shown in green, all others in red.</td></tr>
+<tr><td>FLIP</td><td>Toggles the X/Y flip attributes.</td></tr>
+<tr><td>PRI</td><td>Toggles the priority attribute.</td></tr>
+</table>
+
+
+<h3 id="BD-Disk-Menu">Disk Menu</h3>
+
+<p>From here you load and save characters, color palettes and the
+background separately. There is no option to save everything at once.
+For the background there are two additional options:</p>
+
+<table>
+<tr><td>NEW</td><td>Clear the complete background (keeping its size).
+</td></tr>
+<tr><td>SIZE</td><td>Go to the size menu, where you can choose
+the width and height (in cells).</td></tr>
+</table>
 
 
 <h1 id="Language-Basics">Language Basics</h1>
@@ -237,9 +278,34 @@ $FF02
 %11001011
 </pre>
 
-<h2 id="Jump-Labels">Jump Labels</h2>
+<h2 id="Arrays">Arrays</h2>
 
-<p>A jump label marks a position in a program and is used for commands
+<h3 id="_DIM" name="DIM">DIM</h3>
+
+<pre>DIM [GLOBAL] var-list</pre>
+
+<p>Defines arrays with the highest index for each dimension:</p>
+<pre>
+DIM A(100)
+DIM MAP(31,23,1),NAMES$(9),SCORES(9)
+</pre>
+
+<p>Access elements from arrays, indices start from 0:</p>
+<pre>
+SCORES(0)=100
+SCORES(9)=5
+PRINT SCORES(0),SCORES(9)
+</pre>
+
+<p>All elements of arrays are automatically initialized, using zeros
+(0) or empty strings ("").</p>
+
+<p>With the optional GLOBAL keyword the arrays will be accessable
+from all subprograms.</p>
+
+<h2 id="Labels">Labels</h2>
+
+<p>A label marks a position in a program and is used for commands
 like GOTO. It consists of a name, using the same rules as for
 variables, followed by a colon:</p>
 <pre>
@@ -307,6 +373,8 @@ IF NAME$&gt;"LOWRES" THEN PRINT GREET$
 
 <h1 id="Program-Flow-Control">Program Flow Control</h1>
 
+<h2 id="Basics">Basics</h2>
+
 <h3 id="_REM" name="REM">REM</h3>
 <pre>
 REM remark
@@ -324,7 +392,7 @@ IF expr THEN command [ELSE command]
 
 <p>Checks if the given expression is true or false. If it's true, the
 command after THEN is executed, otherwise the one after ELSE. The ELSE
-part is optional.<p>
+part is optional.</p>
 <p>If you want to execute more than one command, you can use the
 block version of the IF command. It must be closed with the line
 END IF.</p>
@@ -338,6 +406,7 @@ IF expression THEN
     commands
 END IF
 </pre>
+
 
 <h3 id="_GOTO" name="GOTO">GOTO</h3>
 
@@ -355,6 +424,9 @@ END IF
 given label. The program after the label is called a subroutine and
 must be finished using RETURN.</p>
 
+<p>NOTE: Subroutines exist mostly for historical reasons. You should
+prefer the more powerful and safer subprograms.</p>
+
 
 <h3 id="_RETURN" name="RETURN">RETURN</h3>
 
@@ -368,6 +440,32 @@ it from the stack.</p>
 <p>Works like GOTO, but clears the whole stack. Use this to exit from
 a subroutine, if you want to continue your program somewhere else.</p>
 
+
+<h3 id="_END" name="END">END</h3>
+
+<pre>END</pre>
+
+<p>Stops the program from any position. The program is also stopped
+automatically after the last line of code.</p>
+
+
+<h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
+
+<pre>WAIT VBL</pre>
+
+<p>Waits for the next frame. This (or WAIT n) should be the last
+command in all loops which do animations and/or handle input,
+like the main game loop.</p>
+
+
+<h3 id="_WAIT" name="WAIT">WAIT</h3>
+
+<pre>WAIT n</pre>
+
+<p>Waits n frames (n/60 seconds).</p>
+
+
+<h2 id="Loops">Loops</h2>
 
 <h3 id="_FOR-NEXT" name="FOR,TO,STEP,NEXT">FOR...NEXT</h3>
 <pre>
@@ -419,31 +517,7 @@ WEND
 true.</p>
 
 
-<h3 id="_END" name="END">END</h3>
-
-<pre>END</pre>
-
-<p>Stops the program from any position. The program is also stopped
-automatically after the last line of code.</p>
-
-
-<h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
-
-<pre>WAIT VBL</pre>
-
-<p>Waits for the next frame. This (or WAIT n) should be the last
-command in all loops which do animations and/or handle input,
-like the main game loop.</p>
-
-
-<h3 id="_WAIT" name="WAIT">WAIT</h3>
-
-<pre>WAIT n</pre>
-
-<p>Waits n frames (n/60 seconds).</p>
-
-
-<h1 id="Subprograms">Subprograms</h1>
+<h2 id="Subprograms">Subprograms</h2>
 
 <h3 id="_SUB" name="SUB,END SUB,END">SUB...END SUB</h3>
 <pre>
@@ -491,7 +565,7 @@ The list can contain simple variables only. For arrays you should use
 DIM GLOBAL. This command cannot be used within a subprogram.</p>
 
 
-<h1 id="Text-Commands">Text Commands</h1>
+<h1 id="Text">Text</h1>
 
 <h3 id="_PRINT" name="PRINT">PRINT</h3>
 
@@ -534,10 +608,189 @@ or 1).</p>
 
 <pre>CLW</pre>
 
-<p>Clears the window with spaces.</p>
+<p>Clears the window with spaces and resets the text cursor position.
+</p>
 
 
-<h1 id="Sprite-Commands">Sprite Commands</h1>
+<h1 id="User-Input">User Input</h1>
+
+<h2 id="Gamepads">Gamepads</h2>
+
+<h3 id="_GAMEPAD" name="GAMEPAD">GAMEPAD</h3>
+    
+<pre>GAMEPAD n</pre>
+
+<p>Enables gamepads for n players. A maximum of 2 players are
+supported. This disables touchscreen/mouse support.</p>
+
+<pre>GAMEPAD OFF</pre>
+
+<p>Disables all gamepads and enables touchscreen/mouse support.</p>
+
+
+<h3 id="_UP-DOWN-LEFT-RIGHT" name="=UP,DOWN,LEFT,RIGHT">=UP/DOWN/LEFT/RIGHT</h3>
+
+<pre>
+UP(p)
+DOWN(p)
+LEFT(p)
+RIGHT(p)
+</pre>
+
+<p>Returns true if the given direction is currently pressed on the
+direction pad of player p (0/1).</p>
+
+<pre>
+UP TAP(p)
+DOWN TAP(p)
+LEFT TAP(p)
+RIGHT TAP(p)
+</pre>
+
+<p>With the optional TAP keyword, this function returns true only for
+the first frame the button is pressed.</p>
+
+
+<h3 id="_BUTTON" name="BUTTON,TAP">=BUTTON</h3>
+
+<pre>BUTTON(p,n)</pre>
+
+<p>Returns true if button A (n=0) or B (n=1) is currently pressed by
+player p (0/1).</p>
+
+<pre>BUTTON TAP(p,n)</pre>
+
+<p>With the optional TAP keyword, this function returns true only for
+the first frame the button is pressed.</p>
+
+
+<h3 id="_PAUSE-ON-OFF" name="PAUSE ON,PAUSE OFF,PAUSE,ON,OFF">PAUSE ON/OFF</h3>
+
+<pre>
+PAUSE ON
+PAUSE OFF
+</pre>
+
+<p>Enables or disables the automatic pause handling. By default it's
+enabled, so if you press the pause button, the program stops and
+shows "PAUSE" on the screen, until the button is pressed again.</p>
+
+
+<h3 id="_PAUSE" name="PAUSE">PAUSE</h3>
+
+<pre>
+PAUSE
+</pre>
+
+<p>Pauses the program and shows the default "PAUSE" screen, even if
+automatic pause handling is disabled.</p>
+
+
+<h3 id="_=PAUSE" name="PAUSE">=PAUSE</h3>
+
+<pre>
+PAUSE
+</pre>
+
+<p>Returns true if the pause button was pressed, otherwise false.
+After calling this function its value is cleared, so it returns
+each button tap only once. The automatic pause handling needs to
+be disabled for this function.</p>
+
+
+<h2 id="Touch">Touch</h2>
+
+<p>Use touch support only if you think it will work well with a
+computer mouse, too. If you want to create your own game buttons,
+keep in mind that your game might be unplayable on a computer,
+because it won't support the keyboard or a real gamepad. Always
+consider using the standard gamepad functions.</p>
+
+
+<h3 id="_TOUCH.X-TOUCH.Y" name="TOUCH.X,TOUCH.Y">=TOUCH.X/Y</h3>
+<pre>
+TOUCH.X
+TOUCH.Y
+</pre>
+
+<p>Returns the current X or Y pixel position where the user touches
+the screen, or where it was touched the last time.</p>
+
+
+<h3 id="_TOUCH" name="TOUCH">=TOUCH</h3>
+
+<pre>TOUCH</pre>
+
+<p>Returns true if the screen is currently touched.</p>
+
+
+<h3 id="_TAP" name="TAP">=TAP</h3>
+
+<pre>TAP</pre>
+
+<p>Returns true if the screen is currently touched and was not
+touched the last frame.</p>
+
+
+<h2 id="Keyboard">Keyboard</h2>
+
+<h3 id="_KEYBOARD-ON-OFF" name="KEYBOARD ON,KEYBOARD OFF,KEYBOARD,ON,OFF">KEYBOARD ON/OFF</h3>
+
+<pre>
+KEYBOARD ON
+KEYBOARD OFF
+</pre>
+
+<p>Enables or disables the keyboard.</p>
+
+
+<h3 id="_INKEY$" name="INKEY$">=INKEY$</h3>
+
+<pre>INKEY$</pre>
+
+<p>Returns the last pressed key as a string. If no key was pressed,
+it returns an empty string (""). After calling this function its
+value is cleared, so it returns each pressed key only once.
+The keyboard needs to be enabled for this function.</p>
+
+
+<h1 id="Graphics">Graphics</h1>
+
+<p>All graphics in LowRes NX are based on characters. A character is an
+8x8-pixel image with 3 colors plus transparent. They are usually
+designed in black and white, but are displayed with one of the 8
+programmable color palettes.</p>
+
+<p>At program start all characters from ROM entry 2 are copied to
+video RAM to make them immediately usable.</p>
+
+<p>The display is composed of 3 layers, which are from back to front:</p>
+<ul>
+<li>Background 1 (BG 1)</li>
+<li>Background 0 (BG 0)</li>
+<li>Sprites</li>
+</ul>
+
+<p>Each sprite and background cell has an attribute called "priority".
+By setting it, the cell or sprite will appear on a higher display
+layer. Actually there are 6 layers, from back to front:</p>
+<ul>
+<li>Background 1 (BG 1) - prio 0</li>
+<li>Background 0 (BG 0) - prio 0</li>
+<li>Sprites - prio 0</li>
+<li>Background 1 (BG 1) - prio 1</li>
+<li>Background 0 (BG 0) - prio 1</li>
+<li>Sprites - prio 1</li>
+</ul>
+
+
+<h2 id="Sprites">Sprites</h2>
+
+<p>Sprites are independent objects, which can be freely moved on the
+screen. They can have a size of 8x8 pixels (one character) or up to
+32x32 pixels by grouping several characters. Each sprite has the
+standard character attributes (color palette, flip X/Y, priority) and additionally its size.</p>
+
 
 <h3 id="_SPRITE" name="SPRITE">SPRITE</h3>
 
@@ -624,142 +877,19 @@ given, it will check with all sprites from number a to number b.</p>
 the last call of SPRITE HIT.</p>
 
 
-<h1 id="User-Control-Functions">User Control Functions</h1>
+<h2 id="Backgrounds">Backgrounds</h2>
 
-<h3 id="_GAMEPAD" name="GAMEPAD">GAMEPAD</h3>
-    
-<pre>GAMEPAD n</pre>
-
-<p>Enables gamepads for n players. A maximum of 2 players are
-supported. This disables touchscreen/mouse support.</p>
-
-<pre>GAMEPAD OFF</pre>
-
-<p>Disables all gamepads and enables touchscreen/mouse support.</p>
-
-
-<h3 id="_UP-DOWN-LEFT-RIGHT" name="=UP,DOWN,LEFT,RIGHT">=UP/DOWN/LEFT/RIGHT</h3>
-
-<pre>
-UP(p)
-DOWN(p)
-LEFT(p)
-RIGHT(p)
-</pre>
-
-<p>Returns true if the given direction is currently pressed on the
-direction pad of player p (0/1).</p>
-
-<pre>
-UP TAP(p)
-DOWN TAP(p)
-LEFT TAP(p)
-RIGHT TAP(p)
-</pre>
-
-<p>With the optional TAP keyword, this function returns true only for
-the first frame the button is pressed.</p>
-
-
-<h3 id="_BUTTON" name="BUTTON,TAP">=BUTTON</h3>
-
-<pre>BUTTON(p,n)</pre>
-
-<p>Returns true if button A (n=0) or B (n=1) is currently pressed by
-player p (0/1).</p>
-
-<pre>BUTTON TAP(p,n)</pre>
-
-<p>With the optional TAP keyword, this function returns true only for
-the first frame the button is pressed.</p>
-
-
-<h3 id="_TOUCH.X-TOUCH.Y" name="TOUCH.X,TOUCH.Y">=TOUCH.X/Y</h3>
-<pre>
-TOUCH.X
-TOUCH.Y
-</pre>
-
-<p>Returns the current X or Y pixel position where the user touches
-the screen, or where it was touched the last time.</p>
-
-
-<h3 id="_TOUCH" name="TOUCH">=TOUCH</h3>
-
-<pre>TOUCH</pre>
-
-<p>Returns true if the screen is currently touched.</p>
-
-
-<h3 id="_TAP" name="TAP">=TAP</h3>
-
-<pre>TAP</pre>
-
-<p>Returns true if the screen is currently touched and was not
-touched the last frame.</p>
-
-
-<h3 id="_KEYBOARD-ON-OFF" name="KEYBOARD ON,KEYBOARD OFF,KEYBOARD,ON,OFF">KEYBOARD ON/OFF</h3>
-
-<pre>
-KEYBOARD ON
-KEYBOARD OFF
-</pre>
-
-<p>Enables or disables the keyboard.</p>
-
-
-<h3 id="_INKEY$" name="INKEY$">=INKEY$</h3>
-
-<pre>INKEY$</pre>
-
-<p>Returns the last pressed key as a string. If no key was pressed,
-it returns an empty string (""). After calling this function its
-value is cleared, so it returns each pressed key only once.
-The keyboard needs to be enabled for this function.</p>
-
-
-<h3 id="_PAUSE-ON-OFF" name="PAUSE ON,PAUSE OFF,PAUSE,ON,OFF">PAUSE ON/OFF</h3>
-
-<pre>
-PAUSE ON
-PAUSE OFF
-</pre>
-
-<p>Enables or disables the automatic pause handling. By default it's
-enabled, so if you press the pause button, the program stops and
-shows "PAUSE" on the screen, until the button is pressed again.</p>
-
-
-<h3 id="_PAUSE" name="PAUSE">PAUSE</h3>
-
-<pre>
-PAUSE
-</pre>
-
-<p>Pauses the program and shows the default "PAUSE" screen, even if
-automatic pause handling is disabled.</p>
-
-
-<h3 id="_=PAUSE" name="PAUSE">=PAUSE</h3>
-
-<pre>
-PAUSE
-</pre>
-
-<p>Returns true if the pause button was pressed, otherwise false.
-After calling this function its value is cleared, so it returns
-each button tap only once. The automatic pause handling needs to
-be disabled for this function.</p>
-
-
-<h1 id="Background-Commands">Background Commands</h1>
-
-<h3 id="_BG" name="BG">BG</h3>
-
-<pre>BG n</pre>
-
-<p>Sets the current background (0 or 1).</p>
+<p>A background is a map of 32x32 character cells, which is used for text
+and tile based maps or images. Each cell has the information of which
+character it contains and additional attributes (color palette, flip
+X/Y, priority).<br/>
+As a character has the size of 8x8 pixels, the resulting background
+size is 256x256 pixels, which is larger than the actual screen
+(160x128). By modifying the scroll offset of a background, the visible
+area can be moved.<br/>
+If the visible area moves out of the borders of the background, the
+display wraps around the edges. This can be used to achieve endless
+scrolling.</p>
 
 
 <h3 id="_CLS" name="CLS">CLS</h3>
@@ -797,6 +927,13 @@ It defines which bits of a cell attribute should actually be changed.</p>
 <pre>ATTR a[,m]</pre>
 
 <p>Allows setting the attributes as a single 8-bit value.</p>
+
+
+<h3 id="_BG" name="BG">BG</h3>
+
+<pre>BG n</pre>
+
+<p>Sets the current background (0 or 1).</p>
 
 
 <h3 id="_CELL" name="CELL">CELL</h3>
@@ -845,6 +982,9 @@ cells.</p>
 format is assumed: The width is read from address a+2 and
 the actual map data starts at a+4.</p>
 
+<p>By default ROM entry 3 is used as source.</p>
+
+
 <h3 id="_BG-COPY" name="BG COPY,BG,COPY">BG COPY</h3>
 
 <pre>BG COPY x1,y1,w,h TO x2,y2</pre>
@@ -888,8 +1028,9 @@ doesn't need to convert numbers to strings.</p>
 <p>Sets the current character range used for text output.
 c is the character where the font starts (space).</p>
 
+<p>The default value is 192, which points to the standard font,
+if available.</p>
 
-<h1 id="Screen-Commands">Screen Commands</h1>
 
 <h3 id="_SCROLL" name="SCROLL">SCROLL</h3>
 
@@ -908,6 +1049,8 @@ SCROLL.Y(b)
 
 <p>Return the scroll offset of background b.</p>
 
+
+<h2 id="Display-Settings">Display Settings</h2>
 
 <h3 id="_DISPLAY" name="DISPLAY">DISPLAY</h3>
 
@@ -945,6 +1088,8 @@ Valid color values are 0-63 and can be calculated like this:</p>
 VALUE = RED * 16 + GREEN * 4 + BLUE
 </pre>
 <p>RED, GREEN and BLUE are values from 0 to 3.</p>
+
+<p>By default all palettes are read from ROM entry 1.</p>
 
 
 <h3 id="_=COLOR" name="COLOR">=COLOR</h3>
@@ -1004,38 +1149,12 @@ The value wraps to 0 when 5184000 is reached, which is about 24
 hours.</p>
 
 
-<h1 id="Value-Commands">Value Commands</h1>
+<h1 id="Sound">Sound</h1>
 
-<h3 id="_DIM" name="DIM">DIM</h3>
-
-<pre>DIM [GLOBAL] var-list</pre>
-
-<p>Defines arrays with the highest index for each dimension:</p>
-<pre>
-DIM A(100)
-DIM MAP(31,23,1),NAMES$(9),SCORES(9)
-</pre>
-
-<p>Access elements from arrays, indices start from 0:</p>
-<pre>
-SCORES(0)=100
-SCORES(9)=5
-PRINT SCORES(0),SCORES(9)
-</pre>
-
-<p>All elements of arrays are automatically initialized, using zeros
-(0) or empty strings ("").</p>
-
-<p>With the optional GLOBAL keyword the arrays will be accessable
-from all subprograms.</p>
+<p>Coming soon.</p>
 
 
-<h3 id="_SWAP" name="SWAP">SWAP</h3>
-
-<pre>SWAP var1,var2</pre>
-
-<p>Swaps the data between any two variables of the same type.</p>
-
+<h1 id="Data">Data</h1>
 
 <h3 id="_DATA" name="DATA">DATA</h3>
 
@@ -1070,7 +1189,7 @@ is omitted, READ will start again from the top of the program.
 Otherwise the pointer will be set to the jump label.</p>
 
 
-<h1 id="Memory-Commands">Memory Commands</h1>
+<h1 id="Memory-Access">Memory Access</h1>
 
 <h3 id="_=PEEK" name="PEEK">=PEEK</h3>
 
@@ -1117,7 +1236,7 @@ the parameter is omitted.</p>
 <p>Returns the number of bytes of ROM entry n.</p>
 
 
-<h1 id="File-Commands">File Commands</h1>
+<h1 id="Files">Files</h1>
 
 <h3 id="_LOAD" name="LOAD">LOAD</h3>
 
@@ -1147,6 +1266,17 @@ store game states.</p>
 
 <h3 id="_FILES" name="FILES">FILES</h3>
 
+<p>The file commands can be used to store data on a
+virtual disk, which can contain up to 16 files. Its format is the same
+as the ROM entries part in a program file. This makes it possible to
+use any NX program directly as a virtual disk to edit its data.</p>
+
+<p>Virtual disks are meant to be used for development tools only, for
+example image and map editors or music programs. Games should use
+persistent memory instead. Imagine that the standard LowRes NX console
+wouldn't have a disk drive.</p>
+
+
 <pre>FILES</pre>
 
 <p>Loads the current file directory for use with FILES$.</p>
@@ -1159,7 +1289,7 @@ store game states.</p>
 <p>Returns the comment string of file number f. Call FILES before accessing the file directory to update its content, or use FILE$ directly after LOAD or SAVE.</p>
 
 
-<h1 id="Debugging-Commands">Debugging Commands</h1>
+<h1 id="Debugging">Debugging</h1>
 
 <h3 id="_TRACE" name="TRACE">TRACE</h3>
 
@@ -1171,6 +1301,8 @@ mode is not enabled.</p>
 
 
 <h1 id="Math-Functions">Math Functions</h1>
+
+<h2 id="Trigonometric">Trigonometric</h2>
 
 <h3 id="_PI" name="PI">=PI</h3>
 
@@ -1208,6 +1340,8 @@ mode is not enabled.</p>
 <p>The arctangent of x in radians, i.e. the angle whose tangent is x.
 The range of the function is -(PI/2) &lt; ATN(X) &lt; (PI/2).</p>
 
+
+<h2 id="Standard-Math">Standard Math</h2>
 
 <h3 id="_ABS" name="ABS">=ABS</h3>
 
@@ -1253,19 +1387,7 @@ logarithms (e = 2,71828...) raised to the power x.</p>
 <p>The nonnegative square root of x; x must be nonnegative.</p>
 
 
-<h3 id="_MIN" name="MIN">=MIN</h3>
-
-<pre>MIN(x,y)</pre>
-
-<p>The MIN function returns the smallest value of two expressions.</p>
-
-
-<h3 id="_MAX" name="MAX">=MAX</h3>
-
-<pre>MAX(x,y)</pre>
-
-<p>The MAX function returns the largest value of two expressions.</p>
-
+<h2 id="Random-Sequences">Random Sequences</h2>
 
 <h3 id="_RND" name="RND">=RND</h3>
 
@@ -1286,6 +1408,29 @@ random numbers is always the same.</p>
 
 <p>If you want different random numbers each time you run your
 program, you should insert this line at the beginning.</p>
+
+
+<h2 id="Manipulating-Numbers">Manipulating Numbers</h2>
+
+<h3 id="_MIN" name="MIN">=MIN</h3>
+
+<pre>MIN(x,y)</pre>
+
+<p>The MIN function returns the smallest value of two expressions.</p>
+
+
+<h3 id="_MAX" name="MAX">=MAX</h3>
+
+<pre>MAX(x,y)</pre>
+
+<p>The MAX function returns the largest value of two expressions.</p>
+
+
+<h3 id="_SWAP" name="SWAP">SWAP</h3>
+
+<pre>SWAP var1,var2</pre>
+
+<p>Swaps the data between any two variables of the same type.</p>
 
 
 <h1 id="String-Functions">String Functions</h1>
@@ -1386,9 +1531,43 @@ string. Optionally it can start searching at position p.</p>
 <p>Converts the number n into a hexadecimal string.</p>
 
 
-<h1 id="Hardware-Reference">Hardware Reference</h1>
+<h1 id="Advanced-Topics">Advanced Topics</h1>
 
-<h2 id="Memory-Map">Memory Map</h2>
+<h2 id="CPU-Cycles">CPU Cycles</h2>
+
+<p>LowRes NX has a simplified simulation of CPU cycles. There is a
+fixed limit of cycles per frame. This assures the same program
+execution speed on all devices, so if you optimize your program on
+your device to run smoothly, it will run the same on all other
+devices.</p>
+
+<p>Each execution of a command, function or operator, as well as
+access to a variable or a constant count 1 cycle. Some operations have
+additional costs:</p>
+<ul>
+<li>String creation and modification count 1 cycle per letter.</li>
+<li>Array initialization counts 1 cycle per element.</li>
+<li>Memory area modification counts 1 cycle per byte (not single byte
+modifications like POKE).</li>
+<li>BG area modification and text output count 2 cycles per cell (not
+single cell modifications like CELL).</li>
+</ul>
+
+<table>
+<tr><td>Total cycles per frame</td><td>17556</td></tr>
+<tr><td>Cycles per VBL interrupt</td><td>1140</td></tr>
+<tr><td>Cycles per raster interrupt</td><td>51</td></tr>
+</table>
+
+<p>The main program may spend any number of cycles, but when the limit
+is reached before a WAIT VBL or WAIT command, the execution continues
+in the next frame. Interrupts have hard limits. If they are exceeded,
+the program stops with an error.</p>
+
+
+<h2 id="Hardware-Reference">Hardware Reference</h2>
+
+<h3 id="Memory-Map">Memory Map</h3>
 
 <pre>
 $0000 - Cartridge ROM (32 KB)
@@ -1409,7 +1588,7 @@ $FF40 - Audio Registers
 $FF60 - I/O Registers
 </pre>
 
-<h2 id="Character-Data">Character Data</h2>
+<h3 id="Character-Data">Character Data</h3>
 
 <p>A character is an 8x8-pixel image with 2 bits per pixel, with a
 resulting size of 16 bytes. The video RAM has space for 256
@@ -1419,7 +1598,7 @@ characters.</p>
 pixels, followed by 8 more bytes containing the high bits of all
 pixels.</p>
 
-<h2 id="BG-Data">BG Data</h2>
+<h3 id="BG-Data">BG Data</h3>
 
 <p>A background is a map of 32x32 character cells. Each cell occupies two
 bytes:</p>
@@ -1434,7 +1613,7 @@ bytes:</p>
     6-7  Unused
 </pre>
 
-<h2 id="Sprite-Registers">Sprite Registers</h2>
+<h3 id="Sprite-Registers">Sprite Registers</h3>
 
 <p>There are 64 sprites available, each occupies 4 bytes:</p>
 <pre>
@@ -1458,7 +1637,7 @@ so they can move out of the top/left screen borders without using
 negative numbers. Using the BASIC commands, this offset is
 removed for convenience.</p>
 
-<h2 id="Color-Registers">Color Registers</h2>
+<h3 id="Color-Registers">Color Registers</h3>
 
 <p>There are 8 palettes of each 4 colors. One color is one byte:</p>
 <pre>
@@ -1468,7 +1647,7 @@ Bits  Component
 4-5   Red
 </pre>
 
-<h2 id="Video-Registers">Video Registers</h2>
+<h3 id="Video-Registers">Video Registers</h3>
 
 <pre>
 $FF20 - Attributes:
@@ -1501,11 +1680,11 @@ $FF26 - Raster line
 
 <p>Note: Big cell sizes are not available yet.</p>
 
-<h2 id="Audio-Registers">Audio Registers</h2>
+<h3 id="Audio-Registers">Audio Registers</h3>
 
 <p>- Not yet defined -</p>
 
-<h2 id="I-O-Registers">I/O Registers</h2>
+<h3 id="I-O-Registers">I/O Registers</h3>
 
 <pre>
 $FF60 - Gamepad 0 status
