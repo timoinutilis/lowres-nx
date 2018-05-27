@@ -30,20 +30,27 @@ int video_getCharacterPixel(struct Character *character, int x, int y)
     return b0 | (b1 << 1);
 }
 
-void video_renderPlane(struct Character *characters, struct Plane *plane, int y, int scrollX, int scrollY, int pixelFlag, uint8_t *scanlineBuffer)
+void video_renderPlane(struct Character *characters, struct Plane *plane, int sizeMode, int y, int scrollX, int scrollY, int pixelFlag, uint8_t *scanlineBuffer)
 {
+    int divShift = sizeMode ? 4 : 3;
     int planeY = y + scrollY;
-    int row = (planeY >> 3) & 31;
+    int row = (planeY >> divShift) & 31;
     int cellY = planeY & 7;
     for (int x = 0; x < SCREEN_WIDTH; x++)
     {
         int planeX = x + scrollX;
-        int column = (planeX >> 3) & 31;
+        int column = (planeX >> divShift) & 31;
         struct Cell *cell = &plane->cells[row][column];
         if (cell->attr.priority >= (*scanlineBuffer >> 7))
         {
             int cellX = planeX & 7;
-            struct Character *character = &characters[cell->character];
+            int index = cell->character;
+            if (sizeMode)
+            {
+                index += (planeX >> 3) & 1;
+                index += ((planeY >> 3) & 1) << 4;
+            }
+            struct Character *character = &characters[index];
             int pixel = video_getCharacterPixel(character, cell->attr.flipX ? (7 - cellX) : cellX, cell->attr.flipY ? (7 - cellY) : cellY);
             if (pixel)
             {
@@ -154,11 +161,15 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
         memset(scanlineBuffer, 0, sizeof(scanlineBuffer));
         if (reg->attr.planeBEnabled)
         {
-            video_renderPlane(ram->characters, &ram->planeB, y, reg->scrollBX, reg->scrollBY, 0, scanlineBuffer);
+            int scrollX = reg->scrollBX | (reg->scrollMSB.bX << 8);
+            int scrollY = reg->scrollBY | (reg->scrollMSB.bY << 8);
+            video_renderPlane(ram->characters, &ram->planeB, reg->attr.planeBCellSize, y, scrollX, scrollY, 0, scanlineBuffer);
         }
         if (reg->attr.planeAEnabled)
         {
-            video_renderPlane(ram->characters, &ram->planeA, y, reg->scrollAX, reg->scrollAY, 0, scanlineBuffer);
+            int scrollX = reg->scrollAX | (reg->scrollMSB.aX << 8);
+            int scrollY = reg->scrollAY | (reg->scrollMSB.aY << 8);
+            video_renderPlane(ram->characters, &ram->planeA, reg->attr.planeACellSize, y, scrollX, scrollY, 0, scanlineBuffer);
         }
         if (reg->attr.spritesEnabled)
         {
@@ -167,7 +178,7 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
         }
         
         // overlay
-        video_renderPlane((struct Character *)overlayCharacters, &core->overlay->plane, y, 0, 0, OVERLAY_FLAG, scanlineBuffer);
+        video_renderPlane((struct Character *)overlayCharacters, &core->overlay->plane, 0, y, 0, 0, OVERLAY_FLAG, scanlineBuffer);
         
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {

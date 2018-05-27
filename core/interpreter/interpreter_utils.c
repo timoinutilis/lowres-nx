@@ -106,7 +106,9 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
         struct TypedValue sValue = {ValueTypeNull, 0};
         struct TypedValue bg0Value = {ValueTypeNull, 0};
         struct TypedValue bg1Value = {ValueTypeNull, 0};
-        
+        struct TypedValue bg0SizeValue = {ValueTypeNull, 0};
+        struct TypedValue bg1SizeValue = {ValueTypeNull, 0};
+
         // sprites value
         sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
         if (sValue.type == ValueTypeError) return sValue;
@@ -128,6 +130,26 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
                 // bg1 value
                 bg1Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
                 if (bg1Value.type == ValueTypeError) return bg1Value;
+                
+                // comma
+                if (interpreter->pc->type == TokenComma)
+                {
+                    ++interpreter->pc;
+                    
+                    // bg0 cell size value
+                    bg0SizeValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                    if (bg0SizeValue.type == ValueTypeError) return bg0SizeValue;
+                    
+                    // comma
+                    if (interpreter->pc->type == TokenComma)
+                    {
+                        ++interpreter->pc;
+                        
+                        // bg1 cell size value
+                        bg1SizeValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                        if (bg1SizeValue.type == ValueTypeError) return bg1SizeValue;
+                    }
+                }
             }
         }
         
@@ -140,6 +162,8 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
             if (sValue.type != ValueTypeNull) resultAttr.spritesEnabled = sValue.v.floatValue;
             if (bg0Value.type != ValueTypeNull) resultAttr.planeAEnabled = bg0Value.v.floatValue;
             if (bg1Value.type != ValueTypeNull) resultAttr.planeBEnabled = bg1Value.v.floatValue;
+            if (bg0SizeValue.type != ValueTypeNull) resultAttr.planeACellSize = bg0SizeValue.v.floatValue;
+            if (bg1SizeValue.type != ValueTypeNull) resultAttr.planeBCellSize = bg1SizeValue.v.floatValue;
         }
         
         struct TypedValue resultValue;

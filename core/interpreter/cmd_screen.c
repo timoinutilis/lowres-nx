@@ -107,18 +107,23 @@ enum ErrorCode cmd_SCROLL(struct Core *core)
 
     if (interpreter->pass == PassRun)
     {
+        struct VideoRegisters *reg = &core->machine->videoRegisters;
         int bg = bgValue.v.floatValue;
-        int x = (int)xValue.v.floatValue & 0xFF;
-        int y = (int)yValue.v.floatValue & 0xFF;
+        int x = (int)xValue.v.floatValue;
+        int y = (int)yValue.v.floatValue;
         if (bg == 0)
         {
-            core->machine->videoRegisters.scrollAX = x;
-            core->machine->videoRegisters.scrollAY = y;
+            reg->scrollAX = x & 0xFF;
+            reg->scrollAY = y & 0xFF;
+            reg->scrollMSB.aX = (x >> 8) & 1;
+            reg->scrollMSB.aY = (y >> 8) & 1;
         }
         else
         {
-            core->machine->videoRegisters.scrollBX = x;
-            core->machine->videoRegisters.scrollBY = y;
+            reg->scrollBX = x & 0xFF;
+            reg->scrollBY = y & 0xFF;
+            reg->scrollMSB.bX = (x >> 8) & 1;
+            reg->scrollMSB.bY = (y >> 8) & 1;
         }
     }
     
