@@ -249,14 +249,29 @@ struct TypedValue fnc_SCROLL_X_Y(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         int bg = bgValue.v.floatValue;
+        struct VideoRegisters *reg = &core->machine->videoRegisters;
         switch (type)
         {
             case TokenSCROLLX:
-                value.v.floatValue = (bg == 0) ? core->machine->videoRegisters.scrollAX : core->machine->videoRegisters.scrollBX;
+                if (bg == 0)
+                {
+                    value.v.floatValue = reg->scrollAX | (reg->scrollMSB.aX << 8);
+                }
+                else
+                {
+                    value.v.floatValue = reg->scrollBX | (reg->scrollMSB.bX << 8);
+                }
                 break;
                 
             case TokenSCROLLY:
-                value.v.floatValue = (bg == 0) ? core->machine->videoRegisters.scrollAY : core->machine->videoRegisters.scrollBY;
+                if (bg == 0)
+                {
+                    value.v.floatValue = reg->scrollAY | (reg->scrollMSB.aY << 8);
+                }
+                else
+                {
+                    value.v.floatValue = reg->scrollBY | (reg->scrollMSB.bY << 8);
+                }
                 break;
                 
             default:

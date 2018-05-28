@@ -47,8 +47,8 @@ void video_renderPlane(struct Character *characters, struct Plane *plane, int si
             int index = cell->character;
             if (sizeMode)
             {
-                index += (planeX >> 3) & 1;
-                index += ((planeY >> 3) & 1) << 4;
+                index += (cell->attr.flipX ? (planeX >> 3) + 1 : planeX >> 3) & 1;
+                index += ((cell->attr.flipY ? (planeY >> 3) + 1 : planeY >> 3) & 1) << 4;
             }
             struct Character *character = &characters[index];
             int pixel = video_getCharacterPixel(character, cell->attr.flipX ? (7 - cellX) : cellX, cell->attr.flipY ? (7 - cellY) : cellY);
