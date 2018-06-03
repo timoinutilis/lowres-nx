@@ -1054,14 +1054,18 @@ SCROLL.Y(b)
 
 <h3 id="_DISPLAY" name="DISPLAY">DISPLAY</h3>
 
-<pre>DISPLAY (s,b0,b1)</pre>
+<pre>DISPLAY (s,b0,b1,c0,c1)</pre>
 
-<p>Sets the display attributes.</p>
+<p>Sets the display attributes. All attribute parameters can be omitted to keep their current settings.</p>
 
 <table>
 <tr><td>s</td> <td>sprites enabled (0/1)</td></tr>
 <tr><td>b0</td> <td>background 0 enabled (0/1)</td></tr>
 <tr><td>b1</td> <td>background 1 enabled (0/1)</td></tr>
+<tr><td>c0</td> <td>BG 0 cell size,</td></tr>
+<tr><td>c1</td> <td>BG 1 cell size:<br/> 
+0: 1 character (8x8 pixels)<br/>
+1: 2x2 characters (16x16 pixels)</td></tr>
 </table>
 
 <pre>DISPLAY a</pre>
@@ -1677,8 +1681,6 @@ $FF25 - Scroll offset MSB
 
 $FF26 - Raster line
 </pre>
-
-<p>Note: Big cell sizes are not available yet.</p>
 
 <h3 id="Audio-Registers">Audio Registers</h3>
 
