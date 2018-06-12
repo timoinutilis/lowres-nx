@@ -179,8 +179,8 @@ color.</td></tr>
 <tr><td>COP</td><td>Copy the current character.</td></tr>
 <tr><td>PAS</td><td>Paste the copied character.</td></tr>
 <tr><td>DISK</td><td>Go to the disk menu.</td></tr>
-<tr><td>FON</td><td>Copy the standard font to the current page. Tap
-several times to toggle between different versions.</td></tr>
+<tr><td>16*16</td><td>Go to the 16x16-pixel edit screen.</td></tr>
+<tr><td>FON</td><td>Copy the standard font to the current page.</td></tr>
 <tr><td>NEW</td><td>Clear all characters.</td></tr>
 </table>
 
@@ -241,7 +241,7 @@ For the background there are two additional options:</p>
 <tr><td>NEW</td><td>Clear the complete background (keeping its size).
 </td></tr>
 <tr><td>SIZE</td><td>Go to the size menu, where you can choose
-the width and height (in cells).</td></tr>
+the width and height of the background (in cells), as well as the cell size (8x8 or 16x16 pixels).</td></tr>
 </table>
 
 
@@ -889,7 +889,11 @@ size is 256x256 pixels, which is larger than the actual screen
 area can be moved.<br/>
 If the visible area moves out of the borders of the background, the
 display wraps around the edges. This can be used to achieve endless
-scrolling.</p>
+scrolling.<br/>
+There is a mode for 16x16-pixel cells. When active, each cell will show
+2x2 characters, similar to big sprites. This mode also increases the
+background size to 512x512 pixels. Use the DISPLAY command to enable
+it.</p>
 
 
 <h3 id="_CLS" name="CLS">CLS</h3>

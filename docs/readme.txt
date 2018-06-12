@@ -4,12 +4,19 @@
 
 - Read the manual, especially the introduction!
 
-- Send your programs, bug reports and questions to timo@inutilis.com.
+- The manual sometimes refers to the interface of the iOS app.
+  On macOS just use any text editor, there is no included one.
 
-- Development news on Twitter: @timo_inutilis. Tweet with #LowResNX.
+- Share programs and discuss on: https://lowresnx.inutilis.com
 
-- To-do and bug list at:
+- Development news on Twitter: @timo_inutilis
+
+- Tweet with #LowResNX.
+
+- To-do and bug list on:
   https://github.com/timoinutilis/lowres-nx/issues
+
+- Write to timo@inutilis.com.
   
 - There's no real gamepad support yet. Use the keyboard.
 
