@@ -14,6 +14,8 @@ func getBytePointerCallback(_ data: UnsafeMutableRawPointer?) -> UnsafeRawPointe
 
 class LowResNXView: NSView {
     
+    let screenshotScaleFactor = 3
+    
     var data: UnsafeMutablePointer<UInt8>?
     var dataProvider: CGDataProvider?
     
@@ -34,6 +36,38 @@ class LowResNXView: NSView {
             layer?.contents = image
             layer?.magnificationFilter = kCAFilterNearest
         }
+    }
+    
+    func capturePNG() -> Data? {
+        if let contents = layer?.contents {
+            let cgImage = contents as! CGImage
+            
+            let imageWidth = Int(SCREEN_WIDTH) * screenshotScaleFactor
+            let imageHeight = Int(SCREEN_HEIGHT) * screenshotScaleFactor
+            
+            guard
+                let colorSpace = cgImage.colorSpace,
+                let context = CGContext(data: nil, width: imageWidth, height: imageHeight, bitsPerComponent: cgImage.bitsPerComponent, bytesPerRow: cgImage.bytesPerRow * screenshotScaleFactor, space: colorSpace, bitmapInfo: cgImage.alphaInfo.rawValue)
+                else { return nil }
+            
+            // draw image to context (resizing it)
+            context.interpolationQuality = .none
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: imageWidth, height: imageHeight))
+            
+            // extract resulting image from context
+            guard let scaledImage = context.makeImage() else { return nil }
+            
+            let nsImage = NSImage(cgImage: scaledImage, size: NSSize(width: imageWidth, height: imageHeight))
+            
+            guard
+                let imgData: Data = nsImage.tiffRepresentation,
+                let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: imgData),
+                let pngImage = bitmap.representation(using: .png, properties: [:])
+                else { return nil }
+            
+            return pngImage
+        }
+        return nil
     }
     
 }

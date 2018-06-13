@@ -211,6 +211,19 @@ class LowResNXWindowController: NSWindowController, NSWindowDelegate, CoreWrappe
         }
     }
     
+    @IBAction func saveScreenshot(_ sender: Any) {
+        if let pngImage = lowResNXView.capturePNG() {
+            let desktopUrl = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
+            let filename = "NX Screenshot \(Int(Date.timeIntervalSinceReferenceDate)).png"
+            let fileUrl = desktopUrl.appendingPathComponent(filename)
+            do {
+                try pngImage.write(to: fileUrl)
+            } catch {
+                print("saveScreenshot:", error.localizedDescription)
+            }
+        }
+    }
+    
     // MARK: - Core Wrapper Delegate
     
     func coreInterpreterDidFail(coreError: CoreError) -> Void {
