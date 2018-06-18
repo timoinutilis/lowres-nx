@@ -21,7 +21,7 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 
 int mainSDL(int argc, const char * argv[])
 {
-    FILE *file = fopen("Star Scroller 1.0.nx", "rb");
+    FILE *file = fopen("Character Designer 1.1.nx", "rb");
     if (file)
     {
         fseek(file, 0, SEEK_END);
@@ -41,7 +41,10 @@ int mainSDL(int argc, const char * argv[])
             if (core)
             {
                 struct CoreInput coreInput;
+                SDL_memset(&coreInput, 0, sizeof(struct CoreInput));
+                
                 struct CoreDelegate coreDelegate;
+                SDL_memset(&coreDelegate, 0, sizeof(struct CoreDelegate));
                 
                 core_init(core);
                 
@@ -99,6 +102,49 @@ int mainSDL(int argc, const char * argv[])
                                     }
                                 }
                                 break;
+                                
+                            case SDL_KEYDOWN: {
+                                SDL_Keycode code = event.key.keysym.sym;
+                                if (code == SDLK_RETURN)
+                                {
+                                    coreInput.key = CoreInputKeyReturn;
+                                }
+                                else if (code == SDLK_BACKSPACE)
+                                {
+                                    coreInput.key = CoreInputKeyBackspace;
+                                }
+                                else if (code >= SDLK_SPACE && code <= SDLK_UNDERSCORE)
+                                {
+                                    coreInput.key = code;
+                                }
+                                else if (code >= SDLK_a && code <= SDLK_z)
+                                {
+                                    coreInput.key = code - 32;
+                                }
+                                if (code == SDLK_p)
+                                {
+                                    coreInput.pause = true;
+                                }
+                                break;
+                            }
+                                
+                            case SDL_MOUSEBUTTONDOWN: {
+                                coreInput.touch = true;
+                                break;
+                            }
+                                
+                            case SDL_MOUSEBUTTONUP: {
+                                coreInput.touch = false;
+                                break;
+                            }
+                            
+                            case SDL_MOUSEMOTION: {
+                                int x = (event.motion.x - screenRect.x) * SCREEN_WIDTH / screenRect.w;
+                                int y = (event.motion.y - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
+                                coreInput.touchX = x;
+                                coreInput.touchY = y;
+                                break;
+                            }
                         }
                     }
                     
