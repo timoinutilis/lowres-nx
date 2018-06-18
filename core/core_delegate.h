@@ -43,7 +43,7 @@ struct CoreDelegate {
     void (*diskDriveDidSave)(void *context, struct DataManager *diskDataManager);
     
     /** Called when keyboard or gamepad settings changed */
-    void (*controlsDidChange)(void *context, struct ControlsInfo);
+    void (*controlsDidChange)(void *context, struct ControlsInfo controlsInfo);
 };
 
 void delegate_interpreterDidFail(struct Core *core, struct CoreError coreError);

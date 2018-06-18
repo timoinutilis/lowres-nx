@@ -188,9 +188,13 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
             int g = (color >> 2) & 0x03;
             int b = color & 0x03;
             // add some gray (0x0F) to simulate screen
-            *outputByte++ = r * 0x55 | 0x0F;
-            *outputByte++ = g * 0x55 | 0x0F;
-            *outputByte++ = b * 0x55 | 0x0F;
+            *outputByte = 0x00; // alpha
+            outputByte++;
+            *outputByte = b * 0x55 | 0x0F;
+            outputByte++;
+            *outputByte = g * 0x55 | 0x0F;
+            outputByte++;
+            *outputByte = r * 0x55 | 0x0F;
             outputByte++;
         }
         outputByte += (bytesPerLine - SCREEN_WIDTH*4);
