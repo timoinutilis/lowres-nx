@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include "main_sdl.h"
 
-int main(int argc, const char * argv[])
-{
+int main(int argc, const char * argv[]){
     return mainSDL(argc, argv);
 }

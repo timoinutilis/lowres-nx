@@ -47,12 +47,33 @@ enum ErrorCode itp_evaluateCommand(struct Core *core);
 
 void itp_init(struct Core *core)
 {
-    core->interpreter->romDataManager.data = core->machine->cartridgeRom;
+    struct Interpreter *interpreter = core->interpreter;
+    
+    interpreter->romDataManager.data = core->machine->cartridgeRom;
+    
+    // global null string
+    interpreter->nullString = rcstring_new(NULL, 0);
+}
+
+void itp_deinit(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    itp_freeProgram(core);
+    
+    // Free null string
+    if (interpreter->nullString)
+    {
+        rcstring_release(interpreter->nullString);
+        interpreter->nullString = NULL;
+    }
 }
 
 struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
 {
     struct Interpreter *interpreter = core->interpreter;
+    
+    itp_freeProgram(core);
     
     // Parse source code
     
@@ -78,10 +99,11 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
         data_setEntry(romDataManager, 0, "FONT", (uint8_t *)DefaultCharacters, 1024);
     }
     
-    // Prepare
+    // Prepare commands
     
     interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->pass = PassPrepare;
+    interpreter->exitEvaluation = false;
     
     enum ErrorCode errorCode;
     do
@@ -137,35 +159,21 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
         }
     }
     
-    // global null string
-    interpreter->nullString = rcstring_new(NULL, 0);
-    
-    itp_resetProgram(core);
-    
-    return err_noCoreError();
-}
-
-void itp_resetProgram(struct Core *core)
-{
-    struct Interpreter *interpreter = core->interpreter;
+    // prepare for run
     
     interpreter->pc = interpreter->tokenizer.tokens;
-    interpreter->subLevel = 0;
-    interpreter->cycles = 0;
-    interpreter->handlesPause = true;
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
-    interpreter->numLabelStackItems = 0;
-    interpreter->isSingleLineIf = false;
-    interpreter->numSimpleVariables = 0;
-    interpreter->numArrayVariables = 0;
+    interpreter->handlesPause = true;
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
-    interpreter->lastVariableValue = NULL;
-    
+    interpreter->isSingleLineIf = false;
+
     srandom(0);
     runStartupSequence(core);
+    
+    return err_noCoreError();
 }
 
 void itp_runProgram(struct Core *core)
@@ -366,16 +374,20 @@ void itp_freeProgram(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     
     interpreter->state = StateNoProgram;
+    interpreter->firstData = NULL;
+    interpreter->lastData = NULL;
+    interpreter->currentDataToken = NULL;
+    interpreter->currentDataValueToken = NULL;
+    interpreter->currentOnRasterToken = NULL;
+    interpreter->currentOnVBLToken = NULL;
+    interpreter->lastVariableValue = NULL;
     
     var_freeSimpleVariables(interpreter, SUB_LEVEL_GLOBAL);
     var_freeArrayVariables(interpreter, SUB_LEVEL_GLOBAL);
     tok_freeTokens(&interpreter->tokenizer);
     
-    // Free null string
-    if (interpreter->nullString)
-    {
-        rcstring_release(interpreter->nullString);
-    }
+    memset(&interpreter->textLib, 0, sizeof(struct TextLib));
+    memset(&interpreter->spritesLib, 0, sizeof(struct SpritesLib));
 }
 
 enum ValueType itp_getIdentifierTokenValueType(struct Token *token)

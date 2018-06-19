@@ -45,8 +45,7 @@ void core_init(struct Core *core)
 
 void core_deinit(struct Core *core)
 {
-    itp_freeProgram(core);
-    
+    itp_deinit(core);
     disk_deinit(core);
     
     free(core->machine);
@@ -65,6 +64,12 @@ void core_deinit(struct Core *core)
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate)
 {
     core->delegate = delegate;
+}
+
+struct CoreError core_compileProgram(struct Core *core, const char *sourceCode)
+{
+    machine_reset(core);
+    return itp_compileProgram(core, sourceCode);
 }
 
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn)

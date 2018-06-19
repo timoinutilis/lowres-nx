@@ -357,6 +357,7 @@ void tok_freeTokens(struct Tokenizer *tokenizer)
             rcstring_release(token->stringValue);
         }
     }
+    memset(tokenizer, 0, sizeof(struct Tokenizer));
 }
 
 struct JumpLabelItem *tok_getJumpLabel(struct Tokenizer *tokenizer, int symbolIndex)

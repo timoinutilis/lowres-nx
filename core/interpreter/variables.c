@@ -211,6 +211,7 @@ void var_freeArrayVariables(struct Interpreter *interpreter, int minSubLevel)
                     }
                 }
                 free(variable->values);
+                variable->values = NULL;
             }
             interpreter->numArrayVariables--;
         }

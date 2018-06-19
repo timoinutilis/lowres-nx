@@ -60,6 +60,7 @@ extern const char CoreInputKeyBackspace;
 void core_init(struct Core *core);
 void core_deinit(struct Core *core);
 void core_setDelegate(struct Core *core, struct CoreDelegate *delegate);
+struct CoreError core_compileProgram(struct Core *core, const char *sourceCode);
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn);
 void core_update(struct Core *core, struct CoreInput *input);
 void core_setDebug(struct Core *core, bool enabled);

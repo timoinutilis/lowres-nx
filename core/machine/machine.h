@@ -70,6 +70,7 @@ struct Machine {
 };
 
 void machine_init(struct Core *core);
+void machine_reset(struct Core *core);
 int machine_peek(struct Core *core, int address);
 bool machine_poke(struct Core *core, int address, int value);
 
