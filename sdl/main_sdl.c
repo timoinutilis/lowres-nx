@@ -12,7 +12,16 @@
 #include <SDL2/SDL.h>
 #include "core.h"
 
-#define DEFAULT_WINDOW_SCALE 4
+const int defaultWindowScale = 4;
+const int joyAxisThreshold = 16384;
+
+const int keyboardControls[2][8] = {
+    // up, down, left, right, button A, button B, alt. button A, alt. button B
+    {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
+        SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_COMMA, SDL_SCANCODE_PERIOD},
+    {SDL_SCANCODE_R, SDL_SCANCODE_F, SDL_SCANCODE_D, SDL_SCANCODE_G,
+        SDL_SCANCODE_A, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_S}
+};
 
 void loadProgram(const char *filename);
 void configureJoysticks(void);
@@ -28,17 +37,11 @@ char *sourceCode = NULL;
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
 
-int keyboardControls[2][8] = {
-    // up, down, left, right, button A, button B, alt. button A, alt. button B
-    {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_COMMA, SDL_SCANCODE_PERIOD},
-    {SDL_SCANCODE_R, SDL_SCANCODE_F, SDL_SCANCODE_D, SDL_SCANCODE_G, SDL_SCANCODE_A, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_S}
-};
-
 int mainSDL(int argc, const char * argv[])
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     
-    SDL_Window *window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * DEFAULT_WINDOW_SCALE, SCREEN_HEIGHT * DEFAULT_WINDOW_SCALE, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    SDL_Window *window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     
@@ -69,8 +72,8 @@ int mainSDL(int argc, const char * argv[])
         SDL_Rect screenRect;
         screenRect.x = 0;
         screenRect.y = 0;
-        screenRect.w = SCREEN_WIDTH * DEFAULT_WINDOW_SCALE;
-        screenRect.h = SCREEN_HEIGHT * DEFAULT_WINDOW_SCALE;
+        screenRect.w = SCREEN_WIDTH * defaultWindowScale;
+        screenRect.h = SCREEN_HEIGHT * defaultWindowScale;
         
         bool quit = false;
         while (!quit)
@@ -188,10 +191,12 @@ int mainSDL(int argc, const char * argv[])
                 {
                     SDL_Joystick *joy = joysticks[i];
                     Uint8 hat = SDL_JoystickGetHat(joy, 0);
-                    gamepad->up = (hat & SDL_HAT_UP) != 0;
-                    gamepad->down = (hat & SDL_HAT_DOWN) != 0;
-                    gamepad->left = (hat & SDL_HAT_LEFT) != 0;
-                    gamepad->right = (hat & SDL_HAT_RIGHT) != 0;
+                    Sint16 axisX = SDL_JoystickGetAxis(joy, 0);
+                    Sint16 axisY = SDL_JoystickGetAxis(joy, 1);
+                    gamepad->up = (hat & SDL_HAT_UP) != 0 || axisY < -joyAxisThreshold;
+                    gamepad->down = (hat & SDL_HAT_DOWN) != 0 || axisY > joyAxisThreshold;
+                    gamepad->left = (hat & SDL_HAT_LEFT) != 0 || axisX < -joyAxisThreshold;
+                    gamepad->right = (hat & SDL_HAT_RIGHT) != 0 || axisX > joyAxisThreshold;
                     gamepad->buttonA = SDL_JoystickGetButton(joy, 0);
                     gamepad->buttonB = SDL_JoystickGetButton(joy, 1);
                 }
