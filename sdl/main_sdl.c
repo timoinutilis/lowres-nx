@@ -1,9 +1,20 @@
 //
-//  main_sdl.c
-//  LowRes NX macOS SDL
+// Copyright 2017 Timo Kloss
 //
-//  Created by Timo Kloss on 18/6/18.
-//  Copyright © 2018 Inutilis Software. All rights reserved.
+// This file is part of LowRes NX.
+//
+// LowRes NX is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// LowRes NX is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 #include "main_sdl.h"
@@ -11,6 +22,7 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include "core.h"
+#include "boot_intro.h"
 
 const int defaultWindowScale = 4;
 const int joyAxisThreshold = 16384;
@@ -23,6 +35,7 @@ const int keyboardControls[2][8] = {
         SDL_SCANCODE_A, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_S}
 };
 
+void loadBootIntro();
 void loadProgram(const char *filename);
 void configureJoysticks(void);
 void closeJoysticks(void);
@@ -68,6 +81,7 @@ int mainSDL(int argc, const char * argv[])
         core_setDelegate(core, &coreDelegate);
         
 //        loadProgram("/Users/timokloss/projects/lowres-nx/programs/Star Scroller 1.0.nx");
+        loadBootIntro();
         
         SDL_Rect screenRect;
         screenRect.x = 0;
@@ -246,6 +260,17 @@ int mainSDL(int argc, const char * argv[])
     SDL_Quit();
     
     return 0;
+}
+
+void loadBootIntro()
+{
+    SDL_free(sourceCode);
+    sourceCode = NULL;
+    
+    struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
+    SDL_Log("boot compile error: %d", error.code);
+    
+    core_willRunProgram(core, SDL_GetTicks() / 1000);
 }
 
 void loadProgram(const char *filename)

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		921F986620DAD4DF0052F233 /* boot_intro.c in Sources */ = {isa = PBXBuildFile; fileRef = 921F986520DAD4DF0052F233 /* boot_intro.c */; };
 		9287EAC920D85E4E000BBEB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9287EAC820D85E4E000BBEB1 /* Assets.xcassets */; };
 		9287EAD720D85ED9000BBEB1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EAD620D85ED9000BBEB1 /* main.c */; };
 		9287EB2D20D85EEB000BBEB1 /* cmd_variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EADC20D85EEB000BBEB1 /* cmd_variables.c */; };
@@ -52,6 +53,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		921F986420DAD4DF0052F233 /* boot_intro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boot_intro.h; sourceTree = "<group>"; };
+		921F986520DAD4DF0052F233 /* boot_intro.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = boot_intro.c; sourceTree = "<group>"; };
 		9287EAC220D85E4D000BBEB1 /* LowRes NX macOS SDL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX macOS SDL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9287EAC820D85E4E000BBEB1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9287EACD20D85E4E000BBEB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -321,6 +324,8 @@
 			children = (
 				9287EB5420D85EF7000BBEB1 /* main_sdl.h */,
 				9287EB5520D85EF7000BBEB1 /* main_sdl.c */,
+				921F986420DAD4DF0052F233 /* boot_intro.h */,
+				921F986520DAD4DF0052F233 /* boot_intro.c */,
 			);
 			name = sdl;
 			path = ../../sdl;
@@ -425,6 +430,7 @@
 				9287EB4720D85EEB000BBEB1 /* data_manager.c in Sources */,
 				9287EB2F20D85EEB000BBEB1 /* rcstring.c in Sources */,
 				9287EB5120D85EEB000BBEB1 /* overlay.c in Sources */,
+				921F986620DAD4DF0052F233 /* boot_intro.c in Sources */,
 				9287EB3620D85EEB000BBEB1 /* charsets.c in Sources */,
 				9287EB3F20D85EEB000BBEB1 /* cmd_io.c in Sources */,
 				9287EB3520D85EEB000BBEB1 /* cmd_maths.c in Sources */,

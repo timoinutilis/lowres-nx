@@ -17,11 +17,9 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef main_sdl_h
-#define main_sdl_h
+#ifndef boot_intro_h
+#define boot_intro_h
 
-#include <stdio.h>
+extern const char *bootIntroSourceCode;
 
-int mainSDL(int argc, const char * argv[]);
-
-#endif /* main_sdl_h */
+#endif /* boot_intro_h */
