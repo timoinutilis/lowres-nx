@@ -15,6 +15,8 @@
 #define DEFAULT_WINDOW_SCALE 4
 
 void loadProgram(const char *filename);
+void configureJoysticks(void);
+void closeJoysticks(void);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -23,6 +25,14 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 
 struct Core *core = NULL;
 char *sourceCode = NULL;
+int numJoysticks = 0;
+SDL_Joystick *joysticks[2] = {NULL, NULL};
+
+int keyboardControls[2][8] = {
+    // up, down, left, right, button A, button B, alt. button A, alt. button B
+    {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_COMMA, SDL_SCANCODE_PERIOD},
+    {SDL_SCANCODE_R, SDL_SCANCODE_F, SDL_SCANCODE_D, SDL_SCANCODE_G, SDL_SCANCODE_A, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_S}
+};
 
 int mainSDL(int argc, const char * argv[])
 {
@@ -34,16 +44,7 @@ int mainSDL(int argc, const char * argv[])
     
     SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
     
-    SDL_Joystick *joysticks[2] = {NULL, NULL};
-    int numJoysticks = SDL_NumJoysticks();
-    if (numJoysticks > 2)
-    {
-        numJoysticks = 2;
-    }
-    for (int i = 0; i < numJoysticks; i++)
-    {
-        joysticks[i] = SDL_JoystickOpen(i);
-    }
+    configureJoysticks();
     
     core = SDL_calloc(1, sizeof(struct Core));
     if (core)
@@ -109,6 +110,8 @@ int mainSDL(int argc, const char * argv[])
                         
                     case SDL_KEYDOWN: {
                         SDL_Keycode code = event.key.keysym.sym;
+                        
+                        // text input
                         if (code == SDLK_RETURN)
                         {
                             coreInput.key = CoreInputKeyReturn;
@@ -125,9 +128,20 @@ int mainSDL(int argc, const char * argv[])
                         {
                             coreInput.key = code - 32;
                         }
+                        
+                        // console buttons
                         if (code == SDLK_p)
                         {
                             coreInput.pause = true;
+                        }
+                        
+                        // system
+                        if (event.key.keysym.mod & KMOD_GUI)
+                        {
+                            if (code == SDLK_d)
+                            {
+                                core_setDebug(core, !core_getDebug(core));
+                            }
                         }
                         break;
                     }
@@ -150,6 +164,12 @@ int mainSDL(int argc, const char * argv[])
                         break;
                     }
                         
+                    case SDL_JOYDEVICEADDED:
+                    case SDL_JOYDEVICEREMOVED: {
+                        configureJoysticks();
+                        break;
+                    }
+                        
                     case SDL_JOYBUTTONDOWN: {
                         if (event.jbutton.button == 2)
                         {
@@ -160,17 +180,31 @@ int mainSDL(int argc, const char * argv[])
                 }
             }
             
-            for (int i = 0; i < numJoysticks; i++)
+            const Uint8 *state = SDL_GetKeyboardState(NULL);
+            for (int i = 0; i < 2; i++)
             {
-                SDL_Joystick *joy = joysticks[i];
-                int hat = SDL_JoystickGetHat(joy, 0);
                 struct CoreInputGamepad *gamepad = &coreInput.gamepads[i];
-                gamepad->up = (hat & SDL_HAT_UP) != 0;
-                gamepad->down = (hat & SDL_HAT_DOWN) != 0;
-                gamepad->left = (hat & SDL_HAT_LEFT) != 0;
-                gamepad->right = (hat & SDL_HAT_RIGHT) != 0;
-                gamepad->buttonA = SDL_JoystickGetButton(joy, 0);
-                gamepad->buttonB = SDL_JoystickGetButton(joy, 1);
+                if (i < numJoysticks)
+                {
+                    SDL_Joystick *joy = joysticks[i];
+                    Uint8 hat = SDL_JoystickGetHat(joy, 0);
+                    gamepad->up = (hat & SDL_HAT_UP) != 0;
+                    gamepad->down = (hat & SDL_HAT_DOWN) != 0;
+                    gamepad->left = (hat & SDL_HAT_LEFT) != 0;
+                    gamepad->right = (hat & SDL_HAT_RIGHT) != 0;
+                    gamepad->buttonA = SDL_JoystickGetButton(joy, 0);
+                    gamepad->buttonB = SDL_JoystickGetButton(joy, 1);
+                }
+                else
+                {
+                    int ci = i - numJoysticks;
+                    gamepad->up = state[keyboardControls[ci][0]];
+                    gamepad->down = state[keyboardControls[ci][1]];
+                    gamepad->left = state[keyboardControls[ci][2]];
+                    gamepad->right = state[keyboardControls[ci][3]];
+                    gamepad->buttonA = state[keyboardControls[ci][4]] || state[keyboardControls[ci][6]];
+                    gamepad->buttonB = state[keyboardControls[ci][5]] || state[keyboardControls[ci][7]];
+                }
             }
             
             core_update(core, &coreInput);
@@ -198,10 +232,7 @@ int mainSDL(int argc, const char * argv[])
         sourceCode = NULL;
     }
     
-    for (int i = 0; i < numJoysticks; i++)
-    {
-        SDL_JoystickClose(joysticks[i]);
-    }
+    closeJoysticks();
     
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
@@ -247,6 +278,28 @@ void loadProgram(const char *filename)
     {
         SDL_Log("failed to load file: %s", filename);
     }
+}
+
+void configureJoysticks() {
+    closeJoysticks();
+    numJoysticks = SDL_NumJoysticks();
+    if (numJoysticks > 2)
+    {
+        numJoysticks = 2;
+    }
+    for (int i = 0; i < numJoysticks; i++)
+    {
+        joysticks[i] = SDL_JoystickOpen(i);
+    }
+}
+
+void closeJoysticks() {
+    for (int i = 0; i < numJoysticks; i++)
+    {
+        SDL_JoystickClose(joysticks[i]);
+        joysticks[i] = NULL;
+    }
+    numJoysticks = 0;
 }
 
 /** Called on error */
