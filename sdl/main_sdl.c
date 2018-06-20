@@ -26,13 +26,24 @@ char *sourceCode = NULL;
 
 int mainSDL(int argc, const char * argv[])
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     
     SDL_Window *window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * DEFAULT_WINDOW_SCALE, SCREEN_HEIGHT * DEFAULT_WINDOW_SCALE, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     
     SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+    
+    SDL_Joystick *joysticks[2] = {NULL, NULL};
+    int numJoysticks = SDL_NumJoysticks();
+    if (numJoysticks > 2)
+    {
+        numJoysticks = 2;
+    }
+    for (int i = 0; i < numJoysticks; i++)
+    {
+        joysticks[i] = SDL_JoystickOpen(i);
+    }
     
     core = SDL_calloc(1, sizeof(struct Core));
     if (core)
@@ -138,7 +149,28 @@ int mainSDL(int argc, const char * argv[])
                         coreInput.touchY = y;
                         break;
                     }
+                        
+                    case SDL_JOYBUTTONDOWN: {
+                        if (event.jbutton.button == 2)
+                        {
+                            coreInput.pause = true;
+                        }
+                        break;
+                    }
                 }
+            }
+            
+            for (int i = 0; i < numJoysticks; i++)
+            {
+                SDL_Joystick *joy = joysticks[i];
+                int hat = SDL_JoystickGetHat(joy, 0);
+                struct CoreInputGamepad *gamepad = &coreInput.gamepads[i];
+                gamepad->up = (hat & SDL_HAT_UP) != 0;
+                gamepad->down = (hat & SDL_HAT_DOWN) != 0;
+                gamepad->left = (hat & SDL_HAT_LEFT) != 0;
+                gamepad->right = (hat & SDL_HAT_RIGHT) != 0;
+                gamepad->buttonA = SDL_JoystickGetButton(joy, 0);
+                gamepad->buttonB = SDL_JoystickGetButton(joy, 1);
             }
             
             core_update(core, &coreInput);
@@ -164,6 +196,11 @@ int mainSDL(int argc, const char * argv[])
         
         SDL_free(sourceCode);
         sourceCode = NULL;
+    }
+    
+    for (int i = 0; i < numJoysticks; i++)
+    {
+        SDL_JoystickClose(joysticks[i]);
     }
     
     SDL_DestroyTexture(texture);
