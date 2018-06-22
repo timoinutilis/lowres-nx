@@ -107,6 +107,7 @@ struct Interpreter {
     union Gamepad lastFrameGamepads[NUM_GAMEPADS];
     union IOStatus lastFrameIOStatus;
     float timer;
+    int seed;
     union Value *lastVariableValue;
     
     struct TextLib textLib;

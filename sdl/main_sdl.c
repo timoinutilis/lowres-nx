@@ -17,7 +17,6 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "main_sdl.h"
 #include <stdbool.h>
 #include <math.h>
 #include <SDL2/SDL.h>
@@ -35,7 +34,7 @@ const int keyboardControls[2][8] = {
         SDL_SCANCODE_A, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_S}
 };
 
-void loadBootIntro();
+void loadBootIntro(void);
 void loadProgram(const char *filename);
 void configureJoysticks(void);
 void closeJoysticks(void);
@@ -50,8 +49,13 @@ char *sourceCode = NULL;
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
 
-int mainSDL(int argc, const char * argv[])
+int main(int argc, const char * argv[])
 {
+    for (int i = 0; i < argc; i++)
+    {
+        SDL_ShowSimpleMessageBox(0, "Args", argv[i], NULL);
+    }
+    
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     
     SDL_Window *window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);

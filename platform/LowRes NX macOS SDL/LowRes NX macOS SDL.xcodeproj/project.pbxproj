@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		921F986620DAD4DF0052F233 /* boot_intro.c in Sources */ = {isa = PBXBuildFile; fileRef = 921F986520DAD4DF0052F233 /* boot_intro.c */; };
 		9287EAC920D85E4E000BBEB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9287EAC820D85E4E000BBEB1 /* Assets.xcassets */; };
-		9287EAD720D85ED9000BBEB1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EAD620D85ED9000BBEB1 /* main.c */; };
 		9287EB2D20D85EEB000BBEB1 /* cmd_variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EADC20D85EEB000BBEB1 /* cmd_variables.c */; };
 		9287EB2E20D85EEB000BBEB1 /* cmd_data.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EADD20D85EEB000BBEB1 /* cmd_data.c */; };
 		9287EB2F20D85EEB000BBEB1 /* rcstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EADF20D85EEB000BBEB1 /* rcstring.c */; };
@@ -59,7 +58,6 @@
 		9287EAC820D85E4E000BBEB1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9287EACD20D85E4E000BBEB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9287EAD020D85E4E000BBEB1 /* LowRes_NX_macOS_SDL.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LowRes_NX_macOS_SDL.entitlements; sourceTree = "<group>"; };
-		9287EAD620D85ED9000BBEB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		9287EADA20D85EEB000BBEB1 /* cmd_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_memory.h; sourceTree = "<group>"; };
 		9287EADB20D85EEB000BBEB1 /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
 		9287EADC20D85EEB000BBEB1 /* cmd_variables.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmd_variables.c; sourceTree = "<group>"; };
@@ -138,7 +136,6 @@
 		9287EB2A20D85EEB000BBEB1 /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
 		9287EB2B20D85EEB000BBEB1 /* overlay_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlay_data.h; sourceTree = "<group>"; };
 		9287EB2C20D85EEB000BBEB1 /* core_delegate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_delegate.c; sourceTree = "<group>"; };
-		9287EB5420D85EF7000BBEB1 /* main_sdl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main_sdl.h; sourceTree = "<group>"; };
 		9287EB5520D85EF7000BBEB1 /* main_sdl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main_sdl.c; sourceTree = "<group>"; };
 		9287EB5820D85F43000BBEB1 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -180,7 +177,6 @@
 				9287EAC820D85E4E000BBEB1 /* Assets.xcassets */,
 				9287EACD20D85E4E000BBEB1 /* Info.plist */,
 				9287EAD020D85E4E000BBEB1 /* LowRes_NX_macOS_SDL.entitlements */,
-				9287EAD620D85ED9000BBEB1 /* main.c */,
 			);
 			path = "LowRes NX macOS SDL";
 			sourceTree = "<group>";
@@ -322,7 +318,6 @@
 		9287EB5320D85EF7000BBEB1 /* sdl */ = {
 			isa = PBXGroup;
 			children = (
-				9287EB5420D85EF7000BBEB1 /* main_sdl.h */,
 				9287EB5520D85EF7000BBEB1 /* main_sdl.c */,
 				921F986420DAD4DF0052F233 /* boot_intro.h */,
 				921F986520DAD4DF0052F233 /* boot_intro.c */,
@@ -416,7 +411,6 @@
 				9287EB3220D85EEB000BBEB1 /* cmd_control.c in Sources */,
 				9287EB2D20D85EEB000BBEB1 /* cmd_variables.c in Sources */,
 				9287EB4020D85EEB000BBEB1 /* interpreter.c in Sources */,
-				9287EAD720D85ED9000BBEB1 /* main.c in Sources */,
 				9287EB5020D85EEB000BBEB1 /* overlay_data.c in Sources */,
 				9287EB4220D85EEB000BBEB1 /* cmd_sprites.c in Sources */,
 				9287EB4120D85EEB000BBEB1 /* data.c in Sources */,

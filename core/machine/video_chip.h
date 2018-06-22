@@ -21,6 +21,7 @@
 #define video_chip_h
 
 #include <stdio.h>
+#include <stdint.h>
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 128

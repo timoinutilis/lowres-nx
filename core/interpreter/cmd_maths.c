@@ -42,9 +42,12 @@ struct TypedValue fnc_math0(struct Core *core)
                 value.v.floatValue = M_PI;
                 break;
                 
-            case TokenRND:
-                value.v.floatValue = random() / ((float)RAND_MAX + 1.0);
+            case TokenRND: {
+                int seed = (1140671485 * interpreter->seed + 12820163) & 0xFFFFFF;
+                interpreter->seed = seed;
+                value.v.floatValue = seed / ((float)0x1000000);
                 break;
+            }
                 
             default:
                 assert(0);
@@ -198,7 +201,7 @@ enum ErrorCode cmd_RANDOMIZE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        srandom(value.v.floatValue);
+        interpreter->seed = value.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);

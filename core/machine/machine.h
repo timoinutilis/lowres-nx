@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "io_chip.h"
 #include "video_chip.h"
 #include "audio_chip.h"

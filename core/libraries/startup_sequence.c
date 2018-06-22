@@ -20,6 +20,7 @@
 #include "startup_sequence.h"
 #include "core.h"
 #include <string.h>
+#include <stdint.h>
 
 #define FONT_CHAR_OFFSET 192
 

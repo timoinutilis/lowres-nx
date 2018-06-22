@@ -21,6 +21,7 @@
 #define default_characters_h
 
 #include <stdio.h>
+#include <stdint.h>
 
 extern uint8_t DefaultCharacters[][16];
 

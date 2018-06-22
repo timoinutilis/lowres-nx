@@ -20,6 +20,8 @@
 #ifndef io_chip_h
 #define io_chip_h
 
+#include <stdint.h>
+
 #define NUM_GAMEPADS 2
 
 // ================ Gamepad ================

@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "video_chip.h"
 
 #define INPUT_BUFFER_SIZE 256

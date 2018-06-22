@@ -21,6 +21,7 @@
 #define overlay_data_h
 
 #include <stdio.h>
+#include <stdint.h>
 #include "video_chip.h"
 
 extern uint8_t overlayColors[];

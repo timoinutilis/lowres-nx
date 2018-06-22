@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 #include "core.h"
 #include "default_characters.h"
 #include "cmd_control.h"
@@ -169,8 +170,8 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
     interpreter->isSingleLineIf = false;
-
-    srandom(0);
+    interpreter->seed = 0;
+    
     runStartupSequence(core);
     
     return err_noCoreError();
