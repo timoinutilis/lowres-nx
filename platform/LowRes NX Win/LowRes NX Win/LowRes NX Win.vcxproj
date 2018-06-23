@@ -210,6 +210,7 @@
     <ClInclude Include="..\..\..\sdl\boot_intro.h" />
     <ClInclude Include="..\..\..\sdl\main_sdl.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LowRes NX Win.rc" />
