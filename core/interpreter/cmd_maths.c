@@ -17,6 +17,7 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#define _USE_MATH_DEFINES
 #include "cmd_maths.h"
 #include "core.h"
 #include <math.h>

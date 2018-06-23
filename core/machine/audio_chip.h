@@ -21,8 +21,10 @@
 #define audio_chip_h
 
 #include <stdio.h>
+#include <stdint.h>
 
 struct AudioRegisters {
+    uint8_t dummy;
 };
 
 #endif /* audio_chip_h */

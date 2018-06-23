@@ -19,9 +19,14 @@
 
 #include <stdbool.h>
 #include <math.h>
-#include <SDL2/SDL.h>
 #include "core.h"
 #include "boot_intro.h"
+
+#if defined(__APPLE__) && defined(__MACH__)
+#include <SDL2/SDL.h>
+#else
+#include <SDL.h>
+#endif
 
 const int defaultWindowScale = 4;
 const int joyAxisThreshold = 16384;
@@ -29,9 +34,9 @@ const int joyAxisThreshold = 16384;
 const int keyboardControls[2][8] = {
     // up, down, left, right, button A, button B, alt. button A, alt. button B
     {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
-        SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_COMMA, SDL_SCANCODE_PERIOD},
-    {SDL_SCANCODE_R, SDL_SCANCODE_F, SDL_SCANCODE_D, SDL_SCANCODE_G,
-        SDL_SCANCODE_A, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_S}
+        SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_N, SDL_SCANCODE_M},
+    {SDL_SCANCODE_E, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_F,
+        SDL_SCANCODE_TAB, SDL_SCANCODE_Q, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_A}
 };
 
 void loadBootIntro(void);
@@ -51,9 +56,26 @@ SDL_Joystick *joysticks[2] = {NULL, NULL};
 
 int main(int argc, const char * argv[])
 {
-    for (int i = 0; i < argc; i++)
+    const char *programArg = NULL;
+    for (int i = 1; i < argc; i++)
     {
-        SDL_ShowSimpleMessageBox(0, "Args", argv[i], NULL);
+        const char *arg = argv[i];
+        SDL_Log("arg %d: %s", i, arg);
+        if (*arg == '-') {
+            i++;
+            if (i < argc)
+            {
+                const char *value = argv[i];
+                SDL_Log("value: %s", value);
+            }
+            else
+            {
+                SDL_Log("missing value for parameter %s", arg);
+            }
+        } else {
+            SDL_Log("file: %s", arg);
+            programArg = arg;
+        }
     }
     
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
@@ -84,8 +106,14 @@ int main(int argc, const char * argv[])
         
         core_setDelegate(core, &coreDelegate);
         
-//        loadProgram("/Users/timokloss/projects/lowres-nx/programs/Star Scroller 1.0.nx");
-        loadBootIntro();
+        if (programArg)
+        {
+            loadProgram(programArg);
+        }
+        else
+        {
+            loadBootIntro();
+        }
         
         SDL_Rect screenRect;
         screenRect.x = 0;
@@ -157,11 +185,22 @@ int main(int argc, const char * argv[])
                         }
                         
                         // system
-                        if (event.key.keysym.mod & KMOD_GUI)
+                        if (event.key.keysym.mod & KMOD_CTRL)
                         {
                             if (code == SDLK_d)
                             {
                                 core_setDebug(core, !core_getDebug(core));
+                            }
+                            else if (code == SDLK_f)
+                            {
+                                if (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP)
+                                {
+                                    SDL_SetWindowFullscreen(window, 0);
+                                }
+                                else
+                                {
+                                    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                                }
                             }
                         }
                         break;
@@ -272,7 +311,10 @@ void loadBootIntro()
     sourceCode = NULL;
     
     struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
-    SDL_Log("boot compile error: %d", error.code);
+    if (error.code != ErrorNone)
+    {
+        SDL_Log("boot compile error: %d", error.code);
+    }
     
     core_willRunProgram(core, SDL_GetTicks() / 1000);
 }
@@ -299,7 +341,10 @@ void loadProgram(const char *filename)
         if (sourceCode)
         {
             struct CoreError error = core_compileProgram(core, sourceCode);
-            SDL_Log("compile error: %d", error.code);
+            if (error.code != ErrorNone)
+            {
+                SDL_Log("compile error: %d", error.code);
+            }
             
             core_willRunProgram(core, SDL_GetTicks() / 1000);
         }

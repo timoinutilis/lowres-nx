@@ -249,7 +249,7 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
         case StatePaused:
         case StateWaitForDisk:
         {
-            struct Token *startToken;
+            struct Token *startToken = NULL;
             int maxCycles;
             switch (type)
             {
