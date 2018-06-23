@@ -58,3 +58,11 @@ fastlane/screenshots
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+platform/LowRes NX Win/LowRes NX Win/Debug/
+platform/LowRes NX Win/LowRes NX Win/Release/
+platform/LowRes NX Win/Debug/
+platform/LowRes NX Win/Release/
+platform/LowRes NX Win/LowRes NX Win/SDL2.dll
+platform/LowRes NX Win/.vs/
+*.user
+*.aps

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{5F65EDCE-D405-4962-BD3B-65C49E160B3E}</ProjectGuid>
+    <RootNamespace>LowResNXWin</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>false</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\core\accessories\disk_drive.c" />
+    <ClCompile Include="..\..\..\core\core.c" />
+    <ClCompile Include="..\..\..\core\core_delegate.c" />
+    <ClCompile Include="..\..\..\core\datamanager\data_manager.c" />
+    <ClCompile Include="..\..\..\core\interpreter\charsets.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_background.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_control.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_data.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_files.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_io.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_maths.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_memory.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_screen.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_sprites.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_strings.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_subs.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_text.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_variables.c" />
+    <ClCompile Include="..\..\..\core\interpreter\data.c" />
+    <ClCompile Include="..\..\..\core\interpreter\error.c" />
+    <ClCompile Include="..\..\..\core\interpreter\interpreter.c" />
+    <ClCompile Include="..\..\..\core\interpreter\interpreter_utils.c" />
+    <ClCompile Include="..\..\..\core\interpreter\labels.c" />
+    <ClCompile Include="..\..\..\core\interpreter\rcstring.c" />
+    <ClCompile Include="..\..\..\core\interpreter\string_utils.c" />
+    <ClCompile Include="..\..\..\core\interpreter\token.c" />
+    <ClCompile Include="..\..\..\core\interpreter\tokenizer.c" />
+    <ClCompile Include="..\..\..\core\interpreter\value.c" />
+    <ClCompile Include="..\..\..\core\interpreter\variables.c" />
+    <ClCompile Include="..\..\..\core\libraries\default_characters.c" />
+    <ClCompile Include="..\..\..\core\libraries\sprites_lib.c" />
+    <ClCompile Include="..\..\..\core\libraries\startup_sequence.c" />
+    <ClCompile Include="..\..\..\core\libraries\text_lib.c" />
+    <ClCompile Include="..\..\..\core\machine\audio_chip.c" />
+    <ClCompile Include="..\..\..\core\machine\machine.c" />
+    <ClCompile Include="..\..\..\core\machine\video_chip.c" />
+    <ClCompile Include="..\..\..\core\overlay\overlay.c" />
+    <ClCompile Include="..\..\..\core\overlay\overlay_data.c" />
+    <ClCompile Include="..\..\..\sdl\boot_intro.c" />
+    <ClCompile Include="..\..\..\sdl\main_sdl.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\core\accessories\disk_drive.h" />
+    <ClInclude Include="..\..\..\core\core.h" />
+    <ClInclude Include="..\..\..\core\core_delegate.h" />
+    <ClInclude Include="..\..\..\core\datamanager\data_manager.h" />
+    <ClInclude Include="..\..\..\core\interpreter\charsets.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_background.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_control.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_data.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_files.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_io.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_maths.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_memory.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_screen.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_sprites.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_strings.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_subs.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_text.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_variables.h" />
+    <ClInclude Include="..\..\..\core\interpreter\data.h" />
+    <ClInclude Include="..\..\..\core\interpreter\error.h" />
+    <ClInclude Include="..\..\..\core\interpreter\interpreter.h" />
+    <ClInclude Include="..\..\..\core\interpreter\interpreter_config.h" />
+    <ClInclude Include="..\..\..\core\interpreter\interpreter_utils.h" />
+    <ClInclude Include="..\..\..\core\interpreter\labels.h" />
+    <ClInclude Include="..\..\..\core\interpreter\rcstring.h" />
+    <ClInclude Include="..\..\..\core\interpreter\string_utils.h" />
+    <ClInclude Include="..\..\..\core\interpreter\token.h" />
+    <ClInclude Include="..\..\..\core\interpreter\tokenizer.h" />
+    <ClInclude Include="..\..\..\core\interpreter\value.h" />
+    <ClInclude Include="..\..\..\core\interpreter\variables.h" />
+    <ClInclude Include="..\..\..\core\libraries\default_characters.h" />
+    <ClInclude Include="..\..\..\core\libraries\sprites_lib.h" />
+    <ClInclude Include="..\..\..\core\libraries\startup_sequence.h" />
+    <ClInclude Include="..\..\..\core\libraries\text_lib.h" />
+    <ClInclude Include="..\..\..\core\machine\audio_chip.h" />
+    <ClInclude Include="..\..\..\core\machine\io_chip.h" />
+    <ClInclude Include="..\..\..\core\machine\machine.h" />
+    <ClInclude Include="..\..\..\core\machine\video_chip.h" />
+    <ClInclude Include="..\..\..\core\overlay\overlay.h" />
+    <ClInclude Include="..\..\..\core\overlay\overlay_data.h" />
+    <ClInclude Include="..\..\..\sdl\boot_intro.h" />
+    <ClInclude Include="..\..\..\sdl\main_sdl.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LowRes NX Win.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
