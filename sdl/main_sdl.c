@@ -56,30 +56,41 @@ SDL_Joystick *joysticks[2] = {NULL, NULL};
 int main(int argc, const char * argv[])
 {
     const char *programArg = NULL;
+    bool fullscreenArg = false;
+    
     for (int i = 1; i < argc; i++)
     {
         const char *arg = argv[i];
-        SDL_Log("arg %d: %s", i, arg);
         if (*arg == '-') {
             i++;
             if (i < argc)
             {
                 const char *value = argv[i];
-                SDL_Log("value: %s", value);
+                if (strcmp(arg, "-fullscreen") == 0) {
+                    if (strcmp(value, "yes") == 0)
+                    {
+                        fullscreenArg = true;
+                    }
+                }
             }
             else
             {
                 SDL_Log("missing value for parameter %s", arg);
             }
         } else {
-            SDL_Log("file: %s", arg);
             programArg = arg;
         }
     }
     
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     
-    SDL_Window *window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    Uint32 windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+    if (fullscreenArg)
+    {
+        windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+    
+    SDL_Window *window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     
@@ -201,6 +212,10 @@ int main(int argc, const char * argv[])
                                     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                                 }
                             }
+                        }
+                        else if (code == SDLK_ESCAPE)
+                        {
+                            quit = true;
                         }
                         break;
                     }
