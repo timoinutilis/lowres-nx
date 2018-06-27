@@ -5,7 +5,7 @@
 - Read the manual, especially the introduction!
 
 - The manual sometimes refers to the interface of the iOS app.
-  On macOS just use any text editor, there is no included one.
+  On macOS/Windows just use any text editor, there is no included one.
 
 - Share programs and discuss on: https://lowresnx.inutilis.com
 
@@ -18,13 +18,21 @@
 
 - Write to timo@inutilis.com.
   
-- There's no real gamepad support yet. Use the keyboard.
+- Use any real gamepad or the keyboard:
 
 	Button  Player 1    Player 2
 	-------+-----------+--------
-	UP      Arrow Up    R
+	UP      Arrow Up    E
 	DOWN    Arrow Down  D
-	LEFT    Arrow Left  F
-	RIGHT   Arrow Right G
-	A       Z/,         A
-	B       X/.         S
+	LEFT    Arrow Left  S
+	RIGHT   Arrow Right F
+	A       Z/N         Q/Tab
+	B       X/M         A/Shift
+
+- More keys:
+	Quit         Esc
+	Fullscreen   Ctrl+f
+	Debug        Ctrl+d
+
+- Command line arguments:
+	"LowRes NX" [-fullscreen yes] [program.nx]
