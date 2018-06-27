@@ -43,6 +43,7 @@ void loadBootIntro(void);
 void loadProgram(const char *filename);
 void configureJoysticks(void);
 void closeJoysticks(void);
+void setTouchPosition(int windowX, int windowY);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -52,6 +53,8 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 struct Core *core = NULL;
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
+SDL_Rect screenRect;
+struct CoreInput coreInput;
 
 int main(int argc, const char * argv[])
 {
@@ -101,7 +104,6 @@ int main(int argc, const char * argv[])
     core = SDL_calloc(1, sizeof(struct Core));
     if (core)
     {
-        struct CoreInput coreInput;
         SDL_memset(&coreInput, 0, sizeof(struct CoreInput));
         
         struct CoreDelegate coreDelegate;
@@ -125,16 +127,22 @@ int main(int argc, const char * argv[])
             loadBootIntro();
         }
         
-        SDL_Rect screenRect;
         screenRect.x = 0;
         screenRect.y = 0;
         screenRect.w = SCREEN_WIDTH * defaultWindowScale;
         screenRect.h = SCREEN_HEIGHT * defaultWindowScale;
         
         bool quit = false;
+        bool releasedTouch = false;
         while (!quit)
         {
             SDL_Event event;
+            
+            if (releasedTouch)
+            {
+                coreInput.touch = false;
+                releasedTouch = false;
+            }
             
             while (SDL_PollEvent(&event))
             {
@@ -221,23 +229,21 @@ int main(int argc, const char * argv[])
                     }
                         
                     case SDL_MOUSEBUTTONDOWN: {
+                        setTouchPosition(event.button.x, event.button.y);
                         coreInput.touch = true;
                         break;
                     }
                         
                     case SDL_MOUSEBUTTONUP: {
-                        coreInput.touch = false;
+                        releasedTouch = true;
                         break;
                     }
                     
                     case SDL_MOUSEMOTION: {
-                        int x = (event.motion.x - screenRect.x) * SCREEN_WIDTH / screenRect.w;
-                        int y = (event.motion.y - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
-                        coreInput.touchX = x;
-                        coreInput.touchY = y;
+                        setTouchPosition(event.motion.x, event.motion.y);
                         break;
                     }
-                        
+                    
                     case SDL_JOYDEVICEADDED:
                     case SDL_JOYDEVICEREMOVED: {
                         configureJoysticks();
@@ -384,6 +390,12 @@ void closeJoysticks() {
         joysticks[i] = NULL;
     }
     numJoysticks = 0;
+}
+
+void setTouchPosition(int windowX, int windowY)
+{
+    coreInput.touchX = (windowX - screenRect.x) * SCREEN_WIDTH / screenRect.w;
+    coreInput.touchY = (windowY - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
 }
 
 /** Called on error */
