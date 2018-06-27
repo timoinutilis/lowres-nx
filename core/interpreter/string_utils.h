@@ -23,5 +23,7 @@
 #include <stdio.h>
 
 const char *uppercaseString(const char *source);
+const char *lineString(const char *source, int pos);
+int lineNumber(const char *source, int pos);
 
 #endif /* string_utils_h */

@@ -43,3 +43,42 @@ const char *uppercaseString(const char *source)
     }
     return buffer;
 }
+
+const char *lineString(const char *source, int pos)
+{
+    const char *start = &source[pos];
+    const char *end = &source[pos];
+    while (start - 1 >= source && *(start - 1) != '\n')
+    {
+        start--;
+    }
+    while (*(end + 1) != 0 && *end != '\n' && *end != 0)
+    {
+        end++;
+    }
+    if (end > start)
+    {
+        size_t len = end - start;
+        char *buffer = malloc(len + 1);
+        if (buffer)
+        {
+            strncpy(buffer, start, len);
+            buffer[len] = 0;
+            return buffer;
+        }
+    }
+    return NULL;
+}
+
+int lineNumber(const char *source, int pos)
+{
+    int line = 1;
+    for (int i = 0; i < pos; i++)
+    {
+        if (source[i] == '\n')
+        {
+            line++;
+        }
+    }
+    return line;
+}

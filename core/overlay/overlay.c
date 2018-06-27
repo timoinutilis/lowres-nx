@@ -42,6 +42,13 @@ void overlay_init(struct Core *core)
     lib->cursorY = 0;
 }
 
+void overlay_reset(struct Core *core)
+{
+    overlay_clear(core);
+    core->overlay->textLib.cursorX = 0;
+    core->overlay->textLib.cursorY = 0;
+}
+
 void overlay_updateState(struct Core *core)
 {
     overlay_clear(core);

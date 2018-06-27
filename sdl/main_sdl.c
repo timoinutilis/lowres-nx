@@ -50,7 +50,6 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager);
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 
 struct Core *core = NULL;
-char *sourceCode = NULL;
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
 
@@ -289,9 +288,6 @@ int main(int argc, const char * argv[])
         
         SDL_free(core);
         core = NULL;
-        
-        SDL_free(sourceCode);
-        sourceCode = NULL;
     }
     
     closeJoysticks();
@@ -307,13 +303,10 @@ int main(int argc, const char * argv[])
 
 void loadBootIntro()
 {
-    SDL_free(sourceCode);
-    sourceCode = NULL;
-    
     struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
     if (error.code != ErrorNone)
     {
-        SDL_Log("boot compile error: %d", error.code);
+        core_traceError(core, error);
     }
     
     core_willRunProgram(core, SDL_GetTicks() / 1000);
@@ -321,9 +314,6 @@ void loadBootIntro()
 
 void loadProgram(const char *filename)
 {
-    SDL_free(sourceCode);
-    sourceCode = NULL;
-    
     FILE *file = fopen(filename, "rb");
     if (file)
     {
@@ -331,19 +321,17 @@ void loadProgram(const char *filename)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
 
-        sourceCode = SDL_calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = SDL_calloc(1, size + 1); // +1 for NULL terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
-        }
-        fclose(file);
-
-        if (sourceCode)
-        {
+            
             struct CoreError error = core_compileProgram(core, sourceCode);
+            SDL_free(sourceCode);
+            
             if (error.code != ErrorNone)
             {
-                SDL_Log("compile error: %d", error.code);
+                core_traceError(core, error);
             }
             
             core_willRunProgram(core, SDL_GetTicks() / 1000);
@@ -352,6 +340,8 @@ void loadProgram(const char *filename)
         {
             SDL_Log("not enough memory");
         }
+        
+        fclose(file);
     }
     else
     {
@@ -384,7 +374,7 @@ void closeJoysticks() {
 /** Called on error */
 void interpreterDidFail(void *context, struct CoreError coreError)
 {
-    
+    core_traceError(core, coreError);
 }
 
 /** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */

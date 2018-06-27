@@ -139,8 +139,13 @@ void txtlib_printText(struct Core *core, const char *text, struct TextLib *lib)
         
         if (*letter >= 32)
         {
+            char printableLetter = *letter;
+            if (printableLetter >= 97 && printableLetter <= 122)
+            {
+                printableLetter -= 32;
+            }
             struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
-            txtlib_modifyCell(lib, cell, lib->fontCharOffset + (*letter - 32));
+            txtlib_modifyCell(lib, cell, lib->fontCharOffset + (printableLetter - 32));
             if (lib->windowBg != OVERLAY_BG)
             {
                 core->interpreter->cycles += 2;

@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "string_utils.h"
 
 const char CoreInputKeyReturn = '\n';
 const char CoreInputKeyBackspace = '\b';
@@ -69,7 +70,31 @@ void core_setDelegate(struct Core *core, struct CoreDelegate *delegate)
 struct CoreError core_compileProgram(struct Core *core, const char *sourceCode)
 {
     machine_reset(core);
+    overlay_reset(core);
     return itp_compileProgram(core, sourceCode);
+}
+
+void core_traceError(struct Core *core, struct CoreError error)
+{
+    core->interpreter->debug = false;
+    struct TextLib *lib = &core->overlay->textLib;
+    txtlib_printText(core, err_getString(error.code), lib);
+    txtlib_printText(core, "\n", lib);
+    if (core->interpreter->sourceCode)
+    {
+        int number = lineNumber(core->interpreter->sourceCode, error.sourcePosition);
+        char lineNumberText[30];
+        sprintf(lineNumberText, "IN LINE %d:\n", number);
+        txtlib_printText(core, lineNumberText, lib);
+        
+        const char *line = lineString(core->interpreter->sourceCode, error.sourcePosition);
+        if (line)
+        {
+            txtlib_printText(core, line, lib);
+            txtlib_printText(core, "\n", lib);
+            free((void *)line);
+        }
+    }
 }
 
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn)

@@ -35,6 +35,7 @@ struct Overlay {
 };
 
 void overlay_init(struct Core *core);
+void overlay_reset(struct Core *core);
 void overlay_updateState(struct Core *core);
 void overlay_draw(struct Core *core);
 

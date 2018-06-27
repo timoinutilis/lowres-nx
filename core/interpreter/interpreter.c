@@ -78,19 +78,17 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     
     // Parse source code
     
-    const char *uppercaseSourceCode = uppercaseString(sourceCode);
-    if (!uppercaseSourceCode) return err_makeCoreError(ErrorOutOfMemory, 0);
+    interpreter->sourceCode = uppercaseString(sourceCode);
+    if (!interpreter->sourceCode) return err_makeCoreError(ErrorOutOfMemory, 0);
     
-    struct CoreError error = tok_tokenizeUppercaseProgram(&interpreter->tokenizer, uppercaseSourceCode);
+    struct CoreError error = tok_tokenizeUppercaseProgram(&interpreter->tokenizer, interpreter->sourceCode);
     if (error.code != ErrorNone)
     {
-        free((void *)uppercaseSourceCode);
         return error;
     }
     
     struct DataManager *romDataManager = &interpreter->romDataManager;
-    error = data_uppercaseImport(romDataManager, uppercaseSourceCode, false);
-    free((void *)uppercaseSourceCode);
+    error = data_uppercaseImport(romDataManager, interpreter->sourceCode, false);
     if (error.code != ErrorNone) return error;
 
     // add default characters if ROM entry 0 is unused
@@ -386,6 +384,12 @@ void itp_freeProgram(struct Core *core)
     var_freeSimpleVariables(interpreter, SUB_LEVEL_GLOBAL);
     var_freeArrayVariables(interpreter, SUB_LEVEL_GLOBAL);
     tok_freeTokens(&interpreter->tokenizer);
+    
+    if (interpreter->sourceCode)
+    {
+        free((void *)interpreter->sourceCode);
+        interpreter->sourceCode = NULL;
+    }
     
     memset(&interpreter->textLib, 0, sizeof(struct TextLib));
     memset(&interpreter->spritesLib, 0, sizeof(struct SpritesLib));

@@ -67,6 +67,8 @@ enum InterruptType {
 };
 
 struct Interpreter {
+    const char *sourceCode;
+    
     enum Pass pass;
     enum State state;
     enum Mode mode;
