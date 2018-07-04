@@ -55,6 +55,12 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager);
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 
+#ifdef __EMSCRIPTEN__
+void onloaded(const char *filename);
+void onerror(const char *filename);
+#endif
+
+
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
@@ -136,6 +142,10 @@ int main(int argc, const char * argv[])
         else
         {
             loadBootIntro();
+#ifdef __EMSCRIPTEN__
+            const char *url = "LowResGalaxy2.nx";
+            emscripten_async_wget(url, "program.nx", onloaded, onerror);
+#endif
         }
         
         screenRect.x = 0;
@@ -438,3 +448,18 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 {
     
 }
+
+#ifdef __EMSCRIPTEN__
+
+void onloaded(const char *filename)
+{
+    SDL_Log("loaded %s", filename);
+    loadProgram(filename);
+}
+
+void onerror(const char *filename)
+{
+    SDL_Log("failed to load %s", filename);
+}
+
+#endif
