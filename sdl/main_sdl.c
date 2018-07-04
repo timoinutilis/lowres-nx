@@ -19,10 +19,14 @@
 
 #include <stdbool.h>
 #include <math.h>
+#include <string.h>
 #include "core.h"
 #include "boot_intro.h"
 
-#if defined(__APPLE__) && defined(__MACH__)
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <SDL2/SDL.h>
+#elif defined(__APPLE__) && defined(__MACH__)
 #include <SDL2/SDL.h>
 #else
 #include <SDL.h>
@@ -41,6 +45,7 @@ const int keyboardControls[2][8] = {
 
 void loadBootIntro(void);
 void loadProgram(const char *filename);
+void update(void *arg);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
@@ -50,11 +55,17 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager);
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
+SDL_Texture *texture = NULL;
+
 struct Core *core = NULL;
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
 SDL_Rect screenRect;
 struct CoreInput coreInput;
+bool quit = false;
+bool releasedTouch = false;
 
 int main(int argc, const char * argv[])
 {
@@ -93,9 +104,9 @@ int main(int argc, const char * argv[])
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     
-    SDL_Window *window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+    window = SDL_CreateWindow("LowRes NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     
     SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
     
@@ -132,178 +143,14 @@ int main(int argc, const char * argv[])
         screenRect.w = SCREEN_WIDTH * defaultWindowScale;
         screenRect.h = SCREEN_HEIGHT * defaultWindowScale;
         
-        bool quit = false;
-        bool releasedTouch = false;
+#ifdef __EMSCRIPTEN__
+        emscripten_set_main_loop_arg(update, NULL, -1, true);
+#else
         while (!quit)
         {
-            SDL_Event event;
-            
-            if (releasedTouch)
-            {
-                coreInput.touch = false;
-                releasedTouch = false;
-            }
-            
-            while (SDL_PollEvent(&event))
-            {
-                switch (event.type)
-                {
-                    case SDL_QUIT:
-                        quit = true;
-                        break;
-                        
-                    case SDL_WINDOWEVENT:
-                        switch (event.window.event)
-                        {
-                            case SDL_WINDOWEVENT_RESIZED: {
-                                int winW = event.window.data1;
-                                int winH = event.window.data2;
-                                int factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
-                                int nxScreenW = SCREEN_WIDTH * factor;
-                                int nxScreenH = SCREEN_HEIGHT * factor;
-                                screenRect.x = (winW - nxScreenW) / 2;
-                                screenRect.y = (winH - nxScreenH) / 2;
-                                screenRect.w = nxScreenW;
-                                screenRect.h = nxScreenH;
-                                break;
-                            }
-                        }
-                        break;
-                        
-                    case SDL_DROPFILE: {
-                        loadProgram(event.drop.file);
-                        break;
-                    }
-                        
-                    case SDL_KEYDOWN: {
-                        SDL_Keycode code = event.key.keysym.sym;
-                        
-                        // text input
-                        if (code == SDLK_RETURN)
-                        {
-                            coreInput.key = CoreInputKeyReturn;
-                        }
-                        else if (code == SDLK_BACKSPACE)
-                        {
-                            coreInput.key = CoreInputKeyBackspace;
-                        }
-                        else if (code >= SDLK_SPACE && code <= SDLK_UNDERSCORE)
-                        {
-                            coreInput.key = code;
-                        }
-                        else if (code >= SDLK_a && code <= SDLK_z)
-                        {
-                            coreInput.key = code - 32;
-                        }
-                        
-                        // console buttons
-                        if (code == SDLK_p)
-                        {
-                            coreInput.pause = true;
-                        }
-                        
-                        // system
-                        if (event.key.keysym.mod & KMOD_CTRL)
-                        {
-                            if (code == SDLK_d)
-                            {
-                                core_setDebug(core, !core_getDebug(core));
-                            }
-                            else if (code == SDLK_f)
-                            {
-                                if (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP)
-                                {
-                                    SDL_SetWindowFullscreen(window, 0);
-                                }
-                                else
-                                {
-                                    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                                }
-                            }
-                        }
-                        else if (code == SDLK_ESCAPE)
-                        {
-                            quit = true;
-                        }
-                        break;
-                    }
-                        
-                    case SDL_MOUSEBUTTONDOWN: {
-                        setTouchPosition(event.button.x, event.button.y);
-                        coreInput.touch = true;
-                        break;
-                    }
-                        
-                    case SDL_MOUSEBUTTONUP: {
-                        releasedTouch = true;
-                        break;
-                    }
-                    
-                    case SDL_MOUSEMOTION: {
-                        setTouchPosition(event.motion.x, event.motion.y);
-                        break;
-                    }
-                    
-                    case SDL_JOYDEVICEADDED:
-                    case SDL_JOYDEVICEREMOVED: {
-                        configureJoysticks();
-                        break;
-                    }
-                        
-                    case SDL_JOYBUTTONDOWN: {
-                        if (event.jbutton.button == 2)
-                        {
-                            coreInput.pause = true;
-                        }
-                        break;
-                    }
-                }
-            }
-            
-            const Uint8 *state = SDL_GetKeyboardState(NULL);
-            for (int i = 0; i < 2; i++)
-            {
-                struct CoreInputGamepad *gamepad = &coreInput.gamepads[i];
-                if (i < numJoysticks)
-                {
-                    SDL_Joystick *joy = joysticks[i];
-                    Uint8 hat = SDL_JoystickGetHat(joy, 0);
-                    Sint16 axisX = SDL_JoystickGetAxis(joy, 0);
-                    Sint16 axisY = SDL_JoystickGetAxis(joy, 1);
-                    gamepad->up = (hat & SDL_HAT_UP) != 0 || axisY < -joyAxisThreshold;
-                    gamepad->down = (hat & SDL_HAT_DOWN) != 0 || axisY > joyAxisThreshold;
-                    gamepad->left = (hat & SDL_HAT_LEFT) != 0 || axisX < -joyAxisThreshold;
-                    gamepad->right = (hat & SDL_HAT_RIGHT) != 0 || axisX > joyAxisThreshold;
-                    gamepad->buttonA = SDL_JoystickGetButton(joy, 0);
-                    gamepad->buttonB = SDL_JoystickGetButton(joy, 1);
-                }
-                else
-                {
-                    int ci = i - numJoysticks;
-                    gamepad->up = state[keyboardControls[ci][0]];
-                    gamepad->down = state[keyboardControls[ci][1]];
-                    gamepad->left = state[keyboardControls[ci][2]];
-                    gamepad->right = state[keyboardControls[ci][3]];
-                    gamepad->buttonA = state[keyboardControls[ci][4]] || state[keyboardControls[ci][6]];
-                    gamepad->buttonB = state[keyboardControls[ci][5]] || state[keyboardControls[ci][7]];
-                }
-            }
-            
-            core_update(core, &coreInput);
-            
-            SDL_RenderClear(renderer);
-            
-            void *pixels = NULL;
-            int pitch = 0;
-            SDL_LockTexture(texture, NULL, &pixels, &pitch);
-            
-            video_renderScreen(core, pixels, pitch);
-            
-            SDL_UnlockTexture(texture);
-            SDL_RenderCopy(renderer, texture, NULL, &screenRect);
-            
-            SDL_RenderPresent(renderer);
+            update(NULL);
         }
+#endif
         
         core_deinit(core);
         
@@ -368,6 +215,176 @@ void loadProgram(const char *filename)
     {
         SDL_Log("failed to load file: %s", filename);
     }
+}
+
+void update(void *arg) {
+    SDL_Event event;
+    
+    if (releasedTouch)
+    {
+        coreInput.touch = false;
+        releasedTouch = false;
+    }
+    
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_QUIT:
+                quit = true;
+                break;
+                
+            case SDL_WINDOWEVENT:
+                switch (event.window.event)
+                {
+                    case SDL_WINDOWEVENT_RESIZED: {
+                        int winW = event.window.data1;
+                        int winH = event.window.data2;
+                        int factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
+                        int nxScreenW = SCREEN_WIDTH * factor;
+                        int nxScreenH = SCREEN_HEIGHT * factor;
+                        screenRect.x = (winW - nxScreenW) / 2;
+                        screenRect.y = (winH - nxScreenH) / 2;
+                        screenRect.w = nxScreenW;
+                        screenRect.h = nxScreenH;
+                        break;
+                    }
+                }
+                break;
+            
+            case SDL_DROPFILE: {
+                loadProgram(event.drop.file);
+                break;
+            }
+            
+            case SDL_KEYDOWN: {
+                SDL_Keycode code = event.key.keysym.sym;
+                
+                // text input
+                if (code == SDLK_RETURN)
+                {
+                    coreInput.key = CoreInputKeyReturn;
+                }
+                else if (code == SDLK_BACKSPACE)
+                {
+                    coreInput.key = CoreInputKeyBackspace;
+                }
+                else if (code >= SDLK_SPACE && code <= SDLK_UNDERSCORE)
+                {
+                    coreInput.key = code;
+                }
+                else if (code >= SDLK_a && code <= SDLK_z)
+                {
+                    coreInput.key = code - 32;
+                }
+                
+                // console buttons
+                if (code == SDLK_p)
+                {
+                    coreInput.pause = true;
+                }
+                
+                // system
+                if (event.key.keysym.mod & KMOD_CTRL)
+                {
+                    if (code == SDLK_d)
+                    {
+                        core_setDebug(core, !core_getDebug(core));
+                    }
+                    else if (code == SDLK_f)
+                    {
+                        if (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP)
+                        {
+                            SDL_SetWindowFullscreen(window, 0);
+                        }
+                        else
+                        {
+                            SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                        }
+                    }
+                }
+                else if (code == SDLK_ESCAPE)
+                {
+                    quit = true;
+                }
+                break;
+            }
+                
+            case SDL_MOUSEBUTTONDOWN: {
+                setTouchPosition(event.button.x, event.button.y);
+                coreInput.touch = true;
+                break;
+            }
+                
+            case SDL_MOUSEBUTTONUP: {
+                releasedTouch = true;
+                break;
+            }
+                
+            case SDL_MOUSEMOTION: {
+                setTouchPosition(event.motion.x, event.motion.y);
+                break;
+            }
+                
+            case SDL_JOYDEVICEADDED:
+            case SDL_JOYDEVICEREMOVED: {
+                configureJoysticks();
+                break;
+            }
+                
+            case SDL_JOYBUTTONDOWN: {
+                if (event.jbutton.button == 2)
+                {
+                    coreInput.pause = true;
+                }
+                break;
+            }
+        }
+    }
+    
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    for (int i = 0; i < 2; i++)
+    {
+        struct CoreInputGamepad *gamepad = &coreInput.gamepads[i];
+        if (i < numJoysticks)
+        {
+            SDL_Joystick *joy = joysticks[i];
+            Uint8 hat = SDL_JoystickGetHat(joy, 0);
+            Sint16 axisX = SDL_JoystickGetAxis(joy, 0);
+            Sint16 axisY = SDL_JoystickGetAxis(joy, 1);
+            gamepad->up = (hat & SDL_HAT_UP) != 0 || axisY < -joyAxisThreshold;
+            gamepad->down = (hat & SDL_HAT_DOWN) != 0 || axisY > joyAxisThreshold;
+            gamepad->left = (hat & SDL_HAT_LEFT) != 0 || axisX < -joyAxisThreshold;
+            gamepad->right = (hat & SDL_HAT_RIGHT) != 0 || axisX > joyAxisThreshold;
+            gamepad->buttonA = SDL_JoystickGetButton(joy, 0);
+            gamepad->buttonB = SDL_JoystickGetButton(joy, 1);
+        }
+        else
+        {
+            int ci = i - numJoysticks;
+            gamepad->up = state[keyboardControls[ci][0]];
+            gamepad->down = state[keyboardControls[ci][1]];
+            gamepad->left = state[keyboardControls[ci][2]];
+            gamepad->right = state[keyboardControls[ci][3]];
+            gamepad->buttonA = state[keyboardControls[ci][4]] || state[keyboardControls[ci][6]];
+            gamepad->buttonB = state[keyboardControls[ci][5]] || state[keyboardControls[ci][7]];
+        }
+    }
+    
+    core_update(core, &coreInput);
+    
+    SDL_RenderClear(renderer);
+    
+    void *pixels = NULL;
+    int pitch = 0;
+    SDL_LockTexture(texture, NULL, &pixels, &pitch);
+    
+    video_renderScreen(core, pixels, pitch);
+    
+    SDL_UnlockTexture(texture);
+    SDL_RenderCopy(renderer, texture, NULL, &screenRect);
+    
+    SDL_RenderPresent(renderer);
 }
 
 void configureJoysticks() {
