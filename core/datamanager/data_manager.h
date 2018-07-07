@@ -41,6 +41,7 @@ struct DataManager {
     const char *diskSourceCode;
 };
 
+void data_init(struct DataManager *manager);
 void data_deinit(struct DataManager *manager);
 struct CoreError data_import(struct DataManager *manager, const char *input, bool keepSourceCode);
 struct CoreError data_uppercaseImport(struct DataManager *manager, const char *input, bool keepSourceCode);

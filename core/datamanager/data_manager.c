@@ -25,6 +25,12 @@
 #include "string_utils.h"
 
 int data_calcOutputSize(struct DataManager *manager);
+void data_resetEntries(struct DataManager *manager);
+
+void data_init(struct DataManager *manager)
+{
+    data_resetEntries(manager);
+}
 
 void data_deinit(struct DataManager *manager)
 {

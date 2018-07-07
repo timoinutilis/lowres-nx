@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>
+#include <assert.h>
 #include "core.h"
 #include "boot_intro.h"
 
@@ -32,6 +33,7 @@
 #include <SDL.h>
 #endif
 
+const char *defaultDisk = "Disk.nx";
 const int defaultWindowScale = 4;
 const int joyAxisThreshold = 16384;
 
@@ -49,6 +51,7 @@ void update(void *arg);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
+void updateDiskname(const char *programFilename);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -72,6 +75,8 @@ SDL_Rect screenRect;
 struct CoreInput coreInput;
 bool quit = false;
 bool releasedTouch = false;
+char diskname[FILENAME_MAX] = "";
+
 
 int main(int argc, const char * argv[])
 {
@@ -192,6 +197,8 @@ void loadBootIntro()
 
 void loadProgram(const char *filename)
 {
+    updateDiskname(filename);
+    
     FILE *file = fopen(filename, "rb");
     if (file)
     {
@@ -425,6 +432,22 @@ void setTouchPosition(int windowX, int windowY)
     coreInput.touchY = (windowY - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
 }
 
+void updateDiskname(const char *programFilename)
+{
+    assert(strlen(programFilename) + strlen(defaultDisk) < FILENAME_MAX);
+    strncpy(diskname, programFilename, FILENAME_MAX);
+    
+    char *lastSlash = strrchr(diskname, '/');
+    if (lastSlash)
+    {
+        strcpy(lastSlash + 1, "Disk.nx");
+    }
+    else
+    {
+        strcpy(diskname, "Disk.nx");
+    }
+}
+
 /** Called on error */
 void interpreterDidFail(void *context, struct CoreError coreError)
 {
@@ -434,13 +457,60 @@ void interpreterDidFail(void *context, struct CoreError coreError)
 /** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 {
+    FILE *file = fopen(diskname, "rb");
+    if (file)
+    {
+        fseek(file, 0, SEEK_END);
+        long size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        
+        char *sourceCode = SDL_calloc(1, size + 1); // +1 for NULL terminator
+        if (sourceCode)
+        {
+            fread(sourceCode, size, 1, file);
+            
+            struct CoreError error = data_import(diskDataManager, sourceCode, true);
+            SDL_free(sourceCode);
+            
+            if (error.code != ErrorNone)
+            {
+                core_traceError(core, error);
+            }
+        }
+        else
+        {
+            SDL_Log("not enough memory");
+        }
+        
+        fclose(file);
+    }
+    else
+    {
+        SDL_Log("failed to load file: %s", diskname);
+    }
+    
     return true;
 }
 
 /** Called when a disk data entry was saved */
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
 {
-    
+    char *output = data_export(diskDataManager);
+    if (output)
+    {
+        FILE *file = fopen(diskname, "wb");
+        if (file)
+        {
+            fwrite(output, 1, strlen(output), file);
+            fclose(file);
+        }
+        else
+        {
+            SDL_Log("failed to save file: %s", diskname);
+        }
+
+        free(output);
+    }
 }
 
 /** Called when keyboard or gamepad settings changed */

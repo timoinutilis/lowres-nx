@@ -26,6 +26,7 @@
 
 void disk_init(struct Core *core)
 {
+    // init lazily in disk_prepare()
 }
 
 void disk_deinit(struct Core *core)
@@ -46,6 +47,8 @@ bool disk_prepare(struct Core *core)
     {
         dataManager->data = calloc(DATA_SIZE, 1);
         assert(dataManager->data != NULL);
+        data_init(dataManager);
+        
     }
     return delegate_diskDriveWillAccess(core);
 }
