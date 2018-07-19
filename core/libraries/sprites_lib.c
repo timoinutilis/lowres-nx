@@ -30,7 +30,7 @@ bool sprlib_isSpriteOnScreen(struct Sprite *sprite)
             && sprite->y + size > SPRITE_OFFSET_Y);
 }
 
-bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struct Sprite *otherSprite)
+bool sprlib_checkSingleCollision(struct SpritesLib *lib, struct Sprite *sprite, struct Sprite *otherSprite)
 {
     if (sprlib_isSpriteOnScreen(otherSprite))
     {
@@ -55,7 +55,7 @@ bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struc
             int diffX = ax2 - ax1;
             int diffY = ay2 - ay1;
             
-            struct Character *characters = core->machine->videoRam.characters;
+            struct Character *characters = lib->core->machine->videoRam.characters;
             int c1 = sprite->character;
             int c2 = otherSprite->character;
             
@@ -118,9 +118,9 @@ bool sprlib_checkSingleCollision(struct Core *core, struct Sprite *sprite, struc
     return false;
 }
 
-bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, int lastIndex)
+bool sprlib_checkCollision(struct SpritesLib *lib, int checkIndex, int firstIndex, int lastIndex)
 {
-    struct Sprite *sprites = core->machine->spriteRegisters.sprites;
+    struct Sprite *sprites = lib->core->machine->spriteRegisters.sprites;
     struct Sprite *sprite = &sprites[checkIndex];
     
     if (sprlib_isSpriteOnScreen(sprite))
@@ -129,9 +129,9 @@ bool sprlib_checkCollision(struct Core *core, int checkIndex, int firstIndex, in
         {
             if (i != checkIndex)
             {
-                if (sprlib_checkSingleCollision(core, sprite, &sprites[i]))
+                if (sprlib_checkSingleCollision(lib, sprite, &sprites[i]))
                 {
-                    core->interpreter->spritesLib.lastHit = i;
+                    lib->lastHit = i;
                     return true;
                 }
             }

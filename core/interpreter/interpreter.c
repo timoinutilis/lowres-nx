@@ -39,7 +39,6 @@
 #include "cmd_files.h"
 #include "cmd_subs.h"
 #include "string_utils.h"
-#include "startup_sequence.h"
 
 struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level);
 struct TypedValue itp_evaluatePrimaryExpression(struct Core *core);
@@ -170,7 +169,10 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     interpreter->isSingleLineIf = false;
     interpreter->seed = 0;
     
-    runStartupSequence(core);
+    memset(&interpreter->textLib, 0, sizeof(struct TextLib));
+    memset(&interpreter->spritesLib, 0, sizeof(struct SpritesLib));
+    interpreter->textLib.core = core;
+    interpreter->spritesLib.core = core;
     
     return err_noCoreError();
 }
@@ -219,7 +221,7 @@ void itp_runProgram(struct Core *core)
             
         case StateInput:
         {
-            if (txtlib_inputUpdate(core))
+            if (txtlib_inputUpdate(&interpreter->textLib))
             {
                 interpreter->state = StateEvaluate;
                 cmd_endINPUT(core);
@@ -390,9 +392,6 @@ void itp_freeProgram(struct Core *core)
         free((void *)interpreter->sourceCode);
         interpreter->sourceCode = NULL;
     }
-    
-    memset(&interpreter->textLib, 0, sizeof(struct TextLib));
-    memset(&interpreter->spritesLib, 0, sizeof(struct SpritesLib));
 }
 
 enum ValueType itp_getIdentifierTokenValueType(struct Token *token)

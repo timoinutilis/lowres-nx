@@ -22,6 +22,7 @@
 #include <math.h>
 #include <string.h>
 #include "string_utils.h"
+#include "startup_sequence.h"
 
 const char CoreInputKeyReturn = '\n';
 const char CoreInputKeyBackspace = '\b';
@@ -78,20 +79,20 @@ void core_traceError(struct Core *core, struct CoreError error)
 {
     core->interpreter->debug = false;
     struct TextLib *lib = &core->overlay->textLib;
-    txtlib_printText(core, err_getString(error.code), lib);
-    txtlib_printText(core, "\n", lib);
+    txtlib_printText(lib, err_getString(error.code));
+    txtlib_printText(lib, "\n");
     if (core->interpreter->sourceCode)
     {
         int number = lineNumber(core->interpreter->sourceCode, error.sourcePosition);
         char lineNumberText[30];
         sprintf(lineNumberText, "IN LINE %d:\n", number);
-        txtlib_printText(core, lineNumberText, lib);
+        txtlib_printText(lib, lineNumberText);
         
         const char *line = lineString(core->interpreter->sourceCode, error.sourcePosition);
         if (line)
         {
-            txtlib_printText(core, line, lib);
-            txtlib_printText(core, "\n", lib);
+            txtlib_printText(lib, line);
+            txtlib_printText(lib, "\n");
             free((void *)line);
         }
     }
@@ -99,6 +100,7 @@ void core_traceError(struct Core *core, struct CoreError error)
 
 void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
 {
+    runStartupSequence(core);
     core->interpreter->timer = (float)(secondsSincePowerOn * 60 % TIMER_WRAP_VALUE);
 }
 

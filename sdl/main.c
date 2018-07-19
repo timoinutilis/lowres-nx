@@ -22,6 +22,7 @@
 #include <string.h>
 #include <assert.h>
 #include "core.h"
+#include "dev_mode.h"
 #include "boot_intro.h"
 
 #ifdef __EMSCRIPTEN__
@@ -46,12 +47,12 @@ const int keyboardControls[2][8] = {
 };
 
 void loadBootIntro(void);
-void loadProgram(const char *filename);
+void loadMainProgram(const char *filename);
 void update(void *arg);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
-void updateDiskname(const char *programFilename);
+void updateDiskFilename(const char *programFilename);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -69,14 +70,14 @@ SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
 
 struct Core *core = NULL;
+struct DevMode devMode;
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
 SDL_Rect screenRect;
 struct CoreInput coreInput;
 bool quit = false;
 bool releasedTouch = false;
-char diskname[FILENAME_MAX] = "";
-
+char diskFilename[FILENAME_MAX] = "";
 
 int main(int argc, const char * argv[])
 {
@@ -140,9 +141,12 @@ int main(int argc, const char * argv[])
         
         core_setDelegate(core, &coreDelegate);
         
+        SDL_memset(&devMode, 0, sizeof(struct DevMode));
+        devMode.core = core;
+        
         if (programArg)
         {
-            loadProgram(programArg);
+            loadMainProgram(programArg);
         }
         else
         {
@@ -186,18 +190,24 @@ int main(int argc, const char * argv[])
 
 void loadBootIntro()
 {
+    devMode.mainProgramFilename[0] = 0;
+    
     struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
     if (error.code != ErrorNone)
     {
         core_traceError(core, error);
     }
     
+    core->interpreter->debug = false;
     core_willRunProgram(core, SDL_GetTicks() / 1000);
 }
 
-void loadProgram(const char *filename)
+void loadMainProgram(const char *filename)
 {
-    updateDiskname(filename);
+    devMode.state = DevModeStateOff;
+    strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX);
+    
+    updateDiskFilename(filename);
     
     FILE *file = fopen(filename, "rb");
     if (file)
@@ -205,7 +215,7 @@ void loadProgram(const char *filename)
         fseek(file, 0, SEEK_END);
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
-
+        
         char *sourceCode = SDL_calloc(1, size + 1); // +1 for NULL terminator
         if (sourceCode)
         {
@@ -214,12 +224,15 @@ void loadProgram(const char *filename)
             struct CoreError error = core_compileProgram(core, sourceCode);
             SDL_free(sourceCode);
             
+            devMode.lastError = error;
             if (error.code != ErrorNone)
             {
-                core_traceError(core, error);
+                dev_show(&devMode);
             }
-            
-            core_willRunProgram(core, SDL_GetTicks() / 1000);
+            else
+            {
+                core_willRunProgram(core, SDL_GetTicks() / 1000);
+            }
         }
         else
         {
@@ -270,7 +283,7 @@ void update(void *arg) {
                 break;
             
             case SDL_DROPFILE: {
-                loadProgram(event.drop.file);
+                loadMainProgram(event.drop.file);
                 break;
             }
             
@@ -296,7 +309,7 @@ void update(void *arg) {
                 }
                 
                 // console buttons
-                if (code == SDLK_p)
+                if (code == SDLK_RETURN)
                 {
                     coreInput.pause = true;
                 }
@@ -317,6 +330,13 @@ void update(void *arg) {
                         else
                         {
                             SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                        }
+                    }
+                    else if (code == SDLK_m)
+                    {
+                        if (devMode.state != DevModeStateVisible && devMode.mainProgramFilename[0] != 0)
+                        {
+                            dev_show(&devMode);
                         }
                     }
                 }
@@ -388,7 +408,18 @@ void update(void *arg) {
         }
     }
     
-    core_update(core, &coreInput);
+    if (devMode.state == DevModeStateVisible)
+    {
+        dev_update(&devMode, &coreInput);
+        if (devMode.state == DevModeStateOff)
+        {
+            loadBootIntro();
+        }
+    }
+    else
+    {
+        core_update(core, &coreInput);
+    }
     
     SDL_RenderClear(renderer);
     
@@ -432,19 +463,19 @@ void setTouchPosition(int windowX, int windowY)
     coreInput.touchY = (windowY - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
 }
 
-void updateDiskname(const char *programFilename)
+void updateDiskFilename(const char *programFilename)
 {
     assert(strlen(programFilename) + strlen(defaultDisk) < FILENAME_MAX);
-    strncpy(diskname, programFilename, FILENAME_MAX);
+    strncpy(diskFilename, programFilename, FILENAME_MAX);
     
-    char *lastSlash = strrchr(diskname, '/');
+    char *lastSlash = strrchr(diskFilename, '/');
     if (lastSlash)
     {
         strcpy(lastSlash + 1, "Disk.nx");
     }
     else
     {
-        strcpy(diskname, "Disk.nx");
+        strcpy(diskFilename, "Disk.nx");
     }
 }
 
@@ -457,7 +488,7 @@ void interpreterDidFail(void *context, struct CoreError coreError)
 /** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 {
-    FILE *file = fopen(diskname, "rb");
+    FILE *file = fopen(diskFilename, "rb");
     if (file)
     {
         fseek(file, 0, SEEK_END);
@@ -486,7 +517,7 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
     }
     else
     {
-        SDL_Log("failed to load file: %s", diskname);
+        SDL_Log("failed to load file: %s", diskFilename);
     }
     
     return true;
@@ -498,7 +529,7 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
     char *output = data_export(diskDataManager);
     if (output)
     {
-        FILE *file = fopen(diskname, "wb");
+        FILE *file = fopen(diskFilename, "wb");
         if (file)
         {
             fwrite(output, 1, strlen(output), file);
@@ -506,7 +537,7 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
         }
         else
         {
-            SDL_Log("failed to save file: %s", diskname);
+            SDL_Log("failed to save file: %s", diskFilename);
         }
 
         free(output);
@@ -524,7 +555,7 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 void onloaded(const char *filename)
 {
     SDL_Log("loaded %s", filename);
-    loadProgram(filename);
+    loadMainProgram(filename);
 }
 
 void onerror(const char *filename)

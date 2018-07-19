@@ -28,6 +28,7 @@ void overlay_clear(struct Core *core);
 void overlay_init(struct Core *core)
 {
     struct TextLib *lib = &core->overlay->textLib;
+    lib->core = core;
     lib->bg = OVERLAY_BG;
     lib->windowBg = OVERLAY_BG;
     lib->charAttr.priority = 1;
@@ -72,26 +73,26 @@ void overlay_draw(struct Core *core)
     {
         if (core->overlay->timer % 60 < 40)
         {
-            txtlib_writeText(core, "PAUSED", 7, 7, lib);
+            txtlib_writeText(lib, "PAUSED", 7, 7);
         }
         else
         {
-            txtlib_writeText(core, "      ", 7, 7, lib);
+            txtlib_writeText(lib, "      ", 7, 7);
         }
     }
     
     if (core->interpreter->debug)
     {
-        txtlib_writeText(core, "CPU", 17, 0, lib);
+        txtlib_writeText(lib, "CPU", 17, 0);
         int cpuLoad = core->interpreter->cpuLoadDisplay;
         if (cpuLoad < 100)
         {
-            txtlib_writeNumber(core, cpuLoad, 2, 17, 1, lib);
-            txtlib_writeText(core, "%", 19, 1, lib);
+            txtlib_writeNumber(lib, cpuLoad, 2, 17, 1);
+            txtlib_writeText(lib, "%", 19, 1);
         }
         else
         {
-            txtlib_writeText(core, "MAX", 17, 1, lib);
+            txtlib_writeText(lib, "MAX", 17, 1);
         }
     }
     

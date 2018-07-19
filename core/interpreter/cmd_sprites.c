@@ -266,7 +266,7 @@ struct TypedValue fnc_SPRITE_HIT(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        bool hits = sprlib_checkCollision(core, nValue.v.floatValue, first, last);
+        bool hits = sprlib_checkCollision(&interpreter->spritesLib, nValue.v.floatValue, first, last);
         value.v.floatValue = hits ? BAS_TRUE : BAS_FALSE;
     }
     

@@ -31,6 +31,7 @@
 struct Core;
 
 struct TextLib {
+    struct Core *core;
     union CharacterAttributes charAttr;
     uint8_t charAttrFilter;
     int fontCharOffset;
@@ -49,20 +50,20 @@ struct TextLib {
     int blink;
 };
 
-void txtlib_printText(struct Core *core, const char *text, struct TextLib *lib);
-bool txtlib_deleteBackward(struct Core *core);
-void txtlib_writeText(struct Core *core, const char *text, int x, int y, struct TextLib *lib);
-void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y, struct TextLib *lib);
-void txtlib_inputBegin(struct Core *core);
-bool txtlib_inputUpdate(struct Core *core);
-void txtlib_clearWindow(struct Core *core);
-void txtlib_clearScreen(struct Core *core);
-void txtlib_clearBackground(struct Core *core, int bg);
-struct Cell *txtlib_getCell(struct Core *core, int x, int y);
-void txtlib_setCell(struct Core *core, int x, int y, int character);
-void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY, int character);
-void txtlib_scrollBackground(struct Core *core, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY);
-void txtlib_copyBackground(struct Core *core, int srcX, int srcY, int width, int height, int dstX, int dstY);
+void txtlib_printText(struct TextLib *lib, const char *text);
+bool txtlib_deleteBackward(struct TextLib *lib);
+void txtlib_writeText(struct TextLib *lib, const char *text, int x, int y);
+void txtlib_writeNumber(struct TextLib *lib, int number, int digits, int x, int y);
+void txtlib_inputBegin(struct TextLib *lib);
+bool txtlib_inputUpdate(struct TextLib *lib);
+void txtlib_clearWindow(struct TextLib *lib);
+void txtlib_clearScreen(struct TextLib *lib);
+void txtlib_clearBackground(struct TextLib *lib, int bg);
+struct Cell *txtlib_getCell(struct TextLib *lib, int x, int y);
+void txtlib_setCell(struct TextLib *lib, int x, int y, int character);
+void txtlib_setCells(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int character);
+void txtlib_scrollBackground(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY);
+void txtlib_copyBackground(struct TextLib *lib, int srcX, int srcY, int width, int height, int dstX, int dstY);
 
 void txtlib_itobin(char *buffer, size_t buffersize, size_t width, int value);
 

@@ -141,7 +141,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_copyBackground(core, srcXValue.v.floatValue, srcYValue.v.floatValue, wValue.v.floatValue, hValue.v.floatValue, dstXValue.v.floatValue, dstYValue.v.floatValue);
+        txtlib_copyBackground(&interpreter->textLib, srcXValue.v.floatValue, srcYValue.v.floatValue, wValue.v.floatValue, hValue.v.floatValue, dstXValue.v.floatValue, dstYValue.v.floatValue);
     }
     
     return itp_endOfCommand(interpreter);
@@ -201,7 +201,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_scrollBackground(core, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, dxValue.v.floatValue, dyValue.v.floatValue);
+        txtlib_scrollBackground(&interpreter->textLib, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, dxValue.v.floatValue, dyValue.v.floatValue);
     }
     
     return itp_endOfCommand(interpreter);
@@ -288,7 +288,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_setCells(core, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, character);
+        txtlib_setCells(&interpreter->textLib, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, character);
     }
     
     return itp_endOfCommand(interpreter);
@@ -328,7 +328,7 @@ enum ErrorCode cmd_CELL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_setCell(core, xValue.v.floatValue, yValue.v.floatValue, character);
+        txtlib_setCell(&interpreter->textLib, xValue.v.floatValue, yValue.v.floatValue, character);
     }
     
     return itp_endOfCommand(interpreter);
@@ -367,7 +367,7 @@ struct TypedValue fnc_CELL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        struct Cell *cell = txtlib_getCell(core, xValue.v.floatValue, yValue.v.floatValue);
+        struct Cell *cell = txtlib_getCell(&interpreter->textLib, xValue.v.floatValue, yValue.v.floatValue);
         if (type == TokenCELLA)
         {
             value.v.floatValue = cell->attr.value;

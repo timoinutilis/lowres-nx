@@ -31,8 +31,10 @@
 
 - More keys:
 	Quit         Esc
+	Pause        Return
 	Fullscreen   Ctrl+f
 	Debug        Ctrl+d
+	Dev Mode     Ctrl+m
 
 - Command line arguments:
 	"LowRes NX" [-fullscreen yes] [program.nx]

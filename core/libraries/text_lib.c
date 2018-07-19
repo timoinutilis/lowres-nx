@@ -22,18 +22,18 @@
 #include <string.h>
 #include <assert.h>
 
-struct Plane *txtlib_getBackground(struct Core *core, int bg)
+struct Plane *txtlib_getBackground(struct TextLib *lib, int bg)
 {
     switch (bg)
     {
         case 0:
-            return &core->machine->videoRam.planeA;
+            return &lib->core->machine->videoRam.planeA;
             
         case 1:
-            return &core->machine->videoRam.planeB;
+            return &lib->core->machine->videoRam.planeB;
             
         case OVERLAY_BG:
-            return &core->overlay->plane;
+            return &lib->core->overlay->plane;
             
         default:
             assert(0);
@@ -99,9 +99,9 @@ void txtlib_scroll(struct Plane *plane, int fromX, int fromY, int toX, int toY, 
     }
 }
 
-void txtlib_scrollWindowIfNeeded(struct Core *core, struct TextLib *lib)
+void txtlib_scrollWindowIfNeeded(struct TextLib *lib)
 {
-    struct Plane *plane = txtlib_getBackground(core, lib->windowBg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->windowBg);
     
     if (lib->cursorY >= lib->windowHeight)
     {
@@ -119,23 +119,24 @@ void txtlib_scrollWindowIfNeeded(struct Core *core, struct TextLib *lib)
         
         lib->cursorY = lib->windowHeight - 1;
         
-        if (core->interpreter->state == StateEvaluate && lib->windowBg != OVERLAY_BG)
+        struct Interpreter *interpreter = lib->core->interpreter;
+        if (interpreter->state == StateEvaluate && lib->windowBg != OVERLAY_BG)
         {
-            core->interpreter->state = StateWait;
-            core->interpreter->waitCount = 1;
-            core->interpreter->exitEvaluation = true;
-            core->interpreter->cycles += lib->windowWidth * lib->windowHeight * 2;
+            interpreter->state = StateWait;
+            interpreter->waitCount = 1;
+            interpreter->exitEvaluation = true;
+            interpreter->cycles += lib->windowWidth * lib->windowHeight * 2;
         }
     }
 }
 
-void txtlib_printText(struct Core *core, const char *text, struct TextLib *lib)
+void txtlib_printText(struct TextLib *lib, const char *text)
 {
-    struct Plane *plane = txtlib_getBackground(core, lib->windowBg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->windowBg);
     const char *letter = text;
     while (*letter)
     {
-        txtlib_scrollWindowIfNeeded(core, lib);
+        txtlib_scrollWindowIfNeeded(lib);
         
         if (*letter >= 32)
         {
@@ -148,7 +149,7 @@ void txtlib_printText(struct Core *core, const char *text, struct TextLib *lib)
             txtlib_modifyCell(lib, cell, lib->fontCharOffset + (printableLetter - 32));
             if (lib->windowBg != OVERLAY_BG)
             {
-                core->interpreter->cycles += 2;
+                lib->core->interpreter->cycles += 2;
             }
             lib->cursorX++;
         }
@@ -168,10 +169,9 @@ void txtlib_printText(struct Core *core, const char *text, struct TextLib *lib)
     }
 }
 
-bool txtlib_deleteBackward(struct Core *core)
+bool txtlib_deleteBackward(struct TextLib *lib)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->windowBg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->windowBg);
     
     // clear cursor
     struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
@@ -196,13 +196,13 @@ bool txtlib_deleteBackward(struct Core *core)
     cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
     txtlib_modifyCell(lib, cell, lib->fontCharOffset);
     
-    core->interpreter->cycles += 4;
+    lib->core->interpreter->cycles += 4;
     return true;
 }
 
-void txtlib_writeText(struct Core *core, const char *text, int x, int y, struct TextLib *lib)
+void txtlib_writeText(struct TextLib *lib, const char *text, int x, int y)
 {
-    struct Plane *plane = txtlib_getBackground(core, lib->bg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->bg);
     const char *letter = text;
     while (*letter)
     {
@@ -212,7 +212,7 @@ void txtlib_writeText(struct Core *core, const char *text, int x, int y, struct 
             txtlib_modifyCell(lib, cell, lib->fontCharOffset + (*letter - 32));
             if (lib->windowBg != OVERLAY_BG)
             {
-                core->interpreter->cycles += 2;
+                lib->core->interpreter->cycles += 2;
             }
             x++;
         }
@@ -220,9 +220,9 @@ void txtlib_writeText(struct Core *core, const char *text, int x, int y, struct 
     }
 }
 
-void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y, struct TextLib *lib)
+void txtlib_writeNumber(struct TextLib *lib, int number, int digits, int x, int y)
 {
-    struct Plane *plane = txtlib_getBackground(core, lib->bg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->bg);
     
     if (number < 0)
     {
@@ -249,30 +249,28 @@ void txtlib_writeNumber(struct Core *core, int number, int digits, int x, int y,
     
     if (lib->windowBg != OVERLAY_BG)
     {
-        core->interpreter->cycles += digits * 2;
+        lib->core->interpreter->cycles += digits * 2;
     }
 }
 
-void txtlib_inputBegin(struct Core *core)
+void txtlib_inputBegin(struct TextLib *lib)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
     lib->inputBuffer[0] = 0;
     lib->inputLength = 0;
     lib->blink = 0;
-    core->machine->ioRegisters.key = 0;
+    lib->core->machine->ioRegisters.key = 0;
     
-    core->machine->ioRegisters.attr.keyboardEnabled = 1;
-    delegate_controlsDidChange(core);
+    lib->core->machine->ioRegisters.attr.keyboardEnabled = 1;
+    delegate_controlsDidChange(lib->core);
     
-    txtlib_scrollWindowIfNeeded(core, lib);
+    txtlib_scrollWindowIfNeeded(lib);
 }
 
-bool txtlib_inputUpdate(struct Core *core)
+bool txtlib_inputUpdate(struct TextLib *lib)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->windowBg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->windowBg);
     
-    char key = core->machine->ioRegisters.key;
+    char key = lib->core->machine->ioRegisters.key;
     bool done = false;
     if (key)
     {
@@ -280,7 +278,7 @@ bool txtlib_inputUpdate(struct Core *core)
         {
             if (lib->inputLength > 0)
             {
-                if (txtlib_deleteBackward(core))
+                if (txtlib_deleteBackward(lib))
                 {
                     lib->inputBuffer[--lib->inputLength] = 0;
                 }
@@ -291,7 +289,7 @@ bool txtlib_inputUpdate(struct Core *core)
             // clear cursor
             struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
             txtlib_modifyCell(lib, cell, lib->fontCharOffset);
-            txtlib_printText(core, "\n", lib);
+            txtlib_printText(lib, "\n");
             done = true;
         }
         else
@@ -299,15 +297,15 @@ bool txtlib_inputUpdate(struct Core *core)
             if (lib->inputLength < INPUT_BUFFER_SIZE - 2)
             {
                 char text[2] = {key, 0};
-                txtlib_printText(core, text, lib);
+                txtlib_printText(lib, text);
                 lib->inputBuffer[lib->inputLength++] = key;
                 lib->inputBuffer[lib->inputLength] = 0;
                 
-                txtlib_scrollWindowIfNeeded(core, lib);
+                txtlib_scrollWindowIfNeeded(lib);
             }
         }
         lib->blink = 0;
-        core->machine->ioRegisters.key = 0;
+        lib->core->machine->ioRegisters.key = 0;
     }
     if (!done)
     {
@@ -321,10 +319,9 @@ bool txtlib_inputUpdate(struct Core *core)
     return done;
 }
 
-void txtlib_clearWindow(struct Core *core)
+void txtlib_clearWindow(struct TextLib *lib)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->windowBg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->windowBg);
     
     lib->cursorX = 0;
     lib->cursorY = 0;
@@ -338,16 +335,15 @@ void txtlib_clearWindow(struct Core *core)
             txtlib_modifyCell(lib, cell, lib->fontCharOffset);
         }
     }
-    core->interpreter->cycles += lib->windowWidth * lib->windowHeight * 2;
+    lib->core->interpreter->cycles += lib->windowWidth * lib->windowHeight * 2;
 }
 
-void txtlib_clearScreen(struct Core *core)
+void txtlib_clearScreen(struct TextLib *lib)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct VideoRegisters *reg = &core->machine->videoRegisters;
+    struct VideoRegisters *reg = &lib->core->machine->videoRegisters;
     
-    memset(&core->machine->videoRam.planeA, 0, sizeof(struct Plane));
-    memset(&core->machine->videoRam.planeB, 0, sizeof(struct Plane));
+    memset(&lib->core->machine->videoRam.planeA, 0, sizeof(struct Plane));
+    memset(&lib->core->machine->videoRam.planeB, 0, sizeof(struct Plane));
     
     reg->scrollAX = 0;
     reg->scrollAY = 0;
@@ -365,35 +361,32 @@ void txtlib_clearScreen(struct Core *core)
     lib->cursorY = 0;
     lib->bg = 0;
     
-    core->interpreter->cycles += PLANE_COLUMNS * PLANE_ROWS * 2 * 2;
+    lib->core->interpreter->cycles += PLANE_COLUMNS * PLANE_ROWS * 2 * 2;
 }
 
-void txtlib_clearBackground(struct Core *core, int bg)
+void txtlib_clearBackground(struct TextLib *lib, int bg)
 {
-    struct Plane *plane = txtlib_getBackground(core, bg);
+    struct Plane *plane = txtlib_getBackground(lib, bg);
     memset(plane, 0, sizeof(struct Plane));
-    core->interpreter->cycles += PLANE_COLUMNS * PLANE_ROWS * 2;
+    lib->core->interpreter->cycles += PLANE_COLUMNS * PLANE_ROWS * 2;
 }
 
-struct Cell *txtlib_getCell(struct Core *core, int x, int y)
+struct Cell *txtlib_getCell(struct TextLib *lib, int x, int y)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->bg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->bg);
     return &plane->cells[y][x];
 }
 
-void txtlib_setCell(struct Core *core, int x, int y, int character)
+void txtlib_setCell(struct TextLib *lib, int x, int y, int character)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->bg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->bg);
     struct Cell *cell = &plane->cells[y][x];
     txtlib_modifyCell(lib, cell, character);
 }
 
-void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY, int character)
+void txtlib_setCells(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int character)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->bg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->bg);
     for (int y = fromY; y <= toY; y++)
     {
         for (int x = fromX; x <= toX; x++)
@@ -402,21 +395,19 @@ void txtlib_setCells(struct Core *core, int fromX, int fromY, int toX, int toY, 
             txtlib_modifyCell(lib, cell, character);
         }
     }
-    core->interpreter->cycles += (toX - fromX + 1) * (toY - fromY + 1) * 2;
+    lib->core->interpreter->cycles += (toX - fromX + 1) * (toY - fromY + 1) * 2;
 }
 
-void txtlib_scrollBackground(struct Core *core, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY)
+void txtlib_scrollBackground(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->bg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->bg);
     txtlib_scroll(plane, fromX, fromY, toX, toY, deltaX, deltaY);
-    core->interpreter->cycles += (toX - fromX + 1) * (toY - fromY + 1) * 2;
+    lib->core->interpreter->cycles += (toX - fromX + 1) * (toY - fromY + 1) * 2;
 }
 
-void txtlib_copyBackground(struct Core *core, int srcX, int srcY, int width, int height, int dstX, int dstY)
+void txtlib_copyBackground(struct TextLib *lib, int srcX, int srcY, int width, int height, int dstX, int dstY)
 {
-    struct TextLib *lib = &core->interpreter->textLib;
-    struct Plane *plane = txtlib_getBackground(core, lib->bg);
+    struct Plane *plane = txtlib_getBackground(lib, lib->bg);
     
     for (int y = 0; y < height; y++)
     {
@@ -426,11 +417,11 @@ void txtlib_copyBackground(struct Core *core, int srcX, int srcY, int width, int
         {
             int px = dstX + x;
             struct Cell *cell = &plane->cells[py & 0x1F][px & 0x1F];
-            cell->character = machine_peek(core, addr++);
-            cell->attr.value = machine_peek(core, addr++);
+            cell->character = machine_peek(lib->core, addr++);
+            cell->attr.value = machine_peek(lib->core, addr++);
         }
     }
-    core->interpreter->cycles += width * height * 2;
+    lib->core->interpreter->cycles += width * height * 2;
 }
 
 void txtlib_itobin(char *buffer, size_t buffersize, size_t width, int value)

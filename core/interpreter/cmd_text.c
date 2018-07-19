@@ -46,13 +46,13 @@ enum ErrorCode cmd_PRINT(struct Core *core)
         {
             if (value.type == ValueTypeString)
             {
-                txtlib_printText(core, value.v.stringValue->chars, &interpreter->textLib);
+                txtlib_printText(lib, value.v.stringValue->chars);
             }
             else if (value.type == ValueTypeFloat)
             {
                 char buffer[20];
                 snprintf(buffer, 20, "%0.7g", value.v.floatValue);
-                txtlib_printText(core, buffer, lib);
+                txtlib_printText(lib, buffer);
             }
         }
         
@@ -60,7 +60,7 @@ enum ErrorCode cmd_PRINT(struct Core *core)
         {
             if (interpreter->pass == PassRun)
             {
-                txtlib_printText(core, " ", lib);
+                txtlib_printText(lib, " ");
             }
             ++interpreter->pc;
             newLine = false;
@@ -82,7 +82,7 @@ enum ErrorCode cmd_PRINT(struct Core *core)
     
     if (interpreter->pass == PassRun && newLine)
     {
-        txtlib_printText(core, "\n", lib);
+        txtlib_printText(lib, "\n");
     }
     return itp_endOfCommand(interpreter);
 }
@@ -92,6 +92,8 @@ enum ErrorCode cmd_INPUT(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
+    struct TextLib *lib = &interpreter->textLib;
+    
     // INPUT
     ++interpreter->pc;
     
@@ -100,8 +102,7 @@ enum ErrorCode cmd_INPUT(struct Core *core)
         // prompt
         if (interpreter->pass == PassRun)
         {
-            struct TextLib *lib = &interpreter->textLib;
-            txtlib_printText(core, interpreter->pc->stringValue->chars, lib);
+            txtlib_printText(lib, interpreter->pc->stringValue->chars);
         }
         ++interpreter->pc;
         
@@ -112,7 +113,7 @@ enum ErrorCode cmd_INPUT(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_inputBegin(core);
+        txtlib_inputBegin(lib);
         interpreter->state = StateInput;
     }
     else
@@ -184,7 +185,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         struct TextLib *lib = &interpreter->textLib;
-        txtlib_writeText(core, stringValue.v.stringValue->chars, xValue.v.floatValue, yValue.v.floatValue, lib);
+        txtlib_writeText(lib, stringValue.v.stringValue->chars, xValue.v.floatValue, yValue.v.floatValue);
     }
     
     return itp_endOfCommand(interpreter);
@@ -229,7 +230,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     {
         int digits = digitsValue.v.floatValue;
         struct TextLib *lib = &interpreter->textLib;
-        txtlib_writeNumber(core, numberValue.v.floatValue, digits, xValue.v.floatValue, yValue.v.floatValue, lib);
+        txtlib_writeNumber(lib, numberValue.v.floatValue, digits, xValue.v.floatValue, yValue.v.floatValue);
     }
     
     return itp_endOfCommand(interpreter);
@@ -240,6 +241,8 @@ enum ErrorCode cmd_CLS(struct Core *core)
     struct Interpreter *interpreter = core->interpreter;
     if (interpreter->pass == PassRun && interpreter->mode == ModeInterrupt) return ErrorNotAllowedInInterrupt;
     
+    struct TextLib *lib = &interpreter->textLib;
+    
     // CLS
     ++interpreter->pc;
     
@@ -248,7 +251,7 @@ enum ErrorCode cmd_CLS(struct Core *core)
         if (interpreter->pass == PassRun)
         {
             // clear all
-            txtlib_clearScreen(core);
+            txtlib_clearScreen(lib);
         }
     }
     else
@@ -260,7 +263,7 @@ enum ErrorCode cmd_CLS(struct Core *core)
         if (interpreter->pass == PassRun)
         {
             // clear bg
-            txtlib_clearBackground(core, bgValue.v.floatValue);
+            txtlib_clearBackground(lib, bgValue.v.floatValue);
         }
     }
     
@@ -381,7 +384,7 @@ enum ErrorCode cmd_CLW(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_clearWindow(core);
+        txtlib_clearWindow(&interpreter->textLib);
     }
     
     return itp_endOfCommand(interpreter);
@@ -406,13 +409,13 @@ enum ErrorCode cmd_TRACE(struct Core *core)
         {
             if (separate && debug)
             {
-                txtlib_printText(core, " ", lib);
+                txtlib_printText(lib, " ");
             }
             if (value.type == ValueTypeString)
             {
                 if (debug)
                 {
-                    txtlib_printText(core, value.v.stringValue->chars, lib);
+                    txtlib_printText(lib, value.v.stringValue->chars);
                 }
                 rcstring_release(value.v.stringValue);
             }
@@ -422,7 +425,7 @@ enum ErrorCode cmd_TRACE(struct Core *core)
                 {
                     char buffer[20];
                     snprintf(buffer, 20, "%0.7g", value.v.floatValue);
-                    txtlib_printText(core, buffer, lib);
+                    txtlib_printText(lib, buffer);
                 }
             }
         }
@@ -431,7 +434,7 @@ enum ErrorCode cmd_TRACE(struct Core *core)
     
     if (interpreter->pass == PassRun && debug)
     {
-        txtlib_printText(core, "\n", lib);
+        txtlib_printText(lib, "\n");
     }
     
     return itp_endOfCommand(interpreter);

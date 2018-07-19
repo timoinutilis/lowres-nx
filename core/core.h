@@ -73,4 +73,7 @@ void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool dow
 
 void core_diskLoaded(struct Core *core);
 
+// for dev mode only:
+void core_handleInput(struct Core *core, struct CoreInput *input);
+
 #endif /* core_h */

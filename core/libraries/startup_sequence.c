@@ -29,9 +29,10 @@ void runStartupSequence(struct Core *core)
     struct DataEntry *entries = core->interpreter->romDataManager.entries;
     
     // init font and window
-    core->interpreter->textLib.fontCharOffset = FONT_CHAR_OFFSET;
-    core->interpreter->textLib.charAttrFilter = 0xFF;
-    txtlib_clearScreen(core);
+    struct TextLib *textLib = &core->interpreter->textLib;
+    textLib->fontCharOffset = FONT_CHAR_OFFSET;
+    textLib->charAttrFilter = 0xFF;
+    txtlib_clearScreen(textLib);
     
     // default characters/font
     if (strcmp(entries[0].comment, "FONT") == 0)

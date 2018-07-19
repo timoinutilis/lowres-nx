@@ -17,21 +17,31 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef sprites_lib_h
-#define sprites_lib_h
+#ifndef dev_mode_h
+#define dev_mode_h
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "core.h"
+#include "text_lib.h"
 
-struct Core;
-struct Sprite;
-
-struct SpritesLib {
-    struct Core *core;
-    int lastHit;
+enum DevModeState {
+    DevModeStateOff,
+    DevModeStateVisible,
+    DevModeStateHidden
 };
 
-bool sprlib_isSpriteOnScreen(struct Sprite *sprite);
-bool sprlib_checkCollision(struct SpritesLib *lib, int checkIndex, int firstIndex, int lastIndex);
+struct DevMode {
+    enum DevModeState state;
+    struct Core *core;
+    bool lastTouch;
+    int currentButton;
+    char mainProgramFilename[FILENAME_MAX];
+    struct CoreError lastError;
+    struct TextLib textLib;
+};
 
-#endif /* sprites_lib_h */
+void dev_show(struct DevMode *devMode);
+void dev_update(struct DevMode *devMode, struct CoreInput *input);
+
+#endif /* dev_mode_h */
