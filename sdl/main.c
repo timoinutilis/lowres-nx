@@ -52,7 +52,7 @@ void update(void *arg);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
-void updateDiskFilename(const char *programFilename);
+void getDiskFilename(char *outputString);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -77,7 +77,6 @@ SDL_Rect screenRect;
 struct CoreInput coreInput;
 bool quit = false;
 bool releasedTouch = false;
-char diskFilename[FILENAME_MAX] = "";
 
 int main(int argc, const char * argv[])
 {
@@ -206,8 +205,6 @@ void loadMainProgram(const char *filename)
 {
     devMode.state = DevModeStateOff;
     strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX);
-    
-    updateDiskFilename(filename);
     
     FILE *file = fopen(filename, "rb");
     if (file)
@@ -463,19 +460,27 @@ void setTouchPosition(int windowX, int windowY)
     coreInput.touchY = (windowY - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
 }
 
-void updateDiskFilename(const char *programFilename)
+void getDiskFilename(char *outputString)
 {
-    assert(strlen(programFilename) + strlen(defaultDisk) < FILENAME_MAX);
-    strncpy(diskFilename, programFilename, FILENAME_MAX);
-    
-    char *lastSlash = strrchr(diskFilename, '/');
-    if (lastSlash)
+    if (devMode.state == DevModeStateRunningTool)
     {
-        strcpy(lastSlash + 1, "Disk.nx");
+        assert(strlen(devMode.mainProgramFilename) < FILENAME_MAX);
+        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX);
     }
     else
     {
-        strcpy(diskFilename, "Disk.nx");
+        assert(strlen(devMode.mainProgramFilename) + strlen(defaultDisk) < FILENAME_MAX);
+        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX);
+        
+        char *lastSlash = strrchr(outputString, '/');
+        if (lastSlash)
+        {
+            strcpy(lastSlash + 1, "Disk.nx");
+        }
+        else
+        {
+            strcpy(outputString, "Disk.nx");
+        }
     }
 }
 
@@ -488,6 +493,9 @@ void interpreterDidFail(void *context, struct CoreError coreError)
 /** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 {
+    char diskFilename[FILENAME_MAX];
+    getDiskFilename(diskFilename);
+    
     FILE *file = fopen(diskFilename, "rb");
     if (file)
     {
@@ -529,6 +537,9 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
     char *output = data_export(diskDataManager);
     if (output)
     {
+        char diskFilename[FILENAME_MAX];
+        getDiskFilename(diskFilename);
+        
         FILE *file = fopen(diskFilename, "wb");
         if (file)
         {

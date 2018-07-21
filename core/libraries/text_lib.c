@@ -141,7 +141,7 @@ void txtlib_printText(struct TextLib *lib, const char *text)
         if (*letter >= 32)
         {
             char printableLetter = *letter;
-            if (printableLetter >= 97 && printableLetter <= 122)
+            if (printableLetter >= 'a' && printableLetter <= 'z')
             {
                 printableLetter -= 32;
             }
@@ -208,8 +208,13 @@ void txtlib_writeText(struct TextLib *lib, const char *text, int x, int y)
     {
         if (*letter >= 32)
         {
+            char printableLetter = *letter;
+            if (printableLetter >= 'a' && printableLetter <= 'z')
+            {
+                printableLetter -= 32;
+            }
             struct Cell *cell = &plane->cells[y][x];
-            txtlib_modifyCell(lib, cell, lib->fontCharOffset + (*letter - 32));
+            txtlib_modifyCell(lib, cell, lib->fontCharOffset + (printableLetter - 32));
             if (lib->windowBg != OVERLAY_BG)
             {
                 lib->core->interpreter->cycles += 2;

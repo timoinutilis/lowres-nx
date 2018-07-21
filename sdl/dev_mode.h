@@ -28,7 +28,8 @@
 enum DevModeState {
     DevModeStateOff,
     DevModeStateVisible,
-    DevModeStateHidden
+    DevModeStateRunningProgram,
+    DevModeStateRunningTool
 };
 
 enum DevModeMenu {

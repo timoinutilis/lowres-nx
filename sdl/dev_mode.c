@@ -47,9 +47,9 @@ struct DevButton devButtons[] = {
 };
 
 const char *devTools[] = {
-    "CHARACTER DESIGNER 1.1",
-    "BACKGROUND DESIGNER 1.1",
-    "CANCEL"
+    "Character Designer 1.1.nx",
+    "Background Designer 1.1.nx",
+    "Cancel"
 };
 
 void dev_showInfo(struct DevMode *devMode);
@@ -57,10 +57,18 @@ void dev_showError(struct DevMode *devMode, struct CoreError error);
 void dev_updateButtons(struct DevMode *devMode);
 void dev_onButtonTap(struct DevMode *devMode);
 void dev_reloadProgram(struct DevMode *devMode);
+void dev_runToolProgram(struct DevMode *devMode, const char *filename);
+struct CoreError dev_loadProgram(struct DevMode *devMode, const char *filename);
 void dev_showMenu(struct DevMode *devMode, const char *message, const char *buttons[], int numButtons);
 
 void dev_show(struct DevMode *devMode)
 {
+    if (devMode->state == DevModeStateRunningTool)
+    {
+        // did run tool, so reload main program
+        dev_reloadProgram(devMode);
+    }
+    
     devMode->state = DevModeStateVisible;
     devMode->currentMenu = DevModeMenuMain;
     devMode->currentButton = -1;
@@ -94,26 +102,19 @@ void dev_show(struct DevMode *devMode)
     textLib->charAttr.palette = 1;
     txtlib_writeText(textLib, "DEVELOPMENT MODE", 2, 0);
     
-    const char *uppercaseProgName = uppercaseString(devMode->mainProgramFilename);
-    if (uppercaseProgName)
+    textLib->charAttr.palette = 0;
+    char progName[19] = "";
+    char *slash = strrchr(devMode->mainProgramFilename, '/');
+    if (slash)
     {
-        textLib->charAttr.palette = 0;
-        char progName[19] = "";
-        char *slash = strrchr(uppercaseProgName, '/');
-        if (slash)
-        {
-            strncpy(progName, slash + 1, 18);
-        }
-        else
-        {
-            strncpy(progName, uppercaseProgName, 18);
-        }
-        progName[18] = 0;
-        txtlib_writeText(textLib, progName, 1, 2);
-        
-        free((void *)uppercaseProgName);
-        uppercaseProgName = NULL;
+        strncpy(progName, slash + 1, 18);
     }
+    else
+    {
+        strncpy(progName, devMode->mainProgramFilename, 18);
+    }
+    progName[18] = 0;
+    txtlib_writeText(textLib, progName, 1, 2);
     
     if (devMode->lastError.code != ErrorNone)
     {
@@ -283,7 +284,7 @@ void dev_onButtonTap(struct DevMode *devMode)
             dev_reloadProgram(devMode);
             if (core->interpreter->state != StateNoProgram)
             {
-                devMode->state = DevModeStateHidden;
+                devMode->state = DevModeStateRunningProgram;
                 core_willRunProgram(core, SDL_GetTicks() / 1000);
             }
             else
@@ -316,15 +317,43 @@ void dev_onButtonTap(struct DevMode *devMode)
     }
     else if (devMode->currentMenu == DevModeMenuTools)
     {
-        dev_show(devMode);
+        if (devMode->currentButton < 2)
+        {
+            const char *tool = devTools[devMode->currentButton];
+            char toolFilename[FILENAME_MAX];
+            sprintf(toolFilename, "programs/%s", tool);
+            dev_runToolProgram(devMode, toolFilename);
+        }
+        else
+        {
+            dev_show(devMode);
+        }
     }
 }
 
 void dev_reloadProgram(struct DevMode *devMode)
 {
+    devMode->lastError = dev_loadProgram(devMode, devMode->mainProgramFilename);
+}
+
+void dev_runToolProgram(struct DevMode *devMode, const char *filename)
+{
+    struct Core *core = devMode->core;
+    struct CoreError error = dev_loadProgram(devMode, filename);
+    if (error.code == ErrorNone)
+    {
+        devMode->state = DevModeStateRunningTool;
+        core_willRunProgram(core, SDL_GetTicks() / 1000);
+    }
+}
+
+struct CoreError dev_loadProgram(struct DevMode *devMode, const char *filename)
+{
     struct Core *core = devMode->core;
     
-    FILE *file = fopen(devMode->mainProgramFilename, "rb");
+    struct CoreError error = err_noCoreError();
+    
+    FILE *file = fopen(filename, "rb");
     if (file)
     {
         fseek(file, 0, SEEK_END);
@@ -336,7 +365,7 @@ void dev_reloadProgram(struct DevMode *devMode)
         {
             fread(sourceCode, size, 1, file);
             
-            devMode->lastError = core_compileProgram(core, sourceCode);
+            error = core_compileProgram(core, sourceCode);
             SDL_free(sourceCode);
         }
         else
@@ -348,8 +377,9 @@ void dev_reloadProgram(struct DevMode *devMode)
     }
     else
     {
-        SDL_Log("failed to load file: %s", devMode->mainProgramFilename);
+        SDL_Log("failed to load file: %s", filename);
     }
+    return error;
 }
 
 void dev_showMenu(struct DevMode *devMode, const char *message, const char *buttons[], int numButtons)
@@ -369,7 +399,7 @@ void dev_showMenu(struct DevMode *devMode, const char *message, const char *butt
         int y = 1 + i * 3;
         txtlib_setCells(textLib, 0, y, 19, y, 3);
         txtlib_setCells(textLib, 0, y + 2, 19, y + 2, 5);
-        int tx = (20 - strlen(buttons[i])) / 2;
+        int tx = (int)(20 - strlen(buttons[i])) / 2;
         if (tx < 0) tx = 0;
         txtlib_writeText(textLib, buttons[i], tx, y + 1);
     }
