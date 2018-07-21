@@ -31,11 +31,18 @@ enum DevModeState {
     DevModeStateHidden
 };
 
+enum DevModeMenu {
+    DevModeMenuMain,
+    DevModeMenuTools
+};
+
 struct DevMode {
     enum DevModeState state;
     struct Core *core;
     bool lastTouch;
+    enum DevModeMenu currentMenu;
     int currentButton;
+    int currentMenuSize;
     char mainProgramFilename[FILENAME_MAX];
     struct CoreError lastError;
     struct TextLib textLib;

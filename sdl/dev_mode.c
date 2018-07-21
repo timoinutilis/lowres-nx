@@ -46,16 +46,23 @@ struct DevButton devButtons[] = {
     {17,4}
 };
 
+const char *devTools[] = {
+    "CHARACTER DESIGNER 1.1",
+    "BACKGROUND DESIGNER 1.1",
+    "CANCEL"
+};
 
 void dev_showInfo(struct DevMode *devMode);
 void dev_showError(struct DevMode *devMode, struct CoreError error);
 void dev_updateButtons(struct DevMode *devMode);
 void dev_onButtonTap(struct DevMode *devMode);
 void dev_reloadProgram(struct DevMode *devMode);
+void dev_showMenu(struct DevMode *devMode, const char *message, const char *buttons[], int numButtons);
 
 void dev_show(struct DevMode *devMode)
 {
     devMode->state = DevModeStateVisible;
+    devMode->currentMenu = DevModeMenuMain;
     devMode->currentButton = -1;
     devMode->lastTouch = false;
     
@@ -129,34 +136,67 @@ void dev_update(struct DevMode *devMode, struct CoreInput *input)
     int cx = core->machine->ioRegisters.touchX / 8;
     int cy = core->machine->ioRegisters.touchY / 8;
     
-    if (devMode->currentButton >= 0)
+    if (devMode->currentMenu == DevModeMenuMain)
     {
-        int bcx = devButtons[devMode->currentButton].cx;
-        int bcy = devButtons[devMode->currentButton].cy;
-        bool isInside = (cx >= bcx && cy >= bcy && cx <= bcx + 1 && cy <= bcy + 1);
-        if (!touch || !isInside)
+        if (devMode->currentButton >= 0)
         {
-            textLib->charAttr.palette = 0;
-            txtlib_setCells(textLib, bcx, bcy, bcx + 1, bcy + 1, -1);
-            
-            if (isInside)
+            int bcx = devButtons[devMode->currentButton].cx;
+            int bcy = devButtons[devMode->currentButton].cy;
+            bool isInside = (cx >= bcx && cy >= bcy && cx <= bcx + 1 && cy <= bcy + 1);
+            if (!touch || !isInside)
             {
-                dev_onButtonTap(devMode);
+                textLib->charAttr.palette = 0;
+                txtlib_setCells(textLib, bcx, bcy, bcx + 1, bcy + 1, -1);
+                
+                if (isInside)
+                {
+                    dev_onButtonTap(devMode);
+                }
+                devMode->currentButton = -1;
             }
-            devMode->currentButton = -1;
+        }
+        else if (touch && !devMode->lastTouch)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                int bcx = devButtons[i].cx;
+                int bcy = devButtons[i].cy;
+                if (cx >= bcx && cy >= bcy && cx <= bcx + 1 && cy <= bcy + 1)
+                {
+                    textLib->charAttr.palette = 1;
+                    txtlib_setCells(textLib, bcx, bcy, bcx + 1, bcy + 1, -1);
+                    devMode->currentButton = i;
+                }
+            }
         }
     }
-    else if (touch && !devMode->lastTouch)
+    else
     {
-        for (int i = 0; i < 5; i++)
+        if (devMode->currentButton >= 0)
         {
-            int bcx = devButtons[i].cx;
-            int bcy = devButtons[i].cy;
-            if (cx >= bcx && cy >= bcy && cx <= bcx + 1 && cy <= bcy + 1)
+            int bcy = 1 + devMode->currentButton * 3;
+            bool isInside = (cy >= bcy && cy <= bcy + 2);
+            if (!touch || !isInside)
             {
+                textLib->charAttr.palette = 0;
+                txtlib_setCells(textLib, 0, bcy, 19, bcy + 2, -1);
+                
+                if (isInside)
+                {
+                    dev_onButtonTap(devMode);
+                }
+                devMode->currentButton = -1;
+            }
+        }
+        else if (touch && !devMode->lastTouch)
+        {
+            int button = (cy - 1) / 3;
+            if (button >= 0 && button < devMode->currentMenuSize)
+            {
+                int bcy = 1 + button * 3;
                 textLib->charAttr.palette = 1;
-                txtlib_setCells(textLib, bcx, bcy, bcx + 1, bcy + 1, -1);
-                devMode->currentButton = i;
+                txtlib_setCells(textLib, 0, bcy, 19, bcy + 2, -1);
+                devMode->currentButton = button;
             }
         }
     }
@@ -170,15 +210,18 @@ void dev_showInfo(struct DevMode *devMode)
     
     char info[21];
     
-    textLib->charAttr.palette = 0;
-    
+    textLib->charAttr.palette = 5;
     txtlib_writeText(textLib, "TOKENS:", 0, 7);
+    txtlib_writeText(textLib, "ROM:", 0, 8);
+
+    textLib->charAttr.palette = 0;
     sprintf(info, "%d/%d", core->interpreter->tokenizer.numTokens, MAX_TOKENS);
     txtlib_writeText(textLib, info, 20 - (int)strlen(info), 7);
-    
-    txtlib_writeText(textLib, "ROM:", 0, 8);
     sprintf(info, "%d/%d", data_currentSize(&core->interpreter->romDataManager), DATA_SIZE);
     txtlib_writeText(textLib, info, 20 - (int)strlen(info), 8);
+    
+    textLib->charAttr.palette = 4;
+    txtlib_writeText(textLib, "READY TO RUN", 4, 14);
 }
 
 void dev_showError(struct DevMode *devMode, struct CoreError error)
@@ -190,10 +233,12 @@ void dev_showError(struct DevMode *devMode, struct CoreError error)
     
     txtlib_clearWindow(textLib);
     
+    textLib->charAttr.palette = 2;
     txtlib_printText(textLib, err_getString(error.code));
     txtlib_printText(textLib, "\n");
     if (core->interpreter->sourceCode)
     {
+        textLib->charAttr.palette = 0;
         int number = lineNumber(core->interpreter->sourceCode, error.sourcePosition);
         char lineNumberText[30];
         sprintf(lineNumberText, "IN LINE %d:\n", number);
@@ -202,8 +247,9 @@ void dev_showError(struct DevMode *devMode, struct CoreError error)
         const char *line = lineString(core->interpreter->sourceCode, error.sourcePosition);
         if (line)
         {
-            txtlib_printText(textLib, line);
+            textLib->charAttr.palette = 5;
             txtlib_printText(textLib, "\n");
+            txtlib_printText(textLib, line);
             free((void *)line);
         }
     }
@@ -229,36 +275,48 @@ void dev_onButtonTap(struct DevMode *devMode)
     struct Core *core = devMode->core;
     int button = devMode->currentButton;
     
-    if (button == 0)
+    if (devMode->currentMenu == DevModeMenuMain)
     {
-        // Run
-        dev_reloadProgram(devMode);
-        if (core->interpreter->state != StateNoProgram)
+        if (button == 0)
         {
-            devMode->state = DevModeStateHidden;
-            core_willRunProgram(core, SDL_GetTicks() / 1000);
+            // Run
+            dev_reloadProgram(devMode);
+            if (core->interpreter->state != StateNoProgram)
+            {
+                devMode->state = DevModeStateHidden;
+                core_willRunProgram(core, SDL_GetTicks() / 1000);
+            }
+            else
+            {
+                dev_show(devMode);
+            }
         }
-        else
+        else if (button == 1)
         {
+            // Check
+            dev_reloadProgram(devMode);
             dev_show(devMode);
         }
+        else if (button == 2)
+        {
+            devMode->currentMenu = DevModeMenuTools;
+            dev_showMenu(devMode, "EDIT ROM WITH TOOL", devTools, 3);
+        }
+        else if (button == 3)
+        {
+            // Debug On/Off
+            devMode->core->interpreter->debug = !devMode->core->interpreter->debug;
+            dev_updateButtons(devMode);
+        }
+        else if (button == 4)
+        {
+            // Exit
+            devMode->state = DevModeStateOff;
+        }
     }
-    else if (button == 1)
+    else if (devMode->currentMenu == DevModeMenuTools)
     {
-        // Check
-        dev_reloadProgram(devMode);
         dev_show(devMode);
-    }
-    else if (button == 3)
-    {
-        // Debug On/Off
-        devMode->core->interpreter->debug = !devMode->core->interpreter->debug;
-        dev_updateButtons(devMode);
-    }
-    else if (button == 4)
-    {
-        // Exit
-        devMode->state = DevModeStateOff;
     }
 }
 
@@ -292,4 +350,28 @@ void dev_reloadProgram(struct DevMode *devMode)
     {
         SDL_Log("failed to load file: %s", devMode->mainProgramFilename);
     }
+}
+
+void dev_showMenu(struct DevMode *devMode, const char *message, const char *buttons[], int numButtons)
+{
+    struct TextLib *textLib = &devMode->textLib;
+    
+    textLib->charAttr.palette = 0;
+    txtlib_setCells(textLib, 0, 0, 19, 15, 1);
+    
+    textLib->charAttr.palette = 1;
+    txtlib_setCells(textLib, 0, 0, 19, 0, 192);
+    txtlib_writeText(textLib, message, (int)(20 - strlen(message))/2, 0);
+    
+    textLib->charAttr.palette = 0;
+    for (int i = 0; i < numButtons; i++)
+    {
+        int y = 1 + i * 3;
+        txtlib_setCells(textLib, 0, y, 19, y, 3);
+        txtlib_setCells(textLib, 0, y + 2, 19, y + 2, 5);
+        int tx = (20 - strlen(buttons[i])) / 2;
+        if (tx < 0) tx = 0;
+        txtlib_writeText(textLib, buttons[i], tx, y + 1);
+    }
+    devMode->currentMenuSize = numButtons;
 }
