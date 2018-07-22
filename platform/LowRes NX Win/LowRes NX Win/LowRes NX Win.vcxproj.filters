@@ -132,7 +132,13 @@
     <ClCompile Include="..\..\..\sdl\boot_intro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\main_sdl.c">
+    <ClCompile Include="..\..\..\sdl\dev_mode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\settings.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -260,13 +266,19 @@
     <ClInclude Include="..\..\..\sdl\boot_intro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\main_sdl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\dev_mode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\dev_mode_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -28,7 +28,12 @@
 #include <SDL.h>
 #endif
 
+#ifdef _WIN32
+const char *defaultProgramsPath = "programs\\";
+#else
 const char *defaultProgramsPath = "programs/";
+#endif
+
 
 void settings_init(struct Settings *settings, int argc, const char * argv[])
 {

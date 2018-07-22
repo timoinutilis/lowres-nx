@@ -33,6 +33,12 @@
 #include <SDL.h>
 #endif
 
+#ifdef _WIN32
+const char pathSeparator = '\\';
+#else
+const char pathSeparator = '/';
+#endif
+
 struct DevButton {
     int cx;
     int cy;
@@ -110,7 +116,7 @@ void dev_show(struct DevMode *devMode)
     textLib->charAttr.palette = 0;
     char progName[19];
     memset(progName, 0, 19);
-    char *slash = strrchr(devMode->mainProgramFilename, '/');
+    char *slash = strrchr(devMode->mainProgramFilename, pathSeparator);
     if (slash)
     {
         strncpy(progName, slash + 1, 18);

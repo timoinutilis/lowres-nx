@@ -464,7 +464,7 @@ void getDiskFilename(char *outputString)
     else
     {
         strncpy(outputString, settings.programsPath, FILENAME_MAX - 1);
-        strncpy(outputString, defaultDisk, FILENAME_MAX - 1);
+        strncat(outputString, defaultDisk, FILENAME_MAX - 1);
     }
 }
 

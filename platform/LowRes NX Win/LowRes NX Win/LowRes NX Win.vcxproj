@@ -77,6 +77,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -101,6 +102,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -164,7 +166,9 @@
     <ClCompile Include="..\..\..\core\overlay\overlay.c" />
     <ClCompile Include="..\..\..\core\overlay\overlay_data.c" />
     <ClCompile Include="..\..\..\sdl\boot_intro.c" />
-    <ClCompile Include="..\..\..\sdl\main_sdl.c" />
+    <ClCompile Include="..\..\..\sdl\dev_mode.c" />
+    <ClCompile Include="..\..\..\sdl\main.c" />
+    <ClCompile Include="..\..\..\sdl\settings.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\core\accessories\disk_drive.h" />
@@ -208,7 +212,9 @@
     <ClInclude Include="..\..\..\core\overlay\overlay.h" />
     <ClInclude Include="..\..\..\core\overlay\overlay_data.h" />
     <ClInclude Include="..\..\..\sdl\boot_intro.h" />
-    <ClInclude Include="..\..\..\sdl\main_sdl.h" />
+    <ClInclude Include="..\..\..\sdl\dev_mode.h" />
+    <ClInclude Include="..\..\..\sdl\dev_mode_data.h" />
+    <ClInclude Include="..\..\..\sdl\settings.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
   </ItemGroup>
