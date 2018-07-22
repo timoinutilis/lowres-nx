@@ -61,6 +61,11 @@ void dev_runToolProgram(struct DevMode *devMode, const char *filename);
 struct CoreError dev_loadProgram(struct DevMode *devMode, const char *filename);
 void dev_showMenu(struct DevMode *devMode, const char *message, const char *buttons[], int numButtons);
 
+bool dev_hasProgram(struct DevMode *devMode)
+{
+    return devMode->mainProgramFilename[0] != 0;
+}
+
 void dev_show(struct DevMode *devMode)
 {
     if (devMode->state == DevModeStateRunningTool)
@@ -100,10 +105,11 @@ void dev_show(struct DevMode *devMode)
     dev_updateButtons(devMode);
     
     textLib->charAttr.palette = 1;
-    txtlib_writeText(textLib, "DEVELOPMENT MODE", 2, 0);
+    txtlib_writeText(textLib, "DEVELOPMENT MENU", 2, 0);
     
     textLib->charAttr.palette = 0;
-    char progName[19] = "";
+    char progName[19];
+    memset(progName, 0, 19);
     char *slash = strrchr(devMode->mainProgramFilename, '/');
     if (slash)
     {
@@ -113,7 +119,6 @@ void dev_show(struct DevMode *devMode)
     {
         strncpy(progName, devMode->mainProgramFilename, 18);
     }
-    progName[18] = 0;
     txtlib_writeText(textLib, progName, 1, 2);
     
     if (devMode->lastError.code != ErrorNone)
@@ -273,7 +278,6 @@ void dev_updateButtons(struct DevMode *devMode)
 
 void dev_onButtonTap(struct DevMode *devMode)
 {
-    struct Core *core = devMode->core;
     int button = devMode->currentButton;
     
     if (devMode->currentMenu == DevModeMenuMain)
@@ -281,16 +285,7 @@ void dev_onButtonTap(struct DevMode *devMode)
         if (button == 0)
         {
             // Run
-            dev_reloadProgram(devMode);
-            if (devMode->lastError.code == ErrorNone)
-            {
-                devMode->state = DevModeStateRunningProgram;
-                core_willRunProgram(core, SDL_GetTicks() / 1000);
-            }
-            else
-            {
-                dev_show(devMode);
-            }
+            dev_runProgram(devMode);
         }
         else if (button == 1)
         {
@@ -321,8 +316,8 @@ void dev_onButtonTap(struct DevMode *devMode)
         {
             const char *tool = devTools[devMode->currentButton];
             char toolFilename[FILENAME_MAX];
-            SDL_strlcpy(toolFilename, devMode->settings->programsPath, FILENAME_MAX);
-            SDL_strlcat(toolFilename, tool, FILENAME_MAX);
+            strncpy(toolFilename, devMode->settings->programsPath, FILENAME_MAX - 1);
+            strncat(toolFilename, tool, FILENAME_MAX - 1);
             dev_runToolProgram(devMode, toolFilename);
         }
         else
@@ -335,6 +330,20 @@ void dev_onButtonTap(struct DevMode *devMode)
 void dev_reloadProgram(struct DevMode *devMode)
 {
     devMode->lastError = dev_loadProgram(devMode, devMode->mainProgramFilename);
+}
+
+void dev_runProgram(struct DevMode *devMode)
+{
+    dev_reloadProgram(devMode);
+    if (devMode->lastError.code == ErrorNone)
+    {
+        devMode->state = DevModeStateRunningProgram;
+        core_willRunProgram(devMode->core, SDL_GetTicks() / 1000);
+    }
+    else
+    {
+        dev_show(devMode);
+    }
 }
 
 void dev_runToolProgram(struct DevMode *devMode, const char *filename)

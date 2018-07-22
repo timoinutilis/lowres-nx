@@ -171,6 +171,7 @@ int main(int argc, const char * argv[])
 
 void loadBootIntro()
 {
+    devMode.state = DevModeStateOff;
     devMode.mainProgramFilename[0] = 0;
     
     struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
@@ -187,7 +188,7 @@ void loadMainProgram(const char *filename)
 {
     struct CoreError error = err_noCoreError();
     devMode.state = DevModeStateOff;
-    strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX);
+    strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX - 1);
     
     FILE *file = fopen(filename, "rb");
     if (file)
@@ -314,10 +315,21 @@ void update(void *arg) {
                     }
                     else if (code == SDLK_m)
                     {
-                        if (devMode.state != DevModeStateVisible && devMode.mainProgramFilename[0] != 0)
+                        if (devMode.state != DevModeStateVisible && dev_hasProgram(&devMode))
                         {
                             dev_show(&devMode);
                         }
+                    }
+                    else if (code == SDLK_r)
+                    {
+                        if (dev_hasProgram(&devMode))
+                        {
+                            dev_runProgram(&devMode);
+                        }
+                    }
+                    else if (code == SDLK_e)
+                    {
+                        loadBootIntro();
                     }
                 }
                 else if (code == SDLK_ESCAPE)
@@ -447,12 +459,12 @@ void getDiskFilename(char *outputString)
 {
     if (devMode.state == DevModeStateRunningTool)
     {
-        SDL_strlcpy(outputString, devMode.mainProgramFilename, FILENAME_MAX);
+        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX - 1);
     }
     else
     {
-        SDL_strlcpy(outputString, settings.programsPath, FILENAME_MAX);
-        SDL_strlcat(outputString, defaultDisk, FILENAME_MAX);
+        strncpy(outputString, settings.programsPath, FILENAME_MAX - 1);
+        strncpy(outputString, defaultDisk, FILENAME_MAX - 1);
     }
 }
 

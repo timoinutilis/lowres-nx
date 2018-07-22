@@ -6,6 +6,8 @@
 
 - The manual sometimes refers to the interface of the iOS app.
   On macOS/Windows just use any text editor, there is no included one.
+  Press Ctrl+M to show the Development Menu, from where you can use
+  the designer tools.
 
 - Share programs and discuss on: https://lowresnx.inutilis.com
 
@@ -34,7 +36,9 @@
 	Pause        Return
 	Fullscreen   Ctrl+f
 	Debug        Ctrl+d
-	Dev Mode     Ctrl+m
+	Dev Menu     Ctrl+m
+	Reload/Run   Ctrl+r
+	Exit         Ctrl+e
 
 - Command line arguments:
 	"LowRes NX" [-fullscreen yes] [-programs path] [program.nx]

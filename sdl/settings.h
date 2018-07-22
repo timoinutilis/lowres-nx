@@ -25,7 +25,7 @@
 
 struct Settings {
     const char *program;
-    const char *programsPath;
+    char programsPath[FILENAME_MAX];
     bool fullscreen;
 };
 

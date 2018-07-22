@@ -36,14 +36,11 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
     
     char *basePath = SDL_GetBasePath();
     if (basePath) {
-        size_t len = SDL_strlen(basePath) + SDL_strlen(defaultProgramsPath) + 1;
-        char *programsPath = SDL_malloc(len);
-        SDL_strlcpy(programsPath, basePath, len);
-        SDL_strlcat(programsPath, defaultProgramsPath, len);
-        settings->programsPath = programsPath;
+        strncpy(settings->programsPath, basePath, FILENAME_MAX - 1);
+        strncat(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
         SDL_free(basePath);
     } else {
-        settings->programsPath = SDL_strdup(defaultProgramsPath);
+        strncpy(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
     }
     
     // parse arguments
@@ -62,8 +59,7 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
                     }
                 }
                 else if (strcmp(arg, "-programs") == 0) {
-                    SDL_free((void *)settings->programsPath);
-                    settings->programsPath = SDL_strdup(value);
+                    strncpy(settings->programsPath, value, FILENAME_MAX - 1);
                 }
             }
             else
@@ -78,5 +74,4 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
 
 void settings_deinit(struct Settings *settings)
 {
-    SDL_free((void *)settings->programsPath);
 }

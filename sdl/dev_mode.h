@@ -51,7 +51,9 @@ struct DevMode {
     struct TextLib textLib;
 };
 
+bool dev_hasProgram(struct DevMode *devMode);
 void dev_show(struct DevMode *devMode);
 void dev_update(struct DevMode *devMode, struct CoreInput *input);
+void dev_runProgram(struct DevMode *devMode);
 
 #endif /* dev_mode_h */
