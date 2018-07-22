@@ -37,4 +37,8 @@
 	Dev Mode     Ctrl+m
 
 - Command line arguments:
-	"LowRes NX" [-fullscreen yes] [program.nx]
+	"LowRes NX" [-fullscreen yes] [-programs path] [program.nx]
+
+	-fullscreen yes     Starts the application in fullscreen mode
+	-programs path      Path for the tool programs and virtual disk file
+	program.nx          Name of program to run

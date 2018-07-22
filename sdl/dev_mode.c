@@ -321,7 +321,8 @@ void dev_onButtonTap(struct DevMode *devMode)
         {
             const char *tool = devTools[devMode->currentButton];
             char toolFilename[FILENAME_MAX];
-            sprintf(toolFilename, "programs/%s", tool);
+            SDL_strlcpy(toolFilename, devMode->settings->programsPath, FILENAME_MAX);
+            SDL_strlcat(toolFilename, tool, FILENAME_MAX);
             dev_runToolProgram(devMode, toolFilename);
         }
         else

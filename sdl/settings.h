@@ -17,41 +17,19 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef dev_mode_h
-#define dev_mode_h
+#ifndef settings_h
+#define settings_h
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "core.h"
-#include "settings.h"
-#include "text_lib.h"
 
-enum DevModeState {
-    DevModeStateOff,
-    DevModeStateVisible,
-    DevModeStateRunningProgram,
-    DevModeStateRunningTool
+struct Settings {
+    const char *program;
+    const char *programsPath;
+    bool fullscreen;
 };
 
-enum DevModeMenu {
-    DevModeMenuMain,
-    DevModeMenuTools
-};
+void settings_init(struct Settings *settings, int argc, const char * argv[]);
+void settings_deinit(struct Settings *settings);
 
-struct DevMode {
-    enum DevModeState state;
-    struct Core *core;
-    struct Settings *settings;
-    bool lastTouch;
-    enum DevModeMenu currentMenu;
-    int currentButton;
-    int currentMenuSize;
-    char mainProgramFilename[FILENAME_MAX];
-    struct CoreError lastError;
-    struct TextLib textLib;
-};
-
-void dev_show(struct DevMode *devMode);
-void dev_update(struct DevMode *devMode, struct CoreInput *input);
-
-#endif /* dev_mode_h */
+#endif /* settings_h */

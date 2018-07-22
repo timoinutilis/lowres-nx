@@ -42,5 +42,7 @@
 This program is released under the GNU Lesser General Public License.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SDL_FILESYSTEM_BASE_DIR_TYPE</key>
+	<string>parent</string>
 </dict>
 </plist>

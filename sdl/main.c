@@ -20,9 +20,9 @@
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>
-#include <assert.h>
 #include "core.h"
 #include "dev_mode.h"
+#include "settings.h"
 #include "boot_intro.h"
 
 #ifdef __EMSCRIPTEN__
@@ -71,46 +71,27 @@ SDL_Texture *texture = NULL;
 
 struct Core *core = NULL;
 struct DevMode devMode;
+struct Settings settings;
+struct CoreInput coreInput;
+
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
 SDL_Rect screenRect;
-struct CoreInput coreInput;
 bool quit = false;
 bool releasedTouch = false;
 
 int main(int argc, const char * argv[])
 {
-    const char *programArg = NULL;
-    bool fullscreenArg = false;
+    memset(&devMode, 0, sizeof(struct DevMode));
+    memset(&settings, 0, sizeof(struct Settings));
+    memset(&coreInput, 0, sizeof(struct CoreInput));
     
-    for (int i = 1; i < argc; i++)
-    {
-        const char *arg = argv[i];
-        if (*arg == '-') {
-            i++;
-            if (i < argc)
-            {
-                const char *value = argv[i];
-                if (strcmp(arg, "-fullscreen") == 0) {
-                    if (strcmp(value, "yes") == 0)
-                    {
-                        fullscreenArg = true;
-                    }
-                }
-            }
-            else
-            {
-                SDL_Log("missing value for parameter %s", arg);
-            }
-        } else {
-            programArg = arg;
-        }
-    }
+    settings_init(&settings, argc, argv);
     
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     
     Uint32 windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-    if (fullscreenArg)
+    if (settings.fullscreen)
     {
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
@@ -126,7 +107,6 @@ int main(int argc, const char * argv[])
     core = calloc(1, sizeof(struct Core));
     if (core)
     {
-        memset(&coreInput, 0, sizeof(struct CoreInput));
         
         struct CoreDelegate coreDelegate;
         memset(&coreDelegate, 0, sizeof(struct CoreDelegate));
@@ -140,12 +120,12 @@ int main(int argc, const char * argv[])
         
         core_setDelegate(core, &coreDelegate);
         
-        memset(&devMode, 0, sizeof(struct DevMode));
         devMode.core = core;
+        devMode.settings = &settings;
         
-        if (programArg)
+        if (settings.program)
         {
-            loadMainProgram(programArg);
+            loadMainProgram(settings.program);
         }
         else
         {
@@ -183,6 +163,8 @@ int main(int argc, const char * argv[])
     SDL_DestroyWindow(window);
     
     SDL_Quit();
+    
+    settings_deinit(&settings);
     
     return 0;
 }
@@ -465,23 +447,12 @@ void getDiskFilename(char *outputString)
 {
     if (devMode.state == DevModeStateRunningTool)
     {
-        assert(strlen(devMode.mainProgramFilename) < FILENAME_MAX);
-        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX);
+        SDL_strlcpy(outputString, devMode.mainProgramFilename, FILENAME_MAX);
     }
     else
     {
-        assert(strlen(devMode.mainProgramFilename) + strlen(defaultDisk) < FILENAME_MAX);
-        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX);
-        
-        char *lastSlash = strrchr(outputString, '/');
-        if (lastSlash)
-        {
-            strcpy(lastSlash + 1, "Disk.nx");
-        }
-        else
-        {
-            strcpy(outputString, "Disk.nx");
-        }
+        SDL_strlcpy(outputString, settings.programsPath, FILENAME_MAX);
+        SDL_strlcat(outputString, defaultDisk, FILENAME_MAX);
     }
 }
 

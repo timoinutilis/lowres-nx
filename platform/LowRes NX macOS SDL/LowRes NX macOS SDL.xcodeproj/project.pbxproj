@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		921E0F152104BD7100F3C512 /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = 921E0F142104BD7100F3C512 /* settings.c */; };
 		921F986620DAD4DF0052F233 /* boot_intro.c in Sources */ = {isa = PBXBuildFile; fileRef = 921F986520DAD4DF0052F233 /* boot_intro.c */; };
 		9284722B20F9F4FA00B82653 /* dev_mode.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284722A20F9F4FA00B82653 /* dev_mode.c */; };
 		9287EAC920D85E4E000BBEB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9287EAC820D85E4E000BBEB1 /* Assets.xcassets */; };
@@ -53,6 +54,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		921E0F132104BD7100F3C512 /* settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		921E0F142104BD7100F3C512 /* settings.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
 		921F986420DAD4DF0052F233 /* boot_intro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boot_intro.h; sourceTree = "<group>"; };
 		921F986520DAD4DF0052F233 /* boot_intro.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = boot_intro.c; sourceTree = "<group>"; };
 		9284722920F9F4FA00B82653 /* dev_mode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_mode.h; sourceTree = "<group>"; };
@@ -328,6 +331,8 @@
 				9284722C20F9FA5900B82653 /* dev_mode_data.h */,
 				921F986420DAD4DF0052F233 /* boot_intro.h */,
 				921F986520DAD4DF0052F233 /* boot_intro.c */,
+				921E0F132104BD7100F3C512 /* settings.h */,
+				921E0F142104BD7100F3C512 /* settings.c */,
 			);
 			name = sdl;
 			path = ../../sdl;
@@ -428,6 +433,7 @@
 				9287EB4D20D85EEB000BBEB1 /* audio_chip.c in Sources */,
 				9287EB5220D85EEB000BBEB1 /* core_delegate.c in Sources */,
 				9287EB4A20D85EEB000BBEB1 /* startup_sequence.c in Sources */,
+				921E0F152104BD7100F3C512 /* settings.c in Sources */,
 				9287EB4420D85EEB000BBEB1 /* cmd_screen.c in Sources */,
 				9287EB4720D85EEB000BBEB1 /* data_manager.c in Sources */,
 				9287EB2F20D85EEB000BBEB1 /* rcstring.c in Sources */,
