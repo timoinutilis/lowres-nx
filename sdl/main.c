@@ -123,13 +123,13 @@ int main(int argc, const char * argv[])
     
     configureJoysticks();
     
-    core = SDL_calloc(1, sizeof(struct Core));
+    core = calloc(1, sizeof(struct Core));
     if (core)
     {
-        SDL_memset(&coreInput, 0, sizeof(struct CoreInput));
+        memset(&coreInput, 0, sizeof(struct CoreInput));
         
         struct CoreDelegate coreDelegate;
-        SDL_memset(&coreDelegate, 0, sizeof(struct CoreDelegate));
+        memset(&coreDelegate, 0, sizeof(struct CoreDelegate));
         
         core_init(core);
         
@@ -140,7 +140,7 @@ int main(int argc, const char * argv[])
         
         core_setDelegate(core, &coreDelegate);
         
-        SDL_memset(&devMode, 0, sizeof(struct DevMode));
+        memset(&devMode, 0, sizeof(struct DevMode));
         devMode.core = core;
         
         if (programArg)
@@ -172,7 +172,7 @@ int main(int argc, const char * argv[])
         
         core_deinit(core);
         
-        SDL_free(core);
+        free(core);
         core = NULL;
     }
     
@@ -203,6 +203,7 @@ void loadBootIntro()
 
 void loadMainProgram(const char *filename)
 {
+    struct CoreError error = err_noCoreError();
     devMode.state = DevModeStateOff;
     strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX);
     
@@ -213,34 +214,34 @@ void loadMainProgram(const char *filename)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = SDL_calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
             
-            struct CoreError error = core_compileProgram(core, sourceCode);
-            SDL_free(sourceCode);
-            
-            devMode.lastError = error;
-            if (error.code != ErrorNone)
-            {
-                dev_show(&devMode);
-            }
-            else
-            {
-                core_willRunProgram(core, SDL_GetTicks() / 1000);
-            }
+            error = core_compileProgram(core, sourceCode);
+            free(sourceCode);
         }
         else
         {
-            SDL_Log("not enough memory");
+            error = err_makeCoreError(ErrorOutOfMemory, -1);
         }
         
         fclose(file);
     }
     else
     {
-        SDL_Log("failed to load file: %s", filename);
+        error = err_makeCoreError(ErrorCouldNotOpenProgram, -1);
+    }
+    
+    devMode.lastError = error;
+    if (error.code != ErrorNone)
+    {
+        dev_show(&devMode);
+    }
+    else
+    {
+        core_willRunProgram(core, SDL_GetTicks() / 1000);
     }
 }
 
@@ -503,13 +504,13 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = SDL_calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
             
             struct CoreError error = data_import(diskDataManager, sourceCode, true);
-            SDL_free(sourceCode);
+            free(sourceCode);
             
             if (error.code != ErrorNone)
             {

@@ -78,7 +78,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     // Parse source code
     
     interpreter->sourceCode = uppercaseString(sourceCode);
-    if (!interpreter->sourceCode) return err_makeCoreError(ErrorOutOfMemory, 0);
+    if (!interpreter->sourceCode) return err_makeCoreError(ErrorOutOfMemory, -1);
     
     struct CoreError error = tok_tokenizeUppercaseProgram(&interpreter->tokenizer, interpreter->sourceCode);
     if (error.code != ErrorNone)

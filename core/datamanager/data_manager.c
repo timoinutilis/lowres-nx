@@ -57,7 +57,7 @@ struct CoreError data_import(struct DataManager *manager, const char *input, boo
     assert(input);
     
     const char *uppercaseInput = uppercaseString(input);
-    if (!uppercaseInput) return err_makeCoreError(ErrorOutOfMemory, 0);
+    if (!uppercaseInput) return err_makeCoreError(ErrorOutOfMemory, -1);
     
     struct CoreError error = data_uppercaseImport(manager, uppercaseInput, keepSourceCode);
     free((void *)uppercaseInput);

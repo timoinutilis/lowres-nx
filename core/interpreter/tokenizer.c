@@ -27,7 +27,7 @@
 struct CoreError tok_tokenizeProgram(struct Tokenizer *tokenizer, const char *sourceCode)
 {
     const char *uppercaseSourceCode = uppercaseString(sourceCode);
-    if (!uppercaseSourceCode) return err_makeCoreError(ErrorOutOfMemory, 0);
+    if (!uppercaseSourceCode) return err_makeCoreError(ErrorOutOfMemory, -1);
     
     struct CoreError error = tok_tokenizeUppercaseProgram(tokenizer, uppercaseSourceCode);
     free((void *)uppercaseSourceCode);

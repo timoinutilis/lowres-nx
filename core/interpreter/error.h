@@ -25,6 +25,7 @@
 enum ErrorCode {
     ErrorNone,
     
+    ErrorCouldNotOpenProgram,
     ErrorTooManyTokens,
     ErrorRomIsFull,
     ErrorIndexAlreadyDefined,

@@ -237,7 +237,7 @@ void dev_showError(struct DevMode *devMode, struct CoreError error)
     textLib->charAttr.palette = 2;
     txtlib_printText(textLib, err_getString(error.code));
     txtlib_printText(textLib, "\n");
-    if (core->interpreter->sourceCode)
+    if (error.sourcePosition >= 0 && core->interpreter->sourceCode)
     {
         textLib->charAttr.palette = 0;
         int number = lineNumber(core->interpreter->sourceCode, error.sourcePosition);
@@ -282,7 +282,7 @@ void dev_onButtonTap(struct DevMode *devMode)
         {
             // Run
             dev_reloadProgram(devMode);
-            if (core->interpreter->state != StateNoProgram)
+            if (devMode->lastError.code == ErrorNone)
             {
                 devMode->state = DevModeStateRunningProgram;
                 core_willRunProgram(core, SDL_GetTicks() / 1000);
@@ -343,7 +343,12 @@ void dev_runToolProgram(struct DevMode *devMode, const char *filename)
     if (error.code == ErrorNone)
     {
         devMode->state = DevModeStateRunningTool;
+        core->interpreter->debug = false;
         core_willRunProgram(core, SDL_GetTicks() / 1000);
+    }
+    else
+    {
+        core_traceError(core, error);
     }
 }
 
@@ -360,24 +365,24 @@ struct CoreError dev_loadProgram(struct DevMode *devMode, const char *filename)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = SDL_calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
             
             error = core_compileProgram(core, sourceCode);
-            SDL_free(sourceCode);
+            free(sourceCode);
         }
         else
         {
-            SDL_Log("not enough memory");
+            error = err_makeCoreError(ErrorOutOfMemory, -1);
         }
         
         fclose(file);
     }
     else
     {
-        SDL_Log("failed to load file: %s", filename);
+        error = err_makeCoreError(ErrorCouldNotOpenProgram, -1);
     }
     return error;
 }

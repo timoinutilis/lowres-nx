@@ -22,6 +22,7 @@
 const char *ErrorStrings[] = {
     "OK",
     
+    "Could Not Open Program",
     "Too Many Tokens",
     "ROM is full",
     "Index Already Defined",
