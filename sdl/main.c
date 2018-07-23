@@ -290,7 +290,7 @@ void update(void *arg) {
                 }
                 
                 // console buttons
-                if (code == SDLK_RETURN)
+                if (code == SDLK_RETURN || code == SDLK_p)
                 {
                     coreInput.pause = true;
                 }
@@ -507,10 +507,6 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
         
         fclose(file);
     }
-    else
-    {
-        SDL_Log("failed to load file: %s", diskFilename);
-    }
     
     return true;
 }
@@ -532,7 +528,10 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
         }
         else
         {
-            SDL_Log("failed to save file: %s", diskFilename);
+            struct TextLib *lib = &core->overlay->textLib;
+            txtlib_printText(lib, "COULD NOT SAVE:\n");
+            txtlib_printText(lib, diskFilename);
+            txtlib_printText(lib, "\n");
         }
 
         free(output);

@@ -33,7 +33,7 @@
 
 - More keys:
 	Quit         Esc
-	Pause        Return
+	Pause        Return/P
 	Fullscreen   Ctrl+f
 	Debug        Ctrl+d
 	Dev Menu     Ctrl+m
