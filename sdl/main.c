@@ -164,8 +164,6 @@ int main(int argc, const char * argv[])
     
     SDL_Quit();
     
-    settings_deinit(&settings);
-    
     return 0;
 }
 

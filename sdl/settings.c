@@ -34,21 +34,87 @@ const char *defaultProgramsPath = "programs\\";
 const char *defaultProgramsPath = "programs/";
 #endif
 
+const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n";
+
+void settings_setValue(struct Settings *settings, const char *key, const char *value);
+
 
 void settings_init(struct Settings *settings, int argc, const char * argv[])
 {
     // default values
     
     char *basePath = SDL_GetBasePath();
-    if (basePath) {
+    if (basePath)
+    {
         strncpy(settings->programsPath, basePath, FILENAME_MAX - 1);
         strncat(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
         SDL_free(basePath);
-    } else {
+        basePath = NULL;
+    }
+    else
+    {
         strncpy(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
     }
     
+    // load settings file
+    
+    char *prefPath = SDL_GetPrefPath("com.inutilis", "LowResNX");
+    if (prefPath)
+    {
+        char filename[FILENAME_MAX];
+        strncpy(filename, prefPath, FILENAME_MAX - 1);
+        strncat(filename, "settings.txt", FILENAME_MAX - 1);
+        SDL_free((void *)prefPath);
+        prefPath = NULL;
+        
+        FILE *file = fopen(filename, "r");
+        if (file)
+        {
+            // load settings
+            char line[256];
+            while (fgets(line, 256, file))
+            {
+                if (line[0] != '#')
+                {
+                    char *space = strchr(line, ' ');
+                    if (space)
+                    {
+                        *space = 0; // separate into two strings
+                        char *value = space + 1;
+                        
+                        // remove EOL characters
+                        char *eolChar = strchr(value, '\n');
+                        if (eolChar)
+                        {
+                            *eolChar = 0;
+                        }
+                        eolChar = strchr(value, '\r');
+                        if (eolChar)
+                        {
+                            *eolChar = 0;
+                        }
+                        
+                        settings_setValue(settings, line, value);
+                    }
+                }
+            }
+            
+            fclose(file);
+        }
+        else
+        {
+            // write default settings file
+            FILE *file = fopen(filename, "w");
+            if (file)
+            {
+                fputs(defaultSettings, file);
+                fclose(file);
+            }
+        }
+    }
+    
     // parse arguments
+    
     for (int i = 1; i < argc; i++)
     {
         const char *arg = argv[i];
@@ -56,16 +122,7 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
             i++;
             if (i < argc)
             {
-                const char *value = argv[i];
-                if (strcmp(arg, "-fullscreen") == 0) {
-                    if (strcmp(value, "yes") == 0)
-                    {
-                        settings->fullscreen = true;
-                    }
-                }
-                else if (strcmp(arg, "-programs") == 0) {
-                    strncpy(settings->programsPath, value, FILENAME_MAX - 1);
-                }
+                settings_setValue(settings, arg + 1, argv[i]);
             }
             else
             {
@@ -77,6 +134,20 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
     }
 }
 
-void settings_deinit(struct Settings *settings)
+void settings_setValue(struct Settings *settings, const char *key, const char *value)
 {
+    if (strcmp(key, "fullscreen") == 0) {
+        if (strcmp(value, "yes") == 0)
+        {
+            settings->fullscreen = true;
+        }
+        else if (strcmp(value, "no") == 0)
+        {
+            settings->fullscreen = false;
+        }
+    }
+    else if (strcmp(key, "programs") == 0)
+    {
+        strncpy(settings->programsPath, value, FILENAME_MAX - 1);
+    }
 }

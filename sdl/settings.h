@@ -30,6 +30,5 @@ struct Settings {
 };
 
 void settings_init(struct Settings *settings, int argc, const char * argv[]);
-void settings_deinit(struct Settings *settings);
 
 #endif /* settings_h */

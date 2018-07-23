@@ -40,9 +40,26 @@
 	Reload/Run   Ctrl+r
 	Exit         Ctrl+e
 
-- Command line arguments:
-	"LowRes NX" [-fullscreen yes] [-programs path] [program.nx]
+- Settings file:
+	A default settings file is created on application start, if none
+	exists yet. Available options are the same as for command line
+	arguments, but each one is written in its own line and without
+	the leading "-" character.
+	macOS: /Users/YourName/Library/Application Support/com.inutilis/LowResNX/settings.txt
 
-	-fullscreen yes     Starts the application in fullscreen mode
-	-programs path      Path for the tool programs and virtual disk file
-	program.nx          Name of program to run
+- Command line arguments:
+	These override the options from the settings file.
+
+	"LowRes NX" [-fullscreen yes/no] [-programs path] [program.nx]
+
+	-fullscreen yes/no
+	Starts the application in fullscreen mode
+	
+	-programs path
+	Path for the tool programs and virtual disk file. Terminate it
+	with a path separator (slash or back-slash).
+	By default it's the "programs" folder next to the LowRes NX
+	application.
+
+	program.nx
+	Name of program to run
