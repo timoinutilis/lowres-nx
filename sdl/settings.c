@@ -58,7 +58,7 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
     
     // load settings file
     
-    char *prefPath = SDL_GetPrefPath("com.inutilis", "LowResNX");
+    char *prefPath = SDL_GetPrefPath("Inutilis Software", "LowRes NX");
     if (prefPath)
     {
         char filename[FILENAME_MAX];
