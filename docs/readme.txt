@@ -45,7 +45,8 @@
 	exists yet. Available options are the same as for command line
 	arguments, but each one is written in its own line and without
 	the leading "-" character.
-	macOS: /Users/YourName/Library/Application Support/com.inutilis/LowResNX/settings.txt
+	macOS: /Users/YourName/Library/Application Support/Inutilis Software/LowRes NX/settings.txt
+	Windows: C:\Users\YourName\AppData\Roaming\Inutilis Software\LowRes NX\settings.txt
 
 - Command line arguments:
 	These override the options from the settings file.
@@ -56,8 +57,7 @@
 	Starts the application in fullscreen mode
 	
 	-programs path
-	Path for the tool programs and virtual disk file. Terminate it
-	with a path separator (slash or back-slash).
+	Path for the tool programs and virtual disk file.
 	By default it's the "programs" folder next to the LowRes NX
 	application.
 
