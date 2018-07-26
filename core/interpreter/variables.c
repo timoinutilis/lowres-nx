@@ -153,6 +153,8 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
         return NULL;
     }
     variable->values = calloc(size, sizeof(union Value));
+    if (!variable->values) exit(EXIT_FAILURE);
+    
     variable->numValues = (int)size;
     return variable;
 }

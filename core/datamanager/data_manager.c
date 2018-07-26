@@ -92,8 +92,10 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
     if (keepSourceCode)
     {
         size_t length = (size_t)(character - input);
+        
         char *diskSourceCode = malloc(length + 1);
-        assert(diskSourceCode);
+        if (!diskSourceCode) exit(EXIT_FAILURE);
+        
         stringConvertCopy(diskSourceCode, input, length);
         manager->diskSourceCode = diskSourceCode;
     }

@@ -53,6 +53,7 @@ void itp_init(struct Core *core)
     
     // global null string
     interpreter->nullString = rcstring_new(NULL, 0);
+    if (!interpreter->nullString) exit(EXIT_FAILURE);
 }
 
 void itp_deinit(struct Core *core)

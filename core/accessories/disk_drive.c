@@ -46,9 +46,9 @@ bool disk_prepare(struct Core *core)
     if (dataManager->data == NULL)
     {
         dataManager->data = calloc(DATA_SIZE, 1);
-        assert(dataManager->data != NULL);
-        data_init(dataManager);
+        if (!dataManager->data) exit(EXIT_FAILURE);
         
+        data_init(dataManager);
     }
     return delegate_diskDriveWillAccess(core);
 }

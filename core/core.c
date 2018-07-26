@@ -35,9 +35,16 @@ void core_init(struct Core *core)
     memset(core, 0, sizeof(struct Core));
     
     core->machine = calloc(1, sizeof(struct Machine));
+    if (!core->machine) exit(EXIT_FAILURE);
+    
     core->interpreter = calloc(1, sizeof(struct Interpreter));
+    if (!core->interpreter) exit(EXIT_FAILURE);
+    
     core->diskDrive = calloc(1, sizeof(struct DiskDrive));
+    if (!core->diskDrive) exit(EXIT_FAILURE);
+    
     core->overlay = calloc(1, sizeof(struct Overlay));
+    if (!core->overlay) exit(EXIT_FAILURE);
     
     machine_init(core);
     itp_init(core);
