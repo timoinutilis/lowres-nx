@@ -24,14 +24,6 @@
 #include <assert.h>
 #include "string_utils.h"
 
-#ifdef _WIN32
-const int newLineLen = 2;
-#define NEW_LINE "\r\n"
-#else
-const int newLineLen = 1;
-#define NEW_LINE "\n"
-#endif
-
 int data_calcOutputSize(struct DataManager *manager);
 void data_resetEntries(struct DataManager *manager);
 
@@ -102,8 +94,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
         size_t length = (size_t)(character - input);
         char *diskSourceCode = malloc(length + 1);
         assert(diskSourceCode);
-        memcpy((void *)diskSourceCode, input, length);
-        diskSourceCode[length] = 0;
+        stringConvertCopy(diskSourceCode, input, length);
         manager->diskSourceCode = diskSourceCode;
     }
     
@@ -224,8 +215,8 @@ char *data_export(struct DataManager *manager)
                     if (endChar != '\n')
                     {
                         // add new line after end of program
-						strcpy(current, NEW_LINE);
-                        current += newLineLen;
+                        current[0] = '\n';
+                        current++;
                     }
                 }
             }
@@ -235,7 +226,7 @@ char *data_export(struct DataManager *manager)
                 struct DataEntry *entry = &manager->entries[i];
                 if (entry->length > 0)
                 {
-                    sprintf(current, "#%d:%s" NEW_LINE, i, entry->comment);
+                    sprintf(current, "#%d:%s\n", i, entry->comment);
                     current += strlen(current);
                     int valuesInLine = 0;
                     int pos = 0;
@@ -248,11 +239,11 @@ char *data_export(struct DataManager *manager)
                         valuesInLine++;
                         if (pos == entry->length)
                         {
-                            sprintf(current, NEW_LINE NEW_LINE);
+                            sprintf(current, "\n\n");
                         }
                         else if (valuesInLine == 16)
                         {
-                            sprintf(current, NEW_LINE);
+                            sprintf(current, "\n");
                             valuesInLine = 0;
                         }
                         current += strlen(current);
@@ -274,15 +265,15 @@ int data_calcOutputSize(struct DataManager *manager)
         struct DataEntry *entry = &manager->entries[i];
         if (entry->length > 0)
         {
-            size += (i >= 10 ? 4 : 3) + strlen(entry->comment) + newLineLen; // #10:comment\n
+            size += (i >= 10 ? 4 : 3) + strlen(entry->comment) + 1; // #10:comment\n
             size += entry->length * 2; // 2x hex letters
-            size += entry->length / 16 + newLineLen; // new line every 16 values
-            size += newLineLen; // new line
+            size += entry->length / 16 + 1; // new line every 16 values
+            size += 1; // new line
         }
     }
     if (manager->diskSourceCode)
     {
-        size += strlen(manager->diskSourceCode) + newLineLen; // possible new line between program and data
+        size += strlen(manager->diskSourceCode) + 1; // possible new line between program and data
     }
     size += 1; // 0-byte
     return size;

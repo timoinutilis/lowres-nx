@@ -82,3 +82,18 @@ int lineNumber(const char *source, int pos)
     }
     return line;
 }
+
+void stringConvertCopy(char *dest, const char *source, size_t length)
+{
+    char *currDstChar = dest;
+    for (int i = 0; i < length; i++)
+    {
+        char currSrcChar = source[i];
+        if (currSrcChar != '\r')
+        {
+            *currDstChar = currSrcChar;
+            currDstChar++;
+        }
+    }
+    *currDstChar = 0;
+}
