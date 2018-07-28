@@ -49,6 +49,7 @@ const int keyboardControls[2][8] = {
 void loadBootIntro(void);
 void loadMainProgram(const char *filename);
 void update(void *arg);
+void updateScreenRect(int winW, int winH);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
@@ -96,7 +97,7 @@ int main(int argc, const char * argv[])
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     
-    window = SDL_CreateWindow("LowRes NX v0.7 (3)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
+    window = SDL_CreateWindow("LowRes NX v0.7 (4)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     
@@ -136,10 +137,7 @@ int main(int argc, const char * argv[])
 #endif
         }
         
-        screenRect.x = 0;
-        screenRect.y = 0;
-        screenRect.w = SCREEN_WIDTH * defaultWindowScale;
-        screenRect.h = SCREEN_HEIGHT * defaultWindowScale;
+        updateScreenRect(SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale);
         
 #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop_arg(update, NULL, -1, true);
@@ -247,15 +245,7 @@ void update(void *arg) {
                 switch (event.window.event)
                 {
                     case SDL_WINDOWEVENT_RESIZED: {
-                        int winW = event.window.data1;
-                        int winH = event.window.data2;
-                        int factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
-                        int nxScreenW = SCREEN_WIDTH * factor;
-                        int nxScreenH = SCREEN_HEIGHT * factor;
-                        screenRect.x = (winW - nxScreenW) / 2;
-                        screenRect.y = (winH - nxScreenH) / 2;
-                        screenRect.w = nxScreenW;
-                        screenRect.h = nxScreenH;
+                        updateScreenRect(event.window.data1, event.window.data2);
                         break;
                     }
                 }
@@ -428,6 +418,18 @@ void update(void *arg) {
     SDL_RenderCopy(renderer, texture, NULL, &screenRect);
     
     SDL_RenderPresent(renderer);
+}
+
+void updateScreenRect(int winW, int winH)
+{
+    int factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
+    int nxScreenW = SCREEN_WIDTH * factor;
+    int nxScreenH = SCREEN_HEIGHT * factor;
+    screenRect.x = (winW - nxScreenW) / 2;
+    screenRect.y = (winH - nxScreenH) / 2;
+    screenRect.w = nxScreenW;
+    screenRect.h = nxScreenH;
+    SDL_SetTextInputRect(&screenRect);
 }
 
 void configureJoysticks() {
