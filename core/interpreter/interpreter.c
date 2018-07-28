@@ -103,6 +103,9 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     interpreter->pc = interpreter->tokenizer.tokens;
     interpreter->pass = PassPrepare;
     interpreter->exitEvaluation = false;
+    interpreter->subLevel = 0;
+    interpreter->numLabelStackItems = 0;
+    interpreter->isSingleLineIf = false;
     
     enum ErrorCode errorCode;
     do
@@ -168,6 +171,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     interpreter->currentDataToken = interpreter->firstData;
     interpreter->currentDataValueToken = interpreter->firstData + 1;
     interpreter->isSingleLineIf = false;
+    interpreter->lastFrameIOStatus.value = 0;
     interpreter->seed = 0;
     
     memset(&interpreter->textLib, 0, sizeof(struct TextLib));

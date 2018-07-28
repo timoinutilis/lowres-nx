@@ -278,14 +278,6 @@ void update(void *arg) {
                 {
                     coreInput.key = CoreInputKeyBackspace;
                 }
-                else if (code >= SDLK_SPACE && code <= SDLK_UNDERSCORE)
-                {
-                    coreInput.key = code;
-                }
-                else if (code >= SDLK_a && code <= SDLK_z)
-                {
-                    coreInput.key = code - 32;
-                }
                 
                 // console buttons
                 if (code == SDLK_RETURN || code == SDLK_p)
@@ -337,6 +329,19 @@ void update(void *arg) {
                 break;
             }
                 
+            case SDL_TEXTINPUT: {
+                char key = event.text.text[0];
+                if (key >= ' ' && key <= '_')
+                {
+                    coreInput.key = key;
+                }
+                else if (key >= 'a' && key <= 'z')
+                {
+                    coreInput.key = key - 32;
+                }
+                break;
+            }
+            
             case SDL_MOUSEBUTTONDOWN: {
                 setTouchPosition(event.button.x, event.button.y);
                 coreInput.touch = true;
@@ -539,7 +544,17 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
 /** Called when keyboard or gamepad settings changed */
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 {
-    
+    if (controlsInfo.isKeyboardEnabled)
+    {
+        if (!SDL_IsTextInputActive())
+        {
+            SDL_StartTextInput();
+        }
+    }
+    else if (SDL_IsTextInputActive())
+    {
+        SDL_StopTextInput();
+    }
 }
 
 #ifdef __EMSCRIPTEN__

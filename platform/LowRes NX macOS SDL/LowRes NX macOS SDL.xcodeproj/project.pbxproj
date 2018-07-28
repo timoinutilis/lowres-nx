@@ -61,7 +61,7 @@
 		9284722920F9F4FA00B82653 /* dev_mode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_mode.h; sourceTree = "<group>"; };
 		9284722A20F9F4FA00B82653 /* dev_mode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dev_mode.c; sourceTree = "<group>"; };
 		9284722C20F9FA5900B82653 /* dev_mode_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_mode_data.h; sourceTree = "<group>"; };
-		9287EAC220D85E4D000BBEB1 /* LowRes NX macOS SDL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX macOS SDL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9287EAC220D85E4D000BBEB1 /* LowRes NX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LowRes NX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9287EAC820D85E4E000BBEB1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9287EACD20D85E4E000BBEB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9287EAD020D85E4E000BBEB1 /* LowRes_NX_macOS_SDL.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LowRes_NX_macOS_SDL.entitlements; sourceTree = "<group>"; };
@@ -173,7 +173,7 @@
 		9287EAC320D85E4D000BBEB1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9287EAC220D85E4D000BBEB1 /* LowRes NX macOS SDL.app */,
+				9287EAC220D85E4D000BBEB1 /* LowRes NX.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -349,9 +349,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9287EAC120D85E4D000BBEB1 /* LowRes NX macOS SDL */ = {
+		9287EAC120D85E4D000BBEB1 /* LowRes NX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9287EAD320D85E4E000BBEB1 /* Build configuration list for PBXNativeTarget "LowRes NX macOS SDL" */;
+			buildConfigurationList = 9287EAD320D85E4E000BBEB1 /* Build configuration list for PBXNativeTarget "LowRes NX" */;
 			buildPhases = (
 				9287EABE20D85E4D000BBEB1 /* Sources */,
 				9287EABF20D85E4D000BBEB1 /* Frameworks */,
@@ -361,9 +361,9 @@
 			);
 			dependencies = (
 			);
-			name = "LowRes NX macOS SDL";
+			name = "LowRes NX";
 			productName = "LowRes NX macOS SDL";
-			productReference = 9287EAC220D85E4D000BBEB1 /* LowRes NX macOS SDL.app */;
+			productReference = 9287EAC220D85E4D000BBEB1 /* LowRes NX.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -398,7 +398,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9287EAC120D85E4D000BBEB1 /* LowRes NX macOS SDL */,
+				9287EAC120D85E4D000BBEB1 /* LowRes NX */,
 			);
 		};
 /* End PBXProject section */
@@ -518,7 +518,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -570,7 +570,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -592,7 +592,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.LowRes-NX-macOS-SDL";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.LowRes-NX-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -613,7 +613,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.LowRes-NX-macOS-SDL";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.LowRes-NX-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -630,7 +630,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9287EAD320D85E4E000BBEB1 /* Build configuration list for PBXNativeTarget "LowRes NX macOS SDL" */ = {
+		9287EAD320D85E4E000BBEB1 /* Build configuration list for PBXNativeTarget "LowRes NX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9287EAD420D85E4E000BBEB1 /* Debug */,
