@@ -91,6 +91,19 @@ int main(int argc, const char * argv[])
     
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     
+    SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_DROPFILE: {
+                settings.program = event.drop.file;
+                break;
+            }
+        }
+    }
+    
     Uint32 windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
     if (settings.fullscreen)
     {
@@ -100,8 +113,6 @@ int main(int argc, const char * argv[])
     window = SDL_CreateWindow("LowRes NX v0.7 (4)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
-    SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
     
     configureJoysticks();
     

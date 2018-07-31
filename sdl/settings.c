@@ -150,7 +150,7 @@ void settings_setValue(struct Settings *settings, const char *key, const char *v
     else if (strcmp(key, "programs") == 0)
     {
         strncpy(settings->programsPath, value, FILENAME_MAX - 1);
-		int len = strlen(settings->programsPath);
+		size_t len = strlen(settings->programsPath);
 		if (settings->programsPath[len - 1] != PATH_SEPARATOR[0])
 		{
 			strncat(settings->programsPath, PATH_SEPARATOR, FILENAME_MAX - 1);

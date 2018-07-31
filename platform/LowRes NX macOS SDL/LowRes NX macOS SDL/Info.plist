@@ -14,7 +14,7 @@
 			<key>CFBundleTypeName</key>
 			<string>LowRes NX Program</string>
 			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
+			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
 			<integer>0</integer>
 		</dict>
