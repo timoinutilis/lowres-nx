@@ -2,12 +2,10 @@
 * Notes *
 *********
 
-- Read the manual, especially the introduction!
+- Read the manual, if you want to create your own programs.
 
 - The manual sometimes refers to the interface of the iOS app.
-  On macOS/Windows just use any text editor, there is no included one.
-  Press Ctrl+M to show the Development Menu, from where you can use
-  the designer tools.
+  For the desktop version read the First Steps in this file before.
 
 - Share programs and discuss on: https://lowresnx.inutilis.com
 
@@ -63,3 +61,28 @@
 
 	program.nx
 	Name of program to run
+
+
+***************
+* First Steps *
+***************
+
+To run a program, just open the LowRes NX application and drag and
+drop any .nx file into its window. You can also select LowRes NX as
+default application for .nx files, so programs can be started simply
+by double clicking them.
+
+For writing your own programs, use any text editor and save your files
+with the .nx extension. On Windows make sure the text editor supports
+Mac/Linux line ends, otherwise you may see everything in one line.
+
+If you open NX tools (Character Designer, Background Designer, etc.)
+directly like other NX programs, they will use the "Disk.nx" file in
+the application's "programs" folder for loading and saving their data.
+
+To edit your program's data directly (without the "Disk.nx" file),
+run your program in the normal way. Then press Ctrl+M to enter the
+Development Menu. There click on "ED" and select a tool. It will use
+the current program for its data. When done, press Ctrl+M again to
+return to the Development Menu, or Ctrl-R to run your program
+directly.
