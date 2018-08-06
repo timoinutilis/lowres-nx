@@ -54,6 +54,7 @@ void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
 void getDiskFilename(char *outputString);
+void audioCallback(void *userdata, Uint8 *stream, int len);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -69,6 +70,8 @@ void onerror(const char *filename);
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
+SDL_AudioDeviceID audioDevice = 0;
+SDL_AudioSpec audioSpec;
 
 struct Core *core = NULL;
 struct DevMode devMode;
@@ -80,6 +83,7 @@ SDL_Joystick *joysticks[2] = {NULL, NULL};
 SDL_Rect screenRect;
 bool quit = false;
 bool releasedTouch = false;
+bool audioStarted = false;
 
 int main(int argc, const char * argv[])
 {
@@ -89,7 +93,7 @@ int main(int argc, const char * argv[])
     
     settings_init(&settings, argc, argv);
     
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
     
     SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
     SDL_Event event;
@@ -110,9 +114,20 @@ int main(int argc, const char * argv[])
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     
-    window = SDL_CreateWindow("LowRes NX v0.7 (4)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
+    window = SDL_CreateWindow("LowRes NX v0.8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+    
+    SDL_AudioSpec desiredAudioSpec = {
+        .freq = 44100,
+        .format = AUDIO_S16,
+        .channels = 1,
+        .userdata = NULL,
+        .callback = audioCallback
+//        .userdata = NULL
+    };
+    
+    audioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredAudioSpec, &audioSpec, 0);
     
     configureJoysticks();
     
@@ -167,6 +182,7 @@ int main(int argc, const char * argv[])
     
     closeJoysticks();
     
+    SDL_CloseAudioDevice(audioDevice);
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -417,6 +433,12 @@ void update(void *arg) {
         core_update(core, &coreInput);
     }
     
+    if (!audioStarted && audioDevice)
+    {
+        audioStarted = true;
+        SDL_PauseAudioDevice(audioDevice, 0);
+    }
+    
     SDL_RenderClear(renderer);
     
     void *pixels = NULL;
@@ -481,6 +503,33 @@ void getDiskFilename(char *outputString)
     {
         strncpy(outputString, settings.programsPath, FILENAME_MAX - 1);
         strncat(outputString, defaultDisk, FILENAME_MAX - 1);
+    }
+}
+
+uint16_t accumulator = 0;
+uint16_t frequencyControl = 1600;
+uint16_t noiseRandom = 1;
+
+void audioCallback(void *userdata, Uint8 *stream, int len)
+{
+    int16_t *samples = (int16_t *)stream;
+    int numSamples = len / 2;
+    int i = 0;
+    while (i < numSamples)
+    {
+        uint16_t accumulatorLast = accumulator;
+        accumulator = accumulator + frequencyControl;
+//        samples[i++] = accumulator; // Saw
+//        samples[i++] = (accumulator & 0x8000) ? INT16_MAX : INT16_MIN; // Pulse
+//        samples[i++] = ((accumulator & 0x8000) ? ~(accumulator << 1) : (accumulator << 1)) - 0x7FFF; // Tri
+        
+        // Noise
+        if ((accumulator & 0x1000) != (accumulatorLast & 0x1000))
+        {
+            uint16_t bit  = ((noiseRandom >> 0) ^ (noiseRandom >> 2) ^ (noiseRandom >> 3) ^ (noiseRandom >> 5) ) & 1;
+            noiseRandom =  (noiseRandom >> 1) | (bit << 15);
+        }
+        samples[i++] = noiseRandom & 0xFFFF;
     }
 }
 

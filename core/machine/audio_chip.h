@@ -23,8 +23,43 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define NUM_VOICES 4
+
+enum WaveType {
+    WaveTypeSawtooth,
+    WaveTypeTriangle,
+    WaveTypePulse,
+    WaveTypeNoise
+};
+
+struct Voice {
+    uint8_t frequencyLow;
+    uint8_t frequencyHigh;
+    uint8_t volume;
+    uint8_t wave;
+    uint8_t pulseWidth;
+};
+
+struct Mixer {
+    uint8_t v0R:1;
+    uint8_t v1R:1;
+    uint8_t v2R:1;
+    uint8_t v3R:1;
+    uint8_t v0L:1;
+    uint8_t v1L:1;
+    uint8_t v2L:1;
+    uint8_t v3L:1;
+};
+
+struct Volume {
+    uint8_t right:4;
+    uint8_t left:4;
+};
+
 struct AudioRegisters {
-    uint8_t dummy;
+    struct Voice voices[NUM_VOICES];
+    struct Mixer mixer;
+    struct Volume volume;
 };
 
 #endif /* audio_chip_h */
