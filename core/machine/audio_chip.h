@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -25,6 +25,8 @@
 
 #define NUM_VOICES 4
 
+struct Core;
+
 enum WaveType {
     WaveTypeSawtooth,
     WaveTypeTriangle,
@@ -33,22 +35,30 @@ enum WaveType {
 };
 
 struct Voice {
-    uint8_t frequencyLow;
-    uint8_t frequencyHigh;
-    uint8_t volume;
-    uint8_t wave;
-    uint8_t pulseWidth;
+    uint8_t frequencyLow;   // 0
+    uint8_t frequencyHigh;  // 1
+    uint8_t volume;         // 2
+    uint8_t wave;           // 3
+    uint8_t pulseWidth;     // 4
 };
 
-struct Mixer {
-    uint8_t v0R:1;
-    uint8_t v1R:1;
-    uint8_t v2R:1;
-    uint8_t v3R:1;
-    uint8_t v0L:1;
-    uint8_t v1L:1;
-    uint8_t v2L:1;
-    uint8_t v3L:1;
+struct VoiceInternals {
+    uint16_t accumulator;
+    uint16_t noiseRandom;
+};
+
+union Mixer {
+    struct {
+        uint8_t v0R:1;
+        uint8_t v1R:1;
+        uint8_t v2R:1;
+        uint8_t v3R:1;
+        uint8_t v0L:1;
+        uint8_t v1L:1;
+        uint8_t v2L:1;
+        uint8_t v3L:1;
+    };
+    uint8_t value;
 };
 
 struct Volume {
@@ -58,8 +68,15 @@ struct Volume {
 
 struct AudioRegisters {
     struct Voice voices[NUM_VOICES];
-    struct Mixer mixer;
+    union Mixer mixer;
     struct Volume volume;
 };
+
+struct AudioInternals {
+    struct VoiceInternals voices[NUM_VOICES];
+};
+
+void audio_reset(struct Core *core);
+void audio_renderAudio(struct Core *core, int16_t *output, int numSamples);
 
 #endif /* audio_chip_h */

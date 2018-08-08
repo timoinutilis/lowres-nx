@@ -118,22 +118,21 @@ int main(int argc, const char * argv[])
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     
-    SDL_AudioSpec desiredAudioSpec = {
-        .freq = 44100,
-        .format = AUDIO_S16,
-        .channels = 1,
-        .userdata = NULL,
-        .callback = audioCallback
-//        .userdata = NULL
-    };
-    
-    audioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredAudioSpec, &audioSpec, 0);
-    
     configureJoysticks();
     
     core = calloc(1, sizeof(struct Core));
     if (core)
     {
+        SDL_AudioSpec desiredAudioSpec = {
+            .freq = 44100,
+            .format = AUDIO_S16,
+            .channels = 2,
+            .samples = 735,
+            .userdata = core,
+            .callback = audioCallback
+        };
+        
+        audioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredAudioSpec, &audioSpec, 0);
         
         struct CoreDelegate coreDelegate;
         memset(&coreDelegate, 0, sizeof(struct CoreDelegate));
@@ -174,6 +173,8 @@ int main(int argc, const char * argv[])
         }
 #endif
         
+        SDL_CloseAudioDevice(audioDevice);
+        
         core_deinit(core);
         
         free(core);
@@ -182,7 +183,6 @@ int main(int argc, const char * argv[])
     
     closeJoysticks();
     
-    SDL_CloseAudioDevice(audioDevice);
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -506,31 +506,11 @@ void getDiskFilename(char *outputString)
     }
 }
 
-uint16_t accumulator = 0;
-uint16_t frequencyControl = 1600;
-uint16_t noiseRandom = 1;
-
 void audioCallback(void *userdata, Uint8 *stream, int len)
 {
     int16_t *samples = (int16_t *)stream;
     int numSamples = len / 2;
-    int i = 0;
-    while (i < numSamples)
-    {
-        uint16_t accumulatorLast = accumulator;
-        accumulator = accumulator + frequencyControl;
-//        samples[i++] = accumulator; // Saw
-//        samples[i++] = (accumulator & 0x8000) ? INT16_MAX : INT16_MIN; // Pulse
-//        samples[i++] = ((accumulator & 0x8000) ? ~(accumulator << 1) : (accumulator << 1)) - 0x7FFF; // Tri
-        
-        // Noise
-        if ((accumulator & 0x1000) != (accumulatorLast & 0x1000))
-        {
-            uint16_t bit  = ((noiseRandom >> 0) ^ (noiseRandom >> 2) ^ (noiseRandom >> 3) ^ (noiseRandom >> 5) ) & 1;
-            noiseRandom =  (noiseRandom >> 1) | (bit << 15);
-        }
-        samples[i++] = noiseRandom & 0xFFFF;
-    }
+    audio_renderAudio(userdata, samples, numSamples);
 }
 
 /** Called on error */

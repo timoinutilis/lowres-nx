@@ -31,6 +31,8 @@ void machine_init(struct Core *core)
 void machine_reset(struct Core *core)
 {
     memset(core->machine, 0, sizeof(struct Machine));
+    memset(core->machineInternals, 0, sizeof(struct MachineInternals));
+    audio_reset(core);
 }
 
 int machine_peek(struct Core *core, int address)

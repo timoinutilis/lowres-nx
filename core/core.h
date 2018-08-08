@@ -30,6 +30,7 @@
 
 struct Core {
     struct Machine *machine;
+    struct MachineInternals *machineInternals;
     struct Interpreter *interpreter;
     struct DiskDrive *diskDrive;
     struct Overlay *overlay;

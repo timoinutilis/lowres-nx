@@ -70,6 +70,10 @@ struct Machine {
     uint8_t reservedRegisters[0x10000 - 0xFF80];
 };
 
+struct MachineInternals {
+    struct AudioInternals audioInternals;
+};
+
 void machine_init(struct Core *core);
 void machine_reset(struct Core *core);
 int machine_peek(struct Core *core, int address);

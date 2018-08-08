@@ -37,6 +37,9 @@ void core_init(struct Core *core)
     core->machine = calloc(1, sizeof(struct Machine));
     if (!core->machine) exit(EXIT_FAILURE);
     
+    core->machineInternals = calloc(1, sizeof(struct MachineInternals));
+    if (!core->machineInternals) exit(EXIT_FAILURE);
+    
     core->interpreter = calloc(1, sizeof(struct Interpreter));
     if (!core->interpreter) exit(EXIT_FAILURE);
     
@@ -59,6 +62,9 @@ void core_deinit(struct Core *core)
     
     free(core->machine);
     core->machine = NULL;
+    
+    free(core->machineInternals);
+    core->machineInternals = NULL;
     
     free(core->interpreter);
     core->interpreter = NULL;
