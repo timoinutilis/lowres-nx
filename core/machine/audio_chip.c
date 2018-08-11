@@ -53,27 +53,28 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
             
             uint16_t freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
             
-            uint16_t accumulatorLast = voiceIn->accumulator;
-            uint16_t accumulator = voiceIn->accumulator + (freq * errorDiffusionFactor);
+            uint32_t accumulatorLast = voiceIn->accumulator;
+            uint32_t accumulator = voiceIn->accumulator + (freq * errorDiffusionFactor);
             voiceIn->accumulator = accumulator;
             
+            uint16_t accu16 = (accumulator >> 4) & 0xFFFF;
             uint16_t sample = 0x7FFF; // silence
             
             if (voice->wave == WaveTypeSawtooth)
             {
-                sample = accumulator;
+                sample = accu16;
             }
             else if (voice->wave == WaveTypePulse)
             {
-                sample = ((accumulator >> 12) > voice->pulseWidth) ? 0xFFFF : 0x0000;
+                sample = ((accu16 >> 8) > voice->pulseWidth) ? 0xFFFF : 0x0000;
             }
             else if (voice->wave == WaveTypeTriangle)
             {
-                sample = ((accumulator & 0x8000) ? ~(accumulator << 1) : (accumulator << 1));
+                sample = ((accu16 & 0x8000) ? ~(accu16 << 1) : (accu16 << 1));
             }
             else if (voice->wave == WaveTypeNoise)
             {
-                if ((accumulator & 0x1000) != (accumulatorLast & 0x1000))
+                if ((accumulator & 0x10000) != (accumulatorLast & 0x10000))
                 {
                     uint16_t r = voiceIn->noiseRandom;
                     uint16_t bit = ((r >> 0) ^ (r >> 2) ^ (r >> 3) ^ (r >> 5) ) & 1;

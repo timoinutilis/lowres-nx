@@ -43,7 +43,7 @@ struct Voice {
 };
 
 struct VoiceInternals {
-    uint16_t accumulator;
+    uint32_t accumulator;
     uint16_t noiseRandom;
 };
 
