@@ -61,22 +61,17 @@ union Mixer {
     uint8_t value;
 };
 
-struct Volume {
-    uint8_t right:4;
-    uint8_t left:4;
-};
-
 struct AudioRegisters {
     struct Voice voices[NUM_VOICES];
     union Mixer mixer;
-    struct Volume volume;
 };
 
 struct AudioInternals {
     struct VoiceInternals voices[NUM_VOICES];
+    uint32_t accumulatorError;
 };
 
 void audio_reset(struct Core *core);
-void audio_renderAudio(struct Core *core, int16_t *output, int numSamples);
+void audio_renderAudio(struct Core *core, int16_t *output, int numSamples, int outputFrequency);
 
 #endif /* audio_chip_h */

@@ -132,7 +132,7 @@ int main(int argc, const char * argv[])
             .callback = audioCallback
         };
         
-        audioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredAudioSpec, &audioSpec, 0);
+        audioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredAudioSpec, &audioSpec, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
         
         struct CoreDelegate coreDelegate;
         memset(&coreDelegate, 0, sizeof(struct CoreDelegate));
@@ -510,7 +510,7 @@ void audioCallback(void *userdata, Uint8 *stream, int len)
 {
     int16_t *samples = (int16_t *)stream;
     int numSamples = len / 2;
-    audio_renderAudio(userdata, samples, numSamples);
+    audio_renderAudio(userdata, samples, numSamples, audioSpec.freq);
 }
 
 /** Called on error */

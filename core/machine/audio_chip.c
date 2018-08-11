@@ -31,7 +31,7 @@ void audio_reset(struct Core *core)
     }
 }
 
-void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples)
+void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples, int outputFrequency)
 {
     struct AudioRegisters *registers = &core->machine->audioRegisters;
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
@@ -42,6 +42,10 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples)
         int16_t leftOutput = 0;
         int16_t rightOutput = 0;
         
+        internals->accumulatorError += 0x10000;
+        int errorDiffusionFactor = internals->accumulatorError / outputFrequency;
+        internals->accumulatorError -= errorDiffusionFactor * outputFrequency;
+        
         for (int i = 0; i < NUM_VOICES; i++)
         {
             struct Voice *voice = &registers->voices[i];
@@ -50,7 +54,7 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples)
             uint16_t freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
             
             uint16_t accumulatorLast = voiceIn->accumulator;
-            uint16_t accumulator = voiceIn->accumulator + freq;
+            uint16_t accumulator = voiceIn->accumulator + (freq * errorDiffusionFactor);
             voiceIn->accumulator = accumulator;
             
             uint16_t sample = 0x7FFF; // silence
@@ -61,7 +65,7 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples)
             }
             else if (voice->wave == WaveTypePulse)
             {
-                sample = ((accumulator >> 8) >= voice->pulseWidth) ? 0xFFFF : 0x0000;
+                sample = ((accumulator >> 12) > voice->pulseWidth) ? 0xFFFF : 0x0000;
             }
             else if (voice->wave == WaveTypeTriangle)
             {
@@ -78,7 +82,7 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples)
                 sample = voiceIn->noiseRandom & 0xFFFF;
             }
             
-            int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * voice->volume) >> 8;
+            int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * voice->volume) >> 6; // 4 bit for volume, 2 bit for global
             if (registers->mixer.value & (16 << i))
             {
                 leftOutput += voiceSample;
