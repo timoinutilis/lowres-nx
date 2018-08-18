@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2018 Timo Kloss
+// Copyright 2016-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,9 +17,9 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef boot_intro_h
-#define boot_intro_h
+#ifndef core_config_h
+#define core_config_h
 
-extern const char *bootIntroSourceCode;
+#define CORE_VERSION "0.8 (5)"
 
-#endif /* boot_intro_h */
+#endif /* core_config_h */

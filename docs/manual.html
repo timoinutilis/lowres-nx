@@ -61,6 +61,7 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 <li>Backgrounds: Two layers, tile-based, scrollable</li>
 <li>Sprites: 64, max 32x32 pixels</li>
 <li>Colors: 8 dynamic 6-bit palettes with 4 colors each</li>
+<li>Sound: 4 voices, saw/tri/pulse/noise, pulse width, volume</li>
 <li>Input: Two game controllers with d-pad and two buttons + pause</li>
 <li>Optional input: Keyboard and touch/mouse</li>
 </ul>
@@ -1159,7 +1160,71 @@ hours.</p>
 
 <h1 id="Sound">Sound</h1>
 
-<p>Coming soon.</p>
+<p>LowRes NX has four independent sound generators (voices). Each one
+can play sawtooth, triangle, pulse and noise waveforms, and has
+frequency, volume and pulse width settings.<br/>
+Currently only low-level commands are available. Commands for effects
+and music will come in a later version.</p>
+
+
+<h3 id="_VOICE" name="VOICE">VOICE</h3>
+
+<pre>VOICE n,f,v,pw</pre>
+
+<p>Sets the frequency (f, 0-4095 Hz), volume (v, 0-255) and
+pulse width (pw, 0-255) of voice n (0-3). The pulse width only affects
+sounds with the pulse waveform, a value of 127 creates a square
+wave. All parameters can be omitted to keep their current settings.</p>
+
+
+<h3 id="_VOICE.A" name="VOICE.A">VOICE.A</h3>
+
+<pre>VOICE.A n,(w,ml,mr)</pre>
+
+<p>Sets the attributes of voice n (0-3). All attribute parameters
+can be omitted to keep their current settings.</p>
+
+<table>
+<tr><td>w</td> <td>waveform (0-3):<br/>
+0: sawtooth<br/>
+1: triangle<br/>
+2: pulse<br/>
+3: noise</td></tr>
+<tr><td>ml</td> <td>mix to left speaker (0/1)</td></tr>
+<tr><td>mr</td> <td>mix to right speaker (0/1)</td></tr>
+</table>
+
+<pre>VOICE.A n,a</pre>
+
+<p>Allows setting the attributes as a single 8-bit value.</p>
+
+
+<h3 id="_=VOICE.F" name="VOICE.F">=VOICE.F</h3>
+
+<pre>VOICE.F(n)</pre>
+
+<p>Returns the frequency in hertz of voice n.</p>
+
+
+<h3 id="_=VOICE.V" name="VOICE.V">=VOICE.V</h3>
+
+<pre>VOICE.V(n)</pre>
+
+<p>Returns the volume of voice n.</p>
+
+
+<h3 id="_=VOICE.PW" name="VOICE.PW">=VOICE.PW</h3>
+
+<pre>VOICE.PW(n)</pre>
+
+<p>Returns the pulse width of voice n.</p>
+
+
+<h3 id="_=VOICE.A" name="VOICE.A">=VOICE.A</h3>
+
+<pre>VOICE.A(n)</pre>
+
+<p>Returns the attributes of voice n as an 8-bit value.</p>
 
 
 <h1 id="Data">Data</h1>
@@ -1688,7 +1753,7 @@ $FF26 - Raster line
 
 <h3 id="Audio-Registers">Audio Registers</h3>
 
-<p>There are 4 voices available, each occupies 4 bytes:</p>
+<p>There are 4 voices available, each occupies 5 bytes:</p>
 <pre>
 - Frequency low-byte
 - Frequency high-byte
@@ -1704,6 +1769,7 @@ $FF26 - Raster line
     2   Mix to left
     3   Mix to right
 </pre>
+<p>Note: The frequency is a 16-bit value: x = hertz * 16</p>
 
 
 <h3 id="I-O-Registers">I/O Registers</h3>

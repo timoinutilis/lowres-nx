@@ -53,7 +53,21 @@
 		9287EB5220D85EEB000BBEB1 /* core_delegate.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EB2C20D85EEB000BBEB1 /* core_delegate.c */; };
 		9287EB5620D85EF7000BBEB1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EB5520D85EF7000BBEB1 /* main.c */; };
 		9287EB5920D85F43000BBEB1 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9287EB5820D85F43000BBEB1 /* SDL2.framework */; };
+		9289C403212866FD009BE093 /* SDL2.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9287EB5820D85F43000BBEB1 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9289C402212866E8009BE093 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9289C403212866FD009BE093 /* SDL2.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		921E0F132104BD7100F3C512 /* settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
@@ -151,6 +165,7 @@
 		9287EB2C20D85EEB000BBEB1 /* core_delegate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_delegate.c; sourceTree = "<group>"; };
 		9287EB5520D85EF7000BBEB1 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		9287EB5820D85F43000BBEB1 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
+		9289C401212861CF009BE093 /* core_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_config.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,6 +216,7 @@
 				9287EB1D20D85EEB000BBEB1 /* core_delegate.h */,
 				9287EB1E20D85EEB000BBEB1 /* core.c */,
 				9287EB0D20D85EEB000BBEB1 /* core.h */,
+				9289C401212861CF009BE093 /* core_config.h */,
 				9287EB0E20D85EEB000BBEB1 /* accessories */,
 				9287EB1120D85EEB000BBEB1 /* datamanager */,
 				9287EAD920D85EEB000BBEB1 /* interpreter */,
@@ -366,6 +382,7 @@
 				9287EABE20D85E4D000BBEB1 /* Sources */,
 				9287EABF20D85E4D000BBEB1 /* Frameworks */,
 				9287EAC020D85E4D000BBEB1 /* Resources */,
+				9289C402212866E8009BE093 /* CopyFiles */,
 			);
 			buildRules = (
 			);

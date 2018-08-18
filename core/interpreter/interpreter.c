@@ -1147,7 +1147,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenVOICEA:
         case TokenVOICEF:
-        case TokenVOICEP:
+        case TokenVOICEPW:
         case TokenVOICEV:
             return fnc_VOICE(core);
             

@@ -167,7 +167,7 @@ const char *TokenStrings[] = {
     "VBL",
     "VOICE.A",
     "VOICE.F",
-    "VOICE.P",
+    "VOICE.PW",
     "VOICE.V",
     "VOICE",
     "WAIT",

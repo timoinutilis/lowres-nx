@@ -171,7 +171,7 @@ enum TokenType {
     TokenVBL,
     TokenVOICEA,
     TokenVOICEF,
-    TokenVOICEP,
+    TokenVOICEPW,
     TokenVOICEV,
     TokenVOICE,
     TokenWAIT,

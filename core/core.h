@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -27,6 +27,7 @@
 #include "interpreter.h"
 #include "disk_drive.h"
 #include "core_delegate.h"
+#include "core_config.h"
 
 struct Core {
     struct Machine *machine;
