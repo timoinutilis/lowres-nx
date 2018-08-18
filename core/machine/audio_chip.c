@@ -19,6 +19,7 @@
 
 #include "audio_chip.h"
 #include "core.h"
+#include <math.h>
 
 void audio_reset(struct Core *core)
 {
@@ -36,15 +37,13 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
     struct AudioRegisters *registers = &core->machine->audioRegisters;
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
     
+    double overflow = 0xFFFFFF;
+    
     int i = 0;
     while (i < numSamples)
     {
         int16_t leftOutput = 0;
         int16_t rightOutput = 0;
-        
-        internals->accumulatorError += 0x10000;
-        int errorDiffusionFactor = internals->accumulatorError / outputFrequency;
-        internals->accumulatorError -= errorDiffusionFactor * outputFrequency;
         
         for (int i = 0; i < NUM_VOICES; i++)
         {
@@ -52,29 +51,36 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
             struct VoiceInternals *voiceIn = &internals->voices[i];
             
             uint16_t freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
+            if (freq == 0) continue;
             
-            uint32_t accumulatorLast = voiceIn->accumulator;
-            uint32_t accumulator = voiceIn->accumulator + (freq * errorDiffusionFactor);
+            uint16_t accu16Last = ((uint32_t)voiceIn->accumulator >> 4) & 0xFFFF;
+            double accumulator = voiceIn->accumulator + (double)freq * 65536.0 / (double)outputFrequency;
+            if (accumulator >= overflow)
+            {
+                // avoid overflow and loss of precision
+                accumulator -= overflow;
+            }
             voiceIn->accumulator = accumulator;
+            uint16_t accu16 = ((uint32_t)voiceIn->accumulator >> 4) & 0xFFFF;
             
-            uint16_t accu16 = (accumulator >> 4) & 0xFFFF;
             uint16_t sample = 0x7FFF; // silence
             
-            if (voice->wave == WaveTypeSawtooth)
+            enum WaveType waveType = voice->attr.wave;
+            if (waveType == WaveTypeSawtooth)
             {
                 sample = accu16;
             }
-            else if (voice->wave == WaveTypePulse)
+            else if (waveType == WaveTypePulse)
             {
                 sample = ((accu16 >> 8) > voice->pulseWidth) ? 0xFFFF : 0x0000;
             }
-            else if (voice->wave == WaveTypeTriangle)
+            else if (waveType == WaveTypeTriangle)
             {
                 sample = ((accu16 & 0x8000) ? ~(accu16 << 1) : (accu16 << 1));
             }
-            else if (voice->wave == WaveTypeNoise)
+            else if (waveType == WaveTypeNoise)
             {
-                if ((accumulator & 0x10000) != (accumulatorLast & 0x10000))
+                if ((accu16 & 0x1000) != (accu16Last & 0x1000))
                 {
                     uint16_t r = voiceIn->noiseRandom;
                     uint16_t bit = ((r >> 0) ^ (r >> 2) ^ (r >> 3) ^ (r >> 5) ) & 1;
@@ -83,12 +89,12 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 sample = voiceIn->noiseRandom & 0xFFFF;
             }
             
-            int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * voice->volume) >> 6; // 4 bit for volume, 2 bit for global
-            if (registers->mixer.value & (16 << i))
+            int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * voice->volume) >> 10; // 8 bit for volume, 2 bit for global
+            if (voice->attr.mixL)
             {
                 leftOutput += voiceSample;
             }
-            if (registers->mixer.value & (1 << i))
+            if (voice->attr.mixR)
             {
                 rightOutput += voiceSample;
             }

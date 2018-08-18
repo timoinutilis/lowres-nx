@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		921E0F152104BD7100F3C512 /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = 921E0F142104BD7100F3C512 /* settings.c */; };
 		921F986620DAD4DF0052F233 /* boot_intro.c in Sources */ = {isa = PBXBuildFile; fileRef = 921F986520DAD4DF0052F233 /* boot_intro.c */; };
+		9251FDE621259EDE003915D9 /* cmd_audio.c in Sources */ = {isa = PBXBuildFile; fileRef = 9251FDE521259EDE003915D9 /* cmd_audio.c */; };
+		925D482D2121FF76003F1B0D /* audio_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 925D482C2121FF76003F1B0D /* audio_lib.c */; };
 		9284722B20F9F4FA00B82653 /* dev_mode.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284722A20F9F4FA00B82653 /* dev_mode.c */; };
 		9287EAC920D85E4E000BBEB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9287EAC820D85E4E000BBEB1 /* Assets.xcassets */; };
 		9287EB2D20D85EEB000BBEB1 /* cmd_variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EADC20D85EEB000BBEB1 /* cmd_variables.c */; };
@@ -58,6 +60,10 @@
 		921E0F142104BD7100F3C512 /* settings.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
 		921F986420DAD4DF0052F233 /* boot_intro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boot_intro.h; sourceTree = "<group>"; };
 		921F986520DAD4DF0052F233 /* boot_intro.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = boot_intro.c; sourceTree = "<group>"; };
+		9251FDE421259EDE003915D9 /* cmd_audio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cmd_audio.h; sourceTree = "<group>"; };
+		9251FDE521259EDE003915D9 /* cmd_audio.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cmd_audio.c; sourceTree = "<group>"; };
+		925D482B2121FF76003F1B0D /* audio_lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = audio_lib.h; sourceTree = "<group>"; };
+		925D482C2121FF76003F1B0D /* audio_lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = audio_lib.c; sourceTree = "<group>"; };
 		9284722920F9F4FA00B82653 /* dev_mode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_mode.h; sourceTree = "<group>"; };
 		9284722A20F9F4FA00B82653 /* dev_mode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dev_mode.c; sourceTree = "<group>"; };
 		9284722C20F9FA5900B82653 /* dev_mode_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_mode_data.h; sourceTree = "<group>"; };
@@ -211,6 +217,8 @@
 			children = (
 				9287EAEE20D85EEB000BBEB1 /* charsets.c */,
 				9287EB0620D85EEB000BBEB1 /* charsets.h */,
+				9251FDE521259EDE003915D9 /* cmd_audio.c */,
+				9251FDE421259EDE003915D9 /* cmd_audio.h */,
 				9287EAE120D85EEB000BBEB1 /* cmd_background.c */,
 				9287EAFA20D85EEB000BBEB1 /* cmd_background.h */,
 				9287EAE420D85EEB000BBEB1 /* cmd_control.c */,
@@ -293,6 +301,8 @@
 				9287EB1920D85EEB000BBEB1 /* sprites_lib.h */,
 				9287EB1C20D85EEB000BBEB1 /* text_lib.c */,
 				9287EB1820D85EEB000BBEB1 /* text_lib.h */,
+				925D482C2121FF76003F1B0D /* audio_lib.c */,
+				925D482B2121FF76003F1B0D /* audio_lib.h */,
 			);
 			path = libraries;
 			sourceTree = "<group>";
@@ -440,6 +450,7 @@
 				9287EB5120D85EEB000BBEB1 /* overlay.c in Sources */,
 				921F986620DAD4DF0052F233 /* boot_intro.c in Sources */,
 				9287EB3620D85EEB000BBEB1 /* charsets.c in Sources */,
+				9251FDE621259EDE003915D9 /* cmd_audio.c in Sources */,
 				9287EB3F20D85EEB000BBEB1 /* cmd_io.c in Sources */,
 				9287EB3520D85EEB000BBEB1 /* cmd_maths.c in Sources */,
 				9287EB4C20D85EEB000BBEB1 /* core.c in Sources */,
@@ -459,6 +470,7 @@
 				9287EB3820D85EEB000BBEB1 /* interpreter_utils.c in Sources */,
 				9287EB4320D85EEB000BBEB1 /* value.c in Sources */,
 				9287EB4820D85EEB000BBEB1 /* sprites_lib.c in Sources */,
+				925D482D2121FF76003F1B0D /* audio_lib.c in Sources */,
 				9287EB3020D85EEB000BBEB1 /* cmd_background.c in Sources */,
 				9287EB3720D85EEB000BBEB1 /* cmd_text.c in Sources */,
 			);

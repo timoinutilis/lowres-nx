@@ -34,36 +34,30 @@ enum WaveType {
     WaveTypeNoise
 };
 
-struct Voice {
-    uint8_t frequencyLow;   // 0
-    uint8_t frequencyHigh;  // 1
-    uint8_t volume;         // 2
-    uint8_t wave;           // 3
-    uint8_t pulseWidth;     // 4
-};
-
-struct VoiceInternals {
-    uint32_t accumulator;
-    uint16_t noiseRandom;
-};
-
-union Mixer {
+union VoiceAttributes {
     struct {
-        uint8_t v0R:1;
-        uint8_t v1R:1;
-        uint8_t v2R:1;
-        uint8_t v3R:1;
-        uint8_t v0L:1;
-        uint8_t v1L:1;
-        uint8_t v2L:1;
-        uint8_t v3L:1;
+        uint8_t wave:2;
+        uint8_t mixL:1;
+        uint8_t mixR:1;
     };
     uint8_t value;
 };
 
+struct Voice {
+    uint8_t frequencyLow;
+    uint8_t frequencyHigh;
+    uint8_t volume;
+    uint8_t pulseWidth;
+    union VoiceAttributes attr;
+};
+
+struct VoiceInternals {
+    double accumulator;
+    uint16_t noiseRandom;
+};
+
 struct AudioRegisters {
     struct Voice voices[NUM_VOICES];
-    union Mixer mixer;
 };
 
 struct AudioInternals {

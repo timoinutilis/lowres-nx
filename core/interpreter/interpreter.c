@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include "core.h"
 #include "default_characters.h"
+#include "cmd_audio.h"
 #include "cmd_control.h"
 #include "cmd_variables.h"
 #include "cmd_data.h"
@@ -1144,6 +1145,12 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenPAUSE:
             return fnc_PAUSE(core);
             
+        case TokenVOICEA:
+        case TokenVOICEF:
+        case TokenVOICEP:
+        case TokenVOICEV:
+            return fnc_VOICE(core);
+            
         default:
             break;
     }
@@ -1394,6 +1401,12 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenPAUSE:
             return cmd_PAUSE(core);
+            
+        case TokenVOICE:
+            return cmd_VOICE(core);
+            
+        case TokenVOICEA:
+            return cmd_VOICE_A(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

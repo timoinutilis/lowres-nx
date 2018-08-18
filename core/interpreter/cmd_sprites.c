@@ -94,18 +94,18 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
     ++interpreter->pc;
     
-    union CharacterAttributes atrb;
+    union CharacterAttributes attr;
     if (sprite)
     {
-        atrb = sprite->attr;
+        attr = sprite->attr;
     }
     else
     {
-        atrb.value = 0;
+        attr.value = 0;
     }
     
-    // atrb value
-    struct TypedValue aValue = itp_evaluateCharAttributes(core, atrb);
+    // attr value
+    struct TypedValue aValue = itp_evaluateCharAttributes(core, attr);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
 
     if (interpreter->pass == PassRun)

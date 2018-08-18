@@ -1688,7 +1688,23 @@ $FF26 - Raster line
 
 <h3 id="Audio-Registers">Audio Registers</h3>
 
-<p>- Not yet defined -</p>
+<p>There are 4 voices available, each occupies 4 bytes:</p>
+<pre>
+- Frequency low-byte
+- Frequency high-byte
+- Volume
+- Pulse width
+- Attributes:
+    Bit  Purpose
+    0-1  Wave:
+         0: Sawtooth
+         1: Triangle
+         2: Pulse
+         3: Noise
+    2   Mix to left
+    3   Mix to right
+</pre>
+
 
 <h3 id="I-O-Registers">I/O Registers</h3>
 

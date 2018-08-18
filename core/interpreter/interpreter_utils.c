@@ -1,9 +1,20 @@
 //
-//  interpreter_utils.c
-//  LowRes NX macOS
+// Copyright 2017-2018 Timo Kloss
 //
-//  Created by Timo Kloss on 11/5/17.
-//  Copyright © 2017 Inutilis Software. All rights reserved.
+// This file is part of LowRes NX.
+//
+// LowRes NX is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// LowRes NX is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 #include "interpreter_utils.h"
@@ -164,6 +175,66 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
             if (bg1Value.type != ValueTypeNull) resultAttr.planeBEnabled = bg1Value.v.floatValue;
             if (bg0SizeValue.type != ValueTypeNull) resultAttr.planeACellSize = bg0SizeValue.v.floatValue;
             if (bg1SizeValue.type != ValueTypeNull) resultAttr.planeBCellSize = bg1SizeValue.v.floatValue;
+        }
+        
+        struct TypedValue resultValue;
+        resultValue.type = ValueTypeFloat;
+        resultValue.v.floatValue = resultAttr.value;
+        return resultValue;
+    }
+    else
+    {
+        return itp_evaluateNumericExpression(core, 0, 255);
+    }
+}
+
+struct TypedValue itp_evaluateVoiceAttributes(struct Core *core, union VoiceAttributes oldAttr)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    if (interpreter->pc->type == TokenBracketOpen)
+    {
+        // bracket open
+        interpreter->pc++;
+        
+        union VoiceAttributes resultAttr = oldAttr;
+        
+        struct TypedValue wavValue = {ValueTypeNull, 0};
+        struct TypedValue mixLValue = {ValueTypeNull, 0};
+        struct TypedValue mixRValue = {ValueTypeNull, 0};
+
+        // wave value
+        wavValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
+        if (wavValue.type == ValueTypeError) return wavValue;
+        
+        // comma
+        if (interpreter->pc->type == TokenComma)
+        {
+            ++interpreter->pc;
+            
+            // mixL value
+            mixLValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+            if (mixLValue.type == ValueTypeError) return mixLValue;
+            
+            // comma
+            if (interpreter->pc->type == TokenComma)
+            {
+                ++interpreter->pc;
+                
+                // mixR value
+                mixRValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                if (mixRValue.type == ValueTypeError) return mixRValue;
+            }
+        }
+        
+        // bracket close
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        interpreter->pc++;
+        
+        if (interpreter->pass == PassRun)
+        {
+            if (wavValue.type != ValueTypeNull) resultAttr.wave = wavValue.v.floatValue;
+            if (mixLValue.type != ValueTypeNull) resultAttr.mixL = mixLValue.v.floatValue;
+            if (mixRValue.type != ValueTypeNull) resultAttr.mixR = mixRValue.v.floatValue;
         }
         
         struct TypedValue resultValue;

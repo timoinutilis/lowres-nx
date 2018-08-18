@@ -165,6 +165,11 @@ const char *TokenStrings[] = {
     "UP",
     "VAL",
     "VBL",
+    "VOICE.A",
+    "VOICE.F",
+    "VOICE.P",
+    "VOICE.V",
+    "VOICE",
     "WAIT",
     "WEND",
     "WHILE",
@@ -202,7 +207,6 @@ const char *TokenStrings[] = {
     "STOP",
     "TEMPO",
     "UBOUND",
-    "VOICE",
     "WRITE",
 
     NULL

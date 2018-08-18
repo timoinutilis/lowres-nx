@@ -169,6 +169,11 @@ enum TokenType {
     TokenUP,
     TokenVAL,
     TokenVBL,
+    TokenVOICEA,
+    TokenVOICEF,
+    TokenVOICEP,
+    TokenVOICEV,
+    TokenVOICE,
     TokenWAIT,
     TokenWEND,
     TokenWHILE,
@@ -206,7 +211,6 @@ enum TokenType {
     TokenSTOP,
     TokenTEMPO,
     TokenUBOUND,
-    TokenVOICE,
     TokenWRITE,
     
     Token_count
