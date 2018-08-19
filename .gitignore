@@ -60,6 +60,7 @@ fastlane/screenshots
 iOSInjectionProject/
 platform/LowRes NX Win/LowRes NX Win/Debug/
 platform/LowRes NX Win/LowRes NX Win/Release/
+platform/LowRes NX Win/LowRes NX Linux/output/
 platform/LowRes NX Win/Debug/
 platform/LowRes NX Win/Release/
 platform/LowRes NX Win/LowRes NX Win/SDL2.dll
