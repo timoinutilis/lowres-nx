@@ -144,11 +144,11 @@ void video_renderSprites(struct SpriteRegisters *reg, struct VideoRam *ram, int 
     }
 }
 
-void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
+void video_renderScreen(struct Core *core, uint32_t *outputRGB)
 {
     uint8_t scanlineBuffer[SCREEN_WIDTH];
     uint8_t scanlineSpriteBuffer[SCREEN_WIDTH];
-    uint8_t *outputByte = outputRGB;
+    uint32_t *outputPixel = outputRGB;
     
     struct VideoRam *ram = &core->machine->videoRam;
     struct VideoRegisters *reg = &core->machine->videoRegisters;
@@ -188,15 +188,8 @@ void video_renderScreen(struct Core *core, uint8_t *outputRGB, int bytesPerLine)
             int g = (color >> 2) & 0x03;
             int b = color & 0x03;
             // add some gray (0x0F) to simulate screen
-            *outputByte = 0x00; // alpha
-            outputByte++;
-            *outputByte = b * 0x55 | 0x0F;
-            outputByte++;
-            *outputByte = g * 0x55 | 0x0F;
-            outputByte++;
-            *outputByte = r * 0x55 | 0x0F;
-            outputByte++;
+            *outputPixel = (r * 0x55) | ((g * 0x55) << 8) | ((b * 0x55) << 16) | 0x000F0F0F;
+            outputPixel++;
         }
-        outputByte += (bytesPerLine - SCREEN_WIDTH*4);
     }
 }
