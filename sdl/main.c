@@ -119,7 +119,7 @@ int main(int argc, const char * argv[])
     
     window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     
     configureJoysticks();
     
@@ -448,7 +448,7 @@ void update(void *arg) {
     int pitch = 0;
     SDL_LockTexture(texture, NULL, &pixels, &pitch);
     
-    video_renderScreen(core, pixels, pitch);
+    video_renderScreen(core, pixels);
     
     SDL_UnlockTexture(texture);
     SDL_RenderCopy(renderer, texture, NULL, &screenRect);

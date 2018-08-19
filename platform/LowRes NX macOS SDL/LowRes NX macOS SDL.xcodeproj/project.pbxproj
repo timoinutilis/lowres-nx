@@ -165,7 +165,6 @@
 		9287EB2C20D85EEB000BBEB1 /* core_delegate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_delegate.c; sourceTree = "<group>"; };
 		9287EB5520D85EF7000BBEB1 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		9287EB5820D85F43000BBEB1 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
-		9289C401212861CF009BE093 /* core_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_config.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,7 +215,6 @@
 				9287EB1D20D85EEB000BBEB1 /* core_delegate.h */,
 				9287EB1E20D85EEB000BBEB1 /* core.c */,
 				9287EB0D20D85EEB000BBEB1 /* core.h */,
-				9289C401212861CF009BE093 /* core_config.h */,
 				9287EB0E20D85EEB000BBEB1 /* accessories */,
 				9287EB1120D85EEB000BBEB1 /* datamanager */,
 				9287EAD920D85EEB000BBEB1 /* interpreter */,
