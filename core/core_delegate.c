@@ -52,6 +52,7 @@ void delegate_controlsDidChange(struct Core *core)
         struct ControlsInfo info;
         info.isKeyboardEnabled = core->machine->ioRegisters.attr.keyboardEnabled;
         info.numGamepadsEnabled = core->machine->ioRegisters.attr.gamepadsEnabled;
+        info.isAudioEnabled = core->machine->audioRegisters.attr.audioEnabled;
         core->delegate->controlsDidChange(core->delegate->context, info);
     }
 }

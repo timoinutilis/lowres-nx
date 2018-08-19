@@ -20,6 +20,8 @@
 #ifndef core_h
 #define core_h
 
+#define CORE_VERSION "0.8 (5)"
+
 #include <stdio.h>
 #include <stdbool.h>
 #include "machine.h"
@@ -27,7 +29,6 @@
 #include "interpreter.h"
 #include "disk_drive.h"
 #include "core_delegate.h"
-#include "core_config.h"
 
 struct Core {
     struct Machine *machine;

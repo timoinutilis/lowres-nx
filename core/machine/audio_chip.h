@@ -49,6 +49,7 @@ struct Voice {
     uint8_t volume;
     uint8_t pulseWidth;
     union VoiceAttributes attr;
+    uint8_t reserved;
 };
 
 struct VoiceInternals {
@@ -56,13 +57,20 @@ struct VoiceInternals {
     uint16_t noiseRandom;
 };
 
+union AudioAttributes {
+    struct {
+        uint8_t audioEnabled:1;
+    };
+    uint8_t value;
+};
+
 struct AudioRegisters {
     struct Voice voices[NUM_VOICES];
+    union AudioAttributes attr;
 };
 
 struct AudioInternals {
     struct VoiceInternals voices[NUM_VOICES];
-    uint32_t accumulatorError;
 };
 
 void audio_reset(struct Core *core);

@@ -45,58 +45,61 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
         int16_t leftOutput = 0;
         int16_t rightOutput = 0;
         
-        for (int i = 0; i < NUM_VOICES; i++)
+        if (registers->attr.audioEnabled)
         {
-            struct Voice *voice = &registers->voices[i];
-            struct VoiceInternals *voiceIn = &internals->voices[i];
-            
-            uint16_t freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
-            if (freq == 0) continue;
-            
-            uint16_t accu16Last = ((uint32_t)voiceIn->accumulator >> 4) & 0xFFFF;
-            double accumulator = voiceIn->accumulator + (double)freq * 65536.0 / (double)outputFrequency;
-            if (accumulator >= overflow)
+            for (int i = 0; i < NUM_VOICES; i++)
             {
-                // avoid overflow and loss of precision
-                accumulator -= overflow;
-            }
-            voiceIn->accumulator = accumulator;
-            uint16_t accu16 = ((uint32_t)voiceIn->accumulator >> 4) & 0xFFFF;
-            
-            uint16_t sample = 0x7FFF; // silence
-            
-            enum WaveType waveType = voice->attr.wave;
-            if (waveType == WaveTypeSawtooth)
-            {
-                sample = accu16;
-            }
-            else if (waveType == WaveTypePulse)
-            {
-                sample = ((accu16 >> 8) > voice->pulseWidth) ? 0xFFFF : 0x0000;
-            }
-            else if (waveType == WaveTypeTriangle)
-            {
-                sample = ((accu16 & 0x8000) ? ~(accu16 << 1) : (accu16 << 1));
-            }
-            else if (waveType == WaveTypeNoise)
-            {
-                if ((accu16 & 0x1000) != (accu16Last & 0x1000))
+                struct Voice *voice = &registers->voices[i];
+                struct VoiceInternals *voiceIn = &internals->voices[i];
+                
+                uint16_t freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
+                if (freq == 0) continue;
+                
+                uint16_t accu16Last = ((uint32_t)voiceIn->accumulator >> 4) & 0xFFFF;
+                double accumulator = voiceIn->accumulator + (double)freq * 65536.0 / (double)outputFrequency;
+                if (accumulator >= overflow)
                 {
-                    uint16_t r = voiceIn->noiseRandom;
-                    uint16_t bit = ((r >> 0) ^ (r >> 2) ^ (r >> 3) ^ (r >> 5) ) & 1;
-                    voiceIn->noiseRandom = (r >> 1) | (bit << 15);
+                    // avoid overflow and loss of precision
+                    accumulator -= overflow;
                 }
-                sample = voiceIn->noiseRandom & 0xFFFF;
-            }
-            
-            int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * voice->volume) >> 10; // 8 bit for volume, 2 bit for global
-            if (voice->attr.mixL)
-            {
-                leftOutput += voiceSample;
-            }
-            if (voice->attr.mixR)
-            {
-                rightOutput += voiceSample;
+                voiceIn->accumulator = accumulator;
+                uint16_t accu16 = ((uint32_t)voiceIn->accumulator >> 4) & 0xFFFF;
+                
+                uint16_t sample = 0x7FFF; // silence
+                
+                enum WaveType waveType = voice->attr.wave;
+                if (waveType == WaveTypeSawtooth)
+                {
+                    sample = accu16;
+                }
+                else if (waveType == WaveTypePulse)
+                {
+                    sample = ((accu16 >> 8) > voice->pulseWidth) ? 0xFFFF : 0x0000;
+                }
+                else if (waveType == WaveTypeTriangle)
+                {
+                    sample = ((accu16 & 0x8000) ? ~(accu16 << 1) : (accu16 << 1));
+                }
+                else if (waveType == WaveTypeNoise)
+                {
+                    if ((accu16 & 0x1000) != (accu16Last & 0x1000))
+                    {
+                        uint16_t r = voiceIn->noiseRandom;
+                        uint16_t bit = ((r >> 0) ^ (r >> 2) ^ (r >> 3) ^ (r >> 5) ) & 1;
+                        voiceIn->noiseRandom = (r >> 1) | (bit << 15);
+                    }
+                    sample = voiceIn->noiseRandom & 0xFFFF;
+                }
+                
+                int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * voice->volume) >> 10; // 8 bit for volume, 2 bit for global
+                if (voice->attr.mixL)
+                {
+                    leftOutput += voiceSample;
+                }
+                if (voice->attr.mixR)
+                {
+                    rightOutput += voiceSample;
+                }
             }
         }
         

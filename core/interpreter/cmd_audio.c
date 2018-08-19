@@ -75,6 +75,12 @@ enum ErrorCode cmd_VOICE(struct Core *core)
         {
             voice->pulseWidth = pwValue.v.floatValue;
         }
+        
+        if (!core->machine->audioRegisters.attr.audioEnabled)
+        {
+            core->machine->audioRegisters.attr.audioEnabled = 1;
+            delegate_controlsDidChange(core);
+        }
     }
     
     return itp_endOfCommand(interpreter);

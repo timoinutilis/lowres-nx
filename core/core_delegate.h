@@ -28,6 +28,7 @@ struct Core;
 struct ControlsInfo {
     bool isKeyboardEnabled;
     int numGamepadsEnabled;
+    bool isAudioEnabled;
 };
 
 struct CoreDelegate {
