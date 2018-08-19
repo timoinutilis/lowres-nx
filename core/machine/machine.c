@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
