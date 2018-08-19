@@ -21,7 +21,7 @@
 #include "core.h"
 #include <math.h>
 
-void audio_reset(struct Core *core)
+void audio_init(struct Core *core)
 {
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
     

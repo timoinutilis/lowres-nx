@@ -73,7 +73,7 @@ struct AudioInternals {
     struct VoiceInternals voices[NUM_VOICES];
 };
 
-void audio_reset(struct Core *core);
+void audio_init(struct Core *core);
 void audio_renderAudio(struct Core *core, int16_t *output, int numSamples, int outputFrequency);
 
 #endif /* audio_chip_h */

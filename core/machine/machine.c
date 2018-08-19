@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -26,13 +26,13 @@
 void machine_init(struct Core *core)
 {
     assert(sizeof(struct Machine) == 0x10000);
+    audio_init(core);
 }
 
 void machine_reset(struct Core *core)
 {
     memset(core->machine, 0, sizeof(struct Machine));
     memset(core->machineInternals, 0, sizeof(struct MachineInternals));
-    audio_reset(core);
 }
 
 int machine_peek(struct Core *core, int address)
