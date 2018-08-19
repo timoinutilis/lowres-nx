@@ -38,7 +38,7 @@ enum ErrorCode cmd_VOICE(struct Core *core)
     ++interpreter->pc;
     
     // frequency value
-    struct TypedValue fValue = itp_evaluateOptionalNumericExpression(core, 0, 4095);
+    struct TypedValue fValue = itp_evaluateOptionalNumericExpression(core, 0, 65535);
     if (fValue.type == ValueTypeError) return fValue.v.errorCode;
     
     // comma
@@ -63,7 +63,7 @@ enum ErrorCode cmd_VOICE(struct Core *core)
         struct Voice *voice = &core->machine->audioRegisters.voices[n];
         if (fValue.type != ValueTypeNull)
         {
-            int f = fValue.v.floatValue * 16.0f;
+            int f = fValue.v.floatValue;
             voice->frequencyLow = f & 0xFF;
             voice->frequencyHigh = f >> 8;
         }
@@ -160,7 +160,7 @@ struct TypedValue fnc_VOICE(struct Core *core)
         switch (type)
         {
             case TokenVOICEF:
-                value.v.floatValue = (float)((voice->frequencyHigh << 8) | voice->frequencyLow) / 16.0f;
+                value.v.floatValue = (voice->frequencyHigh << 8) | voice->frequencyLow;
                 break;
 
             case TokenVOICEA:

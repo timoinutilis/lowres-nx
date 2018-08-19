@@ -1171,10 +1171,12 @@ and music will come in a later version.</p>
 
 <pre>VOICE n,f,v,pw</pre>
 
-<p>Sets the frequency (f, 0-4095 Hz), volume (v, 0-255) and
-pulse width (pw, 0-255) of voice n (0-3). The pulse width only affects
-sounds with the pulse waveform, a value of 127 creates a square
-wave. All parameters can be omitted to keep their current settings.</p>
+<p>Sets the frequency (f, 0-65535), volume (v, 0-255) and
+pulse width (pw, 0-255) of voice n (0-3).
+The frequency is calculated by this formula: f = hertz * 16.
+The pulse width only affects sounds with the pulse waveform,
+a value of 127 creates a square wave.
+All parameters can be omitted to keep their current settings.</p>
 
 
 <h3 id="_VOICE.A" name="VOICE.A">VOICE.A</h3>
@@ -1203,7 +1205,7 @@ can be omitted to keep their current settings.</p>
 
 <pre>VOICE.F(n)</pre>
 
-<p>Returns the frequency in hertz of voice n.</p>
+<p>Returns the frequency of voice n.</p>
 
 
 <h3 id="_=VOICE.V" name="VOICE.V">=VOICE.V</h3>
@@ -1770,7 +1772,7 @@ $FF26 - Raster line
     3   Mix to right
 - Reserved
 </pre>
-<p>Note: The frequency is a 16-bit value: x = hertz * 16</p>
+<p>Note: The frequency is a 16-bit value: f = hertz * 16</p>
 
 <pre>
 $FF58 - Attributes:
