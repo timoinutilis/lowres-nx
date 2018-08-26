@@ -1408,6 +1408,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenVOICEA:
             return cmd_VOICE_A(core);
             
+        case TokenPLAY:
+            return cmd_PLAY(core);
+            
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
             return ErrorUnexpectedToken;

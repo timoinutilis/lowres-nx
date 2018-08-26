@@ -29,5 +29,6 @@ struct Core;
 enum ErrorCode cmd_VOICE(struct Core *core);
 enum ErrorCode cmd_VOICE_A(struct Core *core);
 struct TypedValue fnc_VOICE(struct Core *core);
+enum ErrorCode cmd_PLAY(struct Core *core);
 
 #endif /* cmd_audio_h */

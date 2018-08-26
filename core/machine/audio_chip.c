@@ -21,6 +21,25 @@
 #include "core.h"
 #include <math.h>
 
+const double envRates[16] = {
+    256.0 / 0.002,
+    256.0 / 0.008,
+    256.0 / 0.016,
+    256.0 / 0.024,
+    256.0 / 0.038,
+    256.0 / 0.056,
+    256.0 / 0.068,
+    256.0 / 0.080,
+    256.0 / 0.100,
+    256.0 / 0.250,
+    256.0 / 0.500,
+    256.0 / 0.800,
+    256.0 / 1.0,
+    256.0 / 3.0,
+    256.0 / 5.0,
+    256.0 / 8.0
+};
+
 void audio_reset(struct Core *core)
 {
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
@@ -51,6 +70,8 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
             {
                 struct Voice *voice = &registers->voices[i];
                 struct VoiceInternals *voiceIn = &internals->voices[i];
+                
+                // --- WAVEFORM GENERATOR ---
                 
                 uint16_t freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
                 if (freq == 0) continue;
@@ -91,7 +112,46 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                     sample = voiceIn->noiseRandom & 0xFFFF;
                 }
                 
-                int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * voice->volume) >> 10; // 8 bit for volume, 2 bit for global
+                // --- ENVELOPE GENERATOR ---
+                
+                if (!voice->attr.gate)
+                {
+                    voiceIn->envState = EnvStateRelease;
+                }
+                
+                switch (voiceIn->envState) {
+                    case EnvStateAttack:
+                        voiceIn->envCounter += envRates[voice->envA] / outputFrequency;
+                        if (voiceIn->envCounter >= 255.0)
+                        {
+                            voiceIn->envCounter = 255.0;
+                            voiceIn->envState = EnvStateDecay;
+                        }
+                        break;
+                        
+                    case EnvStateDecay:
+                        if (voiceIn->envCounter > voice->envS * 16.0)
+                        {
+                            voiceIn->envCounter -= envRates[voice->envD] / 3.0 / outputFrequency;
+                        }
+                        break;
+                        
+                    case EnvStateRelease:
+                        if (voiceIn->envCounter > 0.0)
+                        {
+                            voiceIn->envCounter -= envRates[voice->envR] / 3.0 / outputFrequency;
+                            if (voiceIn->envCounter < 0.0)
+                            {
+                                voiceIn->envCounter = 0.0;
+                            }
+                        }
+                        break;
+                }
+                
+                // --- OUTPUT ---
+                
+                int volume = (voice->volume * (int)voiceIn->envCounter) >> 8;
+                int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * volume) >> 10; // 8 bit for volume, 2 bit for global
                 if (voice->attr.mixL)
                 {
                     leftOutput += voiceSample;

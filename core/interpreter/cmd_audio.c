@@ -21,6 +21,7 @@
 #include "core.h"
 #include "interpreter_utils.h"
 #include <assert.h>
+#include <math.h>
 
 enum ErrorCode cmd_VOICE(struct Core *core)
 {
@@ -181,4 +182,54 @@ struct TypedValue fnc_VOICE(struct Core *core)
         }
     }
     return value;
+}
+
+enum ErrorCode cmd_PLAY(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // PLAY
+    ++interpreter->pc;
+    
+    // n value
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // pitch value
+    struct TypedValue pValue = itp_evaluateNumericExpression(core, 0, 95);
+    if (pValue.type == ValueTypeError) return pValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int n = nValue.v.floatValue;
+        struct Voice *voice = &core->machine->audioRegisters.voices[n];
+        struct VoiceInternals *voiceIn = &core->machineInternals->audioInternals.voices[n];
+        
+        if (pValue.v.floatValue > 0.0)
+        {
+            int f = 16.0 * 440.0 * pow(2.0, (pValue.v.floatValue - 58.0) / 12.0);
+            voice->frequencyLow = f & 0xFF;
+            voice->frequencyHigh = f >> 8;
+            
+            voice->volume = 255;
+            voice->attr.gate = 1;
+            voiceIn->envState = EnvStateAttack;
+        }
+        else
+        {
+            voice->attr.gate = 0;
+        }
+        
+        if (!core->machine->audioRegisters.attr.audioEnabled)
+        {
+            core->machine->audioRegisters.attr.audioEnabled = 1;
+            delegate_controlsDidChange(core);
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
 }

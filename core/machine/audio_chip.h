@@ -34,11 +34,18 @@ enum WaveType {
     WaveTypeNoise
 };
 
+enum EnvState {
+    EnvStateAttack,
+    EnvStateDecay,
+    EnvStateRelease
+};
+
 union VoiceAttributes {
     struct {
         uint8_t wave:2;
         uint8_t mixL:1;
         uint8_t mixR:1;
+        uint8_t gate:1;
     };
     uint8_t value;
 };
@@ -49,12 +56,17 @@ struct Voice {
     uint8_t volume;
     uint8_t pulseWidth;
     union VoiceAttributes attr;
-    uint8_t reserved;
+    uint8_t envD:4;
+    uint8_t envA:4;
+    uint8_t envR:4;
+    uint8_t envS:4;
 };
 
 struct VoiceInternals {
     double accumulator;
     uint16_t noiseRandom;
+    double envCounter;
+    enum EnvState envState;
 };
 
 union AudioAttributes {
