@@ -66,15 +66,49 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
         
         if (registers->attr.audioEnabled)
         {
-            for (int i = 0; i < NUM_VOICES; i++)
+            for (int v = 0; v < NUM_VOICES; v++)
             {
-                struct Voice *voice = &registers->voices[i];
-                struct VoiceInternals *voiceIn = &internals->voices[i];
+                struct Voice *voice = &registers->voices[v];
+                struct VoiceInternals *voiceIn = &internals->voices[v];
+                
+                int freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
+                if (freq == 0) continue;
+                
+                int volume = voice->volume;
+                int pulseWidth = voice->pulseWidth;
+                
+                // --- LFO ---
+                
+                double lfoFreq = 4;
+                double lfoAccumulator = voiceIn->lfoAccumulator + lfoFreq * 65536.0 / (double)outputFrequency;
+                if (lfoAccumulator >= overflow)
+                {
+                    // avoid overflow and loss of precision
+                    lfoAccumulator -= overflow;
+                }
+                voiceIn->lfoAccumulator = lfoAccumulator;
+                uint16_t lfoAccu8 = ((uint32_t)voiceIn->lfoAccumulator >> 8) & 0xFF;
+                
+                uint8_t lfoSample = ((lfoAccu8 & 0x80) ? ~(lfoAccu8 << 1) : (lfoAccu8 << 1));
+                
+                int freqAmount = 2;
+                int volAmount = 2;
+                int pwAmount = 2;
+                
+                freq += freq * lfoSample * freqAmount >> 11;
+                if (freq < 1) freq = 1;
+                if (freq > 65535) freq = 65535;
+                
+                volume += volume * lfoSample * volAmount >> 12;
+                if (volume < 0) volume = 0;
+                if (volume > 255) volume = 255;
+                
+                pulseWidth += lfoSample * pwAmount >> 4;
+                if (pulseWidth < 2) pulseWidth = 2;
+                if (pulseWidth > 252) pulseWidth = 252;
+//                if (i == 0 && v == 0) printf("PW %d\n", pulseWidth);
                 
                 // --- WAVEFORM GENERATOR ---
-                
-                uint16_t freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
-                if (freq == 0) continue;
                 
                 uint16_t accu16Last = ((uint32_t)voiceIn->accumulator >> 4) & 0xFFFF;
                 double accumulator = voiceIn->accumulator + (double)freq * 65536.0 / (double)outputFrequency;
@@ -95,7 +129,7 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 }
                 else if (waveType == WaveTypePulse)
                 {
-                    sample = ((accu16 >> 8) > voice->pulseWidth) ? 0xFFFF : 0x0000;
+                    sample = ((accu16 >> 8) > pulseWidth) ? 0xFFFF : 0x0000;
                 }
                 else if (waveType == WaveTypeTriangle)
                 {
@@ -150,7 +184,7 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 
                 // --- OUTPUT ---
                 
-                int volume = (voice->volume * (int)voiceIn->envCounter) >> 8;
+                volume = volume * (int)voiceIn->envCounter >> 8;
                 int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * volume) >> 10; // 8 bit for volume, 2 bit for global
                 if (voice->attr.mixL)
                 {

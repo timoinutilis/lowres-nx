@@ -215,7 +215,7 @@ enum ErrorCode cmd_PLAY(struct Core *core)
             voice->frequencyLow = f & 0xFF;
             voice->frequencyHigh = f >> 8;
             
-            voice->volume = 255;
+            voice->volume = 128;
             voice->attr.gate = 1;
             voiceIn->envState = EnvStateAttack;
         }

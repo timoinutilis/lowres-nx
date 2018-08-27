@@ -67,6 +67,7 @@ struct VoiceInternals {
     uint16_t noiseRandom;
     double envCounter;
     enum EnvState envState;
+    double lfoAccumulator;
 };
 
 union AudioAttributes {
