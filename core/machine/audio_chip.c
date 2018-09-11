@@ -23,21 +23,40 @@
 
 const double envRates[16] = {
     256.0 / 0.002,
-    256.0 / 0.008,
-    256.0 / 0.016,
-    256.0 / 0.024,
-    256.0 / 0.038,
-    256.0 / 0.056,
-    256.0 / 0.068,
-    256.0 / 0.080,
-    256.0 / 0.100,
-    256.0 / 0.250,
-    256.0 / 0.500,
-    256.0 / 0.800,
+    256.0 / 0.03,
+    256.0 / 0.06,
+    256.0 / 0.09,
+    256.0 / 0.14,
+    256.0 / 0.21,
+    256.0 / 0.31,
+    256.0 / 0.47,
+    256.0 / 0.70,
     256.0 / 1.0,
-    256.0 / 3.0,
+    256.0 / 1.6,
+    256.0 / 2.4,
+    256.0 / 3.5,
     256.0 / 5.0,
-    256.0 / 8.0
+    256.0 / 8.0,
+    256.0 / 12.0
+};
+
+const double lfoRates[16] = {
+    256.0 / 0.01,
+    256.0 / 0.03,
+    256.0 / 0.06,
+    256.0 / 0.09,
+    256.0 / 0.14,
+    256.0 / 0.21,
+    256.0 / 0.31,
+    256.0 / 0.47,
+    256.0 / 0.70,
+    256.0 / 1.0,
+    256.0 / 1.6,
+    256.0 / 2.4,
+    256.0 / 3.5,
+    256.0 / 5.0,
+    256.0 / 8.0,
+    256.0 / 12.0
 };
 
 void audio_reset(struct Core *core)
@@ -74,26 +93,57 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 int freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
                 if (freq == 0) continue;
                 
-                int volume = voice->volume;
-                int pulseWidth = voice->pulseWidth;
+                int volume = voice->volume << 4;
+                int pulseWidth = voice->pulseWidth << 4;
                 
                 // --- LFO ---
                 
-                double lfoFreq = 4;
-                double lfoAccumulator = voiceIn->lfoAccumulator + lfoFreq * 65536.0 / (double)outputFrequency;
-                if (lfoAccumulator >= overflow)
+                if (!voiceIn->lfoHold)
                 {
-                    // avoid overflow and loss of precision
-                    lfoAccumulator -= overflow;
+                    double lfoRate = lfoRates[voice->lfoFrequency];
+                    double lfoAccumulator = voiceIn->lfoAccumulator + lfoRate / (double)outputFrequency;
+                    if (voice->attr.lfoEnvMode && lfoAccumulator >= 255.0)
+                    {
+                        lfoAccumulator = 255.0;
+                        voiceIn->lfoHold = true;
+                    }
+                    else if (lfoAccumulator >= 256.0)
+                    {
+                        // avoid overflow and loss of precision
+                        lfoAccumulator -= 256.0;
+                    }
+                    voiceIn->lfoAccumulator = lfoAccumulator;
                 }
-                voiceIn->lfoAccumulator = lfoAccumulator;
-                uint16_t lfoAccu8 = ((uint32_t)voiceIn->lfoAccumulator >> 8) & 0xFF;
+                uint8_t lfoAccu8 = voiceIn->lfoAccumulator;
+                uint8_t lfoSample = 0;
                 
-                uint8_t lfoSample = ((lfoAccu8 & 0x80) ? ~(lfoAccu8 << 1) : (lfoAccu8 << 1));
+                if (voice->attr.lfoWave)
+                {
+                    // Sawtooth LFO
+                    lfoSample = ~lfoAccu8;
+                }
+                else
+                {
+                    // Triangle LFO
+                    lfoSample = ((lfoAccu8 & 0x80) ? ~(lfoAccu8 << 1) : (lfoAccu8 << 1));
+                }
                 
-                int freqAmount = 2;
-                int volAmount = 2;
-                int pwAmount = 2;
+                int freqAmount = voice->lfoOscAmount; //TODO
+                int volAmount = voice->lfoVolAmount; //TODO
+                int pwAmount = voice->lfoPWAmount; //TODO
+                
+                if (voice->lfoOscSign)
+                {
+                    freqAmount *= -1;
+                }
+                if (voice->lfoVolSign)
+                {
+                    volAmount *= -1;
+                }
+                if (voice->lfoPWSign)
+                {
+                    pwAmount *= -1;
+                }
                 
                 freq += freq * lfoSample * freqAmount >> 11;
                 if (freq < 1) freq = 1;
@@ -166,14 +216,14 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                     case EnvStateDecay:
                         if (voiceIn->envCounter > voice->envS * 16.0)
                         {
-                            voiceIn->envCounter -= envRates[voice->envD] / 3.0 / outputFrequency;
+                            voiceIn->envCounter -= envRates[voice->envD] / outputFrequency;
                         }
                         break;
                         
                     case EnvStateRelease:
                         if (voiceIn->envCounter > 0.0)
                         {
-                            voiceIn->envCounter -= envRates[voice->envR] / 3.0 / outputFrequency;
+                            voiceIn->envCounter -= envRates[voice->envR] / outputFrequency;
                             if (voiceIn->envCounter < 0.0)
                             {
                                 voiceIn->envCounter = 0.0;
@@ -199,5 +249,20 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
         
         stereoOutput[i++] = leftOutput;
         stereoOutput[i++] = rightOutput;
+    }
+}
+
+void audio_onVoiceAttrChange(struct Core *core, int index)
+{
+    struct Voice *voice = &core->machine->audioRegisters.voices[index];
+    if (voice->attr.gate)
+    {
+        struct VoiceInternals *voiceIn = &core->machineInternals->audioInternals.voices[index];
+        voiceIn->envState = EnvStateAttack;
+        voiceIn->lfoHold = false;
+        if (voice->attr.lfoEnvMode || voice->attr.lfoTrigger)
+        {
+            voiceIn->lfoAccumulator = 0.0;
+        }
     }
 }

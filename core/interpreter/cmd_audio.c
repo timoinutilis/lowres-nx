@@ -207,7 +207,6 @@ enum ErrorCode cmd_PLAY(struct Core *core)
     {
         int n = nValue.v.floatValue;
         struct Voice *voice = &core->machine->audioRegisters.voices[n];
-        struct VoiceInternals *voiceIn = &core->machineInternals->audioInternals.voices[n];
         
         if (pValue.v.floatValue > 0.0)
         {
@@ -215,9 +214,9 @@ enum ErrorCode cmd_PLAY(struct Core *core)
             voice->frequencyLow = f & 0xFF;
             voice->frequencyHigh = f >> 8;
             
-            voice->volume = 128;
+            voice->volume = 15;
             voice->attr.gate = 1;
-            voiceIn->envState = EnvStateAttack;
+            audio_onVoiceAttrChange(core, n);
         }
         else
         {

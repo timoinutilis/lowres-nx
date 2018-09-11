@@ -85,7 +85,7 @@ void runStartupSequence(struct Core *core)
     for (int i = 0; i < NUM_VOICES; i++)
     {
         struct Voice *voice = &core->machine->audioRegisters.voices[i];
-        voice->pulseWidth = 127;
+        voice->pulseWidth = 7;
         voice->attr.mixL = 1;
         voice->attr.mixR = 1;
     }

@@ -60,11 +60,11 @@ struct Machine {
     
     // 0xFF40
     struct AudioRegisters audioRegisters;
-    uint8_t reservedAudio[0x20 - sizeof(struct AudioRegisters)];
+    uint8_t reservedAudio[0x30 - sizeof(struct AudioRegisters)];
 
-    // 0xFF60
+    // 0xFF70
     struct IORegisters ioRegisters;
-    uint8_t reservedIO[0x20 - sizeof(struct IORegisters)];
+    uint8_t reservedIO[0x10 - sizeof(struct IORegisters)];
     
     // 0xFF80
     uint8_t reservedRegisters[0x10000 - 0xFF80];

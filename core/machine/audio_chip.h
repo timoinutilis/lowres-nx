@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define NUM_VOICES 4
 
@@ -45,6 +46,9 @@ union VoiceAttributes {
         uint8_t wave:2;
         uint8_t mixL:1;
         uint8_t mixR:1;
+        uint8_t lfoWave:1;
+        uint8_t lfoEnvMode:1;
+        uint8_t lfoTrigger:1;
         uint8_t gate:1;
     };
     uint8_t value;
@@ -53,13 +57,30 @@ union VoiceAttributes {
 struct Voice {
     uint8_t frequencyLow;
     uint8_t frequencyHigh;
-    uint8_t volume;
-    uint8_t pulseWidth;
+    struct {
+        uint8_t volume:4;
+        uint8_t pulseWidth:4;
+    };
     union VoiceAttributes attr;
-    uint8_t envD:4;
-    uint8_t envA:4;
-    uint8_t envR:4;
-    uint8_t envS:4;
+    struct {
+        uint8_t envD:4;
+        uint8_t envA:4;
+    };
+    struct {
+        uint8_t envR:4;
+        uint8_t envS:4;
+    };
+    struct {
+        uint8_t lfoFrequency:4;
+        uint8_t lfoOscAmount:3;
+        uint8_t lfoOscSign:1;
+    };
+    struct {
+        uint8_t lfoVolAmount:3;
+        uint8_t lfoVolSign:1;
+        uint8_t lfoPWAmount:3;
+        uint8_t lfoPWSign:1;
+    };
 };
 
 struct VoiceInternals {
@@ -68,6 +89,7 @@ struct VoiceInternals {
     double envCounter;
     enum EnvState envState;
     double lfoAccumulator;
+    bool lfoHold;
 };
 
 union AudioAttributes {
@@ -88,5 +110,6 @@ struct AudioInternals {
 
 void audio_reset(struct Core *core);
 void audio_renderAudio(struct Core *core, int16_t *output, int numSamples, int outputFrequency);
+void audio_onVoiceAttrChange(struct Core *core, int index);
 
 #endif /* audio_chip_h */
