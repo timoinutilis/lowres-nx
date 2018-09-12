@@ -41,22 +41,41 @@ const double envRates[16] = {
 };
 
 const double lfoRates[16] = {
-    256.0 / 0.01,
-    256.0 / 0.03,
-    256.0 / 0.06,
-    256.0 / 0.09,
-    256.0 / 0.14,
-    256.0 / 0.21,
-    256.0 / 0.31,
-    256.0 / 0.47,
-    256.0 / 0.70,
-    256.0 / 1.0,
-    256.0 / 1.6,
-    256.0 / 2.4,
-    256.0 / 3.5,
-    256.0 / 5.0,
-    256.0 / 8.0,
-    256.0 / 12.0
+    0.03 * 256.0,
+    0.06 * 256.0,
+    0.09 * 256.0,
+    0.14 * 256.0,
+    0.21 * 256.0,
+    0.31 * 256.0,
+    0.47 * 256.0,
+    0.70 * 256.0,
+    1.0 * 256.0,
+    1.6 * 256.0,
+    2.4 * 256.0,
+    3.5 * 256.0,
+    5.0 * 256.0,
+    8.0 * 256.0,
+    12.0 * 256.0,
+    18.0 * 256.0
+};
+
+const int lfoAmounts[16] = {
+    0,
+    1,
+    2,
+    4,
+    6,
+    9,
+    12,
+    17,
+    24,
+    34,
+    48,
+    67,
+    93,
+    131,
+    183,
+    256
 };
 
 void audio_reset(struct Core *core)
@@ -102,7 +121,7 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 {
                     double lfoRate = lfoRates[voice->lfoFrequency];
                     double lfoAccumulator = voiceIn->lfoAccumulator + lfoRate / (double)outputFrequency;
-                    if (voice->attr.lfoEnvMode && lfoAccumulator >= 255.0)
+                    if (voice->lfoAttr.envMode && lfoAccumulator >= 255.0)
                     {
                         lfoAccumulator = 255.0;
                         voiceIn->lfoHold = true;
@@ -117,46 +136,38 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 uint8_t lfoAccu8 = voiceIn->lfoAccumulator;
                 uint8_t lfoSample = 0;
                 
-                if (voice->attr.lfoWave)
+                if (voice->lfoAttr.wave)
                 {
                     // Sawtooth LFO
-                    lfoSample = ~lfoAccu8;
+                    lfoSample = lfoAccu8;
                 }
                 else
                 {
                     // Triangle LFO
                     lfoSample = ((lfoAccu8 & 0x80) ? ~(lfoAccu8 << 1) : (lfoAccu8 << 1));
                 }
-                
-                int freqAmount = voice->lfoOscAmount; //TODO
-                int volAmount = voice->lfoVolAmount; //TODO
-                int pwAmount = voice->lfoPWAmount; //TODO
-                
-                if (voice->lfoOscSign)
+                if (voice->lfoAttr.waveSign)
                 {
-                    freqAmount *= -1;
-                }
-                if (voice->lfoVolSign)
-                {
-                    volAmount *= -1;
-                }
-                if (voice->lfoPWSign)
-                {
-                    pwAmount *= -1;
+                    lfoSample = ~lfoSample;
                 }
                 
-                freq += freq * lfoSample * freqAmount >> 11;
+                int freqAmount = lfoAmounts[voice->lfoOscAmount];
+                int volAmount = voice->lfoVolAmount;
+                int pwAmount = voice->lfoPWAmount;
+                
+                freq += freq * lfoSample * freqAmount >> 16;
                 if (freq < 1) freq = 1;
                 if (freq > 65535) freq = 65535;
                 
-                volume += volume * lfoSample * volAmount >> 12;
+                volume -= volume * (~lfoSample & 0xFF) * volAmount >> 12;
                 if (volume < 0) volume = 0;
                 if (volume > 255) volume = 255;
                 
                 pulseWidth += lfoSample * pwAmount >> 4;
-                if (pulseWidth < 2) pulseWidth = 2;
-                if (pulseWidth > 252) pulseWidth = 252;
-//                if (i == 0 && v == 0) printf("PW %d\n", pulseWidth);
+                if (pulseWidth < 0) pulseWidth = 0;
+                if (pulseWidth > 254) pulseWidth = 254;
+                
+//                if (i == 0 && v == 0) printf("LFO A %d B %d\n", (255 - lfoSample), ~lfoSample & 0xFF);
                 
                 // --- WAVEFORM GENERATOR ---
                 
@@ -260,7 +271,7 @@ void audio_onVoiceAttrChange(struct Core *core, int index)
         struct VoiceInternals *voiceIn = &core->machineInternals->audioInternals.voices[index];
         voiceIn->envState = EnvStateAttack;
         voiceIn->lfoHold = false;
-        if (voice->attr.lfoEnvMode || voice->attr.lfoTrigger)
+        if (voice->lfoAttr.envMode || voice->lfoAttr.trigger)
         {
             voiceIn->lfoAccumulator = 0.0;
         }

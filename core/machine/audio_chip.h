@@ -46,10 +46,17 @@ union VoiceAttributes {
         uint8_t wave:2;
         uint8_t mixL:1;
         uint8_t mixR:1;
-        uint8_t lfoWave:1;
-        uint8_t lfoEnvMode:1;
-        uint8_t lfoTrigger:1;
         uint8_t gate:1;
+    };
+    uint8_t value;
+};
+
+union LFOAttributes {
+    struct {
+        uint8_t wave:1;
+        uint8_t waveSign:1;
+        uint8_t envMode:1;
+        uint8_t trigger:1;
     };
     uint8_t value;
 };
@@ -70,16 +77,18 @@ struct Voice {
         uint8_t envR:4;
         uint8_t envS:4;
     };
+    union LFOAttributes lfoAttr;
     struct {
         uint8_t lfoFrequency:4;
-        uint8_t lfoOscAmount:3;
-        uint8_t lfoOscSign:1;
+        uint8_t lfoOscAmount:4;
     };
     struct {
-        uint8_t lfoVolAmount:3;
-        uint8_t lfoVolSign:1;
-        uint8_t lfoPWAmount:3;
-        uint8_t lfoPWSign:1;
+        uint8_t lfoVolAmount:4;
+        uint8_t lfoPWAmount:4;
+    };
+    struct {
+        uint8_t timeout:7;
+        uint8_t timeoutEnabled:1;
     };
 };
 
