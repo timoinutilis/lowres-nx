@@ -201,7 +201,9 @@ struct TypedValue itp_evaluateVoiceAttributes(struct Core *core, union VoiceAttr
         struct TypedValue wavValue = {ValueTypeNull, 0};
         struct TypedValue mixLValue = {ValueTypeNull, 0};
         struct TypedValue mixRValue = {ValueTypeNull, 0};
-
+        struct TypedValue timeoutValue = {ValueTypeNull, 0};
+        struct TypedValue gateValue = {ValueTypeNull, 0};
+        
         // wave value
         wavValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
         if (wavValue.type == ValueTypeError) return wavValue;
@@ -223,6 +225,26 @@ struct TypedValue itp_evaluateVoiceAttributes(struct Core *core, union VoiceAttr
                 // mixR value
                 mixRValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
                 if (mixRValue.type == ValueTypeError) return mixRValue;
+                
+                // comma
+                if (interpreter->pc->type == TokenComma)
+                {
+                    ++interpreter->pc;
+                    
+                    // timeout value
+                    timeoutValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                    if (timeoutValue.type == ValueTypeError) return timeoutValue;
+                    
+                    // comma
+                    if (interpreter->pc->type == TokenComma)
+                    {
+                        ++interpreter->pc;
+                        
+                        // gate value
+                        gateValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                        if (gateValue.type == ValueTypeError) return gateValue;
+                    }
+                }
             }
         }
         
@@ -235,6 +257,8 @@ struct TypedValue itp_evaluateVoiceAttributes(struct Core *core, union VoiceAttr
             if (wavValue.type != ValueTypeNull) resultAttr.wave = wavValue.v.floatValue;
             if (mixLValue.type != ValueTypeNull) resultAttr.mixL = mixLValue.v.floatValue;
             if (mixRValue.type != ValueTypeNull) resultAttr.mixR = mixRValue.v.floatValue;
+            if (timeoutValue.type != ValueTypeNull) resultAttr.timeout = timeoutValue.v.floatValue;
+            if (gateValue.type != ValueTypeNull) resultAttr.gate = gateValue.v.floatValue;
         }
         
         struct TypedValue resultValue;

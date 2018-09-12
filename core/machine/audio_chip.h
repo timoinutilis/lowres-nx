@@ -46,6 +46,7 @@ union VoiceAttributes {
         uint8_t wave:2;
         uint8_t mixL:1;
         uint8_t mixR:1;
+        uint8_t timeout:1;
         uint8_t gate:1;
     };
     uint8_t value;
@@ -69,6 +70,7 @@ struct Voice {
         uint8_t pulseWidth:4;
     };
     union VoiceAttributes attr;
+    uint8_t length;
     struct {
         uint8_t envD:4;
         uint8_t envA:4;
@@ -86,10 +88,6 @@ struct Voice {
         uint8_t lfoVolAmount:4;
         uint8_t lfoPWAmount:4;
     };
-    struct {
-        uint8_t timeout:7;
-        uint8_t timeoutEnabled:1;
-    };
 };
 
 struct VoiceInternals {
@@ -99,6 +97,7 @@ struct VoiceInternals {
     enum EnvState envState;
     double lfoAccumulator;
     bool lfoHold;
+    double timeoutCounter;
 };
 
 union AudioAttributes {

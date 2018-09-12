@@ -207,6 +207,18 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                     sample = voiceIn->noiseRandom & 0xFFFF;
                 }
                 
+                // --- TIMEOUT ---
+                
+                if (voice->attr.timeout)
+                {
+                    voiceIn->timeoutCounter -= 256.0 / 4.0 / outputFrequency;
+                    if (voiceIn->timeoutCounter <= 0.0)
+                    {
+                        voiceIn->timeoutCounter = 0.0;
+                        voice->attr.gate = 0;
+                    }
+                }
+                
                 // --- ENVELOPE GENERATOR ---
                 
                 if (!voice->attr.gate)
@@ -271,6 +283,7 @@ void audio_onVoiceAttrChange(struct Core *core, int index)
         struct VoiceInternals *voiceIn = &core->machineInternals->audioInternals.voices[index];
         voiceIn->envState = EnvStateAttack;
         voiceIn->lfoHold = false;
+        voiceIn->timeoutCounter = voice->length;
         if (voice->lfoAttr.envMode || voice->lfoAttr.trigger)
         {
             voiceIn->lfoAccumulator = 0.0;
