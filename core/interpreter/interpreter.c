@@ -1144,13 +1144,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenPAUSE:
             return fnc_PAUSE(core);
-            
-        case TokenVOICEA:
-        case TokenVOICEF:
-        case TokenVOICEPW:
-        case TokenVOICEV:
-            return fnc_VOICE(core);
-            
+                        
         default:
             break;
     }
@@ -1407,6 +1401,15 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenVOICEA:
             return cmd_VOICE_A(core);
+            
+        case TokenVOICEEG:
+            return cmd_VOICE_EG(core);
+            
+        case TokenVOICELFO:
+            return cmd_VOICE_LFO(core);
+            
+        case TokenVOICELFOA:
+            return cmd_VOICE_LFO_A(core);
             
         case TokenPLAY:
             return cmd_PLAY(core);

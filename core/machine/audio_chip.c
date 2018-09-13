@@ -139,35 +139,40 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 if (voice->lfoAttr.wave)
                 {
                     // Sawtooth LFO
-                    lfoSample = lfoAccu8;
+                    lfoSample = ~lfoAccu8;
                 }
                 else
                 {
                     // Triangle LFO
                     lfoSample = ((lfoAccu8 & 0x80) ? ~(lfoAccu8 << 1) : (lfoAccu8 << 1));
                 }
-                if (voice->lfoAttr.waveSign)
-                {
-                    lfoSample = ~lfoSample;
-                }
                 
                 int freqAmount = lfoAmounts[voice->lfoOscAmount];
                 int volAmount = voice->lfoVolAmount;
                 int pwAmount = voice->lfoPWAmount;
                 
-                freq += freq * lfoSample * freqAmount >> 16;
+                int freqMod = freq * lfoSample * freqAmount >> 16;
+                if (voice->lfoAttr.invert) freq -= freqMod; else freq += freqMod;
                 if (freq < 1) freq = 1;
                 if (freq > 65535) freq = 65535;
                 
-                volume -= volume * (~lfoSample & 0xFF) * volAmount >> 12;
+                if (voice->lfoAttr.invert)
+                {
+                    volume -= volume * lfoSample * volAmount >> 12;
+                }
+                else
+                {
+                    volume -= volume * (~lfoSample & 0xFF) * volAmount >> 12;
+                }
                 if (volume < 0) volume = 0;
                 if (volume > 255) volume = 255;
                 
-                pulseWidth += lfoSample * pwAmount >> 4;
+                int pwMod = lfoSample * pwAmount >> 4;
+                if (voice->lfoAttr.invert) pulseWidth -= pwMod; else pulseWidth += pwMod;
                 if (pulseWidth < 0) pulseWidth = 0;
                 if (pulseWidth > 254) pulseWidth = 254;
                 
-//                if (i == 0 && v == 0) printf("LFO A %d B %d\n", (255 - lfoSample), ~lfoSample & 0xFF);
+//                if (i == 0 && v == 0) printf("pulseWidth %d\n", pulseWidth);
                 
                 // --- WAVEFORM GENERATOR ---
                 

@@ -110,14 +110,7 @@ enum ErrorCode cmd_VOICE_A(struct Core *core)
     ++interpreter->pc;
     
     union VoiceAttributes attr;
-    if (voice)
-    {
-        attr = voice->attr;
-    }
-    else
-    {
-        attr.value = 0;
-    }
+    if (voice) attr = voice->attr; else attr.value = 0;
     
     // attr value
     struct TypedValue aValue = itp_evaluateVoiceAttributes(core, attr);
@@ -131,57 +124,177 @@ enum ErrorCode cmd_VOICE_A(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-struct TypedValue fnc_VOICE(struct Core *core)
+enum ErrorCode cmd_VOICE_EG(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // VOICE.?
-    enum TokenType type = interpreter->pc->type;
+    // VOICE.EG
     ++interpreter->pc;
     
-    // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
-        ++interpreter->pc;
-    
-    // expression
+    // n value
     struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
-    if (nValue.type == ValueTypeError) return nValue;
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
-    // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
-        ++interpreter->pc;
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
     
-    struct TypedValue value;
-    value.type = ValueTypeFloat;
+    // attack value
+    struct TypedValue attValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (attValue.type == ValueTypeError) return attValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // decay value
+    struct TypedValue decValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (decValue.type == ValueTypeError) return decValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // sustain value
+    struct TypedValue susValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (susValue.type == ValueTypeError) return susValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // release value
+    struct TypedValue relValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (relValue.type == ValueTypeError) return relValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
         int n = nValue.v.floatValue;
         struct Voice *voice = &core->machine->audioRegisters.voices[n];
-        switch (type)
+        if (attValue.type != ValueTypeNull)
         {
-            case TokenVOICEF:
-                value.v.floatValue = (voice->frequencyHigh << 8) | voice->frequencyLow;
-                break;
-
-            case TokenVOICEA:
-                value.v.floatValue = voice->attr.value;
-                break;
-                
-            case TokenVOICEPW:
-                value.v.floatValue = voice->pulseWidth;
-                break;
-                
-            case TokenVOICEV:
-                value.v.floatValue = voice->volume;
-                break;
-                
-            default:
-                assert(0);
-                break;
+            voice->envA = attValue.v.floatValue;
+        }
+        if (decValue.type != ValueTypeNull)
+        {
+            voice->envD = decValue.v.floatValue;
+        }
+        if (susValue.type != ValueTypeNull)
+        {
+            voice->envS = susValue.v.floatValue;
+        }
+        if (relValue.type != ValueTypeNull)
+        {
+            voice->envR = relValue.v.floatValue;
         }
     }
-    return value;
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_VOICE_LFO(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // VOICE.LFO
+    ++interpreter->pc;
+    
+    // n value
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // rate value
+    struct TypedValue rateValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (rateValue.type == ValueTypeError) return rateValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // osc amount value
+    struct TypedValue oscValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (oscValue.type == ValueTypeError) return oscValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // vol amount value
+    struct TypedValue volValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (volValue.type == ValueTypeError) return volValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // pw amount value
+    struct TypedValue pwValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
+    if (pwValue.type == ValueTypeError) return pwValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int n = nValue.v.floatValue;
+        struct Voice *voice = &core->machine->audioRegisters.voices[n];
+        if (rateValue.type != ValueTypeNull)
+        {
+            voice->lfoFrequency = rateValue.v.floatValue;
+        }
+        if (oscValue.type != ValueTypeNull)
+        {
+            voice->lfoOscAmount = oscValue.v.floatValue;
+        }
+        if (volValue.type != ValueTypeNull)
+        {
+            voice->lfoVolAmount = volValue.v.floatValue;
+        }
+        if (pwValue.type != ValueTypeNull)
+        {
+            voice->lfoPWAmount = pwValue.v.floatValue;
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_VOICE_LFO_A(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // VOICE.LFO.A
+    ++interpreter->pc;
+    
+    // n value
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    struct Voice *voice = NULL;
+    if (interpreter->pass == PassRun)
+    {
+        int n = nValue.v.floatValue;
+        voice = &core->machine->audioRegisters.voices[n];
+    }
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    union LFOAttributes attr;
+    if (voice) attr = voice->lfoAttr; else attr.value = 0;
+    
+    // attr value
+    struct TypedValue attrValue = itp_evaluateLFOAttributes(core, attr);
+    if (attrValue.type == ValueTypeError) return attrValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        voice->lfoAttr.value = attrValue.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
 }
 
 enum ErrorCode cmd_PLAY(struct Core *core)

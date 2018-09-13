@@ -55,7 +55,7 @@ union VoiceAttributes {
 union LFOAttributes {
     struct {
         uint8_t wave:1;
-        uint8_t waveSign:1;
+        uint8_t invert:1;
         uint8_t envMode:1;
         uint8_t trigger:1;
     };

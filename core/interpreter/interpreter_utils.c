@@ -271,3 +271,75 @@ struct TypedValue itp_evaluateVoiceAttributes(struct Core *core, union VoiceAttr
         return itp_evaluateNumericExpression(core, 0, 255);
     }
 }
+
+struct TypedValue itp_evaluateLFOAttributes(struct Core *core, union LFOAttributes oldAttr)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    if (interpreter->pc->type == TokenBracketOpen)
+    {
+        // bracket open
+        interpreter->pc++;
+        
+        union LFOAttributes resultAttr = oldAttr;
+        
+        struct TypedValue wavValue = {ValueTypeNull, 0};
+        struct TypedValue invValue = {ValueTypeNull, 0};
+        struct TypedValue envValue = {ValueTypeNull, 0};
+        struct TypedValue triValue = {ValueTypeNull, 0};
+        
+        // wave value
+        wavValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        if (wavValue.type == ValueTypeError) return wavValue;
+        
+        // comma
+        if (interpreter->pc->type == TokenComma)
+        {
+            ++interpreter->pc;
+            
+            // invert value
+            invValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+            if (invValue.type == ValueTypeError) return invValue;
+            
+            // comma
+            if (interpreter->pc->type == TokenComma)
+            {
+                ++interpreter->pc;
+                
+                // env mode value
+                envValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                if (envValue.type == ValueTypeError) return envValue;
+                
+                // comma
+                if (interpreter->pc->type == TokenComma)
+                {
+                    ++interpreter->pc;
+                    
+                    // trigger value
+                    triValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                    if (triValue.type == ValueTypeError) return triValue;
+                }
+            }
+        }
+        
+        // bracket close
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        interpreter->pc++;
+        
+        if (interpreter->pass == PassRun)
+        {
+            if (wavValue.type != ValueTypeNull) resultAttr.wave = wavValue.v.floatValue;
+            if (invValue.type != ValueTypeNull) resultAttr.invert = invValue.v.floatValue;
+            if (envValue.type != ValueTypeNull) resultAttr.envMode = envValue.v.floatValue;
+            if (triValue.type != ValueTypeNull) resultAttr.trigger = triValue.v.floatValue;
+        }
+        
+        struct TypedValue resultValue;
+        resultValue.type = ValueTypeFloat;
+        resultValue.v.floatValue = resultAttr.value;
+        return resultValue;
+    }
+    else
+    {
+        return itp_evaluateNumericExpression(core, 0, 255);
+    }
+}
