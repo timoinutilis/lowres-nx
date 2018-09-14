@@ -46,7 +46,7 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
             ++interpreter->pc;
             
             // flip x value
-            fxValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+            fxValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
             if (fxValue.type == ValueTypeError) return fxValue;
             
             // comma
@@ -55,7 +55,7 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
                 ++interpreter->pc;
                 
                 // flip y value
-                fyValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                fyValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
                 if (fyValue.type == ValueTypeError) return fyValue;
                 
                 // comma
@@ -64,7 +64,7 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
                     ++interpreter->pc;
                     
                     // priority value
-                    priValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                    priValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
                     if (priValue.type == ValueTypeError) return priValue;
 
                     // comma
@@ -121,7 +121,7 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
         struct TypedValue bg1SizeValue = {ValueTypeNull, 0};
 
         // sprites value
-        sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        sValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
         if (sValue.type == ValueTypeError) return sValue;
 
         // comma
@@ -130,7 +130,7 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
             ++interpreter->pc;
             
             // bg0 value
-            bg0Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
+            bg0Value = itp_evaluateOptionalNumericExpression(core, -1, 1);
             if (bg0Value.type == ValueTypeError) return bg0Value;
 
             // comma
@@ -139,7 +139,7 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
                 ++interpreter->pc;
                 
                 // bg1 value
-                bg1Value = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                bg1Value = itp_evaluateOptionalNumericExpression(core, -1, 1);
                 if (bg1Value.type == ValueTypeError) return bg1Value;
                 
                 // comma
@@ -148,7 +148,7 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
                     ++interpreter->pc;
                     
                     // bg0 cell size value
-                    bg0SizeValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                    bg0SizeValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
                     if (bg0SizeValue.type == ValueTypeError) return bg0SizeValue;
                     
                     // comma
@@ -157,7 +157,7 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
                         ++interpreter->pc;
                         
                         // bg1 cell size value
-                        bg1SizeValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                        bg1SizeValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
                         if (bg1SizeValue.type == ValueTypeError) return bg1SizeValue;
                     }
                 }
@@ -175,90 +175,6 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
             if (bg1Value.type != ValueTypeNull) resultAttr.planeBEnabled = bg1Value.v.floatValue;
             if (bg0SizeValue.type != ValueTypeNull) resultAttr.planeACellSize = bg0SizeValue.v.floatValue;
             if (bg1SizeValue.type != ValueTypeNull) resultAttr.planeBCellSize = bg1SizeValue.v.floatValue;
-        }
-        
-        struct TypedValue resultValue;
-        resultValue.type = ValueTypeFloat;
-        resultValue.v.floatValue = resultAttr.value;
-        return resultValue;
-    }
-    else
-    {
-        return itp_evaluateNumericExpression(core, 0, 255);
-    }
-}
-
-struct TypedValue itp_evaluateVoiceAttributes(struct Core *core, union VoiceAttributes oldAttr)
-{
-    struct Interpreter *interpreter = core->interpreter;
-    if (interpreter->pc->type == TokenBracketOpen)
-    {
-        // bracket open
-        interpreter->pc++;
-        
-        union VoiceAttributes resultAttr = oldAttr;
-        
-        struct TypedValue wavValue = {ValueTypeNull, 0};
-        struct TypedValue mixLValue = {ValueTypeNull, 0};
-        struct TypedValue mixRValue = {ValueTypeNull, 0};
-        struct TypedValue timeoutValue = {ValueTypeNull, 0};
-        struct TypedValue gateValue = {ValueTypeNull, 0};
-        
-        // wave value
-        wavValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
-        if (wavValue.type == ValueTypeError) return wavValue;
-        
-        // comma
-        if (interpreter->pc->type == TokenComma)
-        {
-            ++interpreter->pc;
-            
-            // mixL value
-            mixLValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-            if (mixLValue.type == ValueTypeError) return mixLValue;
-            
-            // comma
-            if (interpreter->pc->type == TokenComma)
-            {
-                ++interpreter->pc;
-                
-                // mixR value
-                mixRValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-                if (mixRValue.type == ValueTypeError) return mixRValue;
-                
-                // comma
-                if (interpreter->pc->type == TokenComma)
-                {
-                    ++interpreter->pc;
-                    
-                    // timeout value
-                    timeoutValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-                    if (timeoutValue.type == ValueTypeError) return timeoutValue;
-                    
-                    // comma
-                    if (interpreter->pc->type == TokenComma)
-                    {
-                        ++interpreter->pc;
-                        
-                        // gate value
-                        gateValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
-                        if (gateValue.type == ValueTypeError) return gateValue;
-                    }
-                }
-            }
-        }
-        
-        // bracket close
-        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
-        interpreter->pc++;
-        
-        if (interpreter->pass == PassRun)
-        {
-            if (wavValue.type != ValueTypeNull) resultAttr.wave = wavValue.v.floatValue;
-            if (mixLValue.type != ValueTypeNull) resultAttr.mixL = mixLValue.v.floatValue;
-            if (mixRValue.type != ValueTypeNull) resultAttr.mixR = mixRValue.v.floatValue;
-            if (timeoutValue.type != ValueTypeNull) resultAttr.timeout = timeoutValue.v.floatValue;
-            if (gateValue.type != ValueTypeNull) resultAttr.gate = gateValue.v.floatValue;
         }
         
         struct TypedValue resultValue;
@@ -297,7 +213,7 @@ struct TypedValue itp_evaluateLFOAttributes(struct Core *core, union LFOAttribut
             ++interpreter->pc;
             
             // invert value
-            invValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+            invValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
             if (invValue.type == ValueTypeError) return invValue;
             
             // comma
@@ -306,7 +222,7 @@ struct TypedValue itp_evaluateLFOAttributes(struct Core *core, union LFOAttribut
                 ++interpreter->pc;
                 
                 // env mode value
-                envValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                envValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
                 if (envValue.type == ValueTypeError) return envValue;
                 
                 // comma
@@ -315,7 +231,7 @@ struct TypedValue itp_evaluateLFOAttributes(struct Core *core, union LFOAttribut
                     ++interpreter->pc;
                     
                     // trigger value
-                    triValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+                    triValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
                     if (triValue.type == ValueTypeError) return triValue;
                 }
             }

@@ -1396,20 +1396,20 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenPAUSE:
             return cmd_PAUSE(core);
             
-        case TokenVOICE:
-            return cmd_VOICE(core);
+        case TokenSOUND:
+            return cmd_SOUND(core);
             
-        case TokenVOICEA:
-            return cmd_VOICE_A(core);
+        case TokenVOLUME:
+            return cmd_VOLUME(core);
             
-        case TokenVOICEEG:
-            return cmd_VOICE_EG(core);
+        case TokenENVELOPE:
+            return cmd_ENVELOPE(core);
             
-        case TokenVOICELFO:
-            return cmd_VOICE_LFO(core);
+        case TokenLFO:
+            return cmd_LFO(core);
             
-        case TokenVOICELFOA:
-            return cmd_VOICE_LFO_A(core);
+        case TokenLFOA:
+            return cmd_LFO_A(core);
             
         case TokenPLAY:
             return cmd_PLAY(core);
