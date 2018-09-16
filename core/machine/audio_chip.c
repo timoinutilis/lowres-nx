@@ -216,7 +216,7 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
                 
                 if (voice->attr.timeout)
                 {
-                    voiceIn->timeoutCounter -= 256.0 / 4.0 / outputFrequency;
+                    voiceIn->timeoutCounter -= 60.0 / outputFrequency;
                     if (voiceIn->timeoutCounter <= 0.0)
                     {
                         voiceIn->timeoutCounter = 0.0;

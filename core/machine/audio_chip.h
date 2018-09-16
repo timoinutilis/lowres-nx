@@ -47,6 +47,7 @@ union VoiceAttributes {
         uint8_t mixL:1;
         uint8_t mixR:1;
         uint8_t timeout:1;
+        uint8_t reserved:2;
         uint8_t gate:1;
     };
     uint8_t value;

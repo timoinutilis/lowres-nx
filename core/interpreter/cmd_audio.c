@@ -358,3 +358,35 @@ enum ErrorCode cmd_PLAY(struct Core *core)
     
     return itp_endOfCommand(interpreter);
 }
+
+enum ErrorCode cmd_STOP(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // STOP
+    ++interpreter->pc;
+    
+    // n value
+    struct TypedValue nValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_VOICES - 1);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (nValue.type != ValueTypeNull)
+        {
+            int n = nValue.v.floatValue;
+            struct Voice *voice = &core->machine->audioRegisters.voices[n];
+            voice->attr.gate = 0;
+        }
+        else
+        {
+            for (int i = 0; i < NUM_VOICES; i++)
+            {
+                struct Voice *voice = &core->machine->audioRegisters.voices[i];
+                voice->attr.gate = 0;
+            }
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
