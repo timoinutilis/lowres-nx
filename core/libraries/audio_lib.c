@@ -18,8 +18,29 @@
 //
 
 #include "audio_lib.h"
+#include "core.h"
+#include <math.h>
 
-void audlib_play(struct AudioLib *lib)
+void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len)
 {
+    struct Core *core = lib->core;
+    struct Voice *voice = &core->machine->audioRegisters.voices[voiceIndex];
     
+    int f = 16.0 * 440.0 * pow(2.0, (pitch - 58.0) / 12.0);
+    voice->frequencyLow = f & 0xFF;
+    voice->frequencyHigh = f >> 8;
+    
+    if (len != -1)
+    {
+        voice->length = len;
+        voice->attr.timeout = (len > 0) ? 1 : 0;
+    }
+    voice->attr.gate = 1;
+    audio_onVoiceAttrChange(core, voiceIndex);
+    
+    if (!core->machine->audioRegisters.attr.audioEnabled)
+    {
+        core->machine->audioRegisters.attr.audioEnabled = 1;
+        delegate_controlsDidChange(core);
+    }
 }

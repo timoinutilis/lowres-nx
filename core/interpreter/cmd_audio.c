@@ -20,8 +20,6 @@
 #include "cmd_audio.h"
 #include "core.h"
 #include "interpreter_utils.h"
-#include <assert.h>
-#include <math.h>
 
 enum ErrorCode cmd_SOUND(struct Core *core)
 {
@@ -47,7 +45,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
     ++interpreter->pc;
     
     // pulse width value
-    struct TypedValue pwValue = itp_evaluateOptionalNumericExpression(core, 0, 255);
+    struct TypedValue pwValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
     if (pwValue.type == ValueTypeError) return pwValue.v.errorCode;
     
     // comma
@@ -97,7 +95,7 @@ enum ErrorCode cmd_VOLUME(struct Core *core)
     ++interpreter->pc;
     
     // volume value
-    struct TypedValue volValue = itp_evaluateOptionalNumericExpression(core, 0, 255);
+    struct TypedValue volValue = itp_evaluateOptionalNumericExpression(core, 0, 15);
     if (volValue.type == ValueTypeError) return volValue.v.errorCode;
     
     // comma
@@ -334,26 +332,7 @@ enum ErrorCode cmd_PLAY(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        int n = nValue.v.floatValue;
-        struct Voice *voice = &core->machine->audioRegisters.voices[n];
-        
-        int f = 16.0 * 440.0 * pow(2.0, (pValue.v.floatValue - 58.0) / 12.0);
-        voice->frequencyLow = f & 0xFF;
-        voice->frequencyHigh = f >> 8;
-        
-        if (len != -1)
-        {
-            voice->length = len;
-            voice->attr.timeout = (len > 0) ? 1 : 0;
-        }
-        voice->attr.gate = 1;
-        audio_onVoiceAttrChange(core, n);
-        
-        if (!core->machine->audioRegisters.attr.audioEnabled)
-        {
-            core->machine->audioRegisters.attr.audioEnabled = 1;
-            delegate_controlsDidChange(core);
-        }
+        audlib_play(&core->interpreter->audioLib, nValue.v.floatValue, pValue.v.floatValue, len);
     }
     
     return itp_endOfCommand(interpreter);

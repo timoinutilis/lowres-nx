@@ -177,9 +177,11 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     
     memset(&interpreter->textLib, 0, sizeof(struct TextLib));
     memset(&interpreter->spritesLib, 0, sizeof(struct SpritesLib));
+    memset(&interpreter->audioLib, 0, sizeof(struct AudioLib));
     interpreter->textLib.core = core;
     interpreter->spritesLib.core = core;
-    
+    interpreter->audioLib.core = core;
+
     return err_noCoreError();
 }
 

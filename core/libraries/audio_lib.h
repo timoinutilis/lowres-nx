@@ -28,6 +28,6 @@ struct AudioLib {
     struct Core *core;
 };
 
-void audlib_play(struct AudioLib *lib);
+void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len);
 
 #endif /* audio_lib_h */

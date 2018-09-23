@@ -32,6 +32,7 @@
 #include "data.h"
 #include "text_lib.h"
 #include "sprites_lib.h"
+#include "audio_lib.h"
 #include "io_chip.h"
 #include "data_manager.h"
 
@@ -114,6 +115,7 @@ struct Interpreter {
     
     struct TextLib textLib;
     struct SpritesLib spritesLib;
+    struct AudioLib audioLib;
 };
 
 void itp_init(struct Core *core);
