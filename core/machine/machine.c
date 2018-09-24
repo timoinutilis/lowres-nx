@@ -69,19 +69,6 @@ bool machine_poke(struct Core *core, int address, int value)
         case 0xFF68: // audio attributes
             delegate_controlsDidChange(core);
             break;
-            
-        case 0xFF43: // voice 0 attributes
-            audio_onVoiceAttrChange(core, 0);
-            break;
-        case 0xFF4D: // voice 1 attributes
-            audio_onVoiceAttrChange(core, 1);
-            break;
-        case 0xFF57: // voice 2 attributes
-            audio_onVoiceAttrChange(core, 2);
-            break;
-        case 0xFF61: // voice 3 attributes
-            audio_onVoiceAttrChange(core, 3);
-            break;
     }
     return true;
 }

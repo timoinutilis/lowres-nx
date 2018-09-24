@@ -20,6 +20,7 @@
 #include "audio_chip.h"
 #include "core.h"
 #include <math.h>
+#include <string.h>
 
 const double envRates[16] = {
     256.0 / 0.002,
@@ -78,6 +79,9 @@ const int lfoAmounts[16] = {
     256
 };
 
+void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInternals *internals, int16_t *stereoOutput, int numSamples, int outputFrequency);
+
+
 void audio_reset(struct Core *core)
 {
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
@@ -89,12 +93,75 @@ void audio_reset(struct Core *core)
     }
 }
 
-void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples, int outputFrequency)
+#define BUFFERED 1
+
+void audio_bufferRegisters(struct Core *core)
 {
+#if BUFFERED
     struct AudioRegisters *registers = &core->machine->audioRegisters;
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
     
+    // next buffer
+    int writeBufferIndex = internals->writeBufferIndex + 1;
+    if (writeBufferIndex >= NUM_AUDIO_BUFFERS)
+    {
+        writeBufferIndex = 0;
+    }
+    
+    // copy registers to buffer
+    memcpy(&internals->buffers[writeBufferIndex], registers, sizeof(struct AudioRegisters));
+    
+    // reset "init" flags
+    for (int v = 0; v < NUM_VOICES; v++)
+    {
+        struct Voice *voice = &registers->voices[v];
+        voice->attr.init = 0;
+    }
+    
+    internals->writeBufferIndex = writeBufferIndex;
+#endif
+}
+
+void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples, int outputFrequency)
+{
+    struct AudioInternals *internals = &core->machineInternals->audioInternals;
+#if BUFFERED
+    int readBufferIndex = internals->readBufferIndex;
+    audio_renderAudioBuffer(&internals->buffers[readBufferIndex], internals, stereoOutput, numSamples, outputFrequency);
+    if (internals->writeBufferIndex != readBufferIndex)
+    {
+        if (++readBufferIndex >= NUM_AUDIO_BUFFERS)
+        {
+            readBufferIndex = 0;
+        }
+        internals->readBufferIndex = readBufferIndex;
+    }
+#else
+    audio_renderAudioBuffer(&core->machine->audioRegisters, internals, stereoOutput, numSamples, outputFrequency);
+#endif
+}
+
+void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInternals *internals, int16_t *stereoOutput, int numSamples, int outputFrequency)
+{
     double overflow = 0xFFFFFF;
+    
+    for (int v = 0; v < NUM_VOICES; v++)
+    {
+        struct Voice *voice = &registers->voices[v];
+        if (voice->attr.init)
+        {
+            voice->attr.init = 0;
+            
+            struct VoiceInternals *voiceIn = &internals->voices[v];
+            voiceIn->envState = EnvStateAttack;
+            voiceIn->lfoHold = false;
+            voiceIn->timeoutCounter = voice->length;
+            if (voice->lfoAttr.envMode || voice->lfoAttr.trigger)
+            {
+                voiceIn->lfoAccumulator = 0.0;
+            }
+        }
+    }
     
     int i = 0;
     while (i < numSamples)
@@ -277,21 +344,5 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
         
         stereoOutput[i++] = leftOutput;
         stereoOutput[i++] = rightOutput;
-    }
-}
-
-void audio_onVoiceAttrChange(struct Core *core, int index)
-{
-    struct Voice *voice = &core->machine->audioRegisters.voices[index];
-    if (voice->attr.gate)
-    {
-        struct VoiceInternals *voiceIn = &core->machineInternals->audioInternals.voices[index];
-        voiceIn->envState = EnvStateAttack;
-        voiceIn->lfoHold = false;
-        voiceIn->timeoutCounter = voice->length;
-        if (voice->lfoAttr.envMode || voice->lfoAttr.trigger)
-        {
-            voiceIn->lfoAccumulator = 0.0;
-        }
     }
 }

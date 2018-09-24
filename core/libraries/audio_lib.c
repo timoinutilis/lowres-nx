@@ -35,8 +35,8 @@ void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len)
         voice->length = len;
         voice->attr.timeout = (len > 0) ? 1 : 0;
     }
+    voice->attr.init = 1;
     voice->attr.gate = 1;
-    audio_onVoiceAttrChange(core, voiceIndex);
     
     if (!core->machine->audioRegisters.attr.audioEnabled)
     {

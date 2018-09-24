@@ -25,6 +25,7 @@
 #include <stdbool.h>
 
 #define NUM_VOICES 4
+#define NUM_AUDIO_BUFFERS 4
 
 struct Core;
 
@@ -47,7 +48,8 @@ union VoiceAttributes {
         uint8_t mixL:1;
         uint8_t mixR:1;
         uint8_t timeout:1;
-        uint8_t reserved:2;
+        uint8_t reserved:1;
+        uint8_t init:1;
         uint8_t gate:1;
     };
     uint8_t value;
@@ -91,16 +93,6 @@ struct Voice {
     };
 };
 
-struct VoiceInternals {
-    double accumulator;
-    uint16_t noiseRandom;
-    double envCounter;
-    enum EnvState envState;
-    double lfoAccumulator;
-    bool lfoHold;
-    double timeoutCounter;
-};
-
 union AudioAttributes {
     struct {
         uint8_t audioEnabled:1;
@@ -113,12 +105,25 @@ struct AudioRegisters {
     union AudioAttributes attr;
 };
 
+struct VoiceInternals {
+    double accumulator;
+    uint16_t noiseRandom;
+    double envCounter;
+    enum EnvState envState;
+    double lfoAccumulator;
+    bool lfoHold;
+    double timeoutCounter;
+};
+
 struct AudioInternals {
     struct VoiceInternals voices[NUM_VOICES];
+    struct AudioRegisters buffers[NUM_AUDIO_BUFFERS];
+    int readBufferIndex;
+    int writeBufferIndex;
 };
 
 void audio_reset(struct Core *core);
+void audio_bufferRegisters(struct Core *core);
 void audio_renderAudio(struct Core *core, int16_t *output, int numSamples, int outputFrequency);
-void audio_onVoiceAttrChange(struct Core *core, int index);
 
 #endif /* audio_chip_h */
