@@ -25,7 +25,7 @@
 #include <stdbool.h>
 
 #define NUM_VOICES 4
-#define NUM_AUDIO_BUFFERS 4
+#define NUM_AUDIO_BUFFERS 6
 
 // audio output channels for stereo
 #define NUM_CHANNELS 2

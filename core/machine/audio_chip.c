@@ -91,6 +91,7 @@ void audio_reset(struct Core *core)
         struct VoiceInternals *voiceIn = &internals->voices[i];
         voiceIn->noiseRandom = 1;
     }
+    internals->writeBufferIndex = NUM_AUDIO_BUFFERS / 2;
 }
 
 void audio_bufferRegisters(struct Core *core)
