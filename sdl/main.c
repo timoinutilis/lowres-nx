@@ -131,8 +131,8 @@ int main(int argc, const char * argv[])
         SDL_AudioSpec desiredAudioSpec = {
             .freq = 44100,
             .format = AUDIO_S16,
-            .channels = 2,
-            .samples = 735,
+            .channels = NUM_CHANNELS,
+            .samples = 1470, // sample FRAMES
             .userdata = core,
             .callback = audioCallback
         };
@@ -514,7 +514,7 @@ void getDiskFilename(char *outputString)
 void audioCallback(void *userdata, Uint8 *stream, int len)
 {
     int16_t *samples = (int16_t *)stream;
-    int numSamples = len / 2;
+    int numSamples = len / NUM_CHANNELS;
     audio_renderAudio(userdata, samples, numSamples, audioSpec.freq);
 }
 

@@ -93,11 +93,8 @@ void audio_reset(struct Core *core)
     }
 }
 
-#define BUFFERED 1
-
 void audio_bufferRegisters(struct Core *core)
 {
-#if BUFFERED
     struct AudioRegisters *registers = &core->machine->audioRegisters;
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
     
@@ -119,26 +116,35 @@ void audio_bufferRegisters(struct Core *core)
     }
     
     internals->writeBufferIndex = writeBufferIndex;
-#endif
 }
 
 void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples, int outputFrequency)
 {
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
-#if BUFFERED
-    int readBufferIndex = internals->readBufferIndex;
-    audio_renderAudioBuffer(&internals->buffers[readBufferIndex], internals, stereoOutput, numSamples, outputFrequency);
-    if (internals->writeBufferIndex != readBufferIndex)
+    
+    int numSamplesPerUpdate = outputFrequency / 60 * NUM_CHANNELS;
+    int offset = 0;
+    
+    while (offset < numSamples)
     {
-        if (++readBufferIndex >= NUM_AUDIO_BUFFERS)
+        if (offset + numSamplesPerUpdate > numSamples)
         {
-            readBufferIndex = 0;
+            printf("fix\n");
+            numSamplesPerUpdate = numSamples - offset;
         }
-        internals->readBufferIndex = readBufferIndex;
+        int readBufferIndex = internals->readBufferIndex;
+        audio_renderAudioBuffer(&internals->buffers[readBufferIndex], internals, &stereoOutput[offset], numSamplesPerUpdate, outputFrequency);
+        if (internals->writeBufferIndex != readBufferIndex)
+        {
+            if (++readBufferIndex >= NUM_AUDIO_BUFFERS)
+            {
+                readBufferIndex = 0;
+            }
+            internals->readBufferIndex = readBufferIndex;
+        }
+        
+        offset += numSamplesPerUpdate;
     }
-#else
-    audio_renderAudioBuffer(&core->machine->audioRegisters, internals, stereoOutput, numSamples, outputFrequency);
-#endif
 }
 
 void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInternals *internals, int16_t *stereoOutput, int numSamples, int outputFrequency)

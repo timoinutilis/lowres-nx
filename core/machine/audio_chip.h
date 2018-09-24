@@ -27,6 +27,9 @@
 #define NUM_VOICES 4
 #define NUM_AUDIO_BUFFERS 4
 
+// audio output channels for stereo
+#define NUM_CHANNELS 2
+
 struct Core;
 
 enum WaveType {
