@@ -58,9 +58,16 @@ union VoiceAttributes {
     uint8_t value;
 };
 
+enum LFOWaveType {
+    LFOWaveTypeTriangle,
+    LFOWaveTypeSawtooth,
+    LFOWaveTypeSquare,
+    LFOWaveTypeRandom
+};
+
 union LFOAttributes {
     struct {
-        uint8_t wave:1;
+        uint8_t wave:2;
         uint8_t invert:1;
         uint8_t envMode:1;
         uint8_t trigger:1;
@@ -115,6 +122,7 @@ struct VoiceInternals {
     enum EnvState envState;
     double lfoAccumulator;
     bool lfoHold;
+    uint16_t lfoRandom;
     double timeoutCounter;
 };
 

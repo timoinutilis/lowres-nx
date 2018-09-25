@@ -89,7 +89,8 @@ void audio_reset(struct Core *core)
     for (int i = 0; i < NUM_VOICES; i++)
     {
         struct VoiceInternals *voiceIn = &internals->voices[i];
-        voiceIn->noiseRandom = 1;
+        voiceIn->noiseRandom = 0xABCD;
+        voiceIn->lfoRandom = 0xABCD;
     }
     internals->writeBufferIndex = NUM_AUDIO_BUFFERS / 2;
 }
@@ -130,7 +131,6 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
     {
         if (offset + numSamplesPerUpdate > numSamples)
         {
-            printf("fix\n");
             numSamplesPerUpdate = numSamples - offset;
         }
         int readBufferIndex = internals->readBufferIndex;
@@ -191,6 +191,7 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
                 
                 // --- LFO ---
                 
+                uint8_t lfoAccu8Last = voiceIn->lfoAccumulator;
                 if (!voiceIn->lfoHold)
                 {
                     double lfoRate = lfoRates[voice->lfoFrequency];
@@ -210,15 +211,35 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
                 uint8_t lfoAccu8 = voiceIn->lfoAccumulator;
                 uint8_t lfoSample = 0;
                 
-                if (voice->lfoAttr.wave)
+                enum LFOWaveType lfoWaveType = voice->lfoAttr.wave;
+                switch (lfoWaveType)
                 {
-                    // Sawtooth LFO
-                    lfoSample = ~lfoAccu8;
-                }
-                else
-                {
-                    // Triangle LFO
-                    lfoSample = ((lfoAccu8 & 0x80) ? ~(lfoAccu8 << 1) : (lfoAccu8 << 1));
+                    case LFOWaveTypeTriangle:
+                    {
+                        lfoSample = ((lfoAccu8 & 0x80) ? ~(lfoAccu8 << 1) : (lfoAccu8 << 1));
+                        break;
+                    }
+                    case LFOWaveTypeSawtooth:
+                    {
+                        lfoSample = ~lfoAccu8;
+                        break;
+                    }
+                    case LFOWaveTypeSquare:
+                    {
+                        lfoSample = (lfoAccu8 & 0x80) ? 0x00 : 0xFF;
+                        break;
+                    }
+                    case LFOWaveTypeRandom:
+                    {
+                        if ((lfoAccu8 & 0x80) != (lfoAccu8Last & 0x80))
+                        {
+                            uint16_t r = voiceIn->lfoRandom;
+                            uint16_t bit = ((r >> 0) ^ (r >> 2) ^ (r >> 3) ^ (r >> 5) ) & 1;
+                            voiceIn->lfoRandom = (r >> 1) | (bit << 15);
+                        }
+                        lfoSample = voiceIn->lfoRandom & 0xFF;
+                        break;
+                    }
                 }
                 
                 int freqAmount = lfoAmounts[voice->lfoOscAmount];
@@ -263,27 +284,34 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
                 uint16_t sample = 0x7FFF; // silence
                 
                 enum WaveType waveType = voice->attr.wave;
-                if (waveType == WaveTypeSawtooth)
+                switch (waveType)
                 {
-                    sample = accu16;
-                }
-                else if (waveType == WaveTypePulse)
-                {
-                    sample = ((accu16 >> 8) > pulseWidth) ? 0xFFFF : 0x0000;
-                }
-                else if (waveType == WaveTypeTriangle)
-                {
-                    sample = ((accu16 & 0x8000) ? ~(accu16 << 1) : (accu16 << 1));
-                }
-                else if (waveType == WaveTypeNoise)
-                {
-                    if ((accu16 & 0x1000) != (accu16Last & 0x1000))
+                    case WaveTypeSawtooth:
                     {
-                        uint16_t r = voiceIn->noiseRandom;
-                        uint16_t bit = ((r >> 0) ^ (r >> 2) ^ (r >> 3) ^ (r >> 5) ) & 1;
-                        voiceIn->noiseRandom = (r >> 1) | (bit << 15);
+                        sample = accu16;
+                        break;
                     }
-                    sample = voiceIn->noiseRandom & 0xFFFF;
+                    case WaveTypePulse:
+                    {
+                        sample = ((accu16 >> 8) > pulseWidth) ? 0xFFFF : 0x0000;
+                        break;
+                    }
+                    case WaveTypeTriangle:
+                    {
+                        sample = ((accu16 & 0x8000) ? ~(accu16 << 1) : (accu16 << 1));
+                        break;
+                    }
+                    case WaveTypeNoise:
+                    {
+                        if ((accu16 & 0x1000) != (accu16Last & 0x1000))
+                        {
+                            uint16_t r = voiceIn->noiseRandom;
+                            uint16_t bit = ((r >> 0) ^ (r >> 2) ^ (r >> 3) ^ (r >> 5) ) & 1;
+                            voiceIn->noiseRandom = (r >> 1) | (bit << 15);
+                        }
+                        sample = voiceIn->noiseRandom & 0xFFFF;
+                        break;
+                    }
                 }
                 
                 // --- TIMEOUT ---

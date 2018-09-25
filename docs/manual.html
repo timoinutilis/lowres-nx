@@ -1273,9 +1273,11 @@ These values range from 0 to 15.</p>
 All attribute parameters can be omitted to keep their current settings.</p>
 
 <table>
-<tr><td>w</td> <td>wave (0/1):<br/>
+<tr><td>w</td> <td>wave (0-3):<br/>
 0: triangle<br/>
-1: sawtooth</td></tr>
+1: sawtooth<br/>
+2: square<br/>
+3: random</td></tr>
 <tr><td>r</td> <td>revert (0/1)</td></tr>
 <tr><td>e</td> <td>env mode enabled (0/1)</td></tr>
 <tr><td>t</td> <td>trigger enabled (0/1)</td></tr>
@@ -1843,7 +1845,8 @@ $FF68 - Attributes:
     2   Mix to left
     3   Mix to right
     4   Timeout enabled
-    5-6 Reserved
+    5   Reserved
+    6   Init
     7   Gate
 - Length (timeout)
 - Envelope byte 1:
@@ -1856,12 +1859,14 @@ $FF68 - Attributes:
     4-7  Sustain
 - LFO attributes:
     Bit  Purpose
-    0    Wave:
+    0-1  Wave:
          0: Triangle
          1: Sawtooth
-    1    Invert
-    2    Env mode enabled
-    3    Trigger enabled
+         2: Square
+         3: Random
+    2    Invert
+    3    Env mode enabled
+    4    Trigger enabled
 - LFO settings byte 1:
     Bit  Purpose
     0-3  LFO Rate

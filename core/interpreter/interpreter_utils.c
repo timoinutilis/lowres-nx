@@ -204,7 +204,7 @@ struct TypedValue itp_evaluateLFOAttributes(struct Core *core, union LFOAttribut
         struct TypedValue triValue = {ValueTypeNull, 0};
         
         // wave value
-        wavValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+        wavValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
         if (wavValue.type == ValueTypeError) return wavValue;
         
         // comma
