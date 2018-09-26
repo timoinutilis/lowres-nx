@@ -92,7 +92,7 @@ void audio_reset(struct Core *core)
         voiceIn->noiseRandom = 0xABCD;
         voiceIn->lfoRandom = 0xABCD;
     }
-    internals->writeBufferIndex = NUM_AUDIO_BUFFERS / 2;
+    internals->writeBufferIndex = -1;
 }
 
 void audio_bufferRegisters(struct Core *core)
@@ -101,10 +101,14 @@ void audio_bufferRegisters(struct Core *core)
     struct AudioInternals *internals = &core->machineInternals->audioInternals;
     
     // next buffer
-    int writeBufferIndex = internals->writeBufferIndex + 1;
-    if (writeBufferIndex >= NUM_AUDIO_BUFFERS)
+    int writeBufferIndex = internals->writeBufferIndex;
+    if (writeBufferIndex >= 0)
     {
-        writeBufferIndex = 0;
+        writeBufferIndex = (writeBufferIndex + 1) % NUM_AUDIO_BUFFERS;
+    }
+    else
+    {
+        writeBufferIndex = NUM_AUDIO_BUFFERS / 2;
     }
     
     // copy registers to buffer
@@ -135,13 +139,9 @@ void audio_renderAudio(struct Core *core, int16_t *stereoOutput, int numSamples,
         }
         int readBufferIndex = internals->readBufferIndex;
         audio_renderAudioBuffer(&internals->buffers[readBufferIndex], internals, &stereoOutput[offset], numSamplesPerUpdate, outputFrequency);
-        if (internals->writeBufferIndex != readBufferIndex)
+        if (internals->writeBufferIndex != -1 && internals->writeBufferIndex != readBufferIndex)
         {
-            if (++readBufferIndex >= NUM_AUDIO_BUFFERS)
-            {
-                readBufferIndex = 0;
-            }
-            internals->readBufferIndex = readBufferIndex;
+            internals->readBufferIndex = (readBufferIndex + 1) % NUM_AUDIO_BUFFERS;
         }
         
         offset += numSamplesPerUpdate;
