@@ -177,9 +177,11 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     
     memset(&interpreter->textLib, 0, sizeof(struct TextLib));
     memset(&interpreter->spritesLib, 0, sizeof(struct SpritesLib));
+    memset(&interpreter->audioLib, 0, sizeof(struct AudioLib));
     interpreter->textLib.core = core;
     interpreter->spritesLib.core = core;
-    
+    interpreter->audioLib.core = core;
+
     return err_noCoreError();
 }
 
@@ -1145,13 +1147,7 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenPAUSE:
             return fnc_PAUSE(core);
-            
-        case TokenVOICEA:
-        case TokenVOICEF:
-        case TokenVOICEPW:
-        case TokenVOICEV:
-            return fnc_VOICE(core);
-            
+                        
         default:
             break;
     }
@@ -1403,11 +1399,26 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenPAUSE:
             return cmd_PAUSE(core);
             
-        case TokenVOICE:
-            return cmd_VOICE(core);
+        case TokenSOUND:
+            return cmd_SOUND(core);
             
-        case TokenVOICEA:
-            return cmd_VOICE_A(core);
+        case TokenVOLUME:
+            return cmd_VOLUME(core);
+            
+        case TokenENVELOPE:
+            return cmd_ENVELOPE(core);
+            
+        case TokenLFO:
+            return cmd_LFO(core);
+            
+        case TokenLFOA:
+            return cmd_LFO_A(core);
+            
+        case TokenPLAY:
+            return cmd_PLAY(core);
+            
+        case TokenSTOP:
+            return cmd_STOP(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
