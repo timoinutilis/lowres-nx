@@ -119,7 +119,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     
     if (interpreter->numLabelStackItems > 0)
     {
-        struct LabelStackItem *item = &interpreter->labelStackItems[0];
+        struct LabelStackItem *item = &interpreter->labelStackItems[interpreter->numLabelStackItems - 1];
         switch (item->type)
         {
             case LabelTypeIF:
