@@ -928,15 +928,16 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    interpreter->lastVariableValue = NULL;
-    
     // check for function
     struct TypedValue value = itp_evaluateFunction(core);
     if (value.type != ValueTypeNull)
     {
         ++interpreter->cycles;
+        interpreter->lastVariableValue = NULL;
         return value;
     }
+    
+    interpreter->lastVariableValue = NULL;
     
     // native types
     switch (interpreter->pc->type)
