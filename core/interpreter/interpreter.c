@@ -1145,6 +1145,9 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenFILE:
             return fnc_FILE(core);
             
+        case TokenFSIZE:
+            return fnc_FSIZE(core);
+            
         case TokenPAUSE:
             return fnc_PAUSE(core);
                         
