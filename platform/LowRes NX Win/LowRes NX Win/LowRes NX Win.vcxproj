@@ -108,6 +108,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -137,6 +138,7 @@
     <ClCompile Include="..\..\..\core\core_delegate.c" />
     <ClCompile Include="..\..\..\core\datamanager\data_manager.c" />
     <ClCompile Include="..\..\..\core\interpreter\charsets.c" />
+    <ClCompile Include="..\..\..\core\interpreter\cmd_audio.c" />
     <ClCompile Include="..\..\..\core\interpreter\cmd_background.c" />
     <ClCompile Include="..\..\..\core\interpreter\cmd_control.c" />
     <ClCompile Include="..\..\..\core\interpreter\cmd_data.c" />
@@ -161,6 +163,7 @@
     <ClCompile Include="..\..\..\core\interpreter\tokenizer.c" />
     <ClCompile Include="..\..\..\core\interpreter\value.c" />
     <ClCompile Include="..\..\..\core\interpreter\variables.c" />
+    <ClCompile Include="..\..\..\core\libraries\audio_lib.c" />
     <ClCompile Include="..\..\..\core\libraries\default_characters.c" />
     <ClCompile Include="..\..\..\core\libraries\sprites_lib.c" />
     <ClCompile Include="..\..\..\core\libraries\startup_sequence.c" />
@@ -181,6 +184,7 @@
     <ClInclude Include="..\..\..\core\core_delegate.h" />
     <ClInclude Include="..\..\..\core\datamanager\data_manager.h" />
     <ClInclude Include="..\..\..\core\interpreter\charsets.h" />
+    <ClInclude Include="..\..\..\core\interpreter\cmd_audio.h" />
     <ClInclude Include="..\..\..\core\interpreter\cmd_background.h" />
     <ClInclude Include="..\..\..\core\interpreter\cmd_control.h" />
     <ClInclude Include="..\..\..\core\interpreter\cmd_data.h" />
@@ -206,6 +210,7 @@
     <ClInclude Include="..\..\..\core\interpreter\tokenizer.h" />
     <ClInclude Include="..\..\..\core\interpreter\value.h" />
     <ClInclude Include="..\..\..\core\interpreter\variables.h" />
+    <ClInclude Include="..\..\..\core\libraries\audio_lib.h" />
     <ClInclude Include="..\..\..\core\libraries\default_characters.h" />
     <ClInclude Include="..\..\..\core\libraries\sprites_lib.h" />
     <ClInclude Include="..\..\..\core\libraries\startup_sequence.h" />
