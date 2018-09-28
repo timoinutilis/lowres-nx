@@ -30,5 +30,6 @@ enum ErrorCode cmd_LOAD(struct Core *core);
 enum ErrorCode cmd_SAVE(struct Core *core);
 enum ErrorCode cmd_FILES(struct Core *core);
 struct TypedValue fnc_FILE(struct Core *core);
+struct TypedValue fnc_FSIZE(struct Core *core);
 
 #endif /* cmd_files_h */

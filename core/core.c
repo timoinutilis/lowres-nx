@@ -124,6 +124,7 @@ void core_update(struct Core *core, struct CoreInput *input)
     itp_runProgram(core);
     itp_didFinishVBL(core);
     overlay_draw(core);
+    audio_bufferRegisters(core);
 }
 
 void core_handleInput(struct Core *core, struct CoreInput *input)

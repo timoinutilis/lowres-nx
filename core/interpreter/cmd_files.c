@@ -177,3 +177,37 @@ struct TypedValue fnc_FILE(struct Core *core)
     }
     return resultValue;
 }
+
+struct TypedValue fnc_FSIZE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // FSIZE
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    ++interpreter->pc;
+    
+    // file value
+    struct TypedValue fileValue = itp_evaluateNumericExpression(core, 0, MAX_ENTRIES - 1);
+    if (fileValue.type == ValueTypeError) return fileValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    ++interpreter->pc;
+    
+    struct TypedValue resultValue;
+    resultValue.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (core->diskDrive->dataManager.data == NULL) return val_makeError(ErrorDirectoryNotLoaded);
+        
+        int index = fileValue.v.floatValue;
+        struct DataEntry *entry = &core->diskDrive->dataManager.entries[index];
+        
+        resultValue.v.floatValue = entry->length;
+    }
+    return resultValue;
+}

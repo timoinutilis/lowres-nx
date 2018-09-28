@@ -22,8 +22,13 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define NUM_VOICES 4
+#define NUM_AUDIO_BUFFERS 6
+
+// audio output channels for stereo
+#define NUM_CHANNELS 2
 
 struct Core;
 
@@ -34,11 +39,38 @@ enum WaveType {
     WaveTypeNoise
 };
 
+enum EnvState {
+    EnvStateAttack,
+    EnvStateDecay,
+    EnvStateRelease
+};
+
 union VoiceAttributes {
     struct {
         uint8_t wave:2;
         uint8_t mixL:1;
         uint8_t mixR:1;
+        uint8_t timeout:1;
+        uint8_t reserved:1;
+        uint8_t init:1;
+        uint8_t gate:1;
+    };
+    uint8_t value;
+};
+
+enum LFOWaveType {
+    LFOWaveTypeTriangle,
+    LFOWaveTypeSawtooth,
+    LFOWaveTypeSquare,
+    LFOWaveTypeRandom
+};
+
+union LFOAttributes {
+    struct {
+        uint8_t wave:2;
+        uint8_t invert:1;
+        uint8_t envMode:1;
+        uint8_t trigger:1;
     };
     uint8_t value;
 };
@@ -46,15 +78,29 @@ union VoiceAttributes {
 struct Voice {
     uint8_t frequencyLow;
     uint8_t frequencyHigh;
-    uint8_t volume;
-    uint8_t pulseWidth;
+    struct {
+        uint8_t volume:4;
+        uint8_t pulseWidth:4;
+    };
     union VoiceAttributes attr;
-    uint8_t reserved;
-};
-
-struct VoiceInternals {
-    double accumulator;
-    uint16_t noiseRandom;
+    uint8_t length;
+    struct {
+        uint8_t envD:4;
+        uint8_t envA:4;
+    };
+    struct {
+        uint8_t envR:4;
+        uint8_t envS:4;
+    };
+    union LFOAttributes lfoAttr;
+    struct {
+        uint8_t lfoFrequency:4;
+        uint8_t lfoOscAmount:4;
+    };
+    struct {
+        uint8_t lfoVolAmount:4;
+        uint8_t lfoPWAmount:4;
+    };
 };
 
 union AudioAttributes {
@@ -69,11 +115,26 @@ struct AudioRegisters {
     union AudioAttributes attr;
 };
 
+struct VoiceInternals {
+    double accumulator;
+    uint16_t noiseRandom;
+    double envCounter;
+    enum EnvState envState;
+    double lfoAccumulator;
+    bool lfoHold;
+    uint16_t lfoRandom;
+    double timeoutCounter;
+};
+
 struct AudioInternals {
     struct VoiceInternals voices[NUM_VOICES];
+    struct AudioRegisters buffers[NUM_AUDIO_BUFFERS];
+    int readBufferIndex;
+    int writeBufferIndex;
 };
 
 void audio_reset(struct Core *core);
+void audio_bufferRegisters(struct Core *core);
 void audio_renderAudio(struct Core *core, int16_t *output, int numSamples, int outputFrequency);
 
 #endif /* audio_chip_h */

@@ -61,7 +61,7 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 <li>Backgrounds: Two layers, tile-based, scrollable</li>
 <li>Sprites: 64, max 32x32 pixels</li>
 <li>Colors: 8 dynamic 6-bit palettes with 4 colors each</li>
-<li>Sound: 4 voices, saw/tri/pulse/noise, pulse width, volume</li>
+<li>Sound: 4 voices, saw/tri/pulse/noise, pulse width, volume, ADSR, LFO</li>
 <li>Input: Two game controllers with d-pad and two buttons + pause</li>
 <li>Optional input: Keyboard and touch/mouse</li>
 </ul>
@@ -1162,71 +1162,133 @@ hours.</p>
 
 <p>LowRes NX has four independent sound generators (voices). Each one
 can play sawtooth, triangle, pulse and noise waveforms, and has
-frequency, volume and pulse width settings.<br/>
-Currently only low-level commands are available. Commands for effects
-and music will come in a later version.</p>
+frequency, volume and pulse width settings. An additional envelope
+generator and LFO per voice makes complex sounds and instruments
+possible.</p>
 
 
-<h3 id="_VOICE" name="VOICE">VOICE</h3>
+<h3 id="_PLAY" name="PLAY">PLAY</h3>
 
-<pre>VOICE n,f,v,pw</pre>
+<pre>PLAY v,p[,l]</pre>
 
-<p>Sets the frequency (f, 0-65535), volume (v, 0-255) and
-pulse width (pw, 0-255) of voice n (0-3).
-The frequency is calculated by this formula: f = hertz * 16.
-The pulse width only affects sounds with the pulse waveform,
-a value of 127 creates a square wave.
-All parameters can be omitted to keep their current settings.</p>
+<p>Plays a sound on voice v (0-3). p is the pitch:</p>
+<table>
+    <tr><th>Note</th><th colspan="8">Pitch (with different octaves)</th></tr>
+    <tr><th>C</th><td>1</td><td>13</td><td>25</td><td>37</td><td>49</td><td>61</td><td>73</td><td>85</td></tr>
+    <tr><th>C#</th><td>2</td><td>14</td><td>26</td><td>38</td><td>50</td><td>62</td><td>74</td><td>86</td></tr>
+    <tr><th>D</th><td>3</td><td>15</td><td>27</td><td>39</td><td>51</td><td>63</td><td>75</td><td>87</td></tr>
+    <tr><th>D#</th><td>4</td><td>16</td><td>28</td><td>40</td><td>52</td><td>64</td><td>76</td><td>88</td></tr>
+    <tr><th>E</th><td>5</td><td>17</td><td>29</td><td>41</td><td>53</td><td>65</td><td>77</td><td>89</td></tr>
+    <tr><th>F</th><td>6</td><td>18</td><td>30</td><td>42</td><td>54</td><td>66</td><td>78</td><td>90</td></tr>
+    <tr><th>F#</th><td>7</td><td>19</td><td>31</td><td>43</td><td>55</td><td>67</td><td>79</td><td>91</td></tr>
+    <tr><th>G</th><td>8</td><td>20</td><td>32</td><td>44</td><td>56</td><td>68</td><td>80</td><td>92</td></tr>
+    <tr><th>G#</th><td>9</td><td>21</td><td>33</td><td>45</td><td>57</td><td>69</td><td>81</td><td>93</td></tr>
+    <tr><th>A</th><td>10</td><td>22</td><td>34</td><td>46</td><td>58</td><td>70</td><td>82</td><td>94</td></tr>
+    <tr><th>A#</th><td>11</td><td>23</td><td>35</td><td>47</td><td>59</td><td>71</td><td>83</td><td>95</td></tr>
+    <tr><th>B</th><td>12</td><td>24</td><td>36</td><td>48</td><td>60</td><td>72</td><td>84</td><td>96</td></tr>
+</table>
+<p>The optional parameter l is the length in 1/60 seconds, the maximum
+is 255. 0 means, that the the sound won't stop automatically. If the
+parameter is omitted, the current value of the voice is kept.</p>
 
 
-<h3 id="_VOICE.A" name="VOICE.A">VOICE.A</h3>
+<h3 id="_STOP" name="STOP">STOP</h3>
 
-<pre>VOICE.A n,(w,ml,mr)</pre>
+<pre>STOP [v]</pre>
 
-<p>Sets the attributes of voice n (0-3). All attribute parameters
-can be omitted to keep their current settings.</p>
+<p>Stops the current sound on voice v. If the parameter is omitted,
+all voices are stopped. If the voice's envelope has a release time,
+the sound won't stop immediately, but fade out.</p>
+
+
+<h3 id="_SOUND" name="SOUND">SOUND</h3>
+
+<pre>SOUND v,w,pw,l</pre>
+
+<p>Sets the basic sound parameters of voice v (0-3).</p>
+<p>w is the waveform:</p>
 
 <table>
-<tr><td>w</td> <td>waveform (0-3):<br/>
-0: sawtooth<br/>
-1: triangle<br/>
-2: pulse<br/>
-3: noise</td></tr>
-<tr><td>ml</td> <td>mix to left speaker (0/1)</td></tr>
-<tr><td>mr</td> <td>mix to right speaker (0/1)</td></tr>
+<tr><td>0</td><td>Sawtooth</td></tr>
+<tr><td>1</td><td>Triangle</td></tr>
+<tr><td>2</td><td>Pulse</td></tr>
+<tr><td>3</td><td>Noise</td></tr>
 </table>
 
-<pre>VOICE.A n,a</pre>
-
-<p>Allows setting the attributes as a single 8-bit value.</p>
-
-
-<h3 id="_=VOICE.F" name="VOICE.F">=VOICE.F</h3>
-
-<pre>VOICE.F(n)</pre>
-
-<p>Returns the frequency of voice n.</p>
+<p>pw is the pulse width (0-15), a value of 7 results in a square
+wave. This parameter only has an effect for the pulse waveform.</p>
+<p>l is the sound length in 1/60 seconds, the maximum is 255. 0 means,
+that the sound won't stop automatically. If the length is set using
+this command, the length parameter of PLAY can be omitted.</p>
+<p>All parameters can be omitted to keep their current settings.</p>
 
 
-<h3 id="_=VOICE.V" name="VOICE.V">=VOICE.V</h3>
+<h3 id="_VOLUME" name="VOLUME">VOLUME</h3>
 
-<pre>VOICE.V(n)</pre>
+<pre>VOLUME v,vol,mix</pre>
 
-<p>Returns the volume of voice n.</p>
+<p>Sets the volume of voice n (0-3) to vol (0-15) and its outputs to
+mix (0-3):</p>
+
+<table>
+<tr><td>0</td><td>Muted</td></tr>
+<tr><td>1</td><td>Left</td></tr>
+<tr><td>2</td><td>Right</td></tr>
+<tr><td>3</td><td>Left and right (center)</td></tr>
+</table>
+
+<p>All parameters can be omitted to keep their current settings.</p>
 
 
-<h3 id="_=VOICE.PW" name="VOICE.PW">=VOICE.PW</h3>
+<h3 id="_ENVELOPE" name="ENVELOPE">ENVELOPE</h3>
 
-<pre>VOICE.PW(n)</pre>
+<pre>ENVELOPE v,a,d,s,r</pre>
 
-<p>Returns the pulse width of voice n.</p>
+<p>Sets the volume envelope generator of voice v (0-3).</p>
+<p>a is the attack time, d is the decay time, and r is the release
+time. All times are non-linear and range from 0 (2 ms) to 15 (12 s)</p>
+<p>s is the sustain level (0-15), which is the volume after the decay
+time and before the sound gets released.</p>
+<p>All parameters can be omitted to keep their current settings.</p>
 
 
-<h3 id="_=VOICE.A" name="VOICE.A">=VOICE.A</h3>
+<h3 id="_LFO" name="LFO">LFO</h3>
 
-<pre>VOICE.A(n)</pre>
+<pre>LFO v,r,fr,vol,pw</pre>
 
-<p>Returns the attributes of voice n as an 8-bit value.</p>
+<p>Sets the LFO (low frequency oscillator) of voice v (0-3).</p>
+<p>r is the LFO rate and ranges from 0 (0.12 Hz) to 15 (18 Hz) in a
+non-linear manner.</p>
+<p>The other paramters set the amount of the effect on different sound
+parameters: fr for frequency/pitch, vol for volume and pw for pulse
+width. These values range from 0 to 15.</p>
+<p>All parameters can be omitted to keep their current settings.</p>
+
+
+<h3 id="_LFO.A" name="LFO.A">LFO.A</h3>
+
+<pre>LFO.A v,(w,r,e,t)</pre>
+
+<p>Sets additional LFO attributes of voice v (0-3).
+All attribute parameters can be omitted to keep their current settings.</p>
+
+<table>
+<tr><td>w</td> <td>wave (0-3):<br/>
+0: triangle<br/>
+1: sawtooth<br/>
+2: square<br/>
+3: random</td></tr>
+<tr><td>r</td> <td>revert (0/1)</td></tr>
+<tr><td>e</td> <td>env mode enabled (0/1)</td></tr>
+<tr><td>t</td> <td>trigger enabled (0/1)</td></tr>
+</table>
+
+<p>By default the LFO adds its output to the normal sound parameters.
+If revert is enabled, it subtracts.
+By enabling the env mode, the LFO stops after one cycle, so it can
+be used as an additional envelope generator. If the trigger is
+enabled, the LFO restarts for each played sound, otherwise it runs
+continuously. Trigger is enabled implicitly with the env mode.</p>
 
 
 <h1 id="Data">Data</h1>
@@ -1313,6 +1375,17 @@ the parameter is omitted.</p>
 
 <h1 id="Files">Files</h1>
 
+<p>The file commands can be used to store data on a
+virtual disk, which can contain up to 16 files. Its format is the same
+as the ROM entries part in a program file. This makes it possible to
+use any NX program directly as a virtual disk to edit its data.</p>
+
+<p>Virtual disks are meant to be used for development tools only, for
+example image and map editors or music programs. Games should use
+persistent memory instead. Imagine that the standard LowRes NX console
+wouldn't have a disk drive.</p>
+
+
 <h3 id="_LOAD" name="LOAD">LOAD</h3>
 
 <pre>LOAD f,a</pre>
@@ -1341,17 +1414,6 @@ store game states.</p>
 
 <h3 id="_FILES" name="FILES">FILES</h3>
 
-<p>The file commands can be used to store data on a
-virtual disk, which can contain up to 16 files. Its format is the same
-as the ROM entries part in a program file. This makes it possible to
-use any NX program directly as a virtual disk to edit its data.</p>
-
-<p>Virtual disks are meant to be used for development tools only, for
-example image and map editors or music programs. Games should use
-persistent memory instead. Imagine that the standard LowRes NX console
-wouldn't have a disk drive.</p>
-
-
 <pre>FILES</pre>
 
 <p>Loads the current file directory for use with FILES$.</p>
@@ -1362,6 +1424,13 @@ wouldn't have a disk drive.</p>
 <pre>FILE$(f)</pre>
 
 <p>Returns the comment string of file number f. Call FILES before accessing the file directory to update its content, or use FILE$ directly after LOAD or SAVE.</p>
+
+
+<h3 id="_=FSIZE" name="FSIZE">=FSIZE</h3>
+
+<pre>FSIZE(n)</pre>
+
+<p>Returns the number of bytes of file number n. Call FILES before accessing the file directory to update its content, or use FSIZE directly after LOAD or SAVE.</p>
 
 
 <h1 id="Debugging">Debugging</h1>
@@ -1660,7 +1729,7 @@ $FE00 - Sprite Registers (256 B)
 $FF00 - Color Registers (32 B)
 $FF20 - Video Registers
 $FF40 - Audio Registers
-$FF60 - I/O Registers
+$FF70 - I/O Registers
 </pre>
 
 <h3 id="Character-Data">Character Data</h3>
@@ -1755,12 +1824,26 @@ $FF26 - Raster line
 
 <h3 id="Audio-Registers">Audio Registers</h3>
 
-<p>There are 4 voices available, each occupies 6 bytes:</p>
+<p>There are registers for 4 voices and one for global attributes:</p>
+<pre>
+$FF40 - Voice 0
+$FF4A - Voice 1
+$FF54 - Voice 2
+$FF5E - Voice 3
+
+$FF68 - Attributes:
+    Bit  Purpose
+    0    Audio enabled
+</pre>
+
+<p>Each voice occupies 10 bytes:</p>
 <pre>
 - Frequency low-byte
 - Frequency high-byte
-- Volume
-- Pulse width
+- Settings:
+    Bit  Purpose
+    0-3  Volume
+    4-7  Pulse width
 - Attributes:
     Bit  Purpose
     0-1  Wave:
@@ -1770,22 +1853,46 @@ $FF26 - Raster line
          3: Noise
     2   Mix to left
     3   Mix to right
-- Reserved
+    4   Timeout enabled
+    5   Reserved
+    6   Init
+    7   Gate
+- Length (timeout)
+- Envelope byte 1:
+    Bit  Purpose
+    0-3  Decay
+    4-7  Attack
+- Envelope byte 2:
+    Bit  Purpose
+    0-3  Release
+    4-7  Sustain
+- LFO attributes:
+    Bit  Purpose
+    0-1  Wave:
+         0: Triangle
+         1: Sawtooth
+         2: Square
+         3: Random
+    2    Invert
+    3    Env mode enabled
+    4    Trigger enabled
+- LFO settings byte 1:
+    Bit  Purpose
+    0-3  LFO Rate
+    4-7  Frequency amount
+- LFO settings byte 2:
+    Bit  Purpose
+    0-3  Volume amount
+    4-7  Pulse width amount
 </pre>
 <p>Note: The frequency is a 16-bit value: f = hertz * 16</p>
-
-<pre>
-$FF58 - Attributes:
-    Bit  Purpose
-    0    Audio enabled
-</pre>
 
 
 <h3 id="I-O-Registers">I/O Registers</h3>
 
 <pre>
-$FF60 - Gamepad 0 status
-$FF61 - Gamepad 1 status
+$FF70 - Gamepad 0 status
+$FF71 - Gamepad 1 status
 
 Gamepad status:
     Bit  Purpose
@@ -1796,15 +1903,15 @@ Gamepad status:
     4    Button A
     5    Button B
 
-$FF62 - Last touch X position
-$FF63 - Last touch Y position
-$FF64 - Last pressed key (ASCII code)
-$FF65 - Status:
+$FF72 - Last touch X position
+$FF73 - Last touch Y position
+$FF74 - Last pressed key (ASCII code)
+$FF75 - Status:
     Bit  Purpose
     0    Pause button
     1    Touch
 
-$FF66 - Attributes:
+$FF76 - Attributes:
     Bit  Purpose
     0-1  Gamepads enabled:
          0: off (touchscreen enabled)

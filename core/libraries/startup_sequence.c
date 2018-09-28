@@ -80,4 +80,15 @@ void runStartupSequence(struct Core *core)
     int bgStart = entries[3].start;
     core->interpreter->textLib.sourceAddress = bgStart + 4;
     core->interpreter->textLib.sourceWidth = core->machine->cartridgeRom[bgStart + 2];
+    
+    // voices
+    for (int i = 0; i < NUM_VOICES; i++)
+    {
+        struct Voice *voice = &core->machine->audioRegisters.voices[i];
+        voice->pulseWidth = 7;
+        voice->volume = 15;
+        voice->attr.mixL = 1;
+        voice->attr.mixR = 1;
+        voice->envS = 15;
+    }
 }
