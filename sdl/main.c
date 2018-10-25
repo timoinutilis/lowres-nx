@@ -155,6 +155,14 @@ int main(int argc, const char * argv[])
         devMode.core = core;
         devMode.settings = &settings;
         
+#ifdef __EMSCRIPTEN__
+        loadBootIntro();
+        if (settings.program && strlen(settings.program) > 0)
+        {
+            machine_poke(core, 0xA000, 1);
+            emscripten_async_wget(settings.program, "program.nx", onloaded, onerror);
+        }
+#else
         if (settings.program)
         {
             loadMainProgram(settings.program);
@@ -162,12 +170,9 @@ int main(int argc, const char * argv[])
         else
         {
             loadBootIntro();
-#ifdef __EMSCRIPTEN__
-            const char *url = "LowResGalaxy2.nx";
-            emscripten_async_wget(url, "program.nx", onloaded, onerror);
-#endif
         }
-        
+#endif
+
         updateScreenRect(SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale);
         
 #ifdef __EMSCRIPTEN__
