@@ -56,8 +56,7 @@
 	
 	-programs path
 	Path for the tool programs and virtual disk file.
-	By default it's the "programs" folder next to the LowRes NX
-	application.
+	By default it's "LowRes NX" in your documents folder.
 
 	program.nx
 	Name of program to run
@@ -78,7 +77,7 @@ Mac/Linux line ends, otherwise you may see everything in one line.
 
 If you open NX tools (Character Designer, Background Designer, etc.)
 directly like other NX programs, they will use the "Disk.nx" file in
-the application's "programs" folder for loading and saving their data.
+your programs folder for loading and saving their data.
 
 To edit your program's data directly (without the "Disk.nx" file),
 run your program in the normal way. Then press Ctrl+M to enter the

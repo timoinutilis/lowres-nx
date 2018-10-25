@@ -19,6 +19,7 @@
 
 #include "settings.h"
 #include <string.h>
+#include "system_paths.h"
 
 #ifdef __EMSCRIPTEN__
 #include <SDL2/SDL.h>
@@ -30,13 +31,6 @@
 #include <SDL.h>
 #endif
 
-#ifdef _WIN32
-#define PATH_SEPARATOR "\\"
-#else
-#define PATH_SEPARATOR "/"
-#endif
-const char *defaultProgramsPath = "programs" PATH_SEPARATOR;
-
 const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n";
 
 void settings_setValue(struct Settings *settings, const char *key, const char *value);
@@ -46,18 +40,8 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
 {
     // default values
     
-    char *basePath = SDL_GetBasePath();
-    if (basePath)
-    {
-        strncpy(settings->programsPath, basePath, FILENAME_MAX - 1);
-        strncat(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
-        SDL_free(basePath);
-        basePath = NULL;
-    }
-    else
-    {
-        strncpy(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
-    }
+    documents_path(settings->programsPath, FILENAME_MAX - 1);
+    strncat(settings->programsPath, "LowRes NX" PATH_SEPARATOR, FILENAME_MAX - 1);
     
     // load settings file
     

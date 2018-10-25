@@ -25,6 +25,10 @@
 #include "settings.h"
 #include "boot_intro.h"
 
+#ifndef __EMSCRIPTEN__
+#include "screenshot.h"
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <SDL2/SDL.h>
@@ -57,6 +61,7 @@ void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
 void getDiskFilename(char *outputString);
 void audioCallback(void *userdata, Uint8 *stream, int len);
+void saveScreenshot(void);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -353,6 +358,10 @@ void update(void *arg) {
                     {
                         loadBootIntro();
                     }
+                    else if (code == SDLK_s)
+                    {
+                        saveScreenshot();
+                    }
                 }
                 else if (code == SDLK_ESCAPE)
                 {
@@ -526,6 +535,17 @@ void audioCallback(void *userdata, Uint8 *stream, int len)
     int16_t *samples = (int16_t *)stream;
     int numSamples = len / NUM_CHANNELS;
     audio_renderAudio(userdata, samples, numSamples, audioSpec.freq);
+}
+
+void saveScreenshot(void)
+{
+#ifndef __EMSCRIPTEN__
+    void *pixels = NULL;
+    int pitch = 0;
+    SDL_LockTexture(texture, NULL, &pixels, &pitch);
+    screenshot_save(pixels);
+    SDL_UnlockTexture(texture);
+#endif
 }
 
 /** Called on error */
