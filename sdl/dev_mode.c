@@ -24,6 +24,7 @@
 #include "dev_mode_data.h"
 #include "text_lib.h"
 #include "string_utils.h"
+#include "system_paths.h"
 
 #ifdef __EMSCRIPTEN__
 #include <SDL2/SDL.h>
@@ -35,11 +36,8 @@
 #include <SDL.h>
 #endif
 
-#ifdef _WIN32
-const char pathSeparator = '\\';
-#else
-const char pathSeparator = '/';
-#endif
+#define MENU_SIZE 5
+#define NUM_DEV_TOOLS 2
 
 struct DevButton {
     int cx;
@@ -54,10 +52,9 @@ struct DevButton devButtons[] = {
     {17,4}
 };
 
-const char *devTools[] = {
+const char *devTools[NUM_DEV_TOOLS] = {
     "Character Designer 1.1.nx",
-    "Background Designer 1.1.nx",
-    "Cancel"
+    "Background Designer 1.1.nx"
 };
 
 void dev_showInfo(struct DevMode *devMode);
@@ -118,7 +115,7 @@ void dev_show(struct DevMode *devMode)
     textLib->charAttr.palette = 0;
     char progName[19];
     memset(progName, 0, 19);
-    char *slash = strrchr(devMode->mainProgramFilename, pathSeparator);
+    char *slash = strrchr(devMode->mainProgramFilename, PATH_SEPARATOR_CHAR);
     if (slash)
     {
         strncpy(progName, slash + 1, 18);
@@ -306,7 +303,18 @@ void dev_onButtonTap(struct DevMode *devMode)
         else if (button == 2)
         {
             devMode->currentMenu = DevModeMenuTools;
-            dev_showMenu(devMode, "EDIT ROM WITH TOOL", devTools, 3);
+            const char *menu[MENU_SIZE];
+            int count = 0;
+            for (int i = 0; i < NUM_DEV_TOOLS; i++)
+            {
+                menu[count++] = devTools[i];
+            }
+            for (int i = 0; i < NUM_CUSTOM_TOOLS; i++)
+            {
+                menu[count++] = devMode->settings->customTools[i];
+            }
+            menu[count++] = "Cancel";
+            dev_showMenu(devMode, "EDIT ROM WITH TOOL", menu, count);
         }
         else if (button == 3)
         {
@@ -322,13 +330,28 @@ void dev_onButtonTap(struct DevMode *devMode)
     }
     else if (devMode->currentMenu == DevModeMenuTools)
     {
-        if (devMode->currentButton < 2)
+        if (devMode->currentButton < NUM_DEV_TOOLS + NUM_CUSTOM_TOOLS)
         {
-            const char *tool = devTools[devMode->currentButton];
-            char toolFilename[FILENAME_MAX];
-            strncpy(toolFilename, devMode->settings->programsPath, FILENAME_MAX - 1);
-            strncat(toolFilename, tool, FILENAME_MAX - 1);
-            dev_runToolProgram(devMode, toolFilename);
+            const char *tool;
+            if (devMode->currentButton < NUM_DEV_TOOLS)
+            {
+                tool = devTools[devMode->currentButton];
+            }
+            else
+            {
+                tool = devMode->settings->customTools[devMode->currentButton - NUM_DEV_TOOLS];
+            }
+            if (tool[0] != 0)
+            {
+                char toolFilename[FILENAME_MAX];
+                strncpy(toolFilename, devMode->settings->programsPath, FILENAME_MAX - 1);
+                strncat(toolFilename, tool, FILENAME_MAX - 1);
+                dev_runToolProgram(devMode, toolFilename);
+            }
+            else
+            {
+                dev_show(devMode);
+            }
         }
         else
         {

@@ -55,12 +55,16 @@
 	-fullscreen yes/no
 	Starts the application in fullscreen mode
 	
+	-disabledev yes/no
+	Disables Development Menu, ESC key quits LowRes NX
+
 	-programs path
 	Path for the tool programs and virtual disk file.
 	By default it's "LowRes NX" in your documents folder.
 
-	-disabledev yes/no
-	Disables Development Menu, ESC key quits LowRes NX
+	-tool1 tool.nx
+	-tool2 tool.nx
+	Custom tools for the Edit ROM menu
 
 	program.nx
 	Name of program to run

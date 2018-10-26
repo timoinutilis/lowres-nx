@@ -24,8 +24,10 @@
 
 #ifdef _WIN32
 #define PATH_SEPARATOR "\\"
+#define PATH_SEPARATOR_CHAR '\\'
 #else
 #define PATH_SEPARATOR "/"
+#define PATH_SEPARATOR_CHAR '/'
 #endif
 
 void desktop_path(char *buffer, size_t size);

@@ -31,7 +31,7 @@
 #include <SDL.h>
 #endif
 
-const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n";
+const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n\n# Custom tools for the Edit ROM menu\n#tool1 My Tool 1.nx\n#tool2 My Tool 2.nx\n";
 
 const char *optionYes = "yes";
 const char *optionNo = "no";
@@ -145,7 +145,8 @@ void settings_setValue(struct Settings *settings, const char *key, const char *v
 			strncat(settings->programsPath, PATH_SEPARATOR, FILENAME_MAX - 1);
 		}
     }
-    if (strcmp(key, "disabledev") == 0) {
+    else if (strcmp(key, "disabledev") == 0)
+    {
         if (strcmp(value, optionYes) == 0)
         {
             settings->disabledev = true;
@@ -154,5 +155,13 @@ void settings_setValue(struct Settings *settings, const char *key, const char *v
         {
             settings->disabledev = false;
         }
+    }
+    else if (strcmp(key, "tool1") == 0)
+    {
+        strncpy(settings->customTools[0], value, TOOL_NAME_SIZE - 1);
+    }
+    else if (strcmp(key, "tool2") == 0)
+    {
+        strncpy(settings->customTools[1], value, TOOL_NAME_SIZE - 1);
     }
 }
