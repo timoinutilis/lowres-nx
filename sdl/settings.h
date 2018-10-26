@@ -27,6 +27,7 @@ struct Settings {
     const char *program;
     char programsPath[FILENAME_MAX];
     bool fullscreen;
+    bool disabledev;
 };
 
 void settings_init(struct Settings *settings, int argc, const char * argv[]);

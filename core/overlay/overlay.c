@@ -66,33 +66,55 @@ void overlay_updateState(struct Core *core)
     }
 }
 
-void overlay_draw(struct Core *core)
+void overlay_message(struct Core *core, const char *message)
 {
     struct TextLib *lib = &core->overlay->textLib;
-    if (core->interpreter->state == StatePaused)
+    txtlib_setCells(lib, 0, 15, 19, 15, 0);
+    txtlib_writeText(lib, message, 0, 15);
+    core->overlay->messageTimer = 60;
+}
+
+void overlay_draw(struct Core *core, bool ingame)
+{
+    struct TextLib *lib = &core->overlay->textLib;
+    
+    if (core->overlay->messageTimer > 0)
     {
-        if (core->overlay->timer % 60 < 40)
+        core->overlay->messageTimer--;
+        if (core->overlay->messageTimer < 20)
         {
-            txtlib_writeText(lib, "PAUSED", 7, 7);
-        }
-        else
-        {
-            txtlib_writeText(lib, "      ", 7, 7);
+            txtlib_scrollBackground(lib, 0, 15, 19, 15, -1, 0);
+            txtlib_setCell(lib, 19, 15, 0);
         }
     }
     
-    if (core->interpreter->debug)
+    if (ingame)
     {
-        txtlib_writeText(lib, "CPU", 17, 0);
-        int cpuLoad = core->interpreter->cpuLoadDisplay;
-        if (cpuLoad < 100)
+        if (core->interpreter->state == StatePaused)
         {
-            txtlib_writeNumber(lib, cpuLoad, 2, 17, 1);
-            txtlib_writeText(lib, "%", 19, 1);
+            if (core->overlay->timer % 60 < 40)
+            {
+                txtlib_writeText(lib, "PAUSED", 7, 7);
+            }
+            else
+            {
+                txtlib_setCells(lib, 7, 7, 12, 7, 0);
+            }
         }
-        else
+        
+        if (core->interpreter->debug)
         {
-            txtlib_writeText(lib, "MAX", 17, 1);
+            txtlib_writeText(lib, "CPU", 17, 0);
+            int cpuLoad = core->interpreter->cpuLoadDisplay;
+            if (cpuLoad < 100)
+            {
+                txtlib_writeNumber(lib, cpuLoad, 2, 17, 1);
+                txtlib_writeText(lib, "%", 19, 1);
+            }
+            else
+            {
+                txtlib_writeText(lib, "MAX", 17, 1);
+            }
         }
     }
     
@@ -112,5 +134,6 @@ void overlay_clear(struct Core *core)
             cell->attr.priority = 1;
         }
     }
+    core->overlay->messageTimer = 0;
 }
 

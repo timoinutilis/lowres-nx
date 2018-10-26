@@ -92,6 +92,8 @@ enum ErrorCode {
     ErrorExitSubOutsideOfASubprogram,
     ErrorKeyboardNotEnabled,
     ErrorAutomaticPauseNotDisabled,
+    ErrorGamepadNotEnabled,
+    ErrorGamepadNotDisabled,
 };
 
 struct CoreError {

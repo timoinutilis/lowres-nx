@@ -215,6 +215,8 @@ void dev_update(struct DevMode *devMode, struct CoreInput *input)
         }
     }
     devMode->lastTouch = core->machine->ioRegisters.status.touch;
+    
+    overlay_draw(core, false);
 }
 
 void dev_showInfo(struct DevMode *devMode)

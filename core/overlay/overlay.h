@@ -32,11 +32,13 @@ struct Overlay {
     struct Plane plane;
     struct TextLib textLib;
     int timer;
+    int messageTimer;
 };
 
 void overlay_init(struct Core *core);
 void overlay_reset(struct Core *core);
 void overlay_updateState(struct Core *core);
-void overlay_draw(struct Core *core);
+void overlay_message(struct Core *core, const char *message);
+void overlay_draw(struct Core *core, bool ingame);
 
 #endif /* overlay_h */

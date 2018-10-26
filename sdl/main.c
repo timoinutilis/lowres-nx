@@ -122,8 +122,7 @@ int main(int argc, const char * argv[])
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     
-    const char *windowTitle = "LowRes NX " CORE_VERSION;
-//    const char *windowTitle = "LowRes NX"
+    const char *windowTitle = "LowRes NX";
     
     window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -317,7 +316,7 @@ void update(void *arg) {
                 }
                 
                 // console buttons
-                if (code == SDLK_RETURN || code == SDLK_p)
+                if (!core_getKeyboardEnabled(core) && (code == SDLK_RETURN || code == SDLK_p))
                 {
                     coreInput.pause = true;
                 }
@@ -328,6 +327,14 @@ void update(void *arg) {
                     if (code == SDLK_d)
                     {
                         core_setDebug(core, !core_getDebug(core));
+                        if (core_getDebug(core))
+                        {
+                            overlay_message(core, "DEBUG ON");
+                        }
+                        else
+                        {
+                            overlay_message(core, "DEBUG OFF");
+                        }
                     }
                     else if (code == SDLK_f)
                     {
@@ -340,18 +347,12 @@ void update(void *arg) {
                             SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                         }
                     }
-                    else if (code == SDLK_m)
-                    {
-                        if (devMode.state != DevModeStateVisible && dev_hasProgram(&devMode))
-                        {
-                            dev_show(&devMode);
-                        }
-                    }
                     else if (code == SDLK_r)
                     {
                         if (dev_hasProgram(&devMode))
                         {
                             dev_runProgram(&devMode);
+                            overlay_message(core, "RELOADED");
                         }
                     }
                     else if (code == SDLK_e)
@@ -365,7 +366,21 @@ void update(void *arg) {
                 }
                 else if (code == SDLK_ESCAPE)
                 {
-                    quit = true;
+                    if (settings.disabledev)
+                    {
+                        quit = true;
+                    }
+                    else if (dev_hasProgram(&devMode))
+                    {
+                        if (devMode.state != DevModeStateVisible)
+                        {
+                            dev_show(&devMode);
+                        }
+                    }
+                    else
+                    {
+                        overlay_message(core, "NO PROGRAM");
+                    }
                 }
                 break;
             }
@@ -545,6 +560,7 @@ void saveScreenshot(void)
     SDL_LockTexture(texture, NULL, &pixels, &pitch);
     screenshot_save(pixels);
     SDL_UnlockTexture(texture);
+    overlay_message(core, "SCREENSHOT SAVED");
 #endif
 }
 

@@ -123,7 +123,7 @@ void core_update(struct Core *core, struct CoreInput *input)
     itp_runInterrupt(core, InterruptTypeVBL);
     itp_runProgram(core);
     itp_didFinishVBL(core);
-    overlay_draw(core);
+    overlay_draw(core, true);
     audio_bufferRegisters(core);
 }
 

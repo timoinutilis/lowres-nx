@@ -30,13 +30,14 @@
 	B       X/M         A/Shift
 
 - More keys:
-	Quit         Esc
+	Dev Menu     Esc
 	Pause        Return/P
 	Fullscreen   Ctrl+f
+	Screenshot   Ctrl+s
 	Debug        Ctrl+d
-	Dev Menu     Ctrl+m
 	Reload/Run   Ctrl+r
 	Exit         Ctrl+e
+	Quit         Esc (if disabledev)
 
 - Settings file:
 	A default settings file is created on application start, if none
@@ -57,6 +58,9 @@
 	-programs path
 	Path for the tool programs and virtual disk file.
 	By default it's "LowRes NX" in your documents folder.
+
+	-disabledev yes/no
+	Disables Development Menu, ESC key quits LowRes NX
 
 	program.nx
 	Name of program to run
@@ -83,5 +87,5 @@ To edit your program's data directly (without the "Disk.nx" file),
 run your program in the normal way. Then press Ctrl+M to enter the
 Development Menu. There click on "ED" and select a tool. It will use
 the current program for its data. When done, press Ctrl+M again to
-return to the Development Menu, or Ctrl-R to run your program
+return to the Development Menu, or Ctrl+R to run your program
 directly.

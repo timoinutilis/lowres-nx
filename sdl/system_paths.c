@@ -23,12 +23,20 @@
 
 void desktop_path(char *buffer, size_t size)
 {
+#if defined(__APPLE__) && defined(__MACH__)
     strncpy(buffer, getenv("HOME"), size - 1);
-    strncat(buffer, PATH_SEPARATOR "Desktop" PATH_SEPARATOR, size - 1);
+    strncat(buffer, "/Desktop/", size - 1);
+#else
+#error Not implemented yet
+#endif
 }
 
 void documents_path(char *buffer, size_t size)
 {
+#if defined(__APPLE__) && defined(__MACH__)
     strncpy(buffer, getenv("HOME"), size - 1);
-    strncat(buffer, PATH_SEPARATOR "Documents" PATH_SEPARATOR, size - 1);
+    strncat(buffer, "/Documents/", size - 1);
+#else
+#error Not implemented yet
+#endif
 }
