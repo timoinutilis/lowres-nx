@@ -23,6 +23,7 @@
 #include "core.h"
 #include "dev_mode.h"
 #include "settings.h"
+#include "system_paths.h"
 #include "boot_intro.h"
 
 #ifndef __EMSCRIPTEN__
@@ -92,6 +93,7 @@ bool quit = false;
 bool releasedTouch = false;
 bool audioStarted = false;
 Uint32 lastTicks = 0;
+bool messageShownUsingDisk = false;
 
 int main(int argc, const char * argv[])
 {
@@ -223,6 +225,8 @@ void loadMainProgram(const char *filename)
     devMode.state = DevModeStateOff;
     strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX - 1);
     
+    messageShownUsingDisk = false;
+    
     FILE *file = fopen(filename, "rb");
     if (file)
     {
@@ -230,7 +234,7 @@ void loadMainProgram(const char *filename)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
@@ -540,8 +544,18 @@ void getDiskFilename(char *outputString)
     }
     else
     {
-        strncpy(outputString, settings.programsPath, FILENAME_MAX - 1);
-        strncat(outputString, defaultDisk, FILENAME_MAX - 1);
+        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX - 1);
+        char *separator = strrchr(outputString, PATH_SEPARATOR_CHAR);
+        if (separator)
+        {
+            separator++;
+            *separator = 0;
+            strncat(outputString, defaultDisk, FILENAME_MAX - 1);
+        }
+        else
+        {
+            strncpy(outputString, defaultDisk, FILENAME_MAX - 1);
+        }
     }
 }
 
@@ -576,6 +590,12 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
     char diskFilename[FILENAME_MAX];
     getDiskFilename(diskFilename);
     
+    if (!messageShownUsingDisk && devMode.state != DevModeStateRunningTool)
+    {
+        overlay_message(core, "USING DISK.NX");
+        messageShownUsingDisk = true;
+    }
+    
     FILE *file = fopen(diskFilename, "rb");
     if (file)
     {
@@ -583,7 +603,7 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
@@ -598,7 +618,8 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
         }
         else
         {
-            SDL_Log("not enough memory");
+            struct TextLib *lib = &core->overlay->textLib;
+            txtlib_printText(lib, "NOT ENOUGH MEMORY\n");
         }
         
         fclose(file);
@@ -654,13 +675,11 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 
 void onloaded(const char *filename)
 {
-    SDL_Log("loaded %s", filename);
     loadMainProgram(filename);
 }
 
 void onerror(const char *filename)
 {
-    SDL_Log("failed to load %s", filename);
 }
 
 #endif

@@ -408,7 +408,7 @@ struct CoreError dev_loadProgram(struct DevMode *devMode, const char *filename)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);

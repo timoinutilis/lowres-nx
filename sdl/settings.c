@@ -116,7 +116,7 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
             }
             else
             {
-                SDL_Log("missing value for parameter %s", arg);
+                printf("missing value for parameter %s\n", arg);
             }
         } else {
             settings->program = arg;
