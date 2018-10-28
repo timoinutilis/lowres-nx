@@ -25,7 +25,7 @@
 #include "system_paths.h"
 #include "core.h"
 
-int writeImage(const char *filename, int width, int height, uint32_t *pixels, char *title)
+int writeImage(const char *filename, int width, int height, uint32_t *pixels, int scale, char *title)
 {
     int code = 0;
     FILE *fp = NULL;
@@ -67,7 +67,7 @@ int writeImage(const char *filename, int width, int height, uint32_t *pixels, ch
     png_init_io(png_ptr, fp);
     
     // Write header (8 bit colour depth)
-    png_set_IHDR(png_ptr, info_ptr, width, height,
+    png_set_IHDR(png_ptr, info_ptr, width * scale, height * scale,
                  8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
     
@@ -83,19 +83,27 @@ int writeImage(const char *filename, int width, int height, uint32_t *pixels, ch
     png_write_info(png_ptr, info_ptr);
     
     // Allocate memory for one row (3 bytes per pixel - RGB)
-    row = (png_bytep) malloc(3 * width * sizeof(png_byte));
+    row = (png_bytep) malloc(3 * width * scale * sizeof(png_byte));
     
     // Write image data
-    int x, y, i;
-    for (y=0 ; y<height ; y++) {
+    int x, y, i, s;
+    for (y = 0; y < height; y++)
+    {
         i = 0;
-        for (x=0 ; x<width ; x++) {
+        for (x = 0; x < width; x++)
+        {
             uint32_t pixel = pixels[y * width + x];
-            row[i++] = (pixel) & 0xFF;
-            row[i++] = (pixel >> 8) & 0xFF;
-            row[i++] = (pixel >> 16) & 0xFF;
+            for (s = 0; s < scale; s++)
+            {
+                row[i++] = (pixel) & 0xFF;
+                row[i++] = (pixel >> 8) & 0xFF;
+                row[i++] = (pixel >> 16) & 0xFF;
+            }
         }
-        png_write_row(png_ptr, row);
+        for (s = 0; s < scale; s++)
+        {
+            png_write_row(png_ptr, row);
+        }
     }
     
     // End write
@@ -110,7 +118,7 @@ finalise:
     return code;
 }
 
-void screenshot_save(uint32_t *pixels)
+void screenshot_save(uint32_t *pixels, int scale)
 {
     char filename[FILENAME_MAX];
     
@@ -122,5 +130,5 @@ void screenshot_save(uint32_t *pixels)
     struct tm *timeinfo = localtime(&rawtime);
     strftime(&filename[len], FILENAME_MAX - len - 1, "LowRes NX %Y-%m-%d %H_%M_%S.png", timeinfo);
 
-    writeImage(filename, SCREEN_WIDTH, SCREEN_HEIGHT, pixels, "LowRes NX Screenshot");
+    writeImage(filename, SCREEN_WIDTH, SCREEN_HEIGHT, pixels, scale, "LowRes NX Screenshot");
 }

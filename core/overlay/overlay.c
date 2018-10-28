@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -34,7 +34,7 @@ void overlay_init(struct Core *core)
     lib->charAttr.priority = 1;
     lib->charAttr.palette = 1;
     lib->charAttrFilter = 0xFF;
-    lib->fontCharOffset = 64;
+    lib->fontCharOffset = 0;
     lib->windowX = 0;
     lib->windowY = 0;
     lib->windowWidth = 20;

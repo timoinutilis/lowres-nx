@@ -62,7 +62,7 @@ void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
 void getDiskFilename(char *outputString);
 void audioCallback(void *userdata, Uint8 *stream, int len);
-void saveScreenshot(void);
+void saveScreenshot(int scale);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -365,7 +365,8 @@ void update(void *arg) {
                     }
                     else if (code == SDLK_s)
                     {
-                        saveScreenshot();
+                        int scale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 3;
+                        saveScreenshot(scale);
                     }
                 }
                 else if (code == SDLK_ESCAPE)
@@ -566,13 +567,13 @@ void audioCallback(void *userdata, Uint8 *stream, int len)
     audio_renderAudio(userdata, samples, numSamples, audioSpec.freq);
 }
 
-void saveScreenshot(void)
+void saveScreenshot(int scale)
 {
 #ifndef __EMSCRIPTEN__
     void *pixels = NULL;
     int pitch = 0;
     SDL_LockTexture(texture, NULL, &pixels, &pitch);
-    screenshot_save(pixels);
+    screenshot_save(pixels, scale);
     SDL_UnlockTexture(texture);
     overlay_message(core, "SCREENSHOT SAVED");
 #endif

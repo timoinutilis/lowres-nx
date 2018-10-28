@@ -22,6 +22,6 @@
 
 #include <stdio.h>
 
-void screenshot_save(uint32_t *pixels);
+void screenshot_save(uint32_t *pixels, int scale);
 
 #endif /* screenshot_h */
