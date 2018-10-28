@@ -33,7 +33,9 @@
 	Dev Menu     Esc
 	Pause        Return/P
 	Fullscreen   Ctrl+f
-	Screenshot   Ctrl+s
+	Screenshot
+	   large     Ctrl+s
+	   original  Ctrl+Shift+s
 	Debug        Ctrl+d
 	Reload/Run   Ctrl+r
 	Exit         Ctrl+e
@@ -50,7 +52,7 @@
 - Command line arguments:
 	These override the options from the settings file.
 
-	"LowRes NX" [-fullscreen yes/no] [-programs path] [program.nx]
+	"LowRes NX" [-option value] [program.nx]
 
 	-fullscreen yes/no
 	Starts the application in fullscreen mode
@@ -59,7 +61,7 @@
 	Disables Development Menu, ESC key quits LowRes NX
 
 	-programs path
-	Path for the tool programs and virtual disk file.
+	Path for the tool programs.
 	By default it's "LowRes NX" in your documents folder.
 
 	-tool1 tool.nx
@@ -85,11 +87,11 @@ Mac/Linux line ends, otherwise you may see everything in one line.
 
 If you open NX tools (Character Designer, Background Designer, etc.)
 directly like other NX programs, they will use the "Disk.nx" file in
-your programs folder for loading and saving their data.
+the tool's folder for loading and saving their data.
 
 To edit your program's data directly (without the "Disk.nx" file),
-run your program in the normal way. Then press Ctrl+M to enter the
+run your program in the normal way. Then press Esc to enter the
 Development Menu. There click on "ED" and select a tool. It will use
-the current program for its data. When done, press Ctrl+M again to
+the current program for its data. When done, press Esc again to
 return to the Development Menu, or Ctrl+R to run your program
 directly.
