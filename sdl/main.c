@@ -30,7 +30,7 @@
 #include "screenshot.h"
 #endif
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #include <SDL2/SDL.h>
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -139,7 +139,11 @@ int main(int argc, const char * argv[])
             .freq = 44100,
             .format = AUDIO_S16,
             .channels = NUM_CHANNELS,
+#ifdef __EMSCRIPTEN__
+            .samples = 2048, // sample FRAMES
+#else
             .samples = 1470, // sample FRAMES
+#endif
             .userdata = core,
             .callback = audioCallback
         };

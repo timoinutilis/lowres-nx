@@ -17,6 +17,8 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#ifndef __EMSCRIPTEN__
+
 #include "screenshot.h"
 #include <stdlib.h>
 #include <string.h>
@@ -132,3 +134,6 @@ void screenshot_save(uint32_t *pixels, int scale)
 
     writeImage(filename, SCREEN_WIDTH, SCREEN_HEIGHT, pixels, scale, "LowRes NX Screenshot");
 }
+
+#endif
+

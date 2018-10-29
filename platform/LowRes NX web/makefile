@@ -4,7 +4,7 @@ CC_FLAGS = -w -s USE_SDL=2 -I ../../core -I ../../core/machine -I ../../core/acc
 CC_FLAGS_MAIN = -s USE_SDL=2
 
 # File names
-EXEC = output/LowResNX.html
+EXEC = output/LowResNX.js
 SOURCES = $(wildcard ../../core/*.c) $(wildcard ../../core/*/*.c) $(wildcard ../../sdl/*.c)
 OBJECTS = $(SOURCES:.c=.bc)
  

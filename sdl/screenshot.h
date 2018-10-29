@@ -20,8 +20,12 @@
 #ifndef screenshot_h
 #define screenshot_h
 
+#ifndef __EMSCRIPTEN__
+
 #include <stdio.h>
 
 void screenshot_save(uint32_t *pixels, int scale);
+
+#endif
 
 #endif /* screenshot_h */
