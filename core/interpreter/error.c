@@ -89,6 +89,8 @@ const char *ErrorStrings[] = {
     "EXIT SUB Outside Of A Subprogram",
     "Keyboard Not Enabled",
     "Automatic Pause Not Disabled",
+    "Gamepad Not Enabled",
+    "Gamepad Not Disabled",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

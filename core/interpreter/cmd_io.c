@@ -144,6 +144,8 @@ struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
+        if (core->machine->ioRegisters.attr.gamepadsEnabled == 0) return val_makeError(ErrorGamepadNotEnabled);
+        
         int p = pValue.v.floatValue;
         int active = 0;
         int lastFrameActive = 0;
@@ -220,6 +222,8 @@ struct TypedValue fnc_BUTTON(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
+        if (core->machine->ioRegisters.attr.gamepadsEnabled == 0) return val_makeError(ErrorGamepadNotEnabled);
+        
         int p = pValue.v.floatValue;
         int n = nValue.v.floatValue;
         union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[p];
@@ -253,6 +257,8 @@ struct TypedValue fnc_TOUCH(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
+        if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return val_makeError(ErrorGamepadNotDisabled);
+        
         value.v.floatValue = core->machine->ioRegisters.status.touch ? BAS_TRUE : BAS_FALSE;
     }
     return value;
@@ -270,6 +276,8 @@ struct TypedValue fnc_TAP(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
+        if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return val_makeError(ErrorGamepadNotDisabled);
+        
         value.v.floatValue = (core->machine->ioRegisters.status.touch && !core->interpreter->lastFrameIOStatus.touch) ? BAS_TRUE : BAS_FALSE;
     }
     return value;
@@ -288,6 +296,8 @@ struct TypedValue fnc_TOUCH_X_Y(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
+        if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return val_makeError(ErrorGamepadNotDisabled);
+        
         if (type == TokenTOUCHX)
         {
             value.v.floatValue = core->machine->ioRegisters.touchX;

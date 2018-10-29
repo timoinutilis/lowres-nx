@@ -19,6 +19,7 @@
 
 #include "settings.h"
 #include <string.h>
+#include "system_paths.h"
 
 #ifdef __EMSCRIPTEN__
 #include <SDL2/SDL.h>
@@ -30,14 +31,10 @@
 #include <SDL.h>
 #endif
 
-#ifdef _WIN32
-#define PATH_SEPARATOR "\\"
-#else
-#define PATH_SEPARATOR "/"
-#endif
-const char *defaultProgramsPath = "programs" PATH_SEPARATOR;
+const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n\n# Custom tools for the Edit ROM menu\n#tool1 My Tool 1.nx\n#tool2 My Tool 2.nx\n";
 
-const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n";
+const char *optionYes = "yes";
+const char *optionNo = "no";
 
 void settings_setValue(struct Settings *settings, const char *key, const char *value);
 
@@ -46,18 +43,8 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
 {
     // default values
     
-    char *basePath = SDL_GetBasePath();
-    if (basePath)
-    {
-        strncpy(settings->programsPath, basePath, FILENAME_MAX - 1);
-        strncat(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
-        SDL_free(basePath);
-        basePath = NULL;
-    }
-    else
-    {
-        strncpy(settings->programsPath, defaultProgramsPath, FILENAME_MAX - 1);
-    }
+    documents_path(settings->programsPath, FILENAME_MAX - 1);
+    strncat(settings->programsPath, "LowRes NX" PATH_SEPARATOR, FILENAME_MAX - 1);
     
     // load settings file
     
@@ -129,7 +116,7 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
             }
             else
             {
-                SDL_Log("missing value for parameter %s", arg);
+                printf("missing value for parameter %s\n", arg);
             }
         } else {
             settings->program = arg;
@@ -140,11 +127,11 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
 void settings_setValue(struct Settings *settings, const char *key, const char *value)
 {
     if (strcmp(key, "fullscreen") == 0) {
-        if (strcmp(value, "yes") == 0)
+        if (strcmp(value, optionYes) == 0)
         {
             settings->fullscreen = true;
         }
-        else if (strcmp(value, "no") == 0)
+        else if (strcmp(value, optionNo) == 0)
         {
             settings->fullscreen = false;
         }
@@ -157,6 +144,24 @@ void settings_setValue(struct Settings *settings, const char *key, const char *v
 		{
 			strncat(settings->programsPath, PATH_SEPARATOR, FILENAME_MAX - 1);
 		}
-
+    }
+    else if (strcmp(key, "disabledev") == 0)
+    {
+        if (strcmp(value, optionYes) == 0)
+        {
+            settings->disabledev = true;
+        }
+        else if (strcmp(value, optionNo) == 0)
+        {
+            settings->disabledev = false;
+        }
+    }
+    else if (strcmp(key, "tool1") == 0)
+    {
+        strncpy(settings->customTools[0], value, TOOL_NAME_SIZE - 1);
+    }
+    else if (strcmp(key, "tool2") == 0)
+    {
+        strncpy(settings->customTools[1], value, TOOL_NAME_SIZE - 1);
     }
 }

@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2018 Timo Kloss
+// Copyright 2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,14 +17,26 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef overlay_data_h
-#define overlay_data_h
+#include "system_paths.h"
+#include <stdlib.h>
+#include <string.h>
 
-#include <stdio.h>
-#include <stdint.h>
-#include "video_chip.h"
+void desktop_path(char *buffer, size_t size)
+{
+#if defined(__APPLE__) && defined(__MACH__)
+    strncpy(buffer, getenv("HOME"), size - 1);
+    strncat(buffer, "/Desktop/", size - 1);
+#else
+#error Not implemented yet
+#endif
+}
 
-extern uint8_t overlayColors[];
-extern uint8_t overlayCharacters[];
-
-#endif /* overlay_data_h */
+void documents_path(char *buffer, size_t size)
+{
+#if defined(__APPLE__) && defined(__MACH__)
+    strncpy(buffer, getenv("HOME"), size - 1);
+    strncat(buffer, "/Documents/", size - 1);
+#else
+#error Not implemented yet
+#endif
+}

@@ -23,10 +23,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define NUM_CUSTOM_TOOLS 2
+#define TOOL_NAME_SIZE 40
+
 struct Settings {
     const char *program;
     char programsPath[FILENAME_MAX];
     bool fullscreen;
+    bool disabledev;
+    char customTools[NUM_CUSTOM_TOOLS][TOOL_NAME_SIZE];
 };
 
 void settings_init(struct Settings *settings, int argc, const char * argv[]);

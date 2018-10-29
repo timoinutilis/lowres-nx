@@ -23,7 +23,12 @@
 #include "core.h"
 #include "dev_mode.h"
 #include "settings.h"
+#include "system_paths.h"
 #include "boot_intro.h"
+
+#ifndef __EMSCRIPTEN__
+#include "screenshot.h"
+#endif
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -57,6 +62,7 @@ void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
 void getDiskFilename(char *outputString);
 void audioCallback(void *userdata, Uint8 *stream, int len);
+void saveScreenshot(int scale);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -87,6 +93,7 @@ bool quit = false;
 bool releasedTouch = false;
 bool audioStarted = false;
 Uint32 lastTicks = 0;
+bool messageShownUsingDisk = false;
 
 int main(int argc, const char * argv[])
 {
@@ -117,8 +124,7 @@ int main(int argc, const char * argv[])
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     
-    const char *windowTitle = "LowRes NX " CORE_VERSION;
-//    const char *windowTitle = "LowRes NX"
+    const char *windowTitle = "LowRes NX";
     
     window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -224,6 +230,8 @@ void loadMainProgram(const char *filename)
     devMode.state = DevModeStateOff;
     strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX - 1);
     
+    messageShownUsingDisk = false;
+    
     FILE *file = fopen(filename, "rb");
     if (file)
     {
@@ -231,7 +239,7 @@ void loadMainProgram(const char *filename)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
@@ -317,7 +325,7 @@ void update(void *arg) {
                 }
                 
                 // console buttons
-                if (code == SDLK_RETURN || code == SDLK_p)
+                if (!core_getKeyboardEnabled(core) && (code == SDLK_RETURN || code == SDLK_p))
                 {
                     coreInput.pause = true;
                 }
@@ -328,6 +336,14 @@ void update(void *arg) {
                     if (code == SDLK_d)
                     {
                         core_setDebug(core, !core_getDebug(core));
+                        if (core_getDebug(core))
+                        {
+                            overlay_message(core, "DEBUG ON");
+                        }
+                        else
+                        {
+                            overlay_message(core, "DEBUG OFF");
+                        }
                     }
                     else if (code == SDLK_f)
                     {
@@ -340,28 +356,41 @@ void update(void *arg) {
                             SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                         }
                     }
-                    else if (code == SDLK_m)
-                    {
-                        if (devMode.state != DevModeStateVisible && dev_hasProgram(&devMode))
-                        {
-                            dev_show(&devMode);
-                        }
-                    }
                     else if (code == SDLK_r)
                     {
                         if (dev_hasProgram(&devMode))
                         {
                             dev_runProgram(&devMode);
+                            overlay_message(core, "RELOADED");
                         }
                     }
                     else if (code == SDLK_e)
                     {
                         loadBootIntro();
                     }
+                    else if (code == SDLK_s)
+                    {
+                        int scale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 3;
+                        saveScreenshot(scale);
+                    }
                 }
                 else if (code == SDLK_ESCAPE)
                 {
-                    quit = true;
+                    if (settings.disabledev)
+                    {
+                        quit = true;
+                    }
+                    else if (dev_hasProgram(&devMode))
+                    {
+                        if (devMode.state != DevModeStateVisible)
+                        {
+                            dev_show(&devMode);
+                        }
+                    }
+                    else
+                    {
+                        overlay_message(core, "NO PROGRAM");
+                    }
                 }
                 break;
             }
@@ -521,8 +550,18 @@ void getDiskFilename(char *outputString)
     }
     else
     {
-        strncpy(outputString, settings.programsPath, FILENAME_MAX - 1);
-        strncat(outputString, defaultDisk, FILENAME_MAX - 1);
+        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX - 1);
+        char *separator = strrchr(outputString, PATH_SEPARATOR_CHAR);
+        if (separator)
+        {
+            separator++;
+            *separator = 0;
+            strncat(outputString, defaultDisk, FILENAME_MAX - 1);
+        }
+        else
+        {
+            strncpy(outputString, defaultDisk, FILENAME_MAX - 1);
+        }
     }
 }
 
@@ -531,6 +570,18 @@ void audioCallback(void *userdata, Uint8 *stream, int len)
     int16_t *samples = (int16_t *)stream;
     int numSamples = len / NUM_CHANNELS;
     audio_renderAudio(userdata, samples, numSamples, audioSpec.freq);
+}
+
+void saveScreenshot(int scale)
+{
+#ifndef __EMSCRIPTEN__
+    void *pixels = NULL;
+    int pitch = 0;
+    SDL_LockTexture(texture, NULL, &pixels, &pitch);
+    screenshot_save(pixels, scale);
+    SDL_UnlockTexture(texture);
+    overlay_message(core, "SCREENSHOT SAVED");
+#endif
 }
 
 /** Called on error */
@@ -545,6 +596,12 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
     char diskFilename[FILENAME_MAX];
     getDiskFilename(diskFilename);
     
+    if (!messageShownUsingDisk && devMode.state != DevModeStateRunningTool)
+    {
+        overlay_message(core, "USING DISK.NX");
+        messageShownUsingDisk = true;
+    }
+    
     FILE *file = fopen(diskFilename, "rb");
     if (file)
     {
@@ -552,7 +609,7 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
         
-        char *sourceCode = calloc(1, size + 1); // +1 for NULL terminator
+        char *sourceCode = calloc(1, size + 1); // +1 for terminator
         if (sourceCode)
         {
             fread(sourceCode, size, 1, file);
@@ -567,7 +624,8 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
         }
         else
         {
-            SDL_Log("not enough memory");
+            struct TextLib *lib = &core->overlay->textLib;
+            txtlib_printText(lib, "NOT ENOUGH MEMORY\n");
         }
         
         fclose(file);
@@ -623,13 +681,11 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 
 void onloaded(const char *filename)
 {
-    SDL_Log("loaded %s", filename);
     loadMainProgram(filename);
 }
 
 void onerror(const char *filename)
 {
-    SDL_Log("failed to load %s", filename);
 }
 
 #endif

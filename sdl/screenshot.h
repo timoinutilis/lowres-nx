@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2018 Timo Kloss
+// Copyright 2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,14 +17,11 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef overlay_data_h
-#define overlay_data_h
+#ifndef screenshot_h
+#define screenshot_h
 
 #include <stdio.h>
-#include <stdint.h>
-#include "video_chip.h"
 
-extern uint8_t overlayColors[];
-extern uint8_t overlayCharacters[];
+void screenshot_save(uint32_t *pixels, int scale);
 
-#endif /* overlay_data_h */
+#endif /* screenshot_h */

@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2018 Timo Kloss
+// Copyright 2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,14 +17,20 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef overlay_data_h
-#define overlay_data_h
+#ifndef system_paths_h
+#define system_paths_h
 
 #include <stdio.h>
-#include <stdint.h>
-#include "video_chip.h"
 
-extern uint8_t overlayColors[];
-extern uint8_t overlayCharacters[];
+#ifdef _WIN32
+#define PATH_SEPARATOR "\\"
+#define PATH_SEPARATOR_CHAR '\\'
+#else
+#define PATH_SEPARATOR "/"
+#define PATH_SEPARATOR_CHAR '/'
+#endif
 
-#endif /* overlay_data_h */
+void desktop_path(char *buffer, size_t size);
+void documents_path(char *buffer, size_t size);
+
+#endif /* system_paths_h */
