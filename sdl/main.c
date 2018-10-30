@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -44,6 +44,7 @@
 const char *defaultDisk = "Disk.nx";
 const int defaultWindowScale = 4;
 const int joyAxisThreshold = 16384;
+const int bootIntroStateAddress = 0xA000;
 
 const int keyboardControls[2][8] = {
     // up, down, left, right, button A, button B, alt. button A, alt. button B
@@ -94,6 +95,7 @@ bool releasedTouch = false;
 bool audioStarted = false;
 Uint32 lastTicks = 0;
 bool messageShownUsingDisk = false;
+bool bootIntroActive = false;
 
 int main(int argc, const char * argv[])
 {
@@ -165,23 +167,11 @@ int main(int argc, const char * argv[])
         devMode.core = core;
         devMode.settings = &settings;
         
-#ifdef __EMSCRIPTEN__
         loadBootIntro();
         if (settings.program && strlen(settings.program) > 0)
         {
-            machine_poke(core, 0xA000, 1);
-            emscripten_async_wget(settings.program, "program.nx", onloaded, onerror);
+            machine_poke(core, bootIntroStateAddress, 1);
         }
-#else
-        if (settings.program)
-        {
-            loadMainProgram(settings.program);
-        }
-        else
-        {
-            loadBootIntro();
-        }
-#endif
 
         updateScreenRect(SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale);
         
@@ -215,6 +205,7 @@ int main(int argc, const char * argv[])
 
 void loadBootIntro()
 {
+    bootIntroActive = true;
     devMode.state = DevModeStateOff;
     devMode.mainProgramFilename[0] = 0;
     
@@ -231,6 +222,7 @@ void loadBootIntro()
 void loadMainProgram(const char *filename)
 {
     struct CoreError error = err_noCoreError();
+    bootIntroActive = false;
     devMode.state = DevModeStateOff;
     strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX - 1);
     
@@ -334,6 +326,7 @@ void update(void *arg) {
                     coreInput.pause = true;
                 }
                 
+#ifndef __EMSCRIPTEN__
                 // system
                 if (event.key.keysym.mod & KMOD_CTRL)
                 {
@@ -396,6 +389,7 @@ void update(void *arg) {
                         overlay_message(core, "NO PROGRAM");
                     }
                 }
+#endif
                 break;
             }
                 
@@ -484,6 +478,16 @@ void update(void *arg) {
     else
     {
         core_update(core, &coreInput);
+        
+        if (bootIntroActive && machine_peek(core, bootIntroStateAddress) == 2)
+        {
+            machine_poke(core, bootIntroStateAddress, 3);
+#ifdef __EMSCRIPTEN__
+            emscripten_async_wget(settings.program, "program.nx", onloaded, onerror);
+#else
+            loadMainProgram(settings.program);
+#endif
+        }
     }
     
     if (!audioStarted && audioDevice)
@@ -597,14 +601,20 @@ void interpreterDidFail(void *context, struct CoreError coreError)
 /** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 {
-    char diskFilename[FILENAME_MAX];
-    getDiskFilename(diskFilename);
-    
     if (!messageShownUsingDisk && devMode.state != DevModeStateRunningTool)
     {
+#ifdef __EMSCRIPTEN__
+        overlay_message(core, "NO DISK");
+#else
         overlay_message(core, "USING DISK.NX");
+#endif
         messageShownUsingDisk = true;
     }
+    
+#ifndef __EMSCRIPTEN__
+    
+    char diskFilename[FILENAME_MAX];
+    getDiskFilename(diskFilename);
     
     FILE *file = fopen(diskFilename, "rb");
     if (file)
@@ -634,6 +644,8 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
         
         fclose(file);
     }
+
+#endif
     
     return true;
 }
@@ -641,6 +653,9 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 /** Called when a disk data entry was saved */
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
 {
+#ifdef __EMSCRIPTEN__
+    overlay_message(core, "NO DISK");
+#else
     char *output = data_export(diskDataManager);
     if (output)
     {
@@ -663,6 +678,7 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
 
         free(output);
     }
+#endif
 }
 
 /** Called when keyboard or gamepad settings changed */

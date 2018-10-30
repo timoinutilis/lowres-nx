@@ -1,6 +1,5 @@
 These lines are interesting, but still not a real guide for compiling:
 
-./emsdk activate latest
 source ./emsdk_env.sh
 emmake make
 
