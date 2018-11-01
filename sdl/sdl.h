@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,22 +17,12 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef settings_h
-#define settings_h
-
-#include <stdio.h>
-#include <stdbool.h>
-
-#define NUM_CUSTOM_TOOLS 2
-#define TOOL_NAME_SIZE 40
-
-struct Settings {
-    char programsPath[FILENAME_MAX];
-    bool fullscreen;
-    bool disabledev;
-    char customTools[NUM_CUSTOM_TOOLS][TOOL_NAME_SIZE];
-};
-
-void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[]);
-
-#endif /* settings_h */
+#if defined(__EMSCRIPTEN__)
+#include <SDL2/SDL.h>
+#elif defined(__APPLE__) && defined(__MACH__)
+#include <SDL2/SDL.h>
+#elif defined(__LINUX__)
+#include <SDL2/SDL.h>
+#else
+#include <SDL.h>
+#endif

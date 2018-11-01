@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,24 +17,16 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "dev_mode.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "dev_mode_data.h"
+#include "dev_menu.h"
+#include "main.h"
+#include "dev_menu_data.h"
 #include "text_lib.h"
 #include "string_utils.h"
 #include "system_paths.h"
-
-#ifdef __EMSCRIPTEN__
-#include <SDL2/SDL.h>
-#elif defined(__APPLE__) && defined(__MACH__)
-#include <SDL2/SDL.h>
-#elif defined(__LINUX__)
-#include <SDL2/SDL.h>
-#else
-#include <SDL.h>
-#endif
+#include "sdl.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
 #define MENU_SIZE 5
 #define NUM_DEV_TOOLS 2
@@ -57,36 +49,33 @@ const char *devTools[NUM_DEV_TOOLS] = {
     "Background Designer 1.1.nx"
 };
 
-void dev_showInfo(struct DevMode *devMode);
-void dev_showError(struct DevMode *devMode, struct CoreError error);
-void dev_updateButtons(struct DevMode *devMode);
-void dev_onButtonTap(struct DevMode *devMode);
-void dev_reloadProgram(struct DevMode *devMode);
-void dev_runToolProgram(struct DevMode *devMode, const char *filename);
-struct CoreError dev_loadProgram(struct DevMode *devMode, const char *filename);
-void dev_showMenu(struct DevMode *devMode, const char *message, const char *buttons[], int numButtons);
+void dev_showInfo(struct DevMenu *devMenu);
+void dev_showError(struct DevMenu *devMenu, struct CoreError error);
+void dev_updateButtons(struct DevMenu *devMenu);
+void dev_onButtonTap(struct DevMenu *devMenu);
+void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons);
 
-bool dev_hasProgram(struct DevMode *devMode)
+void dev_init(struct DevMenu *devMenu, struct Runner *runner, struct Settings *settings)
 {
-    return devMode->mainProgramFilename[0] != 0;
+    memset(devMenu, 0, sizeof(struct DevMenu));
+    devMenu->runner = runner;
+    devMenu->settings = settings;
 }
 
-void dev_show(struct DevMode *devMode)
+void dev_show(struct DevMenu *devMenu, bool reload)
 {
-    if (devMode->state == DevModeStateRunningTool)
+    if (reload)
     {
-        // did run tool, so reload main program
-        dev_reloadProgram(devMode);
+        devMenu->lastError = runner_loadProgram(devMenu->runner, getMainProgramFilename());
     }
     
-    devMode->state = DevModeStateVisible;
-    devMode->currentMenu = DevModeMenuMain;
-    devMode->currentButton = -1;
-    devMode->lastTouch = false;
+    devMenu->currentMenu = DevModeMenuMain;
+    devMenu->currentButton = -1;
+    devMenu->lastTouch = false;
     
-    struct Core *core = devMode->core;
+    struct Core *core = devMenu->runner->core;
     
-    struct TextLib *textLib = &devMode->textLib;
+    struct TextLib *textLib = &devMenu->textLib;
     textLib->core = core;
     
     core->interpreter->state = StateEnd;
@@ -107,7 +96,7 @@ void dev_show(struct DevMode *devMode)
     textLib->sourceWidth = core->machine->cartridgeRom[2];
     
     txtlib_copyBackground(textLib, 0, 0, 20, 16, 0, 0);
-    dev_updateButtons(devMode);
+    dev_updateButtons(devMenu);
     
     textLib->charAttr.palette = 1;
     txtlib_writeText(textLib, "DEVELOPMENT MENU", 2, 0);
@@ -115,31 +104,31 @@ void dev_show(struct DevMode *devMode)
     textLib->charAttr.palette = 0;
     char progName[19];
     memset(progName, 0, 19);
-    char *slash = strrchr(devMode->mainProgramFilename, PATH_SEPARATOR_CHAR);
+    char *slash = strrchr(getMainProgramFilename(), PATH_SEPARATOR_CHAR);
     if (slash)
     {
         strncpy(progName, slash + 1, 18);
     }
     else
     {
-        strncpy(progName, devMode->mainProgramFilename, 18);
+        strncpy(progName, getMainProgramFilename(), 18);
     }
     txtlib_writeText(textLib, progName, 1, 2);
     
-    if (devMode->lastError.code != ErrorNone)
+    if (devMenu->lastError.code != ErrorNone)
     {
-        dev_showError(devMode, devMode->lastError);
+        dev_showError(devMenu, devMenu->lastError);
     }
     else
     {
-        dev_showInfo(devMode);
+        dev_showInfo(devMenu);
     }
 }
 
-void dev_update(struct DevMode *devMode, struct CoreInput *input)
+void dev_update(struct DevMenu *devMenu, struct CoreInput *input)
 {
-    struct Core *core = devMode->core;
-    struct TextLib *textLib = &devMode->textLib;
+    struct Core *core = devMenu->runner->core;
+    struct TextLib *textLib = &devMenu->textLib;
     
     core_handleInput(core, input);
     
@@ -147,12 +136,12 @@ void dev_update(struct DevMode *devMode, struct CoreInput *input)
     int cx = core->machine->ioRegisters.touchX / 8;
     int cy = core->machine->ioRegisters.touchY / 8;
     
-    if (devMode->currentMenu == DevModeMenuMain)
+    if (devMenu->currentMenu == DevModeMenuMain)
     {
-        if (devMode->currentButton >= 0)
+        if (devMenu->currentButton >= 0)
         {
-            int bcx = devButtons[devMode->currentButton].cx;
-            int bcy = devButtons[devMode->currentButton].cy;
+            int bcx = devButtons[devMenu->currentButton].cx;
+            int bcy = devButtons[devMenu->currentButton].cy;
             bool isInside = (cx >= bcx && cy >= bcy && cx <= bcx + 1 && cy <= bcy + 1);
             if (!touch || !isInside)
             {
@@ -161,12 +150,12 @@ void dev_update(struct DevMode *devMode, struct CoreInput *input)
                 
                 if (isInside)
                 {
-                    dev_onButtonTap(devMode);
+                    dev_onButtonTap(devMenu);
                 }
-                devMode->currentButton = -1;
+                devMenu->currentButton = -1;
             }
         }
-        else if (touch && !devMode->lastTouch)
+        else if (touch && !devMenu->lastTouch)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -176,16 +165,16 @@ void dev_update(struct DevMode *devMode, struct CoreInput *input)
                 {
                     textLib->charAttr.palette = 1;
                     txtlib_setCells(textLib, bcx, bcy, bcx + 1, bcy + 1, -1);
-                    devMode->currentButton = i;
+                    devMenu->currentButton = i;
                 }
             }
         }
     }
     else
     {
-        if (devMode->currentButton >= 0)
+        if (devMenu->currentButton >= 0)
         {
-            int bcy = 1 + devMode->currentButton * 3;
+            int bcy = 1 + devMenu->currentButton * 3;
             bool isInside = (cy >= bcy && cy <= bcy + 2);
             if (!touch || !isInside)
             {
@@ -194,32 +183,32 @@ void dev_update(struct DevMode *devMode, struct CoreInput *input)
                 
                 if (isInside)
                 {
-                    dev_onButtonTap(devMode);
+                    dev_onButtonTap(devMenu);
                 }
-                devMode->currentButton = -1;
+                devMenu->currentButton = -1;
             }
         }
-        else if (touch && !devMode->lastTouch)
+        else if (touch && !devMenu->lastTouch)
         {
             int button = (cy - 1) / 3;
-            if (button >= 0 && button < devMode->currentMenuSize)
+            if (button >= 0 && button < devMenu->currentMenuSize)
             {
                 int bcy = 1 + button * 3;
                 textLib->charAttr.palette = 1;
                 txtlib_setCells(textLib, 0, bcy, 19, bcy + 2, -1);
-                devMode->currentButton = button;
+                devMenu->currentButton = button;
             }
         }
     }
-    devMode->lastTouch = core->machine->ioRegisters.status.touch;
+    devMenu->lastTouch = core->machine->ioRegisters.status.touch;
     
     overlay_draw(core, false);
 }
 
-void dev_showInfo(struct DevMode *devMode)
+void dev_showInfo(struct DevMenu *devMenu)
 {
-    struct Core *core = devMode->core;
-    struct TextLib *textLib = &devMode->textLib;
+    struct Core *core = devMenu->runner->core;
+    struct TextLib *textLib = &devMenu->textLib;
     
     char info[21];
     
@@ -237,10 +226,10 @@ void dev_showInfo(struct DevMode *devMode)
     txtlib_writeText(textLib, "READY TO RUN", 4, 14);
 }
 
-void dev_showError(struct DevMode *devMode, struct CoreError error)
+void dev_showError(struct DevMenu *devMenu, struct CoreError error)
 {
-    struct Core *core = devMode->core;
-    struct TextLib *textLib = &devMode->textLib;
+    struct Core *core = devMenu->runner->core;
+    struct TextLib *textLib = &devMenu->textLib;
     
     textLib->charAttr.palette = 0;
     
@@ -268,10 +257,10 @@ void dev_showError(struct DevMode *devMode, struct CoreError error)
     }
 }
 
-void dev_updateButtons(struct DevMode *devMode)
+void dev_updateButtons(struct DevMenu *devMenu)
 {
-    struct Plane *bg = &devMode->core->machine->videoRam.planeA;
-    if (devMode->core->interpreter->debug)
+    struct Plane *bg = &devMenu->runner->core->machine->videoRam.planeA;
+    if (devMenu->runner->core->interpreter->debug)
     {
         bg->cells[5][7].character = 30;
         bg->cells[5][8].character = 31;
@@ -283,26 +272,25 @@ void dev_updateButtons(struct DevMode *devMode)
     }
 }
 
-void dev_onButtonTap(struct DevMode *devMode)
+void dev_onButtonTap(struct DevMenu *devMenu)
 {
-    int button = devMode->currentButton;
+    int button = devMenu->currentButton;
     
-    if (devMode->currentMenu == DevModeMenuMain)
+    if (devMenu->currentMenu == DevModeMenuMain)
     {
         if (button == 0)
         {
             // Run
-            dev_runProgram(devMode);
+            runMainProgram();
         }
         else if (button == 1)
         {
             // Check
-            dev_reloadProgram(devMode);
-            dev_show(devMode);
+            dev_show(devMenu, true);
         }
         else if (button == 2)
         {
-            devMode->currentMenu = DevModeMenuTools;
+            devMenu->currentMenu = DevModeMenuTools;
             const char *menu[MENU_SIZE];
             int count = 0;
             for (int i = 0; i < NUM_DEV_TOOLS; i++)
@@ -311,128 +299,58 @@ void dev_onButtonTap(struct DevMode *devMode)
             }
             for (int i = 0; i < NUM_CUSTOM_TOOLS; i++)
             {
-                menu[count++] = devMode->settings->customTools[i];
+                menu[count++] = devMenu->settings->customTools[i];
             }
             menu[count++] = "Cancel";
-            dev_showMenu(devMode, "EDIT ROM WITH TOOL", menu, count);
+            dev_showMenu(devMenu, "EDIT ROM WITH TOOL", menu, count);
         }
         else if (button == 3)
         {
             // Debug On/Off
-            devMode->core->interpreter->debug = !devMode->core->interpreter->debug;
-            dev_updateButtons(devMode);
+            devMenu->runner->core->interpreter->debug = !devMenu->runner->core->interpreter->debug;
+            dev_updateButtons(devMenu);
         }
         else if (button == 4)
         {
             // Exit
-            devMode->state = DevModeStateOff;
+            rebootNX();
         }
     }
-    else if (devMode->currentMenu == DevModeMenuTools)
+    else if (devMenu->currentMenu == DevModeMenuTools)
     {
-        if (devMode->currentButton < NUM_DEV_TOOLS + NUM_CUSTOM_TOOLS)
+        if (devMenu->currentButton < NUM_DEV_TOOLS + NUM_CUSTOM_TOOLS)
         {
             const char *tool;
-            if (devMode->currentButton < NUM_DEV_TOOLS)
+            if (devMenu->currentButton < NUM_DEV_TOOLS)
             {
-                tool = devTools[devMode->currentButton];
+                tool = devTools[devMenu->currentButton];
             }
             else
             {
-                tool = devMode->settings->customTools[devMode->currentButton - NUM_DEV_TOOLS];
+                tool = devMenu->settings->customTools[devMenu->currentButton - NUM_DEV_TOOLS];
             }
             if (tool[0] != 0)
             {
                 char toolFilename[FILENAME_MAX];
-                strncpy(toolFilename, devMode->settings->programsPath, FILENAME_MAX - 1);
+                strncpy(toolFilename, devMenu->settings->programsPath, FILENAME_MAX - 1);
                 strncat(toolFilename, tool, FILENAME_MAX - 1);
-                dev_runToolProgram(devMode, toolFilename);
+                runToolProgram(toolFilename);
             }
             else
             {
-                dev_show(devMode);
+                dev_show(devMenu, false);
             }
         }
         else
         {
-            dev_show(devMode);
+            dev_show(devMenu, false);
         }
     }
 }
 
-void dev_reloadProgram(struct DevMode *devMode)
+void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons)
 {
-    devMode->lastError = dev_loadProgram(devMode, devMode->mainProgramFilename);
-}
-
-void dev_runProgram(struct DevMode *devMode)
-{
-    dev_reloadProgram(devMode);
-    if (devMode->lastError.code == ErrorNone)
-    {
-        devMode->state = DevModeStateRunningProgram;
-        core_willRunProgram(devMode->core, SDL_GetTicks() / 1000);
-    }
-    else
-    {
-        dev_show(devMode);
-    }
-}
-
-void dev_runToolProgram(struct DevMode *devMode, const char *filename)
-{
-    struct Core *core = devMode->core;
-    struct CoreError error = dev_loadProgram(devMode, filename);
-    if (error.code == ErrorNone)
-    {
-        devMode->state = DevModeStateRunningTool;
-        core->interpreter->debug = false;
-        core_willRunProgram(core, SDL_GetTicks() / 1000);
-    }
-    else
-    {
-        core_traceError(core, error);
-    }
-}
-
-struct CoreError dev_loadProgram(struct DevMode *devMode, const char *filename)
-{
-    struct Core *core = devMode->core;
-    
-    struct CoreError error = err_noCoreError();
-    
-    FILE *file = fopen(filename, "rb");
-    if (file)
-    {
-        fseek(file, 0, SEEK_END);
-        long size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        
-        char *sourceCode = calloc(1, size + 1); // +1 for terminator
-        if (sourceCode)
-        {
-            fread(sourceCode, size, 1, file);
-            
-            error = core_compileProgram(core, sourceCode);
-            free(sourceCode);
-        }
-        else
-        {
-            error = err_makeCoreError(ErrorOutOfMemory, -1);
-        }
-        
-        fclose(file);
-    }
-    else
-    {
-        error = err_makeCoreError(ErrorCouldNotOpenProgram, -1);
-    }
-    return error;
-}
-
-void dev_showMenu(struct DevMode *devMode, const char *message, const char *buttons[], int numButtons)
-{
-    struct TextLib *textLib = &devMode->textLib;
+    struct TextLib *textLib = &devMenu->textLib;
     
     textLib->charAttr.palette = 0;
     txtlib_setCells(textLib, 0, 0, 19, 15, 1);
@@ -451,5 +369,5 @@ void dev_showMenu(struct DevMode *devMode, const char *message, const char *butt
         if (tx < 0) tx = 0;
         txtlib_writeText(textLib, buttons[i], tx, y + 1);
     }
-    devMode->currentMenuSize = numButtons;
+    devMenu->currentMenuSize = numButtons;
 }

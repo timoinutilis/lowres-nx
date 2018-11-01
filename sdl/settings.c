@@ -39,8 +39,10 @@ const char *optionNo = "no";
 void settings_setValue(struct Settings *settings, const char *key, const char *value);
 
 
-void settings_init(struct Settings *settings, int argc, const char * argv[])
+void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[])
 {
+    memset(settings, 0, sizeof(struct Settings));
+    
     // default values
     
     documents_path(settings->programsPath, FILENAME_MAX - 1);
@@ -119,7 +121,7 @@ void settings_init(struct Settings *settings, int argc, const char * argv[])
                 printf("missing value for parameter %s\n", arg);
             }
         } else {
-            settings->program = arg;
+            strncpy(filenameOut, arg, FILENAME_MAX - 1);
         }
     }
 }

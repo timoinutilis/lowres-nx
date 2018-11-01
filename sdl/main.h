@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,22 +17,28 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef settings_h
-#define settings_h
+#ifndef main_h
+#define main_h
 
-#include <stdio.h>
 #include <stdbool.h>
 
-#define NUM_CUSTOM_TOOLS 2
-#define TOOL_NAME_SIZE 40
-
-struct Settings {
-    char programsPath[FILENAME_MAX];
-    bool fullscreen;
-    bool disabledev;
-    char customTools[NUM_CUSTOM_TOOLS][TOOL_NAME_SIZE];
+enum MainState {
+    MainStateUndefined,
+    MainStateBootIntro,
+    MainStateRunningProgram,
+    MainStateRunningTool,
+    MainStateDevMenu,
 };
 
-void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[]);
+void bootNX(void);
+void rebootNX(void);
+bool hasProgram(void);
+const char *getMainProgramFilename(void);
+void selectProgram(const char *filename);
+void runMainProgram(void);
+void runToolProgram(const char *filename);
+void showDevMenu(void);
+bool usesMainProgramAsDisk(void);
+void getDiskFilename(char *outputString);
 
-#endif /* settings_h */
+#endif /* main_h */

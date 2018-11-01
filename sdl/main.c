@@ -17,28 +17,23 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <stdbool.h>
+#include "main.h"
 #include <math.h>
 #include <string.h>
 #include "core.h"
-#include "dev_mode.h"
+#include "runner.h"
+#include "dev_menu.h"
 #include "settings.h"
 #include "system_paths.h"
 #include "boot_intro.h"
+#include "sdl.h"
 
 #ifndef __EMSCRIPTEN__
 #include "screenshot.h"
 #endif
 
-#if defined(__EMSCRIPTEN__)
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#include <SDL2/SDL.h>
-#elif defined(__APPLE__) && defined(__MACH__)
-#include <SDL2/SDL.h>
-#elif defined(__LINUX__)
-#include <SDL2/SDL.h>
-#else
-#include <SDL.h>
 #endif
 
 const char *defaultDisk = "Disk.nx";
@@ -54,21 +49,13 @@ const int keyboardControls[2][8] = {
         SDL_SCANCODE_TAB, SDL_SCANCODE_Q, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_A}
 };
 
-void loadBootIntro(void);
-void loadMainProgram(const char *filename);
 void update(void *arg);
 void updateScreenRect(int winW, int winH);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
-void getDiskFilename(char *outputString);
 void audioCallback(void *userdata, Uint8 *stream, int len);
 void saveScreenshot(int scale);
-
-void interpreterDidFail(void *context, struct CoreError coreError);
-bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
-void diskDriveDidSave(void *context, struct DataManager *diskDataManager);
-void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 
 #ifdef __EMSCRIPTEN__
 void onloaded(const char *filename);
@@ -82,10 +69,13 @@ SDL_Texture *texture = NULL;
 SDL_AudioDeviceID audioDevice = 0;
 SDL_AudioSpec audioSpec;
 
-struct Core *core = NULL;
-struct DevMode devMode;
+struct Runner runner;
+struct DevMenu devMenu;
 struct Settings settings;
 struct CoreInput coreInput;
+
+enum MainState mainState = MainStateUndefined;
+char mainProgramFilename[FILENAME_MAX] = "";
 
 int numJoysticks = 0;
 SDL_Joystick *joysticks[2] = {NULL, NULL};
@@ -94,49 +84,45 @@ bool quit = false;
 bool releasedTouch = false;
 bool audioStarted = false;
 Uint32 lastTicks = 0;
-bool messageShownUsingDisk = false;
-bool bootIntroActive = false;
 
 int main(int argc, const char * argv[])
 {
-    memset(&devMode, 0, sizeof(struct DevMode));
-    memset(&settings, 0, sizeof(struct Settings));
     memset(&coreInput, 0, sizeof(struct CoreInput));
     
-    settings_init(&settings, argc, argv);
+    settings_init(&settings, mainProgramFilename, argc, argv);
+    runner_init(&runner);
+    dev_init(&devMenu, &runner, &settings);
     
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
-    
-    SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
+    if (runner_isOkay(&runner))
     {
-        switch (event.type)
+        SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
+        
+        SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
         {
-            case SDL_DROPFILE: {
-                settings.program = event.drop.file;
-                break;
+            switch (event.type)
+            {
+                case SDL_DROPFILE: {
+                    strncpy(mainProgramFilename, event.drop.file, FILENAME_MAX - 1);
+                    SDL_free(event.drop.file);
+                    break;
+                }
             }
         }
-    }
-    
-    Uint32 windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-    if (settings.fullscreen)
-    {
-        windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-    }
-    
-    const char *windowTitle = "LowRes NX";
-    
-    window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
-    configureJoysticks();
-    
-    core = calloc(1, sizeof(struct Core));
-    if (core)
-    {
+        
+        Uint32 windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+        if (settings.fullscreen)
+        {
+            windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        }
+        
+        const char *windowTitle = "LowRes NX";
+        
+        window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale, windowFlags);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+        
         SDL_AudioSpec desiredAudioSpec = {
             .freq = 44100,
             .format = AUDIO_S16,
@@ -146,31 +132,18 @@ int main(int argc, const char * argv[])
 #else
             .samples = 1470, // sample FRAMES
 #endif
-            .userdata = core,
+            .userdata = runner.core,
             .callback = audioCallback
         };
         
         audioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredAudioSpec, &audioSpec, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
         
-        struct CoreDelegate coreDelegate;
-        memset(&coreDelegate, 0, sizeof(struct CoreDelegate));
+        configureJoysticks();
         
-        core_init(core);
-        
-        coreDelegate.interpreterDidFail = interpreterDidFail;
-        coreDelegate.diskDriveWillAccess = diskDriveWillAccess;
-        coreDelegate.diskDriveDidSave = diskDriveDidSave;
-        coreDelegate.controlsDidChange = controlsDidChange;
-        
-        core_setDelegate(core, &coreDelegate);
-        
-        devMode.core = core;
-        devMode.settings = &settings;
-        
-        loadBootIntro();
-        if (settings.program && strlen(settings.program) > 0)
+        bootNX();
+        if (mainProgramFilename[0] != 0)
         {
-            machine_poke(core, bootIntroStateAddress, 1);
+            machine_poke(runner.core, bootIntroStateAddress, 1);
         }
 
         updateScreenRect(SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale);
@@ -183,16 +156,11 @@ int main(int argc, const char * argv[])
             update(NULL);
         }
 #endif
-        
-        SDL_CloseAudioDevice(audioDevice);
-        
-        core_deinit(core);
-        
-        free(core);
-        core = NULL;
     }
     
     closeJoysticks();
+    
+    SDL_CloseAudioDevice(audioDevice);
     
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
@@ -200,73 +168,121 @@ int main(int argc, const char * argv[])
     
     SDL_Quit();
     
+    runner_deinit(&runner);
+    
     return 0;
 }
 
-void loadBootIntro()
+void bootNX()
 {
-    bootIntroActive = true;
-    devMode.state = DevModeStateOff;
-    devMode.mainProgramFilename[0] = 0;
+    mainState = MainStateBootIntro;
     
-    struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
+    struct CoreError error = core_compileProgram(runner.core, bootIntroSourceCode);
     if (error.code != ErrorNone)
     {
-        core_traceError(core, error);
+        core_traceError(runner.core, error);
     }
     
-    core->interpreter->debug = false;
-    core_willRunProgram(core, SDL_GetTicks() / 1000);
+    runner.core->interpreter->debug = false;
+    core_willRunProgram(runner.core, SDL_GetTicks() / 1000);
 }
 
-void loadMainProgram(const char *filename)
+void rebootNX()
 {
-    struct CoreError error = err_noCoreError();
-    bootIntroActive = false;
-    devMode.state = DevModeStateOff;
-    strncpy(devMode.mainProgramFilename, filename, FILENAME_MAX - 1);
-    
-    messageShownUsingDisk = false;
-    
-    FILE *file = fopen(filename, "rb");
-    if (file)
+    mainProgramFilename[0] = 0;
+    bootNX();
+}
+
+bool hasProgram()
+{
+    return mainProgramFilename[0] != 0;
+}
+
+const char *getMainProgramFilename()
+{
+    return mainProgramFilename;
+}
+
+void selectProgram(const char *filename)
+{
+    strncpy(mainProgramFilename, filename, FILENAME_MAX - 1);
+    if (mainState == MainStateBootIntro)
     {
-        fseek(file, 0, SEEK_END);
-        long size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        
-        char *sourceCode = calloc(1, size + 1); // +1 for terminator
-        if (sourceCode)
+        machine_poke(runner.core, bootIntroStateAddress, 1);
+    }
+    else
+    {
+        runMainProgram();
+    }
+}
+
+void runMainProgram()
+{
+    struct CoreError error = runner_loadProgram(&runner, mainProgramFilename);
+    devMenu.lastError = error;
+    if (error.code != ErrorNone)
+    {
+        showDevMenu();
+    }
+    else
+    {
+        core_willRunProgram(runner.core, SDL_GetTicks() / 1000);
+        mainState = MainStateRunningProgram;
+    }
+}
+
+void runToolProgram(const char *filename)
+{
+    struct CoreError error = runner_loadProgram(&runner, filename);
+    if (error.code == ErrorNone)
+    {
+        mainState = MainStateRunningTool;
+        runner.core->interpreter->debug = false;
+        core_willRunProgram(runner.core, SDL_GetTicks() / 1000);
+    }
+    else
+    {
+        core_traceError(runner.core, error);
+    }
+}
+
+void showDevMenu()
+{
+    bool reload = (mainState == MainStateRunningTool);
+    mainState = MainStateDevMenu;
+    dev_show(&devMenu, reload);
+}
+
+bool usesMainProgramAsDisk()
+{
+    return (mainState == MainStateRunningTool);
+}
+
+void getDiskFilename(char *outputString)
+{
+    if (usesMainProgramAsDisk())
+    {
+        strncpy(outputString, mainProgramFilename, FILENAME_MAX - 1);
+    }
+    else
+    {
+        strncpy(outputString, mainProgramFilename, FILENAME_MAX - 1);
+        char *separator = strrchr(outputString, PATH_SEPARATOR_CHAR);
+        if (separator)
         {
-            fread(sourceCode, size, 1, file);
-            
-            error = core_compileProgram(core, sourceCode);
-            free(sourceCode);
+            separator++;
+            *separator = 0;
+            strncat(outputString, defaultDisk, FILENAME_MAX - 1);
         }
         else
         {
-            error = err_makeCoreError(ErrorOutOfMemory, -1);
+            strncpy(outputString, defaultDisk, FILENAME_MAX - 1);
         }
-        
-        fclose(file);
-    }
-    else
-    {
-        error = err_makeCoreError(ErrorCouldNotOpenProgram, -1);
-    }
-    
-    devMode.lastError = error;
-    if (error.code != ErrorNone)
-    {
-        dev_show(&devMode);
-    }
-    else
-    {
-        core_willRunProgram(core, SDL_GetTicks() / 1000);
     }
 }
 
-void update(void *arg) {
+void update(void *arg)
+{
     SDL_Event event;
     
     // limit to 60 FPS
@@ -303,7 +319,8 @@ void update(void *arg) {
                 break;
             
             case SDL_DROPFILE: {
-                loadMainProgram(event.drop.file);
+                selectProgram(event.drop.file);
+                SDL_free(event.drop.file);
                 break;
             }
             
@@ -321,7 +338,7 @@ void update(void *arg) {
                 }
                 
                 // console buttons
-                if (!core_getKeyboardEnabled(core) && (code == SDLK_RETURN || code == SDLK_p))
+                if (!core_getKeyboardEnabled(runner.core) && (code == SDLK_RETURN || code == SDLK_p))
                 {
                     coreInput.pause = true;
                 }
@@ -332,14 +349,14 @@ void update(void *arg) {
                 {
                     if (code == SDLK_d)
                     {
-                        core_setDebug(core, !core_getDebug(core));
-                        if (core_getDebug(core))
+                        core_setDebug(runner.core, !core_getDebug(runner.core));
+                        if (core_getDebug(runner.core))
                         {
-                            overlay_message(core, "DEBUG ON");
+                            overlay_message(runner.core, "DEBUG ON");
                         }
                         else
                         {
-                            overlay_message(core, "DEBUG OFF");
+                            overlay_message(runner.core, "DEBUG OFF");
                         }
                     }
                     else if (code == SDLK_f)
@@ -355,15 +372,15 @@ void update(void *arg) {
                     }
                     else if (code == SDLK_r)
                     {
-                        if (dev_hasProgram(&devMode))
+                        if (hasProgram())
                         {
-                            dev_runProgram(&devMode);
-                            overlay_message(core, "RELOADED");
+                            runMainProgram();
+                            overlay_message(runner.core, "RELOADED");
                         }
                     }
                     else if (code == SDLK_e)
                     {
-                        loadBootIntro();
+                        rebootNX();
                     }
                     else if (code == SDLK_s)
                     {
@@ -377,16 +394,16 @@ void update(void *arg) {
                     {
                         quit = true;
                     }
-                    else if (dev_hasProgram(&devMode))
+                    else if (hasProgram())
                     {
-                        if (devMode.state != DevModeStateVisible)
+                        if (mainState != MainStateDevMenu)
                         {
-                            dev_show(&devMode);
+                            showDevMenu();
                         }
                     }
                     else
                     {
-                        overlay_message(core, "NO PROGRAM");
+                        overlay_message(runner.core, "NO PROGRAM");
                     }
                 }
 #endif
@@ -467,27 +484,32 @@ void update(void *arg) {
         }
     }
     
-    if (devMode.state == DevModeStateVisible)
+    switch (mainState)
     {
-        dev_update(&devMode, &coreInput);
-        if (devMode.state == DevModeStateOff)
-        {
-            loadBootIntro();
-        }
-    }
-    else
-    {
-        core_update(core, &coreInput);
-        
-        if (bootIntroActive && machine_peek(core, bootIntroStateAddress) == 2)
-        {
-            machine_poke(core, bootIntroStateAddress, 3);
+        case MainStateUndefined:
+            break;
+            
+        case MainStateBootIntro:
+            core_update(runner.core, &coreInput);
+            if (machine_peek(runner.core, bootIntroStateAddress) == 2)
+            {
+                machine_poke(runner.core, bootIntroStateAddress, 3);
 #ifdef __EMSCRIPTEN__
-            emscripten_async_wget(settings.program, "program.nx", onloaded, onerror);
+                emscripten_async_wget(settings.program, "program.nx", onloaded, onerror);
 #else
-            loadMainProgram(settings.program);
+                runMainProgram();
 #endif
-        }
+            }
+            break;
+            
+        case MainStateRunningProgram:
+        case MainStateRunningTool:
+            core_update(runner.core, &coreInput);
+            break;
+            
+        case MainStateDevMenu:
+            dev_update(&devMenu, &coreInput);
+            break;
     }
     
     if (!audioStarted && audioDevice)
@@ -502,7 +524,7 @@ void update(void *arg) {
     int pitch = 0;
     SDL_LockTexture(texture, NULL, &pixels, &pitch);
     
-    video_renderScreen(core, pixels);
+    video_renderScreen(runner.core, pixels);
     
     SDL_UnlockTexture(texture);
     SDL_RenderCopy(renderer, texture, NULL, &screenRect);
@@ -550,29 +572,6 @@ void setTouchPosition(int windowX, int windowY)
     coreInput.touchY = (windowY - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
 }
 
-void getDiskFilename(char *outputString)
-{
-    if (devMode.state == DevModeStateRunningTool)
-    {
-        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX - 1);
-    }
-    else
-    {
-        strncpy(outputString, devMode.mainProgramFilename, FILENAME_MAX - 1);
-        char *separator = strrchr(outputString, PATH_SEPARATOR_CHAR);
-        if (separator)
-        {
-            separator++;
-            *separator = 0;
-            strncat(outputString, defaultDisk, FILENAME_MAX - 1);
-        }
-        else
-        {
-            strncpy(outputString, defaultDisk, FILENAME_MAX - 1);
-        }
-    }
-}
-
 void audioCallback(void *userdata, Uint8 *stream, int len)
 {
     int16_t *samples = (int16_t *)stream;
@@ -588,120 +587,15 @@ void saveScreenshot(int scale)
     SDL_LockTexture(texture, NULL, &pixels, &pitch);
     screenshot_save(pixels, scale);
     SDL_UnlockTexture(texture);
-    overlay_message(core, "SCREENSHOT SAVED");
+    overlay_message(runner.core, "SCREENSHOT SAVED");
 #endif
-}
-
-/** Called on error */
-void interpreterDidFail(void *context, struct CoreError coreError)
-{
-    core_traceError(core, coreError);
-}
-
-/** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */
-bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
-{
-    if (!messageShownUsingDisk && devMode.state != DevModeStateRunningTool)
-    {
-#ifdef __EMSCRIPTEN__
-        overlay_message(core, "NO DISK");
-#else
-        overlay_message(core, "USING DISK.NX");
-#endif
-        messageShownUsingDisk = true;
-    }
-    
-#ifndef __EMSCRIPTEN__
-    
-    char diskFilename[FILENAME_MAX];
-    getDiskFilename(diskFilename);
-    
-    FILE *file = fopen(diskFilename, "rb");
-    if (file)
-    {
-        fseek(file, 0, SEEK_END);
-        long size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        
-        char *sourceCode = calloc(1, size + 1); // +1 for terminator
-        if (sourceCode)
-        {
-            fread(sourceCode, size, 1, file);
-            
-            struct CoreError error = data_import(diskDataManager, sourceCode, true);
-            free(sourceCode);
-            
-            if (error.code != ErrorNone)
-            {
-                core_traceError(core, error);
-            }
-        }
-        else
-        {
-            struct TextLib *lib = &core->overlay->textLib;
-            txtlib_printText(lib, "NOT ENOUGH MEMORY\n");
-        }
-        
-        fclose(file);
-    }
-
-#endif
-    
-    return true;
-}
-
-/** Called when a disk data entry was saved */
-void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
-{
-#ifdef __EMSCRIPTEN__
-    overlay_message(core, "NO DISK");
-#else
-    char *output = data_export(diskDataManager);
-    if (output)
-    {
-        char diskFilename[FILENAME_MAX];
-        getDiskFilename(diskFilename);
-        
-        FILE *file = fopen(diskFilename, "wb");
-        if (file)
-        {
-            fwrite(output, 1, strlen(output), file);
-            fclose(file);
-        }
-        else
-        {
-            struct TextLib *lib = &core->overlay->textLib;
-            txtlib_printText(lib, "COULD NOT SAVE:\n");
-            txtlib_printText(lib, diskFilename);
-            txtlib_printText(lib, "\n");
-        }
-
-        free(output);
-    }
-#endif
-}
-
-/** Called when keyboard or gamepad settings changed */
-void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
-{
-    if (controlsInfo.isKeyboardEnabled)
-    {
-        if (!SDL_IsTextInputActive())
-        {
-            SDL_StartTextInput();
-        }
-    }
-    else if (SDL_IsTextInputActive())
-    {
-        SDL_StopTextInput();
-    }
 }
 
 #ifdef __EMSCRIPTEN__
 
 void onloaded(const char *filename)
 {
-    loadMainProgram(filename);
+    loadMainProgram();
 }
 
 void onerror(const char *filename)

@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,22 +17,22 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef settings_h
-#define settings_h
+#ifndef runner_h
+#define runner_h
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "core.h"
 
-#define NUM_CUSTOM_TOOLS 2
-#define TOOL_NAME_SIZE 40
-
-struct Settings {
-    char programsPath[FILENAME_MAX];
-    bool fullscreen;
-    bool disabledev;
-    char customTools[NUM_CUSTOM_TOOLS][TOOL_NAME_SIZE];
+struct Runner {
+    struct Core *core;
+    struct CoreDelegate coreDelegate;
+    bool messageShownUsingDisk;
 };
 
-void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[]);
+void runner_init(struct Runner *runner);
+void runner_deinit(struct Runner *runner);
+bool runner_isOkay(struct Runner *runner);
+struct CoreError runner_loadProgram(struct Runner *runner, const char *filename);
 
-#endif /* settings_h */
+#endif /* runner_h */

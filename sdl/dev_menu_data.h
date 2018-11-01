@@ -17,8 +17,8 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef dev_mode_data_h
-#define dev_mode_data_h
+#ifndef dev_menu_data_h
+#define dev_menu_data_h
 
 const char dev_colors[] = {
     0x05, 0x3F, 0x2A, 0x15, 0x00, 0x0F, 0x05, 0x00, 0x3C, 0x30, 0x2A, 0x00, 0x00, 0x3C, 0x2A, 0x00,
@@ -328,4 +328,4 @@ const char dev_bg[] = {
     0x01, 0x00, 0x01, 0x00,
 };
 
-#endif /* dev_mode_data_h */
+#endif /* dev_menu_data_h */
