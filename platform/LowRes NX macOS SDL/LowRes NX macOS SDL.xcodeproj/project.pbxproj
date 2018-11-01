@@ -174,6 +174,7 @@
 		928CA2E52189DC370085125F /* runner.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = runner.c; sourceTree = "<group>"; };
 		928CA2E72189DCE90085125F /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		928CA2E8218A03EF0085125F /* sdl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sdl.h; sourceTree = "<group>"; };
+		92ADAC74218B475C0040A1F1 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		92D708922181C0ED00F40043 /* screenshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = screenshot.h; sourceTree = "<group>"; };
 		92D708932181C0ED00F40043 /* screenshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = screenshot.c; sourceTree = "<group>"; };
 		92D708952181C39900F40043 /* libz.1.1.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.1.3.tbd; path = usr/lib/libz.1.1.3.tbd; sourceTree = SDKROOT; };
@@ -383,6 +384,7 @@
 				92D7089C2181E0A400F40043 /* system_paths.h */,
 				92D7089D2181E0A400F40043 /* system_paths.c */,
 				928CA2E8218A03EF0085125F /* sdl.h */,
+				92ADAC74218B475C0040A1F1 /* config.h */,
 			);
 			name = sdl;
 			path = ../../sdl;

@@ -17,9 +17,9 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "config.h"
+
 #include "main.h"
-#include <math.h>
-#include <string.h>
 #include "core.h"
 #include "runner.h"
 #include "dev_menu.h"
@@ -28,13 +28,16 @@
 #include "boot_intro.h"
 #include "sdl.h"
 
-#ifndef __EMSCRIPTEN__
+#if SCREENSHOTS
 #include "screenshot.h"
 #endif
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
+
+#include <math.h>
+#include <string.h>
 
 const char *defaultDisk = "Disk.nx";
 const int defaultWindowScale = 4;
@@ -70,7 +73,9 @@ SDL_AudioDeviceID audioDevice = 0;
 SDL_AudioSpec audioSpec;
 
 struct Runner runner;
+#if DEV_MENU
 struct DevMenu devMenu;
+#endif
 struct Settings settings;
 struct CoreInput coreInput;
 
@@ -91,7 +96,9 @@ int main(int argc, const char * argv[])
     
     settings_init(&settings, mainProgramFilename, argc, argv);
     runner_init(&runner);
+#if DEV_MENU
     dev_init(&devMenu, &runner, &settings);
+#endif
     
     if (runner_isOkay(&runner))
     {
@@ -219,10 +226,16 @@ void selectProgram(const char *filename)
 void runMainProgram()
 {
     struct CoreError error = runner_loadProgram(&runner, mainProgramFilename);
+#if DEV_MENU
     devMenu.lastError = error;
+#endif
     if (error.code != ErrorNone)
     {
+#if DEV_MENU
         showDevMenu();
+#else
+        core_traceError(runner.core, error);
+#endif
     }
     else
     {
@@ -248,9 +261,11 @@ void runToolProgram(const char *filename)
 
 void showDevMenu()
 {
+#if DEV_MENU
     bool reload = (mainState == MainStateRunningTool);
     mainState = MainStateDevMenu;
     dev_show(&devMenu, reload);
+#endif
 }
 
 bool usesMainProgramAsDisk()
@@ -343,7 +358,7 @@ void update(void *arg)
                     coreInput.pause = true;
                 }
                 
-#ifndef __EMSCRIPTEN__
+#if HOT_KEYS
                 // system
                 if (event.key.keysym.mod & KMOD_CTRL)
                 {
@@ -394,6 +409,7 @@ void update(void *arg)
                     {
                         quit = true;
                     }
+#if DEV_MENU
                     else if (hasProgram())
                     {
                         if (mainState != MainStateDevMenu)
@@ -405,6 +421,7 @@ void update(void *arg)
                     {
                         overlay_message(runner.core, "NO PROGRAM");
                     }
+#endif
                 }
 #endif
                 break;
@@ -508,7 +525,9 @@ void update(void *arg)
             break;
             
         case MainStateDevMenu:
+#if DEV_MENU
             dev_update(&devMenu, &coreInput);
+#endif
             break;
     }
     
@@ -581,7 +600,7 @@ void audioCallback(void *userdata, Uint8 *stream, int len)
 
 void saveScreenshot(int scale)
 {
-#ifndef __EMSCRIPTEN__
+#if SCREENSHOTS
     void *pixels = NULL;
     int pitch = 0;
     SDL_LockTexture(texture, NULL, &pixels, &pitch);

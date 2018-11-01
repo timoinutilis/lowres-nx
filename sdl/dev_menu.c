@@ -17,6 +17,10 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "config.h"
+
+#if DEV_MENU
+
 #include "dev_menu.h"
 #include "main.h"
 #include "dev_menu_data.h"
@@ -371,3 +375,6 @@ void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *butt
     }
     devMenu->currentMenuSize = numButtons;
 }
+
+#endif
+

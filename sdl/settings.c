@@ -18,18 +18,9 @@
 //
 
 #include "settings.h"
-#include <string.h>
 #include "system_paths.h"
-
-#ifdef __EMSCRIPTEN__
-#include <SDL2/SDL.h>
-#elif defined(__APPLE__) && defined(__MACH__)
-#include <SDL2/SDL.h>
-#elif defined(__LINUX__)
-#include <SDL2/SDL.h>
-#else
-#include <SDL.h>
-#endif
+#include "sdl.h"
+#include <string.h>
 
 const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n\n# Custom tools for the Edit ROM menu\n#tool1 My Tool 1.nx\n#tool2 My Tool 2.nx\n";
 

@@ -20,6 +20,10 @@
 #ifndef dev_menu_h
 #define dev_menu_h
 
+#include "config.h"
+
+#if DEV_MENU
+
 #include <stdio.h>
 #include <stdbool.h>
 #include "core.h"
@@ -46,5 +50,7 @@ struct DevMenu {
 void dev_init(struct DevMenu *devMenu, struct Runner *runner, struct Settings *settings);
 void dev_show(struct DevMenu *devMenu, bool reload);
 void dev_update(struct DevMenu *devMenu, struct CoreInput *input);
+
+#endif
 
 #endif /* dev_menu_h */

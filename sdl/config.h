@@ -17,17 +17,17 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef screenshot_h
-#define screenshot_h
+#ifndef config_h
+#define config_h
 
-#include "config.h"
-
-#if SCREENSHOTS
-
-#include <stdio.h>
-
-void screenshot_save(uint32_t *pixels, int scale);
-
+#ifdef __EMSCRIPTEN__
+#define DEV_MENU 0
+#define SCREENSHOTS 0
+#define HOT_KEYS 0
+#else
+#define DEV_MENU 1
+#define SCREENSHOTS 1
+#define HOT_KEYS 1
 #endif
 
-#endif /* screenshot_h */
+#endif /* config_h */
