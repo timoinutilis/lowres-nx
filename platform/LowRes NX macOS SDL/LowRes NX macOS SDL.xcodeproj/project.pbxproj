@@ -10,6 +10,7 @@
 		921E0F152104BD7100F3C512 /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = 921E0F142104BD7100F3C512 /* settings.c */; };
 		921F986620DAD4DF0052F233 /* boot_intro.c in Sources */ = {isa = PBXBuildFile; fileRef = 921F986520DAD4DF0052F233 /* boot_intro.c */; };
 		9251FDE621259EDE003915D9 /* cmd_audio.c in Sources */ = {isa = PBXBuildFile; fileRef = 9251FDE521259EDE003915D9 /* cmd_audio.c */; };
+		9258F207218C49C000CE81D6 /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 9258F206218C49C000CE81D6 /* utils.c */; };
 		925D482D2121FF76003F1B0D /* audio_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 925D482C2121FF76003F1B0D /* audio_lib.c */; };
 		9284722B20F9F4FA00B82653 /* dev_menu.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284722A20F9F4FA00B82653 /* dev_menu.c */; };
 		9287EAC920D85E4E000BBEB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9287EAC820D85E4E000BBEB1 /* Assets.xcassets */; };
@@ -81,6 +82,8 @@
 		921F986520DAD4DF0052F233 /* boot_intro.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = boot_intro.c; sourceTree = "<group>"; };
 		9251FDE421259EDE003915D9 /* cmd_audio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cmd_audio.h; sourceTree = "<group>"; };
 		9251FDE521259EDE003915D9 /* cmd_audio.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cmd_audio.c; sourceTree = "<group>"; };
+		9258F205218C49C000CE81D6 /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
+		9258F206218C49C000CE81D6 /* utils.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = utils.c; sourceTree = "<group>"; };
 		925D482B2121FF76003F1B0D /* audio_lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = audio_lib.h; sourceTree = "<group>"; };
 		925D482C2121FF76003F1B0D /* audio_lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = audio_lib.c; sourceTree = "<group>"; };
 		9284722920F9F4FA00B82653 /* dev_menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_menu.h; sourceTree = "<group>"; };
@@ -385,6 +388,8 @@
 				92D7089D2181E0A400F40043 /* system_paths.c */,
 				928CA2E8218A03EF0085125F /* sdl.h */,
 				92ADAC74218B475C0040A1F1 /* config.h */,
+				9258F205218C49C000CE81D6 /* utils.h */,
+				9258F206218C49C000CE81D6 /* utils.c */,
 			);
 			name = sdl;
 			path = ../../sdl;
@@ -484,6 +489,7 @@
 				9287EB4220D85EEB000BBEB1 /* cmd_sprites.c in Sources */,
 				9287EB4120D85EEB000BBEB1 /* data.c in Sources */,
 				9287EB2E20D85EEB000BBEB1 /* cmd_data.c in Sources */,
+				9258F207218C49C000CE81D6 /* utils.c in Sources */,
 				9287EB3E20D85EEB000BBEB1 /* cmd_subs.c in Sources */,
 				9284722B20F9F4FA00B82653 /* dev_menu.c in Sources */,
 				9287EB4520D85EEB000BBEB1 /* tokenizer.c in Sources */,

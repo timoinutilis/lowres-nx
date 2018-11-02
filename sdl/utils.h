@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -17,25 +17,13 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef settings_h
-#define settings_h
+#ifndef utils_h
+#define utils_h
 
 #include <stdio.h>
 #include <stdbool.h>
 
-#define MAX_TOOLS 4
-#define TOOL_NAME_SIZE 21
+void displayName(const char *filename, char *destination, size_t size);
+bool hasPostfix(const char *string, const char *postfix);
 
-struct Settings {
-    bool fullscreen;
-    bool disabledev;
-    int numTools;
-    char tools[MAX_TOOLS][FILENAME_MAX];
-    char toolNames[MAX_TOOLS][TOOL_NAME_SIZE];
-};
-
-void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[]);
-bool settings_addTool(struct Settings *settings, const char *filename);
-void settings_removeTool(struct Settings *settings, int index);
-
-#endif /* settings_h */
+#endif /* utils_h */

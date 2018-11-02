@@ -19,6 +19,7 @@
 
 #include "settings.h"
 #include "system_paths.h"
+#include "utils.h"
 #include "sdl.h"
 #include <string.h>
 
@@ -35,10 +36,7 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
     memset(settings, 0, sizeof(struct Settings));
     
     // default values
-    
-    documents_path(settings->programsPath, FILENAME_MAX - 1);
-    strncat(settings->programsPath, "LowRes NX" PATH_SEPARATOR, FILENAME_MAX - 1);
-    
+        
     // load settings file
     
     char *prefPath = SDL_GetPrefPath("Inutilis Software", "LowRes NX");
@@ -129,15 +127,6 @@ void settings_setValue(struct Settings *settings, const char *key, const char *v
             settings->fullscreen = false;
         }
     }
-    else if (strcmp(key, "programs") == 0)
-    {
-        strncpy(settings->programsPath, value, FILENAME_MAX - 1);
-		size_t len = strlen(settings->programsPath);
-		if (settings->programsPath[len - 1] != PATH_SEPARATOR[0])
-		{
-			strncat(settings->programsPath, PATH_SEPARATOR, FILENAME_MAX - 1);
-		}
-    }
     else if (strcmp(key, "disabledev") == 0)
     {
         if (strcmp(value, optionYes) == 0)
@@ -149,12 +138,36 @@ void settings_setValue(struct Settings *settings, const char *key, const char *v
             settings->disabledev = false;
         }
     }
-    else if (strcmp(key, "tool1") == 0)
+    else if (strcmp(key, "tool") == 0)
     {
-        strncpy(settings->customTools[0], value, TOOL_NAME_SIZE - 1);
+        settings_addTool(settings, value);
     }
-    else if (strcmp(key, "tool2") == 0)
+}
+
+bool settings_addTool(struct Settings *settings, const char *filename)
+{
+    int index = settings->numTools;
+    if (index < MAX_TOOLS)
     {
-        strncpy(settings->customTools[1], value, TOOL_NAME_SIZE - 1);
+        strncpy(settings->tools[index], filename, FILENAME_MAX - 1);
+        displayName(filename, settings->toolNames[index], TOOL_NAME_SIZE);
+        settings->numTools++;
+        return true;
+    }
+    return false;
+}
+
+void settings_removeTool(struct Settings *settings, int index)
+{
+    if (index < settings->numTools)
+    {
+        for (int i = index; i < MAX_TOOLS - 1; i++)
+        {
+            strncpy(settings->tools[i], settings->tools[i + 1], FILENAME_MAX - 1);
+            strncpy(settings->toolNames[i], settings->toolNames[i + 1], TOOL_NAME_SIZE - 1);
+        }
+        settings->tools[MAX_TOOLS - 1][0] = 0;
+        settings->toolNames[MAX_TOOLS - 1][0] = 0;
+        settings->numTools--;
     }
 }

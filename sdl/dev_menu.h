@@ -50,6 +50,7 @@ struct DevMenu {
 void dev_init(struct DevMenu *devMenu, struct Runner *runner, struct Settings *settings);
 void dev_show(struct DevMenu *devMenu, bool reload);
 void dev_update(struct DevMenu *devMenu, struct CoreInput *input);
+bool dev_handleDropFile(struct DevMenu *devMenu, const char *filename);
 
 #endif
 

@@ -25,6 +25,7 @@
 #include "dev_menu.h"
 #include "settings.h"
 #include "system_paths.h"
+#include "utils.h"
 #include "boot_intro.h"
 #include "sdl.h"
 
@@ -334,7 +335,18 @@ void update(void *arg)
                 break;
             
             case SDL_DROPFILE: {
-                selectProgram(event.drop.file);
+                if (hasPostfix(event.drop.file, ".nx") || hasPostfix(event.drop.file, ".NX"))
+                {
+                    bool handled = (mainState == MainStateDevMenu && dev_handleDropFile(&devMenu, event.drop.file));
+                    if (!handled)
+                    {
+                        selectProgram(event.drop.file);
+                    }
+                }
+                else
+                {
+                    overlay_message(runner.core, "NOT NX FORMAT");
+                }
                 SDL_free(event.drop.file);
                 break;
             }

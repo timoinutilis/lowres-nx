@@ -38,7 +38,7 @@
 	   original  Ctrl+Shift+s
 	Debug        Ctrl+d
 	Reload/Run   Ctrl+r
-	Exit         Ctrl+e
+	Eject        Ctrl+e
 	Quit         Esc (if disabledev)
 
 - Settings file:
@@ -58,18 +58,13 @@
 	Starts the application in fullscreen mode
 	
 	-disabledev yes/no
-	Disables Development Menu, ESC key quits LowRes NX
+	Disables the Development Menu, ESC key quits LowRes NX
 
-	-programs path
-	Path for the tool programs.
-	By default it's "LowRes NX" in your documents folder.
-
-	-tool1 tool.nx
-	-tool2 tool.nx
-	Custom tools for the Edit ROM menu
+	-tool tool.nx
+	Adds a tool for the Edit ROM menu (max 4)
 
 	program.nx
-	Name of program to run
+	Name of the program to run
 
 
 ***************

@@ -27,13 +27,13 @@
 #include "text_lib.h"
 #include "string_utils.h"
 #include "system_paths.h"
+#include "utils.h"
 #include "sdl.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
 #define MENU_SIZE 5
-#define NUM_DEV_TOOLS 2
 
 struct DevButton {
     int cx;
@@ -48,16 +48,12 @@ struct DevButton devButtons[] = {
     {17,4}
 };
 
-const char *devTools[NUM_DEV_TOOLS] = {
-    "Character Designer 1.1.nx",
-    "Background Designer 1.1.nx"
-};
-
 void dev_showInfo(struct DevMenu *devMenu);
 void dev_showError(struct DevMenu *devMenu, struct CoreError error);
 void dev_updateButtons(struct DevMenu *devMenu);
 void dev_onButtonTap(struct DevMenu *devMenu);
-void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons);
+void dev_showToolsMenu(struct DevMenu *devMenu);
+void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons, int numRemoveButtons);
 
 void dev_init(struct DevMenu *devMenu, struct Runner *runner, struct Settings *settings)
 {
@@ -107,16 +103,7 @@ void dev_show(struct DevMenu *devMenu, bool reload)
     
     textLib->charAttr.palette = 0;
     char progName[19];
-    memset(progName, 0, 19);
-    char *slash = strrchr(getMainProgramFilename(), PATH_SEPARATOR_CHAR);
-    if (slash)
-    {
-        strncpy(progName, slash + 1, 18);
-    }
-    else
-    {
-        strncpy(progName, getMainProgramFilename(), 18);
-    }
+    displayName(getMainProgramFilename(), progName, 19);
     txtlib_writeText(textLib, progName, 1, 2);
     
     if (devMenu->lastError.code != ErrorNone)
@@ -209,6 +196,23 @@ void dev_update(struct DevMenu *devMenu, struct CoreInput *input)
     overlay_draw(core, false);
 }
 
+bool dev_handleDropFile(struct DevMenu *devMenu, const char *filename)
+{
+    if (devMenu->currentMenu == DevModeMenuTools)
+    {
+        if (settings_addTool(devMenu->settings, filename))
+        {
+            dev_showToolsMenu(devMenu);
+        }
+        else
+        {
+            overlay_message(devMenu->runner->core, "NO EMPTY SPACE");
+        }
+        return true;
+    }
+    return false;
+}
+
 void dev_showInfo(struct DevMenu *devMenu)
 {
     struct Core *core = devMenu->runner->core;
@@ -294,19 +298,7 @@ void dev_onButtonTap(struct DevMenu *devMenu)
         }
         else if (button == 2)
         {
-            devMenu->currentMenu = DevModeMenuTools;
-            const char *menu[MENU_SIZE];
-            int count = 0;
-            for (int i = 0; i < NUM_DEV_TOOLS; i++)
-            {
-                menu[count++] = devTools[i];
-            }
-            for (int i = 0; i < NUM_CUSTOM_TOOLS; i++)
-            {
-                menu[count++] = devMenu->settings->customTools[i];
-            }
-            menu[count++] = "Cancel";
-            dev_showMenu(devMenu, "EDIT ROM WITH TOOL", menu, count);
+            dev_showToolsMenu(devMenu);
         }
         else if (button == 3)
         {
@@ -316,33 +308,23 @@ void dev_onButtonTap(struct DevMenu *devMenu)
         }
         else if (button == 4)
         {
-            // Exit
+            // Eject
             rebootNX();
         }
     }
     else if (devMenu->currentMenu == DevModeMenuTools)
     {
-        if (devMenu->currentButton < NUM_DEV_TOOLS + NUM_CUSTOM_TOOLS)
+        if (devMenu->currentButton < devMenu->settings->numTools)
         {
-            const char *tool;
-            if (devMenu->currentButton < NUM_DEV_TOOLS)
+            int cx = devMenu->runner->core->machine->ioRegisters.touchX / 8;
+            if (cx >= 18)
             {
-                tool = devTools[devMenu->currentButton];
+                settings_removeTool(devMenu->settings, devMenu->currentButton);
+                dev_showToolsMenu(devMenu);
             }
             else
             {
-                tool = devMenu->settings->customTools[devMenu->currentButton - NUM_DEV_TOOLS];
-            }
-            if (tool[0] != 0)
-            {
-                char toolFilename[FILENAME_MAX];
-                strncpy(toolFilename, devMenu->settings->programsPath, FILENAME_MAX - 1);
-                strncat(toolFilename, tool, FILENAME_MAX - 1);
-                runToolProgram(toolFilename);
-            }
-            else
-            {
-                dev_show(devMenu, false);
+                runToolProgram(devMenu->settings->tools[devMenu->currentButton]);
             }
         }
         else
@@ -352,7 +334,28 @@ void dev_onButtonTap(struct DevMenu *devMenu)
     }
 }
 
-void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons)
+void dev_showToolsMenu(struct DevMenu *devMenu)
+{
+    struct TextLib *textLib = &devMenu->textLib;
+    
+    devMenu->currentMenu = DevModeMenuTools;
+    const char *menu[MENU_SIZE];
+    int count = 0;
+    for (int i = 0; i < devMenu->settings->numTools; i++)
+    {
+        menu[count++] = devMenu->settings->toolNames[i];
+    }
+    menu[count++] = "Cancel";
+    dev_showMenu(devMenu, "EDIT ROM WITH TOOL", menu, count, count - 1);
+    if (count < MENU_SIZE)
+    {
+        textLib->charAttr.palette = 5;
+        txtlib_writeText(textLib, "DRAG & DROP PROGRAM", 0, 14);
+        txtlib_writeText(textLib, "TO ADD AS TOOL", 3, 15);
+    }
+}
+
+void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons, int numRemoveButtons)
 {
     struct TextLib *textLib = &devMenu->textLib;
     
@@ -372,6 +375,10 @@ void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *butt
         int tx = (int)(20 - strlen(buttons[i])) / 2;
         if (tx < 0) tx = 0;
         txtlib_writeText(textLib, buttons[i], tx, y + 1);
+        if (i < numRemoveButtons)
+        {
+            txtlib_setCell(textLib, 19, y, 20);
+        }
     }
     devMenu->currentMenuSize = numButtons;
 }
