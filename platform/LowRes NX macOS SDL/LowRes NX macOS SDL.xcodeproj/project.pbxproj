@@ -371,6 +371,8 @@
 		9287EB5320D85EF7000BBEB1 /* sdl */ = {
 			isa = PBXGroup;
 			children = (
+				92ADAC74218B475C0040A1F1 /* config.h */,
+				928CA2E8218A03EF0085125F /* sdl.h */,
 				928CA2E72189DCE90085125F /* main.h */,
 				9287EB5520D85EF7000BBEB1 /* main.c */,
 				928CA2E42189DC370085125F /* runner.h */,
@@ -386,8 +388,6 @@
 				92D708932181C0ED00F40043 /* screenshot.c */,
 				92D7089C2181E0A400F40043 /* system_paths.h */,
 				92D7089D2181E0A400F40043 /* system_paths.c */,
-				928CA2E8218A03EF0085125F /* sdl.h */,
-				92ADAC74218B475C0040A1F1 /* config.h */,
 				9258F205218C49C000CE81D6 /* utils.h */,
 				9258F206218C49C000CE81D6 /* utils.c */,
 			);

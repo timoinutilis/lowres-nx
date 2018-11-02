@@ -202,6 +202,7 @@ bool dev_handleDropFile(struct DevMenu *devMenu, const char *filename)
     {
         if (settings_addTool(devMenu->settings, filename))
         {
+            settings_save(devMenu->settings);
             dev_showToolsMenu(devMenu);
         }
         else
@@ -320,6 +321,7 @@ void dev_onButtonTap(struct DevMenu *devMenu)
             if (cx >= 18)
             {
                 settings_removeTool(devMenu->settings, devMenu->currentButton);
+                settings_save(devMenu->settings);
                 dev_showToolsMenu(devMenu);
             }
             else

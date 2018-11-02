@@ -35,6 +35,7 @@ struct Settings {
 };
 
 void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[]);
+void settings_save(struct Settings *settings);
 bool settings_addTool(struct Settings *settings, const char *filename);
 void settings_removeTool(struct Settings *settings, int index);
 

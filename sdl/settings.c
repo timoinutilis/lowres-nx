@@ -17,43 +17,37 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "config.h"
+
 #include "settings.h"
 #include "system_paths.h"
 #include "utils.h"
 #include "sdl.h"
 #include <string.h>
 
-const char *defaultSettings = "# Lines starting with a # character are comments. Remove the # to enable an option.\n\n# Starts the application in fullscreen mode\n#fullscreen yes\n\n# Path for the tool programs and virtual disk file\n#programs path\n\n# Custom tools for the Edit ROM menu\n#tool1 My Tool 1.nx\n#tool2 My Tool 2.nx\n";
-
 const char *optionYes = "yes";
 const char *optionNo = "no";
 
+bool settings_filename(char *destination);
 void settings_setValue(struct Settings *settings, const char *key, const char *value);
-
+void settings_saveAs(struct Settings *settings, const char *filename);
 
 void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[])
 {
     memset(settings, 0, sizeof(struct Settings));
     
-    // default values
-        
+#if SETTINGS_FILE
+    
     // load settings file
     
-    char *prefPath = SDL_GetPrefPath("Inutilis Software", "LowRes NX");
-    if (prefPath)
+    char filename[FILENAME_MAX];
+    if (settings_filename(filename))
     {
-        char filename[FILENAME_MAX];
-        strncpy(filename, prefPath, FILENAME_MAX - 1);
-        strncat(filename, "settings.txt", FILENAME_MAX - 1);
-        SDL_free((void *)prefPath);
-        prefPath = NULL;
-        
         FILE *file = fopen(filename, "r");
         if (file)
         {
-            // load settings
-            char line[256];
-            while (fgets(line, 256, file))
+            char line[FILENAME_MAX];
+            while (fgets(line, FILENAME_MAX, file))
             {
                 if (line[0] != '#')
                 {
@@ -85,14 +79,11 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
         else
         {
             // write default settings file
-            FILE *file = fopen(filename, "w");
-            if (file)
-            {
-                fputs(defaultSettings, file);
-                fclose(file);
-            }
+            settings_saveAs(settings, filename);
         }
     }
+    
+#endif
     
     // parse arguments
     
@@ -113,6 +104,21 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
             strncpy(filenameOut, arg, FILENAME_MAX - 1);
         }
     }
+}
+
+bool settings_filename(char *destination)
+{
+#if SETTINGS_FILE
+    char *prefPath = SDL_GetPrefPath("Inutilis Software", "LowRes NX");
+    if (prefPath)
+    {
+        strncpy(destination, prefPath, FILENAME_MAX - 1);
+        strncat(destination, "settings.txt", FILENAME_MAX - 1);
+        SDL_free((void *)prefPath);
+        return true;
+    }
+#endif
+    return false;
 }
 
 void settings_setValue(struct Settings *settings, const char *key, const char *value)
@@ -142,6 +148,46 @@ void settings_setValue(struct Settings *settings, const char *key, const char *v
     {
         settings_addTool(settings, value);
     }
+}
+
+void settings_save(struct Settings *settings)
+{
+#if SETTINGS_FILE
+    char filename[FILENAME_MAX];
+    if (settings_filename(filename))
+    {
+        settings_saveAs(settings, filename);
+    }
+#endif
+}
+
+void settings_saveAs(struct Settings *settings, const char *filename)
+{
+#if SETTINGS_FILE
+    FILE *file = fopen(filename, "w");
+    if (file)
+    {
+        fputs("# Start the application in fullscreen mode.\n# fullscreen yes/no\n", file);
+        fputs("fullscreen ", file);
+        fputs(settings->fullscreen ? optionYes : optionNo, file);
+        fputs("\n\n", file);
+        
+        fputs("# Disable the Development Menu, ESC key quits LowRes NX.\n# disabledev yes/no\n", file);
+        fputs("disabledev ", file);
+        fputs(settings->disabledev ? optionYes : optionNo, file);
+        fputs("\n\n", file);
+
+        fputs("# Add tools for the Edit ROM menu (max 4).\n# tool My Tool.nx\n", file);
+        for (int i = 0; i < settings->numTools; i++)
+        {
+            fputs("tool ", file);
+            fputs(settings->tools[i], file);
+            fputs("\n", file);
+        }
+        
+        fclose(file);
+    }
+#endif
 }
 
 bool settings_addTool(struct Settings *settings, const char *filename)
