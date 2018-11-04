@@ -26,9 +26,14 @@
 #define MAX_TOOLS 4
 #define TOOL_NAME_SIZE 21
 
-struct Settings {
+struct Parameters {
     bool fullscreen;
     bool disabledev;
+};
+
+struct Settings {
+    struct Parameters file;
+    struct Parameters session;
     int numTools;
     char tools[MAX_TOOLS][FILENAME_MAX];
     char toolNames[MAX_TOOLS][TOOL_NAME_SIZE];

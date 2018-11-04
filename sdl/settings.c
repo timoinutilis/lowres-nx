@@ -29,7 +29,7 @@ const char *optionYes = "yes";
 const char *optionNo = "no";
 
 bool settings_filename(char *destination);
-void settings_setValue(struct Settings *settings, const char *key, const char *value);
+void settings_setParameter(struct Parameters *parameters, const char *key, const char *value);
 void settings_saveAs(struct Settings *settings, const char *filename);
 
 void settings_init(struct Settings *settings, char *filenameOut, int argc, const char * argv[])
@@ -69,7 +69,14 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
                             *eolChar = 0;
                         }
                         
-                        settings_setValue(settings, line, value);
+                        if (strcmp(line, "tool") == 0)
+                        {
+                            settings_addTool(settings, value);
+                        }
+                        else
+                        {
+                            settings_setParameter(&settings->file, line, value);
+                        }
                     }
                 }
             }
@@ -81,6 +88,9 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
             // write default settings file
             settings_saveAs(settings, filename);
         }
+        
+        // copy file parameters to session parameters
+        memcpy(&settings->session, &settings->file, sizeof(struct Parameters));
     }
     
 #endif
@@ -94,7 +104,7 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
             i++;
             if (i < argc)
             {
-                settings_setValue(settings, arg + 1, argv[i]);
+                settings_setParameter(&settings->session, arg + 1, argv[i]);
             }
             else
             {
@@ -121,32 +131,32 @@ bool settings_filename(char *destination)
     return false;
 }
 
-void settings_setValue(struct Settings *settings, const char *key, const char *value)
+void settings_setParameter(struct Parameters *parameters, const char *key, const char *value)
 {
     if (strcmp(key, "fullscreen") == 0) {
         if (strcmp(value, optionYes) == 0)
         {
-            settings->fullscreen = true;
+            parameters->fullscreen = true;
         }
         else if (strcmp(value, optionNo) == 0)
         {
-            settings->fullscreen = false;
+            parameters->fullscreen = false;
         }
     }
     else if (strcmp(key, "disabledev") == 0)
     {
         if (strcmp(value, optionYes) == 0)
         {
-            settings->disabledev = true;
+            parameters->disabledev = true;
         }
         else if (strcmp(value, optionNo) == 0)
         {
-            settings->disabledev = false;
+            parameters->disabledev = false;
         }
     }
-    else if (strcmp(key, "tool") == 0)
+    else
     {
-        settings_addTool(settings, value);
+        printf("unknown parameter %s\n", key);
     }
 }
 
@@ -169,12 +179,12 @@ void settings_saveAs(struct Settings *settings, const char *filename)
     {
         fputs("# Start the application in fullscreen mode.\n# fullscreen yes/no\n", file);
         fputs("fullscreen ", file);
-        fputs(settings->fullscreen ? optionYes : optionNo, file);
+        fputs(settings->file.fullscreen ? optionYes : optionNo, file);
         fputs("\n\n", file);
         
         fputs("# Disable the Development Menu, ESC key quits LowRes NX.\n# disabledev yes/no\n", file);
         fputs("disabledev ", file);
-        fputs(settings->disabledev ? optionYes : optionNo, file);
+        fputs(settings->file.disabledev ? optionYes : optionNo, file);
         fputs("\n\n", file);
 
         fputs("# Add tools for the Edit ROM menu (max 4).\n# tool My Tool.nx\n", file);

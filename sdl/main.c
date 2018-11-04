@@ -120,7 +120,7 @@ int main(int argc, const char * argv[])
         }
         
         Uint32 windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-        if (settings.fullscreen)
+        if (settings.session.fullscreen)
         {
             windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
         }
@@ -417,7 +417,7 @@ void update(void *arg)
                 }
                 else if (code == SDLK_ESCAPE)
                 {
-                    if (settings.disabledev)
+                    if (settings.session.disabledev)
                     {
                         quit = true;
                     }
