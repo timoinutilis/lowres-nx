@@ -85,6 +85,7 @@ struct CoreError core_compileProgram(struct Core *core, const char *sourceCode)
 {
     machine_reset(core);
     overlay_reset(core);
+    disk_reset(core);
     return itp_compileProgram(core, sourceCode);
 }
 

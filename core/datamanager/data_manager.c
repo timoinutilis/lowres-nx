@@ -25,11 +25,10 @@
 #include "string_utils.h"
 
 int data_calcOutputSize(struct DataManager *manager);
-void data_resetEntries(struct DataManager *manager);
 
 void data_init(struct DataManager *manager)
 {
-    data_resetEntries(manager);
+    data_reset(manager);
 }
 
 void data_deinit(struct DataManager *manager)
@@ -43,12 +42,19 @@ void data_deinit(struct DataManager *manager)
     }
 }
 
-void data_resetEntries(struct DataManager *manager)
+void data_reset(struct DataManager *manager)
 {
     memset(manager->entries, 0, sizeof(struct DataEntry) * MAX_ENTRIES);
+    
     strcpy(manager->entries[1].comment, "MAIN PALETTES");
     strcpy(manager->entries[2].comment, "MAIN CHARACTERS");
     strcpy(manager->entries[3].comment, "MAIN BG");
+
+    if (manager->diskSourceCode)
+    {
+        free((void *)manager->diskSourceCode);
+        manager->diskSourceCode = NULL;
+    }
 }
 
 struct CoreError data_import(struct DataManager *manager, const char *input, bool keepSourceCode)
@@ -70,7 +76,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
     assert(manager);
     assert(input);
     
-    data_resetEntries(manager);
+    data_reset(manager);
     
     const char *character = input;
     uint8_t *currentDataByte = manager->data;
@@ -84,11 +90,6 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
         character++;
     }
     
-    if (manager->diskSourceCode)
-    {
-        free((void *)manager->diskSourceCode);
-        manager->diskSourceCode = NULL;
-    }
     if (keepSourceCode)
     {
         size_t length = (size_t)(character - input);

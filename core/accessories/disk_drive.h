@@ -32,6 +32,7 @@ struct DiskDrive {
 
 void disk_init(struct Core *core);
 void disk_deinit(struct Core *core);
+void disk_reset(struct Core *core);
 
 bool disk_prepare(struct Core *core);
 bool disk_saveFile(struct Core *core, int index, char *comment, int address, int length);

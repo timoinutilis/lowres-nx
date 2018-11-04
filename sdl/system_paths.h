@@ -31,6 +31,5 @@
 #endif
 
 void desktop_path(char *buffer, size_t size);
-void documents_path(char *buffer, size_t size);
 
 #endif /* system_paths_h */

@@ -40,6 +40,15 @@ void disk_deinit(struct Core *core)
     data_deinit(dataManager);
 }
 
+void disk_reset(struct Core *core)
+{
+    struct DataManager *dataManager = &core->diskDrive->dataManager;
+    if (dataManager->data)
+    {
+        data_reset(dataManager);
+    }
+}
+
 bool disk_prepare(struct Core *core)
 {
     struct DataManager *dataManager = &core->diskDrive->dataManager;
