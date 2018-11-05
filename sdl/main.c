@@ -27,7 +27,7 @@
 #include "system_paths.h"
 #include "utils.h"
 #include "boot_intro.h"
-#include "sdl.h"
+#include "sdl_include.h"
 
 #if SCREENSHOTS
 #include "screenshot.h"

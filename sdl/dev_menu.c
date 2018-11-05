@@ -28,7 +28,7 @@
 #include "string_utils.h"
 #include "system_paths.h"
 #include "utils.h"
-#include "sdl.h"
+#include "sdl_include.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>

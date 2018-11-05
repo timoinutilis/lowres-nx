@@ -22,7 +22,7 @@
 #include "settings.h"
 #include "system_paths.h"
 #include "utils.h"
-#include "sdl.h"
+#include "sdl_include.h"
 #include <string.h>
 
 const char *optionYes = "yes";

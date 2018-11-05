@@ -174,9 +174,13 @@
     <ClCompile Include="..\..\..\core\overlay\overlay.c" />
     <ClCompile Include="..\..\..\core\overlay\overlay_data.c" />
     <ClCompile Include="..\..\..\sdl\boot_intro.c" />
-    <ClCompile Include="..\..\..\sdl\dev_mode.c" />
+    <ClCompile Include="..\..\..\sdl\dev_menu.c" />
     <ClCompile Include="..\..\..\sdl\main.c" />
+    <ClCompile Include="..\..\..\sdl\runner.c" />
+    <ClCompile Include="..\..\..\sdl\screenshot.c" />
     <ClCompile Include="..\..\..\sdl\settings.c" />
+    <ClCompile Include="..\..\..\sdl\system_paths.c" />
+    <ClCompile Include="..\..\..\sdl\utils.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\core\accessories\disk_drive.h" />
@@ -222,9 +226,16 @@
     <ClInclude Include="..\..\..\core\overlay\overlay.h" />
     <ClInclude Include="..\..\..\core\overlay\overlay_data.h" />
     <ClInclude Include="..\..\..\sdl\boot_intro.h" />
-    <ClInclude Include="..\..\..\sdl\dev_mode.h" />
-    <ClInclude Include="..\..\..\sdl\dev_mode_data.h" />
+    <ClInclude Include="..\..\..\sdl\config.h" />
+    <ClInclude Include="..\..\..\sdl\dev_menu.h" />
+    <ClInclude Include="..\..\..\sdl\dev_menu_data.h" />
+    <ClInclude Include="..\..\..\sdl\main.h" />
+    <ClInclude Include="..\..\..\sdl\runner.h" />
+    <ClInclude Include="..\..\..\sdl\screenshot.h" />
+    <ClInclude Include="..\..\..\sdl\sdl_include.h" />
     <ClInclude Include="..\..\..\sdl\settings.h" />
+    <ClInclude Include="..\..\..\sdl\system_paths.h" />
+    <ClInclude Include="..\..\..\sdl\utils.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
   </ItemGroup>
