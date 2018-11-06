@@ -57,8 +57,6 @@
 		9289C403212866FD009BE093 /* SDL2.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9287EB5820D85F43000BBEB1 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		928CA2E62189DC370085125F /* runner.c in Sources */ = {isa = PBXBuildFile; fileRef = 928CA2E52189DC370085125F /* runner.c */; };
 		92D708942181C0ED00F40043 /* screenshot.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D708932181C0ED00F40043 /* screenshot.c */; };
-		92D7089A2181C80200F40043 /* libz.1.2.8.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 92D708992181C80200F40043 /* libz.1.2.8.tbd */; };
-		92D7089B2181C93F00F40043 /* libpng16.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92D708972181C67000F40043 /* libpng16.a */; };
 		92D7089E2181E0A400F40043 /* system_paths.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D7089D2181E0A400F40043 /* system_paths.c */; };
 /* End PBXBuildFile section */
 
@@ -178,6 +176,7 @@
 		928CA2E72189DCE90085125F /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		92ADAC74218B475C0040A1F1 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		92AF302F219179930053EA80 /* sdl_include.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sdl_include.h; sourceTree = "<group>"; };
+		92AF303021917A9D0053EA80 /* stb_image_write.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		92D708922181C0ED00F40043 /* screenshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = screenshot.h; sourceTree = "<group>"; };
 		92D708932181C0ED00F40043 /* screenshot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = screenshot.c; sourceTree = "<group>"; };
 		92D708952181C39900F40043 /* libz.1.1.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.1.3.tbd; path = usr/lib/libz.1.1.3.tbd; sourceTree = SDKROOT; };
@@ -192,8 +191,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92D7089B2181C93F00F40043 /* libpng16.a in Frameworks */,
-				92D7089A2181C80200F40043 /* libz.1.2.8.tbd in Frameworks */,
 				9287EB5920D85F43000BBEB1 /* SDL2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -386,6 +383,7 @@
 				921E0F142104BD7100F3C512 /* settings.c */,
 				92D708922181C0ED00F40043 /* screenshot.h */,
 				92D708932181C0ED00F40043 /* screenshot.c */,
+				92AF303021917A9D0053EA80 /* stb_image_write.h */,
 				92D7089C2181E0A400F40043 /* system_paths.h */,
 				92D7089D2181E0A400F40043 /* system_paths.c */,
 				9258F205218C49C000CE81D6 /* utils.h */,

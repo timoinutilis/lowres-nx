@@ -25,8 +25,9 @@
 #if SCREENSHOTS
 
 #include <stdio.h>
+#include <stdbool.h>
 
-void screenshot_save(uint32_t *pixels, int scale);
+bool screenshot_save(uint32_t *pixels, int scale);
 
 #endif
 
