@@ -616,9 +616,16 @@ void saveScreenshot(int scale)
     void *pixels = NULL;
     int pitch = 0;
     SDL_LockTexture(texture, NULL, &pixels, &pitch);
-    screenshot_save(pixels, scale);
+    bool succeeded = screenshot_save(pixels, scale);
     SDL_UnlockTexture(texture);
-    overlay_message(runner.core, "SCREENSHOT SAVED");
+    if (succeeded)
+    {
+        overlay_message(runner.core, "SCREENSHOT SAVED");
+    }
+    else
+    {
+        overlay_message(runner.core, "SCREENSHOT ERROR");
+    }
 #endif
 }
 
