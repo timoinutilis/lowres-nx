@@ -19,7 +19,7 @@
 
 #include "runner.h"
 #include "main.h"
-#include "sdl.h"
+#include "sdl_include.h"
 #include <string.h>
 #include <stdlib.h>
 
