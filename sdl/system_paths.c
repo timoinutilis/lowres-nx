@@ -26,6 +26,9 @@ void desktop_path(char *buffer, size_t size)
 #if defined(__APPLE__) && defined(__MACH__)
     strncpy(buffer, getenv("HOME"), size - 1);
     strncat(buffer, "/Desktop/", size - 1);
+#elif defined(_WIN32)
+	strncpy(buffer, getenv("USERPROFILE"), size - 1);
+	strncat(buffer, "\\Desktop\\", size - 1);
 #elif defined(__EMSCRIPTEN__)
     strncpy(buffer, "", size - 1);
 #else

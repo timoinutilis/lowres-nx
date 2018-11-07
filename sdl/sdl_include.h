@@ -17,12 +17,8 @@
 // along with LowRes NX.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#if defined(__EMSCRIPTEN__)
-#include <SDL2/SDL.h>
-#elif defined(__APPLE__) && defined(__MACH__)
-#include <SDL2/SDL.h>
-#elif defined(__LINUX__)
-#include <SDL2/SDL.h>
-#else
+#if defined(_WIN32)
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
 #endif
