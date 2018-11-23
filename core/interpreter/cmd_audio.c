@@ -66,7 +66,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
         }
         if (pwValue.type != ValueTypeNull)
         {
-            voice->pulseWidth = pwValue.v.floatValue;
+            voice->attr.pulseWidth = pwValue.v.floatValue;
         }
         if (lenValue.type != ValueTypeNull)
         {
@@ -112,13 +112,13 @@ enum ErrorCode cmd_VOLUME(struct Core *core)
         struct Voice *voice = &core->machine->audioRegisters.voices[n];
         if (volValue.type != ValueTypeNull)
         {
-            voice->volume = volValue.v.floatValue;
+            voice->status.volume = volValue.v.floatValue;
         }
         if (mixValue.type != ValueTypeNull)
         {
             int mix = mixValue.v.floatValue;
-            voice->attr.mixL = mix & 0x01;
-            voice->attr.mixR = (mix >> 1) & 0x01;
+            voice->status.mixL = mix & 0x01;
+            voice->status.mixR = (mix >> 1) & 0x01;
         }
     }
     
@@ -314,7 +314,7 @@ enum ErrorCode cmd_PLAY(struct Core *core)
     ++interpreter->pc;
     
     // pitch value
-    struct TypedValue pValue = itp_evaluateNumericExpression(core, 0, 95);
+    struct TypedValue pValue = itp_evaluateNumericExpression(core, 0, 96);
     if (pValue.type == ValueTypeError) return pValue.v.errorCode;
     
     int len = -1;
@@ -355,14 +355,14 @@ enum ErrorCode cmd_STOP(struct Core *core)
         {
             int n = nValue.v.floatValue;
             struct Voice *voice = &core->machine->audioRegisters.voices[n];
-            voice->attr.gate = 0;
+            voice->status.gate = 0;
         }
         else
         {
             for (int i = 0; i < NUM_VOICES; i++)
             {
                 struct Voice *voice = &core->machine->audioRegisters.voices[i];
-                voice->attr.gate = 0;
+                voice->status.gate = 0;
             }
         }
     }

@@ -85,10 +85,10 @@ void runStartupSequence(struct Core *core)
     for (int i = 0; i < NUM_VOICES; i++)
     {
         struct Voice *voice = &core->machine->audioRegisters.voices[i];
-        voice->pulseWidth = 7;
-        voice->volume = 15;
-        voice->attr.mixL = 1;
-        voice->attr.mixR = 1;
+        voice->attr.pulseWidth = 8;
+        voice->status.volume = 15;
+        voice->status.mixL = 1;
+        voice->status.mixR = 1;
         voice->envS = 15;
     }
 }

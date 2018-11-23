@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2018 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -20,7 +20,7 @@
 #ifndef interpreter_config_h
 #define interpreter_config_h
 
-#define MAX_TOKENS 8192
+#define MAX_TOKENS 16384
 #define MAX_SYMBOLS 1024
 #define MAX_LABEL_STACK_ITEMS 128
 #define MAX_JUMP_LABEL_ITEMS 128

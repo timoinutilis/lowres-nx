@@ -35,12 +35,12 @@ void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len)
         voice->length = len;
         voice->attr.timeout = (len > 0) ? 1 : 0;
     }
-    voice->attr.init = 1;
-    voice->attr.gate = 1;
+    voice->status.init = 1;
+    voice->status.gate = 1;
     
-    if (!core->machine->audioRegisters.attr.audioEnabled)
+    if (!core->machineInternals->audioInternals.audioEnabled)
     {
-        core->machine->audioRegisters.attr.audioEnabled = 1;
+        core->machineInternals->audioInternals.audioEnabled = true;
         delegate_controlsDidChange(core);
     }
 }

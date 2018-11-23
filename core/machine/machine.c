@@ -63,12 +63,17 @@ bool machine_poke(struct Core *core, int address, int value)
     }
     *(uint8_t *)((uint8_t *)core->machine + address) = value & 0xFF;
     
-    switch (address)
+    if (address == 0xFF76) // IO attributes
     {
-        case 0xFF76: // IO attributes
-        case 0xFF68: // audio attributes
+        delegate_controlsDidChange(core);
+    }
+    else if (address >= 0xFF40 && address < 0xFF70) // audio
+    {
+        if (!core->machineInternals->audioInternals.audioEnabled)
+        {
+            core->machineInternals->audioInternals.audioEnabled = true;
             delegate_controlsDidChange(core);
-            break;
+        }
     }
     return true;
 }

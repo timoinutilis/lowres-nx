@@ -45,15 +45,22 @@ enum EnvState {
     EnvStateRelease
 };
 
-union VoiceAttributes {
+union VoiceStatus {
     struct {
-        uint8_t wave:2;
+        uint8_t volume:4;
         uint8_t mixL:1;
         uint8_t mixR:1;
-        uint8_t timeout:1;
-        uint8_t reserved:1;
         uint8_t init:1;
         uint8_t gate:1;
+    };
+    uint8_t value;
+};
+
+union VoiceAttributes {
+    struct {
+        uint8_t pulseWidth:4;
+        uint8_t wave:2;
+        uint8_t timeout:1;
     };
     uint8_t value;
 };
@@ -78,19 +85,17 @@ union LFOAttributes {
 struct Voice {
     uint8_t frequencyLow;
     uint8_t frequencyHigh;
-    struct {
-        uint8_t volume:4;
-        uint8_t pulseWidth:4;
-    };
+    union VoiceStatus status;
+    uint8_t reserved1;
     union VoiceAttributes attr;
     uint8_t length;
     struct {
-        uint8_t envD:4;
         uint8_t envA:4;
+        uint8_t envD:4;
     };
     struct {
-        uint8_t envR:4;
         uint8_t envS:4;
+        uint8_t envR:4;
     };
     union LFOAttributes lfoAttr;
     struct {
@@ -101,18 +106,11 @@ struct Voice {
         uint8_t lfoVolAmount:4;
         uint8_t lfoPWAmount:4;
     };
-};
-
-union AudioAttributes {
-    struct {
-        uint8_t audioEnabled:1;
-    };
-    uint8_t value;
+    uint8_t reserved2;
 };
 
 struct AudioRegisters {
     struct Voice voices[NUM_VOICES];
-    union AudioAttributes attr;
 };
 
 struct VoiceInternals {
@@ -131,6 +129,7 @@ struct AudioInternals {
     struct AudioRegisters buffers[NUM_AUDIO_BUFFERS];
     int readBufferIndex;
     int writeBufferIndex;
+    bool audioEnabled;
 };
 
 void audio_reset(struct Core *core);

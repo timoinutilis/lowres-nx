@@ -49,6 +49,7 @@ void data_reset(struct DataManager *manager)
     strcpy(manager->entries[1].comment, "MAIN PALETTES");
     strcpy(manager->entries[2].comment, "MAIN CHARACTERS");
     strcpy(manager->entries[3].comment, "MAIN BG");
+    strcpy(manager->entries[15].comment, "MAIN SOUND");
 
     if (manager->diskSourceCode)
     {
@@ -139,7 +140,8 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
             }
             while (*character && *character != '\n' && *character != '\r');
             size_t commentLen = (character - comment);
-            if (commentLen > ENTRY_COMMENT_SIZE) commentLen = ENTRY_COMMENT_SIZE - 1;
+            if (commentLen >= ENTRY_COMMENT_SIZE) commentLen = ENTRY_COMMENT_SIZE - 1;
+            memset(entry->comment, 0, ENTRY_COMMENT_SIZE);
             strncpy(entry->comment, comment, commentLen);
             
             // binary data

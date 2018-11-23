@@ -1215,7 +1215,7 @@ the sound won't stop immediately, but fade out.</p>
 <tr><td>3</td><td>Noise</td></tr>
 </table>
 
-<p>pw is the pulse width (0-15), a value of 7 results in a square
+<p>pw is the pulse width (0-15), a value of 8 results in a square
 wave. This parameter only has an effect for the pulse waveform.</p>
 <p>l is the sound length in 1/60 seconds, the maximum is 255. 0 means,
 that the sound won't stop automatically. If the length is set using
@@ -1824,48 +1824,44 @@ $FF26 - Raster line
 
 <h3 id="Audio-Registers">Audio Registers</h3>
 
-<p>There are registers for 4 voices and one for global attributes:</p>
+<p>There are registers for 4 voices:</p>
 <pre>
 $FF40 - Voice 0
-$FF4A - Voice 1
-$FF54 - Voice 2
-$FF5E - Voice 3
-
-$FF68 - Attributes:
-    Bit  Purpose
-    0    Audio enabled
+$FF4C - Voice 1
+$FF58 - Voice 2
+$FF64 - Voice 3
 </pre>
 
-<p>Each voice occupies 10 bytes:</p>
+<p>Each voice occupies 12 bytes:</p>
 <pre>
 - Frequency low-byte
 - Frequency high-byte
-- Settings:
+- Status:
     Bit  Purpose
     0-3  Volume
-    4-7  Pulse width
+    4    Mix to left
+    5    Mix to right
+    6    Init
+    7    Gate
+- Reserved
 - Attributes:
     Bit  Purpose
-    0-1  Wave:
+    0-3  Pulse width
+    4-5  Wave:
          0: Sawtooth
          1: Triangle
          2: Pulse
          3: Noise
-    2   Mix to left
-    3   Mix to right
-    4   Timeout enabled
-    5   Reserved
-    6   Init
-    7   Gate
+    6    Timeout enabled
 - Length (timeout)
 - Envelope byte 1:
     Bit  Purpose
-    0-3  Decay
-    4-7  Attack
+    0-3  Attack
+    4-7  Decay
 - Envelope byte 2:
     Bit  Purpose
-    0-3  Release
-    4-7  Sustain
+    0-3  Sustain
+    4-7  Release
 - LFO attributes:
     Bit  Purpose
     0-1  Wave:
@@ -1884,6 +1880,7 @@ $FF68 - Attributes:
     Bit  Purpose
     0-3  Volume amount
     4-7  Pulse width amount
+- Reserved
 </pre>
 <p>Note: The frequency is a 16-bit value: f = hertz * 16</p>
 

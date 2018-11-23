@@ -118,7 +118,7 @@ void audio_bufferRegisters(struct Core *core)
     for (int v = 0; v < NUM_VOICES; v++)
     {
         struct Voice *voice = &registers->voices[v];
-        voice->attr.init = 0;
+        voice->status.init = 0;
     }
     
     internals->writeBufferIndex = writeBufferIndex;
@@ -155,9 +155,9 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
     for (int v = 0; v < NUM_VOICES; v++)
     {
         struct Voice *voice = &registers->voices[v];
-        if (voice->attr.init)
+        if (voice->status.init)
         {
-            voice->attr.init = 0;
+            voice->status.init = 0;
             
             struct VoiceInternals *voiceIn = &internals->voices[v];
             voiceIn->envState = EnvStateAttack;
@@ -176,7 +176,7 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
         int16_t leftOutput = 0;
         int16_t rightOutput = 0;
         
-        if (registers->attr.audioEnabled)
+        if (internals->audioEnabled)
         {
             for (int v = 0; v < NUM_VOICES; v++)
             {
@@ -186,8 +186,8 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
                 int freq = (voice->frequencyHigh << 8) | voice->frequencyLow;
                 if (freq == 0) continue;
                 
-                int volume = voice->volume << 4;
-                int pulseWidth = voice->pulseWidth << 4;
+                int volume = voice->status.volume << 4;
+                int pulseWidth = voice->attr.pulseWidth << 4;
                 
                 // --- LFO ---
                 
@@ -322,13 +322,13 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
                     if (voiceIn->timeoutCounter <= 0.0)
                     {
                         voiceIn->timeoutCounter = 0.0;
-                        voice->attr.gate = 0;
+                        voice->status.gate = 0;
                     }
                 }
                 
                 // --- ENVELOPE GENERATOR ---
                 
-                if (!voice->attr.gate)
+                if (!voice->status.gate)
                 {
                     voiceIn->envState = EnvStateRelease;
                 }
@@ -366,11 +366,11 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
                 
                 volume = volume * (int)voiceIn->envCounter >> 8;
                 int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * volume) >> 10; // 8 bit for volume, 2 bit for global
-                if (voice->attr.mixL)
+                if (voice->status.mixL)
                 {
                     leftOutput += voiceSample;
                 }
-                if (voice->attr.mixR)
+                if (voice->status.mixR)
                 {
                     rightOutput += voiceSample;
                 }
