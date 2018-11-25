@@ -79,6 +79,54 @@ enum ErrorCode cmd_SOUND(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_SOUND_SOURCE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // SOUND SOURCE
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // address value
+    struct TypedValue aValue = itp_evaluateNumericExpression(core, 0, 0xFFFF);
+    if (aValue.type == ValueTypeError) return aValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        interpreter->audioLib.soundSourceAddress = aValue.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+//enum ErrorCode cmd_SOUND_COPY(struct Core *core)
+//{
+//    struct Interpreter *interpreter = core->interpreter;
+//    
+//    // SOUND COPY
+//    ++interpreter->pc;
+//    ++interpreter->pc;
+//    
+//    // sound value
+//    struct TypedValue sValue = itp_evaluateNumericExpression(core, 0, 15);
+//    if (sValue.type == ValueTypeError) return sValue.v.errorCode;
+//    
+//    // TO
+//    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+//    ++interpreter->pc;
+//    
+//    // voice value
+//    struct TypedValue vValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+//    if (vValue.type == ValueTypeError) return vValue.v.errorCode;
+//
+//    if (interpreter->pass == PassRun)
+//    {
+//        audlib_copySound(&interpreter->audioLib, sValue.v.floatValue, vValue.v.floatValue);
+//    }
+//    
+//    return itp_endOfCommand(interpreter);
+//}
+
 enum ErrorCode cmd_VOLUME(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
@@ -330,9 +378,22 @@ enum ErrorCode cmd_PLAY(struct Core *core)
         len = lenValue.v.floatValue;
     }
     
+    int sound = -1;
+    if (interpreter->pc->type == TokenSOUND)
+    {
+        // SOUND
+        ++interpreter->pc;
+
+        // length value
+        struct TypedValue sValue = itp_evaluateNumericExpression(core, 0, 15);
+        if (sValue.type == ValueTypeError) return sValue.v.errorCode;
+        
+        sound = sValue.v.floatValue;
+    }
+    
     if (interpreter->pass == PassRun)
     {
-        audlib_play(&core->interpreter->audioLib, nValue.v.floatValue, pValue.v.floatValue, len);
+        audlib_play(&core->interpreter->audioLib, nValue.v.floatValue, pValue.v.floatValue, len, sound);
     }
     
     return itp_endOfCommand(interpreter);

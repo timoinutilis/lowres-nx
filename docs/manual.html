@@ -56,7 +56,7 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 
 <ul>
 <li>Cartridge ROM: 32 KB for gfx, music, any binary data</li>
-<li>Code: BASIC, max 8192 tokens</li>
+<li>Code: BASIC, max 16384 tokens</li>
 <li>Screen: 160x128 pixels, 60 Hz</li>
 <li>Backgrounds: Two layers, tile-based, scrollable</li>
 <li>Sprites: 64, max 32x32 pixels</li>
@@ -1169,7 +1169,7 @@ possible.</p>
 
 <h3 id="_PLAY" name="PLAY">PLAY</h3>
 
-<pre>PLAY v,p[,l]</pre>
+<pre>PLAY v,p[,l] [SOUND s]</pre>
 
 <p>Plays a sound on voice v (0-3). p is the pitch:</p>
 <table>
@@ -1187,9 +1187,14 @@ possible.</p>
     <tr><th>A#</th><td>11</td><td>23</td><td>35</td><td>47</td><td>59</td><td>71</td><td>83</td><td>95</td></tr>
     <tr><th>B</th><td>12</td><td>24</td><td>36</td><td>48</td><td>60</td><td>72</td><td>84</td><td>96</td></tr>
 </table>
+
 <p>The optional parameter l is the length in 1/60 seconds, the maximum
 is 255. 0 means, that the the sound won't stop automatically. If the
 parameter is omitted, the current value of the voice is kept.</p>
+
+<p>By default the current sound settings of the voice are used. Add
+the SOUND parameter to use the sound number s from the Sound Composer
+tool.</p>
 
 
 <h3 id="_STOP" name="STOP">STOP</h3>
@@ -1199,6 +1204,23 @@ parameter is omitted, the current value of the voice is kept.</p>
 <p>Stops the current sound on voice v. If the parameter is omitted,
 all voices are stopped. If the voice's envelope has a release time,
 the sound won't stop immediately, but fade out.</p>
+
+
+<h3 id="_VOLUME" name="VOLUME">VOLUME</h3>
+
+<pre>VOLUME v,vol,mix</pre>
+
+<p>Sets the volume of voice n (0-3) to vol (0-15) and its outputs to
+mix (0-3):</p>
+
+<table>
+<tr><td>0</td><td>Muted</td></tr>
+<tr><td>1</td><td>Left</td></tr>
+<tr><td>2</td><td>Right</td></tr>
+<tr><td>3</td><td>Left and right (center)</td></tr>
+</table>
+
+<p>All parameters can be omitted to keep their current settings.</p>
 
 
 <h3 id="_SOUND" name="SOUND">SOUND</h3>
@@ -1220,23 +1242,6 @@ wave. This parameter only has an effect for the pulse waveform.</p>
 <p>l is the sound length in 1/60 seconds, the maximum is 255. 0 means,
 that the sound won't stop automatically. If the length is set using
 this command, the length parameter of PLAY can be omitted.</p>
-<p>All parameters can be omitted to keep their current settings.</p>
-
-
-<h3 id="_VOLUME" name="VOLUME">VOLUME</h3>
-
-<pre>VOLUME v,vol,mix</pre>
-
-<p>Sets the volume of voice n (0-3) to vol (0-15) and its outputs to
-mix (0-3):</p>
-
-<table>
-<tr><td>0</td><td>Muted</td></tr>
-<tr><td>1</td><td>Left</td></tr>
-<tr><td>2</td><td>Right</td></tr>
-<tr><td>3</td><td>Left and right (center)</td></tr>
-</table>
-
 <p>All parameters can be omitted to keep their current settings.</p>
 
 
@@ -1289,6 +1294,16 @@ By enabling the env mode, the LFO stops after one cycle, so it can
 be used as an additional envelope generator. If the trigger is
 enabled, the LFO restarts for each played sound, otherwise it runs
 continuously. Trigger is enabled implicitly with the env mode.</p>
+
+
+<h3 id="_SOUND-SOURCE" name="SOUND SOURCE,SOUND,SOURCE">SOUND SOURCE</h3>
+
+<pre>SOUND SOURCE a</pre>
+
+<p>Sets the current source for the SOUND parameter of the PLAY
+command to the memory address "a".</p>
+
+<p>By default ROM entry 15 is used as source.</p>
 
 
 <h1 id="Data">Data</h1>

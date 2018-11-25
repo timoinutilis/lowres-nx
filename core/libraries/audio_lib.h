@@ -26,8 +26,10 @@ struct Core;
 
 struct AudioLib {
     struct Core *core;
+    int soundSourceAddress;
 };
 
-void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len);
+void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int sound);
+void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex);
 
 #endif /* audio_lib_h */

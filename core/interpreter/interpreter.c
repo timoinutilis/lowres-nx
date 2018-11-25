@@ -1403,7 +1403,18 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_PAUSE(core);
             
         case TokenSOUND:
-            return cmd_SOUND(core);
+            switch (itp_getNextTokenType(interpreter))
+            {
+//                case TokenCOPY:
+//                    return cmd_SOUND_COPY(core);
+                    
+                case TokenSOURCE:
+                    return cmd_SOUND_SOURCE(core);
+                    
+                default:
+                    return cmd_SOUND(core);
+            }
+            break;
             
         case TokenVOLUME:
             return cmd_VOLUME(core);

@@ -91,4 +91,7 @@ void runStartupSequence(struct Core *core)
         voice->status.mixR = 1;
         voice->envS = 15;
     }
+    
+    // main sound source
+    core->interpreter->audioLib.soundSourceAddress = entries[15].start;
 }

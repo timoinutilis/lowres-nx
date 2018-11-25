@@ -21,7 +21,7 @@
 #include "core.h"
 #include <math.h>
 
-void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len)
+void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int sound)
 {
     struct Core *core = lib->core;
     struct Voice *voice = &core->machine->audioRegisters.voices[voiceIndex];
@@ -29,6 +29,11 @@ void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len)
     int f = 16.0 * 440.0 * pow(2.0, (pitch - 58.0) / 12.0);
     voice->frequencyLow = f & 0xFF;
     voice->frequencyHigh = f >> 8;
+    
+    if (sound != -1)
+    {
+        audlib_copySound(lib, sound, voiceIndex);
+    }
     
     if (len != -1)
     {
@@ -43,4 +48,16 @@ void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len)
         core->machineInternals->audioInternals.audioEnabled = true;
         delegate_controlsDidChange(core);
     }
+}
+
+void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex)
+{
+    int addr = lib->soundSourceAddress + sound * 8;
+    int dest = 0xFF40 + voiceIndex * sizeof(struct Voice) + 4;
+    for (int i = 0; i < 8; i++)
+    {
+        int peek = machine_peek(lib->core, addr++);
+        machine_poke(lib->core, dest++, peek);
+    }
+    lib->core->interpreter->cycles += 8;
 }

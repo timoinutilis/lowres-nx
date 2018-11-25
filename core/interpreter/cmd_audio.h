@@ -27,6 +27,8 @@
 struct Core;
 
 enum ErrorCode cmd_SOUND(struct Core *core);
+enum ErrorCode cmd_SOUND_SOURCE(struct Core *core);
+//enum ErrorCode cmd_SOUND_COPY(struct Core *core);
 enum ErrorCode cmd_VOLUME(struct Core *core);
 enum ErrorCode cmd_ENVELOPE(struct Core *core);
 enum ErrorCode cmd_LFO(struct Core *core);
