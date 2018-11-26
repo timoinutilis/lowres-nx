@@ -61,3 +61,28 @@ void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex)
     }
     lib->core->interpreter->cycles += 8;
 }
+
+void audlib_playMusic(struct AudioLib *lib, int startPattern)
+{
+    
+}
+
+void audlib_playTrack(struct AudioLib *lib, int voiceIndex, int track)
+{
+    
+}
+
+void audlib_stopAll(struct AudioLib *lib)
+{
+    for (int i = 0; i < NUM_VOICES; i++)
+    {
+        struct Voice *voice = &lib->core->machine->audioRegisters.voices[i];
+        voice->status.gate = 0;
+    }
+}
+
+void audlib_stopVoice(struct AudioLib *lib, int voiceIndex)
+{
+    struct Voice *voice = &lib->core->machine->audioRegisters.voices[voiceIndex];
+    voice->status.gate = 0;
+}

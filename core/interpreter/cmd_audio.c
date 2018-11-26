@@ -79,26 +79,6 @@ enum ErrorCode cmd_SOUND(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_SOUND_SOURCE(struct Core *core)
-{
-    struct Interpreter *interpreter = core->interpreter;
-    
-    // SOUND SOURCE
-    ++interpreter->pc;
-    ++interpreter->pc;
-    
-    // address value
-    struct TypedValue aValue = itp_evaluateNumericExpression(core, 0, 0xFFFF);
-    if (aValue.type == ValueTypeError) return aValue.v.errorCode;
-    
-    if (interpreter->pass == PassRun)
-    {
-        interpreter->audioLib.soundSourceAddress = aValue.v.floatValue;
-    }
-    
-    return itp_endOfCommand(interpreter);
-}
-
 //enum ErrorCode cmd_SOUND_COPY(struct Core *core)
 //{
 //    struct Interpreter *interpreter = core->interpreter;
@@ -385,7 +365,7 @@ enum ErrorCode cmd_PLAY(struct Core *core)
         ++interpreter->pc;
 
         // length value
-        struct TypedValue sValue = itp_evaluateNumericExpression(core, 0, 15);
+        struct TypedValue sValue = itp_evaluateNumericExpression(core, 0, NUM_SOUNDS - 1);
         if (sValue.type == ValueTypeError) return sValue.v.errorCode;
         
         sound = sValue.v.floatValue;
@@ -415,16 +395,88 @@ enum ErrorCode cmd_STOP(struct Core *core)
         if (nValue.type != ValueTypeNull)
         {
             int n = nValue.v.floatValue;
-            struct Voice *voice = &core->machine->audioRegisters.voices[n];
-            voice->status.gate = 0;
+            audlib_stopVoice(&interpreter->audioLib, n);
         }
         else
         {
-            for (int i = 0; i < NUM_VOICES; i++)
-            {
-                struct Voice *voice = &core->machine->audioRegisters.voices[i];
-                voice->status.gate = 0;
-            }
+            audlib_stopAll(&interpreter->audioLib);
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_MUSIC(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // MUSIC
+    ++interpreter->pc;
+    
+    // pattern value
+    struct TypedValue pValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_PATTERNS - 1);
+    if (pValue.type == ValueTypeError) return pValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int startPattern = (pValue.type != ValueTypeNull) ? pValue.v.floatValue : 0;
+        audlib_playMusic(&interpreter->audioLib, startPattern);
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_TRACK(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // TRACK
+    ++interpreter->pc;
+    
+    // voice value
+    struct TypedValue vValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+    if (vValue.type == ValueTypeError) return vValue.v.errorCode;
+    
+    // track value
+    struct TypedValue tValue = itp_evaluateNumericExpression(core, 0, NUM_TRACKS - 1);
+    if (tValue.type == ValueTypeError) return tValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        audlib_playTrack(&interpreter->audioLib, vValue.v.floatValue, tValue.v.floatValue);
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_SOUND_MUSIC_TRACK_SOURCE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // SOUND/MUSIC/TRACK
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    // SOURCE
+    ++interpreter->pc;
+    
+    // address value
+    struct TypedValue aValue = itp_evaluateNumericExpression(core, 0, 0xFFFF);
+    if (aValue.type == ValueTypeError) return aValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (type == TokenSOUND)
+        {
+            interpreter->audioLib.soundSourceAddress = aValue.v.floatValue;
+        }
+        else if (type == TokenMUSIC)
+        {
+            interpreter->audioLib.musicSourceAddress = aValue.v.floatValue;
+        }
+        else if (type == TokenTRACK)
+        {
+            interpreter->audioLib.trackSourceAddress = aValue.v.floatValue;
         }
     }
     

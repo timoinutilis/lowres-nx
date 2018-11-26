@@ -94,4 +94,6 @@ void runStartupSequence(struct Core *core)
     
     // main sound source
     core->interpreter->audioLib.soundSourceAddress = entries[15].start;
+    core->interpreter->audioLib.musicSourceAddress = entries[15].start;
+    core->interpreter->audioLib.trackSourceAddress = entries[15].start;
 }
