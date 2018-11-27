@@ -31,6 +31,9 @@ void desktop_path(char *buffer, size_t size)
 	strncat(buffer, "\\Desktop\\", size - 1);
 #elif defined(__EMSCRIPTEN__)
     strncpy(buffer, "", size - 1);
+#elif defined(__LINUX__)
+    strncpy(buffer, getenv("HOME"), size - 1);
+    strncat(buffer, "/Desktop/", size - 1);
 #else
 #error Not implemented yet
 #endif
