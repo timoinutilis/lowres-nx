@@ -32,6 +32,7 @@ void desktop_path(char *buffer, size_t size)
 #elif defined(__EMSCRIPTEN__)
     strncpy(buffer, "", size - 1);
 #else
-//error Not implemented yet
+    strncpy(buffer, getenv("HOME"), size - 1);
+    strncat(buffer, "/Desktop/", size - 1);
 #endif
 }
