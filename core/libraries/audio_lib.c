@@ -34,6 +34,7 @@ struct TrackRow {
 };
 
 void audlib_updateMusic(struct AudioLib *lib);
+void audlib_setPitch(struct Voice *voice, float pitch);
 bool audlib_isPatternEmpty(struct AudioLib *lib, int pattern);
 int audlib_getLoopStart(struct AudioLib *lib, int pattern);
 int audlib_getLoop(struct AudioLib *lib, int pattern, int param);
@@ -42,21 +43,6 @@ struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int track, int row);
 void audlib_playRow(struct AudioLib *lib, int track, int row, int voice);
 void audlib_command(struct AudioLib *lib, struct Voice *voice, int command, int parameter);
 
-void audlib_enableAudio(struct Core *core)
-{
-    if (!core->machineInternals->audioInternals.audioEnabled)
-    {
-        core->machineInternals->audioInternals.audioEnabled = true;
-        delegate_controlsDidChange(core);
-    }
-}
-
-void audlib_setPitch(struct Voice *voice, float pitch)
-{
-    int f = 16.0 * 440.0 * pow(2.0, (pitch - 58.0) / 12.0);
-    voice->frequencyLow = f & 0xFF;
-    voice->frequencyHigh = f >> 8;
-}
 
 void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int sound)
 {
@@ -78,7 +64,7 @@ void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int
     voice->status.init = 1;
     voice->status.gate = 1;
     
-    audlib_enableAudio(core);
+    machine_enableAudio(core);
 }
 
 void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex)
@@ -101,7 +87,7 @@ void audlib_playMusic(struct AudioLib *lib, int startPattern)
     lib->row = 0;
     lib->state = MusicStatePlaying;
     
-    audlib_enableAudio(lib->core);
+    machine_enableAudio(lib->core);
 }
 
 void audlib_playTrack(struct AudioLib *lib, int voiceIndex, int track)
@@ -132,6 +118,7 @@ void audlib_update(struct AudioLib *lib)
         audlib_updateMusic(lib);
     }
 }
+
 
 void audlib_updateMusic(struct AudioLib *lib)
 {
@@ -188,6 +175,13 @@ void audlib_updateMusic(struct AudioLib *lib)
         }
     }
     lib->tick = (lib->tick + 1) % lib->speed;
+}
+
+void audlib_setPitch(struct Voice *voice, float pitch)
+{
+    int f = 16.0 * 440.0 * pow(2.0, (pitch - 58.0) / 12.0);
+    voice->frequencyLow = f & 0xFF;
+    voice->frequencyHigh = f >> 8;
 }
 
 int audlib_getSoundsAddress(struct AudioLib *lib)

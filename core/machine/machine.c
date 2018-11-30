@@ -69,11 +69,16 @@ bool machine_poke(struct Core *core, int address, int value)
     }
     else if (address >= 0xFF40 && address < 0xFF70) // audio
     {
-        if (!core->machineInternals->audioInternals.audioEnabled)
-        {
-            core->machineInternals->audioInternals.audioEnabled = true;
-            delegate_controlsDidChange(core);
-        }
+        machine_enableAudio(core);
     }
     return true;
+}
+
+void machine_enableAudio(struct Core *core)
+{
+    if (!core->machineInternals->audioInternals.audioEnabled)
+    {
+        core->machineInternals->audioInternals.audioEnabled = true;
+        delegate_controlsDidChange(core);
+    }
 }
