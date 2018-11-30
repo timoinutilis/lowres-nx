@@ -145,8 +145,7 @@ enum ErrorCode cmd_VOLUME(struct Core *core)
         if (mixValue.type != ValueTypeNull)
         {
             int mix = mixValue.v.floatValue;
-            voice->status.mixL = mix & 0x01;
-            voice->status.mixR = (mix >> 1) & 0x01;
+            voice->status.mix = mix;
         }
     }
     

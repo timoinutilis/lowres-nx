@@ -48,8 +48,7 @@ enum EnvState {
 union VoiceStatus {
     struct {
         uint8_t volume:4;
-        uint8_t mixL:1;
-        uint8_t mixR:1;
+        uint8_t mix:2;
         uint8_t init:1;
         uint8_t gate:1;
     };

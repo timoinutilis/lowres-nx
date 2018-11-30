@@ -366,11 +366,11 @@ void audio_renderAudioBuffer(struct AudioRegisters *registers, struct AudioInter
                 
                 volume = volume * (int)voiceIn->envCounter >> 8;
                 int16_t voiceSample = (((int32_t)(sample - 0x7FFF)) * volume) >> 10; // 8 bit for volume, 2 bit for global
-                if (voice->status.mixL)
+                if (voice->status.mix & 0x01)
                 {
                     leftOutput += voiceSample;
                 }
-                if (voice->status.mixR)
+                if (voice->status.mix & 0x02)
                 {
                     rightOutput += voiceSample;
                 }

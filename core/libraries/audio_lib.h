@@ -25,14 +25,26 @@
 #define NUM_SOUNDS 16
 #define NUM_PATTERNS 64
 #define NUM_TRACKS 64
+#define NUM_ROWS 32
 
 struct Core;
+
+enum MusicState {
+    MusicStateOff = 0,
+    MusicStatePlaying = 1,
+};
 
 struct AudioLib {
     struct Core *core;
     int soundSourceAddress;
     int musicSourceAddress;
     int trackSourceAddress;
+    
+    enum MusicState state;
+    int speed;
+    int tick;
+    int pattern;
+    int row;
 };
 
 void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int sound);
@@ -41,5 +53,6 @@ void audlib_playMusic(struct AudioLib *lib, int startPattern);
 void audlib_playTrack(struct AudioLib *lib, int voiceIndex, int track);
 void audlib_stopAll(struct AudioLib *lib);
 void audlib_stopVoice(struct AudioLib *lib, int voiceIndex);
+void audlib_update(struct AudioLib *lib);
 
 #endif /* audio_lib_h */

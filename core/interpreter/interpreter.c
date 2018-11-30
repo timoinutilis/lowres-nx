@@ -259,6 +259,10 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
         {
             struct Token *startToken = NULL;
             int maxCycles;
+            
+            int mainCycles = interpreter->cycles;
+            interpreter->cycles = 0;
+            
             switch (type)
             {
                 case InterruptTypeRaster:
@@ -269,14 +273,13 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 case InterruptTypeVBL:
                     startToken = interpreter->currentOnVBLToken;
                     maxCycles = MAX_CYCLES_PER_VBL;
+                    // update audio player
+                    audlib_update(&interpreter->audioLib);
                     break;
             }
             
             if (startToken)
             {
-                int mainCycles = interpreter->cycles;
-                interpreter->cycles = 0;
-                
                 interpreter->mode = ModeInterrupt;
                 interpreter->exitEvaluation = false;
                 struct Token *pc = interpreter->pc;
@@ -307,10 +310,11 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 {
                     interpreter->pc = pc;
                 }
-                
-                // sum of interrupt's and main cycle count
-                interpreter->cycles += mainCycles;
             }
+            
+            // sum of interrupt's and main cycle count
+            interpreter->cycles += mainCycles;
+            
             break;
         }
             
