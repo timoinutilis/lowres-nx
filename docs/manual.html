@@ -145,6 +145,7 @@ following table. Their data is made ready for use automatically.
 <tr><td>#1</td><td>Color palettes</td></tr>
 <tr><td>#2</td><td>Characters (sprites, tiles)</td></tr>
 <tr><td>#3</td><td>Background (tile map)</td></tr>
+<tr><td>#15</td><td>Sounds and music</td></tr>
 </table>
 
 <p>If cartridge ROM entry 0 is not used by a program, the compiler adds
@@ -243,6 +244,102 @@ For the background there are two additional options:</p>
 </td></tr>
 <tr><td>SIZE</td><td>Go to the size menu, where you can choose
 the width and height of the background (in cells), as well as the cell size (8x8 or 16x16 pixels).</td></tr>
+</table>
+
+
+<h2 id="Sound-Composer">Sound Composer</h2>
+
+<p>The Sound Composer serves to create sound presets, sequences
+("tracks") and complete songs.</p>
+<p>It loads the main sound data (file 15) on startup, but keep in mind
+that it doesn't save automatically. A sound file includes all sound
+and music data.</p>
+
+
+<h3 id="SC-Structure">Structure</h3>
+
+<p>- 16 Sounds</p>
+<p>A sound is a preset with all available sound parameters (waveform,
+envelope, LFO, etc.). It can be used directly with the PLAY command in
+your program or as an instrument in a track/song.</p>
+
+<p>- 64 Tracks</p>
+<p>A track is a sequence of 32 steps for a single voice, where each
+step can play a note or modify the sound. It can be used in your
+program for complex sound effects and short melodies (e.g. "level up")
+with the TRACK command. Tracks are also used to create songs.</p>
+
+<p>- 64 Patterns</p>
+<p>A pattern is a block of music, which defines which track should be
+played on each of the four voices. Patterns will be played one after
+another, except in the following cases: If the next pattern is empty,
+the song is stopped. When the current pattern finishes and has a "loop
+end" flag, the player jumps back to the previous pattern with a "loop
+start" flag. When a pattern finishes and has a "stop" flag, the player
+stops.<br/>
+If you want to create music for a game and you plan to use
+additional sound effects, you should leave at least one voice empty.</p>
+
+- Songs
+<p>The 64 patterns can be used for one long song or several shorter
+ones. By using the "loop" and "stop" flags songs can be separated. To
+play one specific song, just start at its first pattern. To play a
+song in your program use the MUSIC command.</p>
+
+
+<h3 id="SC-Editors">Editors</h3>
+
+<p>The Sound Composer has three tabs in the top right corner for the
+different sections: The pattern editor, the track editor and the sound
+editor. This is a "Tracker"-style program, which means the timeline
+goes from top to bottom, not from left to right. So the steps in a
+track are also called rows.</p>
+
+<h3 id="SC-The-Pattern-Editor">The Pattern Editor</h3>
+<p>Here you can select a pattern, choose its tracks for all voices and
+edit directly the notes of each selected track. There is also a toggle
+button for the "loop" and "stop" flags for the current pattern. If you
+set notes in a voice without track, it selects automatically a free
+track.</p>
+
+<h3 id="SC-The-Track-Editor">The Track Editor</h3>
+<p>Here you can select and edit a single track with additional
+parameters:</p>
+<table>
+<tr><td>S</td><td>Sound</td></tr>
+<tr><td>V</td><td>Volume</td></tr>
+<tr><td>C</td><td>Sound command</td></tr>
+<tr><td>P</td><td>Parameter</td></tr>
+</table>
+
+
+<h3 id="SC-The-Sound-Editor">The Sound Editor</h3>
+
+<p>Define and test your sounds here. The currently selected sound will
+be used in the other editors for new notes.</p>
+
+
+<h3 id="SC-Sound-Commands">Sound Commands</h3>
+
+<p>These commands allow you to change parameters dynamically while
+playback.</p>
+
+<table>
+<tr><th>C</th><th>P</th><th>Purpose</th></tr>
+<tr><td>0</td><td>0</td><td>No command</td></tr>
+<tr><td>0</td><td>x</td><td>Mix</td></tr>
+<tr><td>1</td><td>x</td><td>Attack</td></tr>
+<tr><td>2</td><td>x</td><td>Decay</td></tr>
+<tr><td>3</td><td>x</td><td>Sustain</td></tr>
+<tr><td>4</td><td>x</td><td>Release</td></tr>
+<tr><td>5</td><td>x</td><td>LFO rate</td></tr>
+<tr><td>6</td><td>x</td><td>Freq amount</td></tr>
+<tr><td>7</td><td>x</td><td>Vol amount</td></tr>
+<tr><td>8</td><td>x</td><td>PW amount</td></tr>
+<tr><td>9</td><td>x</td><td>Pulse Width</td></tr>
+<tr><td>A</td><td>x</td><td>Speed (ticks per row, 8 by default)</td></tr>
+<tr><td>F</td><td>0</td><td>Break Track/Pattern (TO DO)</td></tr>
+<tr><td>F</td><td>1</td><td>Cut Note / Volume 0</td></tr>
 </table>
 
 
@@ -1165,6 +1262,26 @@ can play sawtooth, triangle, pulse and noise waveforms, and has
 frequency, volume and pulse width settings. An additional envelope
 generator and LFO per voice makes complex sounds and instruments
 possible.</p>
+<p>You can use the tool "Sound Composer" (or compatible programs) to
+create music, tracks and sound presets.</p>
+
+
+<h3 id="_MUSIC" name="MUSIC">MUSIC</h3>
+
+<pre>MUSIC [p]</pre>
+
+<p>Starts playback of a song at pattern p. If the parameter p is
+omitted, it starts at pattern 0.</p>
+
+
+<h3 id="_TRACK" name="TRACK">TRACK</h3>
+
+<pre>TRACK v,n</pre>
+
+<p>- Not yet implemented -</p>
+<p>Plays track n once on voice v. Each voice can play a track
+independently, so this can be used for sound effects, even if music
+is playing.</p>
 
 
 <h3 id="_PLAY" name="PLAY">PLAY</h3>
