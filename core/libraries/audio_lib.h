@@ -21,17 +21,20 @@
 #define audio_lib_h
 
 #include <stdio.h>
+#include "audio_chip.h"
 
 #define NUM_SOUNDS 16
 #define NUM_PATTERNS 64
 #define NUM_TRACKS 64
-#define NUM_ROWS 32
+#define NUM_TRACK_ROWS 32
 
 struct Core;
 
-enum MusicState {
-    MusicStateOff = 0,
-    MusicStatePlaying = 1,
+struct ComposerPlayer {
+    int index; // pattern for music, otherwise track
+    int speed;
+    int tick;
+    int row;
 };
 
 struct AudioLib {
@@ -40,17 +43,14 @@ struct AudioLib {
     int musicSourceAddress;
     int trackSourceAddress;
     
-    enum MusicState state;
-    int speed;
-    int tick;
-    int pattern;
-    int row;
+    struct ComposerPlayer musicPlayer;
+    struct ComposerPlayer trackPlayers[NUM_VOICES];
 };
 
 void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int sound);
 void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex);
 void audlib_playMusic(struct AudioLib *lib, int startPattern);
-void audlib_playTrack(struct AudioLib *lib, int voiceIndex, int track);
+void audlib_playTrack(struct AudioLib *lib, int track, int voiceIndex);
 void audlib_stopAll(struct AudioLib *lib);
 void audlib_stopVoice(struct AudioLib *lib, int voiceIndex);
 void audlib_update(struct AudioLib *lib);

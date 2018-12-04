@@ -432,17 +432,21 @@ enum ErrorCode cmd_TRACK(struct Core *core)
     // TRACK
     ++interpreter->pc;
     
-    // voice value
-    struct TypedValue vValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
-    if (vValue.type == ValueTypeError) return vValue.v.errorCode;
-    
     // track value
     struct TypedValue tValue = itp_evaluateNumericExpression(core, 0, NUM_TRACKS - 1);
     if (tValue.type == ValueTypeError) return tValue.v.errorCode;
     
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // voice value
+    struct TypedValue vValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+    if (vValue.type == ValueTypeError) return vValue.v.errorCode;
+    
     if (interpreter->pass == PassRun)
     {
-        audlib_playTrack(&interpreter->audioLib, vValue.v.floatValue, tValue.v.floatValue);
+        audlib_playTrack(&interpreter->audioLib, tValue.v.floatValue, vValue.v.floatValue);
     }
     
     return itp_endOfCommand(interpreter);

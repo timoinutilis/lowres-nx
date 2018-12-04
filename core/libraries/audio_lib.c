@@ -34,14 +34,15 @@ struct TrackRow {
 };
 
 void audlib_updateMusic(struct AudioLib *lib);
+void audlib_updateTrack(struct AudioLib *lib, int voiceIndex);
 void audlib_setPitch(struct Voice *voice, float pitch);
 bool audlib_isPatternEmpty(struct AudioLib *lib, int pattern);
 int audlib_getLoopStart(struct AudioLib *lib, int pattern);
 int audlib_getLoop(struct AudioLib *lib, int pattern, int param);
 int audlib_getTrack(struct AudioLib *lib, int pattern, int voice);
 struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int track, int row);
-void audlib_playRow(struct AudioLib *lib, int track, int row, int voice);
-void audlib_command(struct AudioLib *lib, struct Voice *voice, int command, int parameter);
+void audlib_playRow(struct AudioLib *lib, struct ComposerPlayer *player, int track, int voice);
+void audlib_command(struct AudioLib *lib, struct Voice *voice, struct ComposerPlayer *player, int command, int parameter);
 
 
 void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int sound)
@@ -81,27 +82,34 @@ void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex)
 
 void audlib_playMusic(struct AudioLib *lib, int startPattern)
 {
-    lib->pattern = startPattern;
-    lib->speed = 8;
-    lib->tick = -1;
-    lib->row = 0;
-    lib->state = MusicStatePlaying;
+    struct ComposerPlayer *player = &lib->musicPlayer;
+    player->index = startPattern;
+    player->tick = -1;
+    player->row = 0;
+    player->speed = 8;
     
     machine_enableAudio(lib->core);
 }
 
-void audlib_playTrack(struct AudioLib *lib, int voiceIndex, int track)
+void audlib_playTrack(struct AudioLib *lib, int track, int voiceIndex)
 {
+    struct ComposerPlayer *player = &lib->trackPlayers[voiceIndex];
+    player->index = track;
+    player->tick = -1;
+    player->row = 0;
+    player->speed = 8;
     
+    machine_enableAudio(lib->core);
 }
 
 void audlib_stopAll(struct AudioLib *lib)
 {
-    lib->state = MusicStateOff;
+    lib->musicPlayer.speed = 0;
     for (int i = 0; i < NUM_VOICES; i++)
     {
         struct Voice *voice = &lib->core->machine->audioRegisters.voices[i];
         voice->status.gate = 0;
+        lib->trackPlayers[i].speed = 0;
     }
 }
 
@@ -109,40 +117,50 @@ void audlib_stopVoice(struct AudioLib *lib, int voiceIndex)
 {
     struct Voice *voice = &lib->core->machine->audioRegisters.voices[voiceIndex];
     voice->status.gate = 0;
+    lib->trackPlayers[voiceIndex].speed = 0;
 }
 
 void audlib_update(struct AudioLib *lib)
 {
-    if (lib->state == MusicStatePlaying)
+    if (lib->musicPlayer.speed)
     {
         audlib_updateMusic(lib);
     }
+    for (int v = 0; v < NUM_VOICES; v++)
+    {
+        if (lib->trackPlayers[v].speed)
+        {
+            audlib_updateTrack(lib, v);
+        }
+    }
+
 }
 
 
 void audlib_updateMusic(struct AudioLib *lib)
 {
-    if (lib->tick == -1)
+    struct ComposerPlayer *player = &lib->musicPlayer;
+    if (player->tick == -1)
     {
-        lib->tick = 0;
+        player->tick = 0;
     }
-    else if (lib->tick == 0)
+    else if (player->tick == 0)
     {
-        lib->row = (lib->row + 1) % NUM_ROWS;
-        if (lib->row == 0 && lib->state == MusicStatePlaying)
+        player->row = (player->row + 1) % NUM_TRACK_ROWS;
+        if (player->row == 0 && player->speed)
         {
-            if (audlib_getLoop(lib, lib->pattern, 2) == 1)
+            if (audlib_getLoop(lib, player->index, 2) == 1)
             {
                 audlib_stopAll(lib);
                 return;
             }
-            if (audlib_getLoop(lib, lib->pattern, 1) == 1)
+            if (audlib_getLoop(lib, player->index, 1) == 1)
             {
-                lib->pattern = audlib_getLoopStart(lib, lib->pattern);
+                player->index = audlib_getLoopStart(lib, player->index);
             }
             else
             {
-                int p = lib->pattern + 1;
+                int p = player->index + 1;
                 if (p < NUM_PATTERNS)
                 {
                     if (audlib_isPatternEmpty(lib, p))
@@ -152,7 +170,7 @@ void audlib_updateMusic(struct AudioLib *lib)
                     }
                     else
                     {
-                        lib->pattern = p;
+                        player->index = p;
                     }
                 }
                 else
@@ -163,18 +181,50 @@ void audlib_updateMusic(struct AudioLib *lib)
             }
         }
     }
-    if (lib->tick == 0)
+    if (player->tick == 0)
     {
-        for (int voice = 0; voice < NUM_VOICES; voice++)
+        for (int v = 0; v < NUM_VOICES; v++)
         {
-            int track = audlib_getTrack(lib, lib->pattern, voice);
-            if (track >= 0)
+            if (lib->trackPlayers[v].speed == 0)
             {
-                audlib_playRow(lib, track, lib->row, voice);
+                int track = audlib_getTrack(lib, player->index, v);
+                if (track >= 0)
+                {
+                    audlib_playRow(lib, player, track, v);
+                }
             }
         }
     }
-    lib->tick = (lib->tick + 1) % lib->speed;
+    if (player->speed)
+    {
+        player->tick = (player->tick + 1) % player->speed;
+    }
+}
+
+void audlib_updateTrack(struct AudioLib *lib, int voiceIndex)
+{
+    struct ComposerPlayer *player = &lib->trackPlayers[voiceIndex];
+    if (player->tick == -1)
+    {
+        player->tick = 0;
+    }
+    else if (player->tick == 0)
+    {
+        player->row = (player->row + 1) % NUM_TRACK_ROWS;
+        if (player->row == 0)
+        {
+            audlib_stopVoice(lib, voiceIndex);
+            return;
+        }
+    }
+    if (player->tick == 0)
+    {
+        audlib_playRow(lib, player, player->index, voiceIndex);
+    }
+    if (player->speed)
+    {
+        player->tick = (player->tick + 1) % player->speed;
+    }
 }
 
 void audlib_setPitch(struct Voice *voice, float pitch)
@@ -243,7 +293,7 @@ int audlib_getTrack(struct AudioLib *lib, int pattern, int voice)
 struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int track, int row)
 {
     struct TrackRow trackRow;
-    int a = audlib_getTracksAddress(lib) + track * NUM_ROWS * ROW_SIZE + row * ROW_SIZE;
+    int a = audlib_getTracksAddress(lib) + track * NUM_TRACK_ROWS * ROW_SIZE + row * ROW_SIZE;
     struct Core *core = lib->core;
     trackRow.note = machine_peek(core, a);
     int peek1 = machine_peek(core, a + 1);
@@ -255,12 +305,12 @@ struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int track, int row)
     return trackRow;
 }
 
-void audlib_playRow(struct AudioLib *lib, int track, int row, int voiceIndex)
+void audlib_playRow(struct AudioLib *lib, struct ComposerPlayer *player, int track, int voiceIndex)
 {
     struct Core *core = lib->core;
     struct Voice *voice = &core->machine->audioRegisters.voices[voiceIndex];
     
-    struct TrackRow trackRow = audlib_getTrackRow(lib, track, row);
+    struct TrackRow trackRow = audlib_getTrackRow(lib, track, player->row);
     if (trackRow.note > 0 && trackRow.note < 255)
     {
         audlib_copySound(lib, trackRow.sound, voiceIndex);
@@ -269,7 +319,7 @@ void audlib_playRow(struct AudioLib *lib, int track, int row, int voiceIndex)
     {
         voice->status.volume = trackRow.volume;
     }
-    audlib_command(lib, voice, trackRow.command, trackRow.parameter);
+    audlib_command(lib, voice, player, trackRow.command, trackRow.parameter);
     if (trackRow.note == 255)
     {
         voice->status.gate = 0;
@@ -282,7 +332,7 @@ void audlib_playRow(struct AudioLib *lib, int track, int row, int voiceIndex)
     }
 }
 
-void audlib_command(struct AudioLib *lib, struct Voice *voice, int command, int parameter)
+void audlib_command(struct AudioLib *lib, struct Voice *voice, struct ComposerPlayer *player, int command, int parameter)
 {
     if (command == 0 && parameter == 0) return;
     switch (command)
@@ -318,10 +368,7 @@ void audlib_command(struct AudioLib *lib, struct Voice *voice, int command, int 
             voice->attr.pulseWidth = parameter;
             break;
         case 0x0A:
-            if (parameter > 0)
-            {
-                lib->speed = parameter;
-            }
+            player->speed = parameter;
             break;
         case 0x0F:
             switch (parameter)
