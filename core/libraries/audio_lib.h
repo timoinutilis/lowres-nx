@@ -21,6 +21,7 @@
 #define audio_lib_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "audio_chip.h"
 
 #define NUM_SOUNDS 16
@@ -35,6 +36,7 @@ struct ComposerPlayer {
     int speed;
     int tick;
     int row;
+    bool willBreak;
 };
 
 struct AudioLib {

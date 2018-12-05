@@ -87,6 +87,7 @@ void audlib_playMusic(struct AudioLib *lib, int startPattern)
     player->tick = -1;
     player->row = 0;
     player->speed = 8;
+    player->willBreak = false;
     
     machine_enableAudio(lib->core);
 }
@@ -98,6 +99,7 @@ void audlib_playTrack(struct AudioLib *lib, int track, int voiceIndex)
     player->tick = -1;
     player->row = 0;
     player->speed = 8;
+    player->willBreak = false;
     
     machine_enableAudio(lib->core);
 }
@@ -146,12 +148,20 @@ void audlib_updateMusic(struct AudioLib *lib)
     }
     else if (player->tick == 0)
     {
-        player->row = (player->row + 1) % NUM_TRACK_ROWS;
+        if (player->willBreak)
+        {
+            player->row = 0;
+            player->willBreak = false;
+        }
+        else
+        {
+            player->row = (player->row + 1) % NUM_TRACK_ROWS;
+        }
         if (player->row == 0 && player->speed)
         {
             if (audlib_getLoop(lib, player->index, 2) == 1)
             {
-                audlib_stopAll(lib);
+                player->speed = 0;
                 return;
             }
             if (audlib_getLoop(lib, player->index, 1) == 1)
@@ -165,7 +175,7 @@ void audlib_updateMusic(struct AudioLib *lib)
                 {
                     if (audlib_isPatternEmpty(lib, p))
                     {
-                        audlib_stopAll(lib);
+                        player->speed = 0;
                         return;
                     }
                     else
@@ -175,7 +185,7 @@ void audlib_updateMusic(struct AudioLib *lib)
                 }
                 else
                 {
-                    audlib_stopAll(lib);
+                    player->speed = 0;
                     return;
                 }
             }
@@ -185,6 +195,7 @@ void audlib_updateMusic(struct AudioLib *lib)
     {
         for (int v = 0; v < NUM_VOICES; v++)
         {
+            // play only if no other track is playing on that voice
             if (lib->trackPlayers[v].speed == 0)
             {
                 int track = audlib_getTrack(lib, player->index, v);
@@ -194,11 +205,12 @@ void audlib_updateMusic(struct AudioLib *lib)
                 }
             }
         }
+        if (player->speed == 0)
+        {
+            return;
+        }
     }
-    if (player->speed)
-    {
-        player->tick = (player->tick + 1) % player->speed;
-    }
+    player->tick = (player->tick + 1) % player->speed;
 }
 
 void audlib_updateTrack(struct AudioLib *lib, int voiceIndex)
@@ -211,20 +223,22 @@ void audlib_updateTrack(struct AudioLib *lib, int voiceIndex)
     else if (player->tick == 0)
     {
         player->row = (player->row + 1) % NUM_TRACK_ROWS;
-        if (player->row == 0)
+        if (player->row == 0 || player->willBreak)
         {
-            audlib_stopVoice(lib, voiceIndex);
+            player->willBreak = false;
+            player->speed = 0;
             return;
         }
     }
     if (player->tick == 0)
     {
         audlib_playRow(lib, player, player->index, voiceIndex);
+        if (player->speed == 0)
+        {
+            return;
+        }
     }
-    if (player->speed)
-    {
-        player->tick = (player->tick + 1) % player->speed;
-    }
+    player->tick = (player->tick + 1) % player->speed;
 }
 
 void audlib_setPitch(struct Voice *voice, float pitch)
@@ -367,14 +381,14 @@ void audlib_command(struct AudioLib *lib, struct Voice *voice, struct ComposerPl
         case 0x09:
             voice->attr.pulseWidth = parameter;
             break;
-        case 0x0A:
+        case 0x0E:
             player->speed = parameter;
             break;
         case 0x0F:
             switch (parameter)
             {
                 case 0:
-                    //TODO: break pattern
+                    player->willBreak = true;
                     break;
                 case 1:
                     voice->status.gate = 0;
