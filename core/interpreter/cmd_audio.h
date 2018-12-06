@@ -36,6 +36,6 @@ enum ErrorCode cmd_PLAY(struct Core *core);
 enum ErrorCode cmd_STOP(struct Core *core);
 enum ErrorCode cmd_MUSIC(struct Core *core);
 enum ErrorCode cmd_TRACK(struct Core *core);
-enum ErrorCode cmd_SOUND_MUSIC_TRACK_SOURCE(struct Core *core);
+enum ErrorCode cmd_SOUND_SOURCE(struct Core *core);
 
 #endif /* cmd_audio_h */

@@ -25,6 +25,9 @@
 #define PATTERN_SIZE 4
 #define ROW_SIZE 3
 
+#define PATTERNS_OFFSET (NUM_SOUNDS * SOUND_SIZE)
+#define TRACKS_OFFSET (PATTERNS_OFFSET + NUM_PATTERNS * PATTERN_SIZE)
+
 struct TrackRow {
     int note;
     int sound;
@@ -36,11 +39,11 @@ struct TrackRow {
 void audlib_updateMusic(struct AudioLib *lib);
 void audlib_updateTrack(struct AudioLib *lib, int voiceIndex);
 void audlib_setPitch(struct Voice *voice, float pitch);
-bool audlib_isPatternEmpty(struct AudioLib *lib, int pattern);
-int audlib_getLoopStart(struct AudioLib *lib, int pattern);
-int audlib_getLoop(struct AudioLib *lib, int pattern, int param);
-int audlib_getTrack(struct AudioLib *lib, int pattern, int voice);
-struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int track, int row);
+bool audlib_isPatternEmpty(struct AudioLib *lib, int sourceAddress, int pattern);
+int audlib_getLoopStart(struct AudioLib *lib, int sourceAddress, int pattern);
+int audlib_getLoop(struct AudioLib *lib, int sourceAddress, int pattern, int param);
+int audlib_getTrack(struct AudioLib *lib, int sourceAddress, int pattern, int voice);
+struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int sourceAddress, int track, int row);
 void audlib_playRow(struct AudioLib *lib, struct ComposerPlayer *player, int track, int voice);
 void audlib_command(struct AudioLib *lib, struct Voice *voice, struct ComposerPlayer *player, int command, int parameter);
 
@@ -54,7 +57,7 @@ void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int
     
     if (sound != -1)
     {
-        audlib_copySound(lib, sound, voiceIndex);
+        audlib_copySound(lib, lib->sourceAddress, sound, voiceIndex);
     }
     
     if (len != -1)
@@ -68,9 +71,9 @@ void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int
     machine_enableAudio(core);
 }
 
-void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex)
+void audlib_copySound(struct AudioLib *lib, int sourceAddress, int sound, int voiceIndex)
 {
-    int addr = lib->soundSourceAddress + sound * 8;
+    int addr = sourceAddress + sound * 8;
     int dest = 0xFF40 + voiceIndex * sizeof(struct Voice) + 4;
     for (int i = 0; i < 8; i++)
     {
@@ -83,6 +86,7 @@ void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex)
 void audlib_playMusic(struct AudioLib *lib, int startPattern)
 {
     struct ComposerPlayer *player = &lib->musicPlayer;
+    player->sourceAddress = lib->sourceAddress;
     player->index = startPattern;
     player->tick = -1;
     player->row = 0;
@@ -95,6 +99,7 @@ void audlib_playMusic(struct AudioLib *lib, int startPattern)
 void audlib_playTrack(struct AudioLib *lib, int track, int voiceIndex)
 {
     struct ComposerPlayer *player = &lib->trackPlayers[voiceIndex];
+    player->sourceAddress = lib->sourceAddress;
     player->index = track;
     player->tick = -1;
     player->row = 0;
@@ -159,21 +164,21 @@ void audlib_updateMusic(struct AudioLib *lib)
         }
         if (player->row == 0 && player->speed)
         {
-            if (audlib_getLoop(lib, player->index, 2) == 1)
+            if (audlib_getLoop(lib, player->sourceAddress, player->index, 2) == 1)
             {
                 player->speed = 0;
                 return;
             }
-            if (audlib_getLoop(lib, player->index, 1) == 1)
+            if (audlib_getLoop(lib, player->sourceAddress, player->index, 1) == 1)
             {
-                player->index = audlib_getLoopStart(lib, player->index);
+                player->index = audlib_getLoopStart(lib, player->sourceAddress, player->index);
             }
             else
             {
                 int p = player->index + 1;
                 if (p < NUM_PATTERNS)
                 {
-                    if (audlib_isPatternEmpty(lib, p))
+                    if (audlib_isPatternEmpty(lib, player->sourceAddress, p))
                     {
                         player->speed = 0;
                         return;
@@ -198,7 +203,7 @@ void audlib_updateMusic(struct AudioLib *lib)
             // play only if no other track is playing on that voice
             if (lib->trackPlayers[v].speed == 0)
             {
-                int track = audlib_getTrack(lib, player->index, v);
+                int track = audlib_getTrack(lib, player->sourceAddress, player->index, v);
                 if (track >= 0)
                 {
                     audlib_playRow(lib, player, track, v);
@@ -248,26 +253,11 @@ void audlib_setPitch(struct Voice *voice, float pitch)
     voice->frequencyHigh = f >> 8;
 }
 
-int audlib_getSoundsAddress(struct AudioLib *lib)
-{
-    return lib->soundSourceAddress;
-}
-
-int audlib_getPatternsAddress(struct AudioLib *lib)
-{
-    return audlib_getSoundsAddress(lib) + NUM_SOUNDS * SOUND_SIZE;
-}
-
-int audlib_getTracksAddress(struct AudioLib *lib)
-{
-    return audlib_getPatternsAddress(lib) + NUM_PATTERNS * PATTERN_SIZE;
-}
-
-bool audlib_isPatternEmpty(struct AudioLib *lib, int pattern)
+bool audlib_isPatternEmpty(struct AudioLib *lib, int sourceAddress, int pattern)
 {
     for (int v = 0; v < NUM_VOICES; v++)
     {
-        if (audlib_getTrack(lib, pattern, v) >= 0)
+        if (audlib_getTrack(lib, sourceAddress, pattern, v) >= 0)
         {
             return false;
         }
@@ -275,11 +265,11 @@ bool audlib_isPatternEmpty(struct AudioLib *lib, int pattern)
     return true;
 }
 
-int audlib_getLoopStart(struct AudioLib *lib, int pattern)
+int audlib_getLoopStart(struct AudioLib *lib, int sourceAddress, int pattern)
 {
     for (int p = pattern; p >= 0; p--)
     {
-        if (audlib_getLoop(lib, p, 0) == 1)
+        if (audlib_getLoop(lib, sourceAddress, p, 0) == 1)
         {
             return p;
         }
@@ -287,15 +277,15 @@ int audlib_getLoopStart(struct AudioLib *lib, int pattern)
     return 0;
 }
 
-int audlib_getLoop(struct AudioLib *lib, int pattern, int param)
+int audlib_getLoop(struct AudioLib *lib, int sourceAddress, int pattern, int param)
 {
-    int a = audlib_getPatternsAddress(lib) + pattern * PATTERN_SIZE + param;
+    int a = sourceAddress + PATTERNS_OFFSET + pattern * PATTERN_SIZE + param;
     return machine_peek(lib->core, a) >> 7;
 }
 
-int audlib_getTrack(struct AudioLib *lib, int pattern, int voice)
+int audlib_getTrack(struct AudioLib *lib, int sourceAddress, int pattern, int voice)
 {
-    int a = audlib_getPatternsAddress(lib) + pattern * PATTERN_SIZE + voice;
+    int a = sourceAddress + PATTERNS_OFFSET + pattern * PATTERN_SIZE + voice;
     int track = machine_peek(lib->core, a) & 0x7F;
     if (track == 0x40)
     {
@@ -304,10 +294,10 @@ int audlib_getTrack(struct AudioLib *lib, int pattern, int voice)
     return track;
 }
 
-struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int track, int row)
+struct TrackRow audlib_getTrackRow(struct AudioLib *lib, int sourceAddress, int track, int row)
 {
     struct TrackRow trackRow;
-    int a = audlib_getTracksAddress(lib) + track * NUM_TRACK_ROWS * ROW_SIZE + row * ROW_SIZE;
+    int a = sourceAddress + TRACKS_OFFSET + track * NUM_TRACK_ROWS * ROW_SIZE + row * ROW_SIZE;
     struct Core *core = lib->core;
     trackRow.note = machine_peek(core, a);
     int peek1 = machine_peek(core, a + 1);
@@ -324,10 +314,10 @@ void audlib_playRow(struct AudioLib *lib, struct ComposerPlayer *player, int tra
     struct Core *core = lib->core;
     struct Voice *voice = &core->machine->audioRegisters.voices[voiceIndex];
     
-    struct TrackRow trackRow = audlib_getTrackRow(lib, track, player->row);
+    struct TrackRow trackRow = audlib_getTrackRow(lib, player->sourceAddress, track, player->row);
     if (trackRow.note > 0 && trackRow.note < 255)
     {
-        audlib_copySound(lib, trackRow.sound, voiceIndex);
+        audlib_copySound(lib, player->sourceAddress, trackRow.sound, voiceIndex);
     }
     if (trackRow.volume > 0)
     {

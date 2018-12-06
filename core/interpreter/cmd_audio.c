@@ -82,7 +82,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
 //enum ErrorCode cmd_SOUND_COPY(struct Core *core)
 //{
 //    struct Interpreter *interpreter = core->interpreter;
-//    
+//
 //    // SOUND COPY
 //    ++interpreter->pc;
 //    ++interpreter->pc;
@@ -101,7 +101,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
 //
 //    if (interpreter->pass == PassRun)
 //    {
-//        audlib_copySound(&interpreter->audioLib, sValue.v.floatValue, vValue.v.floatValue);
+//        audlib_copySound(&interpreter->audioLib, interpreter->audioLib.sourceAddress, sValue.v.floatValue, vValue.v.floatValue);
 //    }
 //    
 //    return itp_endOfCommand(interpreter);
@@ -452,12 +452,11 @@ enum ErrorCode cmd_TRACK(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_SOUND_MUSIC_TRACK_SOURCE(struct Core *core)
+enum ErrorCode cmd_SOUND_SOURCE(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // SOUND/MUSIC/TRACK
-    enum TokenType type = interpreter->pc->type;
+    // SOUND
     ++interpreter->pc;
     
     // SOURCE
@@ -469,18 +468,7 @@ enum ErrorCode cmd_SOUND_MUSIC_TRACK_SOURCE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        if (type == TokenSOUND)
-        {
-            interpreter->audioLib.soundSourceAddress = aValue.v.floatValue;
-        }
-        else if (type == TokenMUSIC)
-        {
-            interpreter->audioLib.musicSourceAddress = aValue.v.floatValue;
-        }
-        else if (type == TokenTRACK)
-        {
-            interpreter->audioLib.trackSourceAddress = aValue.v.floatValue;
-        }
+        interpreter->audioLib.sourceAddress = aValue.v.floatValue;
     }
     
     return itp_endOfCommand(interpreter);

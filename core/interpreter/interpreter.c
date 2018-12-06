@@ -1413,7 +1413,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
 //                    return cmd_SOUND_COPY(core);
                     
                 case TokenSOURCE:
-                    return cmd_SOUND_MUSIC_TRACK_SOURCE(core);
+                    return cmd_SOUND_SOURCE(core);
                     
                 default:
                     return cmd_SOUND(core);
@@ -1439,26 +1439,10 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_STOP(core);
             
         case TokenMUSIC:
-            switch (itp_getNextTokenType(interpreter))
-            {
-                case TokenSOURCE:
-                    return cmd_SOUND_MUSIC_TRACK_SOURCE(core);
-                    
-                default:
-                    return cmd_MUSIC(core);
-            }
-            break;
-
+            return cmd_MUSIC(core);
+            
         case TokenTRACK:
-            switch (itp_getNextTokenType(interpreter))
-            {
-                case TokenSOURCE:
-                    return cmd_SOUND_MUSIC_TRACK_SOURCE(core);
-                    
-                default:
-                    return cmd_TRACK(core);
-            }
-            break;
+            return cmd_TRACK(core);
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);

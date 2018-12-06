@@ -32,6 +32,7 @@
 struct Core;
 
 struct ComposerPlayer {
+    int sourceAddress;
     int index; // pattern for music, otherwise track
     int speed;
     int tick;
@@ -41,16 +42,14 @@ struct ComposerPlayer {
 
 struct AudioLib {
     struct Core *core;
-    int soundSourceAddress;
-    int musicSourceAddress;
-    int trackSourceAddress;
+    int sourceAddress;
     
     struct ComposerPlayer musicPlayer;
     struct ComposerPlayer trackPlayers[NUM_VOICES];
 };
 
 void audlib_play(struct AudioLib *lib, int voiceIndex, float pitch, int len, int sound);
-void audlib_copySound(struct AudioLib *lib, int sound, int voiceIndex);
+void audlib_copySound(struct AudioLib *lib, int sourceAddress, int sound, int voiceIndex);
 void audlib_playMusic(struct AudioLib *lib, int startPattern);
 void audlib_playTrack(struct AudioLib *lib, int track, int voiceIndex);
 void audlib_stopAll(struct AudioLib *lib);
