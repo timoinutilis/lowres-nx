@@ -293,14 +293,16 @@ song in your program use the MUSIC command.</p>
 different sections: The pattern editor, the track editor and the sound
 editor. This is a "Tracker"-style program, which means the timeline
 goes from top to bottom, not from left to right. So the steps in a
-track are also called rows.</p>
+track are also called rows. Most values in the range from 0 to 15 are
+shown in hexadecimal format (0-F).</p>
 
 <h3 id="SC-The-Pattern-Editor">The Pattern Editor</h3>
 <p>Here you can select a pattern, choose its tracks for all voices and
 edit directly the notes of each selected track. There is also a toggle
 button for the "loop" and "stop" flags for the current pattern. If you
 set notes in a voice without track, it selects automatically a free
-track.</p>
+track. Use the star symbol from the musical keyboard, if you want to
+stop/release a note in a track.</p>
 
 <h3 id="SC-The-Track-Editor">The Track Editor</h3>
 <p>Here you can select and edit a single track with additional
@@ -327,15 +329,15 @@ playback.</p>
 <table>
 <tr><th>C</th><th>P</th><th>Purpose</th></tr>
 <tr><td>0</td><td>0</td><td>No command</td></tr>
-<tr><td>0</td><td>x</td><td>Mix</td></tr>
-<tr><td>1</td><td>x</td><td>Attack</td></tr>
-<tr><td>2</td><td>x</td><td>Decay</td></tr>
-<tr><td>3</td><td>x</td><td>Sustain</td></tr>
-<tr><td>4</td><td>x</td><td>Release</td></tr>
-<tr><td>5</td><td>x</td><td>LFO rate</td></tr>
-<tr><td>6</td><td>x</td><td>Freq amount</td></tr>
-<tr><td>7</td><td>x</td><td>Vol amount</td></tr>
-<tr><td>8</td><td>x</td><td>PW amount</td></tr>
+<tr><td>0</td><td>x</td><td>Mix (1=left, 2=right, 3=center/both)</td></tr>
+<tr><td>1</td><td>x</td><td>Attack Time</td></tr>
+<tr><td>2</td><td>x</td><td>Decay Time</td></tr>
+<tr><td>3</td><td>x</td><td>Sustain Level</td></tr>
+<tr><td>4</td><td>x</td><td>Release Time</td></tr>
+<tr><td>5</td><td>x</td><td>LFO Rate</td></tr>
+<tr><td>6</td><td>x</td><td>LFO Frequency Amount</td></tr>
+<tr><td>7</td><td>x</td><td>LFO Volume Amount</td></tr>
+<tr><td>8</td><td>x</td><td>LFO Pulse Width Amount</td></tr>
 <tr><td>9</td><td>x</td><td>Pulse Width</td></tr>
 <tr><td>E</td><td>x</td><td>Speed (ticks per row, 8 by default)</td></tr>
 <tr><td>F</td><td>0</td><td>Break Track/Pattern</td></tr>
@@ -1278,9 +1280,8 @@ omitted, it starts at pattern 0.</p>
 
 <pre>TRACK n,v</pre>
 
-<p>- Not yet implemented -</p>
 <p>Plays track n once on voice v. Each voice can play a track
-independently, so this can be used for sound effects, even if music
+independently, so this can be used for sound effects, even while music
 is playing.</p>
 
 
@@ -1318,9 +1319,10 @@ tool.</p>
 
 <pre>STOP [v]</pre>
 
-<p>Stops the current sound on voice v. If the parameter is omitted,
-all voices are stopped. If the voice's envelope has a release time,
-the sound won't stop immediately, but fade out.</p>
+<p>Stops the current sound and track on voice v. If the parameter is
+omitted, all voices, tracks and music are stopped. If a voice's
+envelope has a release time, the sound won't stop immediately, but
+fade out.</p>
 
 
 <h3 id="_VOLUME" name="VOLUME">VOLUME</h3>
@@ -1417,8 +1419,11 @@ continuously. Trigger is enabled implicitly with the env mode.</p>
 
 <pre>SOUND SOURCE a</pre>
 
-<p>Sets the current source for the SOUND parameter of the PLAY
-command to the memory address "a".</p>
+<p>Sets the current data source for the PLAY, MUSIC and TRACK
+commands to the memory address "a". This only affects the following
+calls to these commands, already started playback keeps its own data
+source. The data is assumed to be in the format of the Sound Composer
+tool.</p>
 
 <p>By default ROM entry 15 is used as source.</p>
 
