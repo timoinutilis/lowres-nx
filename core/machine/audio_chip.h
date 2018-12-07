@@ -85,7 +85,7 @@ struct Voice {
     uint8_t frequencyLow;
     uint8_t frequencyHigh;
     union VoiceStatus status;
-    uint8_t reserved1;
+    uint8_t peak;
     union VoiceAttributes attr;
     uint8_t length;
     struct {
