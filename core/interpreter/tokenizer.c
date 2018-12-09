@@ -87,11 +87,11 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
             {
                 if (*character == '\n')
                 {
-                    return err_makeCoreError(ErrorUnterminatedString, tokenSourcePosition);
+                    return err_makeCoreError(ErrorUnterminatedString, (int)(character - sourceCode));
                 }
                 else if (*character < 0)
                 {
-                    return err_makeCoreError(ErrorUnexpectedCharacter, tokenSourcePosition);
+                    return err_makeCoreError(ErrorUnexpectedCharacter, (int)(character - sourceCode));
                 }
                 character++;
             }
@@ -242,6 +242,10 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
                 // REM comment, skip until end of line
                 while (*character)
                 {
+                    if (*character < 0)
+                    {
+                        return err_makeCoreError(ErrorUnexpectedCharacter, (int)(character - sourceCode));
+                    }
                     if (*character == '\n')
                     {
                         character++;
