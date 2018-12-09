@@ -2054,5 +2054,57 @@ $FF76 - Attributes:
     2    Keyboard enabled
 </pre>
 
+
+<h2 id="Sound-Data-Format">Sound Data Format</h2>
+
+<p>This is the format used for the PLAY, MUSIC and TRACK commands.
+It's valid to store only the sound presets, if no MUSIC or TRACK
+commands are used with this data. If any tracks are available, all
+patterns must be stored. Empty tracks after the last used one don't
+need to be stored.</p> 
+
+<pre>
+Offset - Content
+0      - 16 sound presets
+128    - 64 patterns
+384    - 64 tracks
+</pre>
+
+<p>Each sound preset occupies 8 bytes and matches the format of the
+audio registers of one voice, but without the first 4 bytes.</p>
+
+<p>Each pattern occupies 4 bytes:</p>
+<pre>
+- Voice 0:
+    Bit  Purpose
+    0-6  Track index (64 = voice unused)
+    7    Flag loop start
+- Voice 1:
+    Bit  Purpose
+    0-6  Track index (64 = voice unused)
+    7    Flag loop end
+- Voice 2:
+    Bit  Purpose
+    0-6  Track index (64 = voice unused)
+    7    Flag song stop
+- Voice 3:
+    Bit  Purpose
+    0-6  Track index (64 = voice unused)
+</pre>
+
+<p>Each track occupies 96 bytes and consists of 32 entries with each 3
+bytes:</p>
+<pre>
+- Note pitch (0 = empty)
+- Data (ignored if note is 0):
+    Bit  Purpose
+    0-3  Volume
+    4-7  Sound
+- Control:
+    Bit  Purpose
+    0-3  Parameter
+    4-7  Command
+</pre>
+
 </body>
 </html>
