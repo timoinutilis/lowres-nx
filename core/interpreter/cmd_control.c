@@ -32,7 +32,7 @@ enum ErrorCode cmd_END(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        interpreter->state = StateEnd;
+        itp_endProgram(core);
         return ErrorNone;
     }
     

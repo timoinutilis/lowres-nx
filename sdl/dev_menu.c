@@ -78,7 +78,7 @@ void dev_show(struct DevMenu *devMenu, bool reload)
     struct TextLib *textLib = &devMenu->textLib;
     textLib->core = core;
     
-    core->interpreter->state = StateEnd;
+    itp_endProgram(core);
     machine_reset(core);
     overlay_reset(core);
     

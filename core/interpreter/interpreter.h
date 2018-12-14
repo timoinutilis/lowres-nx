@@ -76,6 +76,7 @@ struct Interpreter {
     struct Token *pc;
     int subLevel;
     int cycles;
+    int interruptOverCycles;
     bool debug;
     bool handlesPause;
     int cpuLoadDisplay;
@@ -124,6 +125,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode);
 void itp_runProgram(struct Core *core);
 void itp_runInterrupt(struct Core *core, enum InterruptType type);
 void itp_didFinishVBL(struct Core *core);
+void itp_endProgram(struct Core *core);
 void itp_freeProgram(struct Core *core);
 
 enum ValueType itp_getIdentifierTokenValueType(struct Token *token);

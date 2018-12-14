@@ -165,6 +165,8 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     // prepare for run
     
     interpreter->pc = interpreter->tokenizer.tokens;
+    interpreter->cycles = 0;
+    interpreter->interruptOverCycles = 0;
     interpreter->pass = PassRun;
     interpreter->state = StateEvaluate;
     interpreter->mode = ModeNone;
@@ -208,7 +210,7 @@ void itp_runProgram(struct Core *core)
             interpreter->mode = ModeNone;
             if (errorCode != ErrorNone)
             {
-                interpreter->state = StateEnd;
+                itp_endProgram(core);
                 delegate_interpreterDidFail(core, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
             }
             break;
@@ -289,27 +291,36 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
                 enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeONCALL, NULL);
                 
                 while (   errorCode == ErrorNone
-                       && interpreter->cycles < maxCycles
+                       // cycles can exceed interrupt limit (see interruptOverCycles), but there is still a hard limit for extreme cases
+                       && interpreter->cycles < MAX_CYCLES_TOTAL_PER_FRAME
                        && !interpreter->exitEvaluation)
                 {
                     errorCode = itp_evaluateCommand(core);
                 }
                 
                 interpreter->mode = ModeNone;
-                if (interpreter->cycles >= maxCycles)
+                
+                if (interpreter->cycles >= MAX_CYCLES_TOTAL_PER_FRAME)
                 {
-                    interpreter->state = StateEnd;
+                    itp_endProgram(core);
                     delegate_interpreterDidFail(core, err_makeCoreError(ErrorTooManyCPUCyclesInInterrupt, interpreter->pc->sourcePosition));
                 }
                 else if (errorCode != ErrorNone)
                 {
-                    interpreter->state = StateEnd;
+                    itp_endProgram(core);
                     delegate_interpreterDidFail(core, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
                 }
                 else
                 {
                     interpreter->pc = pc;
                 }
+            }
+            
+            // calculate cycles exceeding limit
+            interpreter->interruptOverCycles += interpreter->cycles - maxCycles;
+            if (interpreter->interruptOverCycles < 0)
+            {
+                interpreter->interruptOverCycles = 0;
             }
             
             // sum of interrupt's and main cycle count
@@ -380,6 +391,13 @@ void itp_didFinishVBL(struct Core *core)
     {
         interpreter->cycles = 0;
     }
+}
+
+void itp_endProgram(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    interpreter->state = StateEnd;
+    interpreter->interruptOverCycles = 0;
 }
 
 void itp_freeProgram(struct Core *core)
@@ -1176,7 +1194,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenUndefined:
             if (interpreter->pass == PassRun)
             {
-                interpreter->state = StateEnd;
+                itp_endProgram(core);
             }
             break;
             
