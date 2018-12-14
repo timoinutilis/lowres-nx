@@ -1220,7 +1220,7 @@ BLUE = VALUE MOD 4
 <p>Sets a subprogram which is executed for every screen line before
 it's drawn. Usually used to change color palettes or scroll
 offsets to achieve graphical effects. Raster subprograms must be
-short.</p>
+short (see "CPU Cycles").</p>
 
 <pre>ON RASTER OFF</pre>
 
@@ -1239,9 +1239,10 @@ subprogram.</p>
 
 <pre>ON VBL CALL name</pre>
 
-<p>Sets a subprogram which is executed after each frame. Can be used
+<p>Sets a subprogram which is executed each frame. Can be used
 to update animations or sounds, even if the main program is
-blocked by WAIT or INPUT.</p>
+blocked by WAIT or INPUT. VBL subprograms should not be very long
+(see "CPU Cycles").</p>
 
 <pre>ON VBL OFF</pre>
 
@@ -1842,8 +1843,8 @@ single cell modifications like CELL).</li>
 
 <p>The main program may spend any number of cycles, but when the limit
 is reached before a WAIT VBL or WAIT command, the execution continues
-in the next frame. Interrupts have hard limits. If they are exceeded,
-the program stops with an error.</p>
+in the next frame. If interrupts exceed their limit, you will see
+black scanlines on the screen.</p>
 
 
 <h2 id="Hardware-Reference">Hardware Reference</h2>

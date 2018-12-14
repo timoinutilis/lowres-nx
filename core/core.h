@@ -20,7 +20,7 @@
 #ifndef core_h
 #define core_h
 
-#define CORE_VERSION "0.10 (12)"
+#define CORE_VERSION "0.10"
 
 #include <stdio.h>
 #include <stdbool.h>
