@@ -337,11 +337,15 @@ void update(void *arg)
             case SDL_DROPFILE: {
                 if (hasPostfix(event.drop.file, ".nx") || hasPostfix(event.drop.file, ".NX"))
                 {
+#if DEV_MENU
                     bool handled = (mainState == MainStateDevMenu && dev_handleDropFile(&devMenu, event.drop.file));
                     if (!handled)
                     {
                         selectProgram(event.drop.file);
                     }
+#else
+                    selectProgram(event.drop.file);
+#endif
                 }
                 else
                 {
@@ -524,7 +528,7 @@ void update(void *arg)
             {
                 machine_poke(runner.core, bootIntroStateAddress, 3);
 #ifdef __EMSCRIPTEN__
-                emscripten_async_wget(settings.program, "program.nx", onloaded, onerror);
+                emscripten_async_wget(mainProgramFilename, mainProgramFilename, onloaded, onerror);
 #else
                 runMainProgram();
 #endif
@@ -633,7 +637,7 @@ void saveScreenshot(int scale)
 
 void onloaded(const char *filename)
 {
-    loadMainProgram();
+    runMainProgram();
 }
 
 void onerror(const char *filename)

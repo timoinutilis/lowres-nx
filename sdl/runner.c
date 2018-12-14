@@ -165,7 +165,7 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
 {
     struct Runner *runner = context;
 #ifdef __EMSCRIPTEN__
-    overlay_message(core, "NO DISK");
+    overlay_message(runner->core, "NO DISK");
 #else
     char *output = data_export(diskDataManager);
     if (output)
