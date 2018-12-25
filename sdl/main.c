@@ -89,7 +89,6 @@ SDL_Rect screenRect;
 bool quit = false;
 bool releasedTouch = false;
 bool audioStarted = false;
-Uint32 lastTicks = 0;
 
 int main(int argc, const char * argv[])
 {
@@ -161,7 +160,16 @@ int main(int argc, const char * argv[])
 #else
         while (!quit)
         {
+            Uint32 ticks = SDL_GetTicks();
+            
             update(NULL);
+            
+            // limit to 60 FPS
+            Uint32 ticksDelta = SDL_GetTicks() - ticks;
+            if (ticksDelta < 16)
+            {
+                SDL_Delay(16 - ticksDelta);
+            }
         }
 #endif
     }
@@ -300,15 +308,6 @@ void getDiskFilename(char *outputString)
 void update(void *arg)
 {
     SDL_Event event;
-    
-    // limit to 60 FPS
-    Uint32 ticks = SDL_GetTicks();
-    Uint32 ticksDelta = ticks - lastTicks;
-    if (ticksDelta < 16)
-    {
-        SDL_Delay(16 - ticksDelta);
-    }
-    lastTicks = ticks;
     
     if (releasedTouch)
     {
