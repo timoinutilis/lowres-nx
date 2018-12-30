@@ -125,6 +125,7 @@ enum TokenType {
     TokenNUMBER,
     TokenOFF,
     TokenON,
+    TokenOPTIONAL,
     TokenPALETTE,
     TokenPAUSE,
     TokenPEEK,

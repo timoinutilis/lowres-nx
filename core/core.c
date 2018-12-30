@@ -26,6 +26,10 @@
 
 const char CoreInputKeyReturn = '\n';
 const char CoreInputKeyBackspace = '\b';
+const char CoreInputKeyRight = 17;
+const char CoreInputKeyLeft = 18;
+const char CoreInputKeyDown = 19;
+const char CoreInputKeyUp = 20;
 
 void core_handleInput(struct Core *core, struct CoreInput *input);
 
@@ -132,10 +136,12 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
 {
     if (input->key != 0)
     {
-        char key = input->key;
         if (core->machine->ioRegisters.attr.keyboardEnabled)
         {
-            if ((key >= 32 && key < 127) || key == '\b' || key == '\n')
+            char key = input->key;
+            if (   (key >= 32 && key < 127)
+                || key == CoreInputKeyBackspace || key == CoreInputKeyReturn
+                || key == CoreInputKeyDown || key == CoreInputKeyUp || key == CoreInputKeyRight || key == CoreInputKeyLeft )
             {
                 core->machine->ioRegisters.key = key;
             }

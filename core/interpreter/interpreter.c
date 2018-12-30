@@ -176,6 +176,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     interpreter->isSingleLineIf = false;
     interpreter->lastFrameIOStatus.value = 0;
     interpreter->seed = 0;
+    interpreter->isKeyboardOptional = false;
     
     memset(&interpreter->textLib, 0, sizeof(struct TextLib));
     memset(&interpreter->spritesLib, 0, sizeof(struct SpritesLib));

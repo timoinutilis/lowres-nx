@@ -59,6 +59,10 @@ struct CoreInput {
 
 extern const char CoreInputKeyReturn;
 extern const char CoreInputKeyBackspace;
+extern const char CoreInputKeyRight;
+extern const char CoreInputKeyLeft;
+extern const char CoreInputKeyDown;
+extern const char CoreInputKeyUp;
 
 void core_init(struct Core *core);
 void core_deinit(struct Core *core);

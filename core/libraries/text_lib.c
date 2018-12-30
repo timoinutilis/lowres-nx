@@ -266,6 +266,7 @@ void txtlib_inputBegin(struct TextLib *lib)
     lib->core->machine->ioRegisters.key = 0;
     
     lib->core->machine->ioRegisters.attr.keyboardEnabled = 1;
+    lib->core->interpreter->isKeyboardOptional = false;
     delegate_controlsDidChange(lib->core);
     
     txtlib_scrollWindowIfNeeded(lib);

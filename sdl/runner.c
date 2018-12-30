@@ -195,7 +195,8 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
 /** Called when keyboard or gamepad settings changed */
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 {
-    if (controlsInfo.isKeyboardEnabled)
+    if (   controlsInfo.keyboardMode == KeyboardModeOn
+        || (controlsInfo.keyboardMode == KeyboardModeOptional && !SDL_HasScreenKeyboardSupport()) )
     {
         if (!SDL_IsTextInputActive())
         {

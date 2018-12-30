@@ -28,14 +28,15 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
     // KEYBOARD
     ++interpreter->pc;
     
-    // ON/OFF
+    // ON/OFF/OPTIONAL
     enum TokenType type = interpreter->pc->type;
-    if (type != TokenON && type != TokenOFF) return ErrorUnexpectedToken;
+    if (type != TokenON && type != TokenOFF && type != TokenOPTIONAL) return ErrorUnexpectedToken;
     ++interpreter->pc;
     
     if (interpreter->pass == PassRun)
     {
-        core->machine->ioRegisters.attr.keyboardEnabled = (type == TokenON);
+        core->machine->ioRegisters.attr.keyboardEnabled = (type == TokenON || type == TokenOPTIONAL);
+        interpreter->isKeyboardOptional = (type == TokenOPTIONAL);
         delegate_controlsDidChange(core);
     }
     

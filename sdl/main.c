@@ -355,20 +355,37 @@ void update(void *arg)
             }
             
             case SDL_KEYDOWN: {
-                SDL_Keycode code = event.key.keysym.sym;
+                SDL_Keycode keycode = event.key.keysym.sym;
+                SDL_Scancode scancode = event.key.keysym.scancode;
                 
                 // text input
-                if (code == SDLK_RETURN)
+                if (keycode == SDLK_RETURN)
                 {
                     coreInput.key = CoreInputKeyReturn;
                 }
-                else if (code == SDLK_BACKSPACE)
+                else if (keycode == SDLK_BACKSPACE)
                 {
                     coreInput.key = CoreInputKeyBackspace;
                 }
+                else if (scancode == SDL_SCANCODE_UP)
+                {
+                    coreInput.key = CoreInputKeyUp;
+                }
+                else if (scancode == SDL_SCANCODE_DOWN)
+                {
+                    coreInput.key = CoreInputKeyDown;
+                }
+                else if (scancode == SDL_SCANCODE_LEFT)
+                {
+                    coreInput.key = CoreInputKeyLeft;
+                }
+                else if (scancode == SDL_SCANCODE_RIGHT)
+                {
+                    coreInput.key = CoreInputKeyRight;
+                }
                 
                 // console buttons
-                if (!core_getKeyboardEnabled(runner.core) && (code == SDLK_RETURN || code == SDLK_p))
+                if (!core_getKeyboardEnabled(runner.core) && (keycode == SDLK_RETURN || keycode == SDLK_p))
                 {
                     coreInput.pause = true;
                 }
@@ -377,7 +394,7 @@ void update(void *arg)
                 // system
                 if (event.key.keysym.mod & KMOD_CTRL)
                 {
-                    if (code == SDLK_d)
+                    if (keycode == SDLK_d)
                     {
                         core_setDebug(runner.core, !core_getDebug(runner.core));
                         if (core_getDebug(runner.core))
@@ -389,7 +406,7 @@ void update(void *arg)
                             overlay_message(runner.core, "DEBUG OFF");
                         }
                     }
-                    else if (code == SDLK_f)
+                    else if (keycode == SDLK_f)
                     {
                         if (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP)
                         {
@@ -400,7 +417,7 @@ void update(void *arg)
                             SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                         }
                     }
-                    else if (code == SDLK_r)
+                    else if (keycode == SDLK_r)
                     {
                         if (hasProgram())
                         {
@@ -408,17 +425,17 @@ void update(void *arg)
                             overlay_message(runner.core, "RELOADED");
                         }
                     }
-                    else if (code == SDLK_e)
+                    else if (keycode == SDLK_e)
                     {
                         rebootNX();
                     }
-                    else if (code == SDLK_s)
+                    else if (keycode == SDLK_s)
                     {
                         int scale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 3;
                         saveScreenshot(scale);
                     }
                 }
-                else if (code == SDLK_ESCAPE)
+                else if (keycode == SDLK_ESCAPE)
                 {
                     if (settings.session.disabledev)
                     {

@@ -25,8 +25,14 @@
 
 struct Core;
 
+enum KeyboardMode {
+    KeyboardModeOff,
+    KeyboardModeOn,
+    KeyboardModeOptional
+};
+
 struct ControlsInfo {
-    bool isKeyboardEnabled;
+    enum KeyboardMode keyboardMode;
     int numGamepadsEnabled;
     bool isAudioEnabled;
 };

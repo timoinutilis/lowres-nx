@@ -229,14 +229,15 @@ struct TypedValue fnc_INSTR(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         char *string = stringValue.v.stringValue->chars;
-        size_t len = strlen(string);
-        if (startIndex >= len)
+        char *search = searchValue.v.stringValue->chars;
+        size_t stringlen = strlen(string);
+        if (startIndex >= stringlen || search[0] == 0)
         {
             resultValue.v.floatValue = 0;
         }
         else
         {
-            char *found = strstr(&string[startIndex], searchValue.v.stringValue->chars);
+            char *found = strstr(&string[startIndex], search);
             if (found)
             {
                 resultValue.v.floatValue = (found - string) + 1;
