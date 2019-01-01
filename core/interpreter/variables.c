@@ -129,6 +129,11 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
         *errorCode = ErrorArrayAlreadyDimensionized;
         return NULL;
     }
+    if (var_getSimpleVariable(interpreter, symbolIndex, interpreter->subLevel))
+    {
+        *errorCode = ErrorVariableAlreadyUsed;
+        return NULL;
+    }
     if (interpreter->numArrayVariables >= MAX_ARRAY_VARIABLES)
     {
         *errorCode = ErrorOutOfMemory;

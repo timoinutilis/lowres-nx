@@ -536,6 +536,12 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
             struct SimpleVariable *variable = var_getSimpleVariable(interpreter, symbolIndex, interpreter->subLevel);
             if (!variable)
             {
+                // check if variable name is already used for array
+                if (var_getArrayVariable(interpreter, symbolIndex, interpreter->subLevel))
+                {
+                    *errorCode = ErrorArrayVariableWithoutIndex;
+                    return NULL;
+                }
                 if (!forWriting)
                 {
                     *errorCode = ErrorVariableNotInitialized;
