@@ -93,7 +93,8 @@ enum ErrorCode {
     ErrorKeyboardNotEnabled,
     ErrorAutomaticPauseNotDisabled,
     ErrorGamepadNotEnabled,
-    ErrorGamepadNotDisabled,
+    ErrorTouchNotEnabled,
+    ErrorInputChangeNotAllowed,
 };
 
 struct CoreError {

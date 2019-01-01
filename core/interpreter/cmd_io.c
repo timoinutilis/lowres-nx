@@ -43,6 +43,27 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_TOUCH(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // TOUCH
+    ++interpreter->pc;
+    
+    // ON
+    if (interpreter->pc->type != TokenON) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return ErrorInputChangeNotAllowed;
+        core->machine->ioRegisters.attr.touchEnabled = 1;
+        delegate_controlsDidChange(core);
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
 enum ErrorCode cmd_GAMEPAD(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
@@ -50,23 +71,15 @@ enum ErrorCode cmd_GAMEPAD(struct Core *core)
     // GAMEPAD
     ++interpreter->pc;
     
-    int num = 0;
-    if (interpreter->pc->type == TokenOFF)
-    {
-        // OFF
-        ++interpreter->pc;
-    }
-    else
-    {
-        // number
-        struct TypedValue value = itp_evaluateNumericExpression(core, 0, 2);
-        if (value.type == ValueTypeError) return value.v.errorCode;
-        num = value.v.floatValue;
-    }
+    // number
+    struct TypedValue value = itp_evaluateNumericExpression(core, 1, 2);
+    if (value.type == ValueTypeError) return value.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        core->machine->ioRegisters.attr.gamepadsEnabled = num;
+        if (core->machine->ioRegisters.attr.touchEnabled) return ErrorInputChangeNotAllowed;
+        
+        core->machine->ioRegisters.attr.gamepadsEnabled = value.v.floatValue;
         core->machine->ioRegisters.status.touch = 0;
         for (int i = 0; i < NUM_GAMEPADS; i++)
         {
@@ -258,7 +271,7 @@ struct TypedValue fnc_TOUCH(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return val_makeError(ErrorGamepadNotDisabled);
+        if (core->machine->ioRegisters.attr.touchEnabled == 0) return val_makeError(ErrorTouchNotEnabled);
         
         value.v.floatValue = core->machine->ioRegisters.status.touch ? BAS_TRUE : BAS_FALSE;
     }
@@ -277,7 +290,7 @@ struct TypedValue fnc_TAP(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return val_makeError(ErrorGamepadNotDisabled);
+        if (core->machine->ioRegisters.attr.touchEnabled == 0) return val_makeError(ErrorTouchNotEnabled);
         
         value.v.floatValue = (core->machine->ioRegisters.status.touch && !core->interpreter->lastFrameIOStatus.touch) ? BAS_TRUE : BAS_FALSE;
     }
@@ -297,7 +310,7 @@ struct TypedValue fnc_TOUCH_X_Y(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return val_makeError(ErrorGamepadNotDisabled);
+        if (core->machine->ioRegisters.attr.touchEnabled == 0) return val_makeError(ErrorTouchNotEnabled);
         
         if (type == TokenTOUCHX)
         {

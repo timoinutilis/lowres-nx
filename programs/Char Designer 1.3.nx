@@ -30,6 +30,7 @@ OK=0
 R=0
 CALL BLOAD(OK)
 
+TOUCH ON
 
 '==== TOUCH ZONES INIT ====
 

@@ -61,6 +61,21 @@ bool machine_poke(struct Core *core, int address, int value)
         // reserved registers
         return false;
     }
+    if (address == 0xFF76) // IO attributes
+    {
+        // check for illegal input change (gamepad <-> touch)
+        union IOAttributes currAttr = core->machine->ioRegisters.attr;
+        union IOAttributes newAttr;
+        newAttr.value = value;
+        if (currAttr.gamepadsEnabled > 0 && (newAttr.gamepadsEnabled == 0 || newAttr.touchEnabled))
+        {
+            return false;
+        }
+        if (currAttr.touchEnabled && (newAttr.touchEnabled == 0 || newAttr.gamepadsEnabled > 0))
+        {
+            return false;
+        }
+    }
     *(uint8_t *)((uint8_t *)core->machine + address) = value & 0xFF;
     
     if (address == 0xFF76) // IO attributes

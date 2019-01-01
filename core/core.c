@@ -151,7 +151,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
     
     if (input->touch)
     {
-        if (core->machine->ioRegisters.attr.gamepadsEnabled == 0)
+        if (core->machine->ioRegisters.attr.touchEnabled)
         {
             core->machine->ioRegisters.status.touch = 1;
             int x = input->touchX;

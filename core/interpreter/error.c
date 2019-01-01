@@ -90,7 +90,8 @@ const char *ErrorStrings[] = {
     "Keyboard Not Enabled",
     "Automatic Pause Not Disabled",
     "Gamepad Not Enabled",
-    "Gamepad Not Disabled",
+    "Touch Not Enabled",
+    "Input Change Not Allowed",
 };
 
 const char *err_getString(enum ErrorCode errorCode)

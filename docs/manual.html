@@ -232,6 +232,9 @@ palette, using the selected flip and priority attributes.</td></tr>
 <tr><td>PRI</td><td>Toggles the priority attribute.</td></tr>
 </table>
 
+<p>You can use the arrow keys to scroll the map when running LowRes
+NX on a computer.</p>
+
 
 <h3 id="BD-Disk-Menu">Disk Menu</h3>
 
@@ -295,6 +298,12 @@ editor. This is a "Tracker"-style program, which means the timeline
 goes from top to bottom, not from left to right. So the steps in a
 track are also called rows. Most values in the range from 0 to 15 are
 shown in hexadecimal format (0-F).</p>
+<p>There is some keyboard support when running LowRes NX on a
+computer: The arrow keys move the cursor and the key rows simulate a
+musical keyboard with two octaves to enter notes. The return key
+enters a note stop, backspace deletes the current note and space
+toggles between play (pattern/track) and stop.
+</p>
 
 <h3 id="SC-The-Pattern-Editor">The Pattern Editor</h3>
 <p>Here you can select a pattern, choose its tracks for all voices and
@@ -720,12 +729,9 @@ or 1).</p>
     
 <pre>GAMEPAD n</pre>
 
-<p>Enables gamepads for n players. A maximum of 2 players are
-supported. This disables touchscreen/mouse support.</p>
-
-<pre>GAMEPAD OFF</pre>
-
-<p>Disables all gamepads and enables touchscreen/mouse support.</p>
+<p>Enables gamepads for n (1 or 2) players. Once the gamepad is
+enabled, the program cannot change to touchscreen/mouse input anymore.
+</p>
 
 
 <h3 id="_UP-DOWN-LEFT-RIGHT" name="=UP,DOWN,LEFT,RIGHT">=UP/DOWN/LEFT/RIGHT</h3>
@@ -807,6 +813,16 @@ because it won't support the keyboard or a real gamepad. Always
 consider using the standard gamepad functions.</p>
 
 
+<h3 id="_TOUCH-ON-OFF" name="TOUCH ON,TOUCH,ON">TOUCH ON</h3>
+
+<pre>
+TOUCH ON
+</pre>
+
+<p>Enables the touchscreen/mouse support. Once it's enabled, the
+program cannot change to gamepad input anymore.</p>
+
+
 <h3 id="_TOUCH.X-TOUCH.Y" name="TOUCH.X,TOUCH.Y">=TOUCH.X/Y</h3>
 <pre>
 TOUCH.X
@@ -834,7 +850,7 @@ touched the last frame.</p>
 
 <h2 id="Keyboard">Keyboard</h2>
 
-<h3 id="_KEYBOARD-ON-OFF" name="KEYBOARD ON,KEYBOARD OFF,KEYBOARD,ON,OFF">KEYBOARD ON/OFF</h3>
+<h3 id="_KEYBOARD-ON-OFF-OPTIONAL" name="KEYBOARD ON,KEYBOARD OFF,KEYBOARD OPTIONAL,KEYBOARD,ON,OFF,OPTIONAL">KEYBOARD ON/OFF/OPTIONAL</h3>
 
 <pre>
 KEYBOARD ON
@@ -842,6 +858,15 @@ KEYBOARD OFF
 </pre>
 
 <p>Enables or disables the keyboard.</p>
+
+<pre>
+KEYBOARD OPTIONAL
+</pre>
+
+<p>Enables the keyboard, but won't show an on-screen keyboard on
+touchscreen devices. Programs using this mode should be completely
+usable with gamepad or touch control and use the keyboard for
+alternative input only.</p>
 
 
 <h3 id="_INKEY$" name="INKEY$">=INKEY$</h3>

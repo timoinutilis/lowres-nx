@@ -82,6 +82,8 @@ void dev_show(struct DevMenu *devMenu, bool reload)
     machine_reset(core);
     overlay_reset(core);
     
+    core->machine->ioRegisters.attr.touchEnabled = 1;
+    
     txtlib_clearScreen(textLib);
     textLib->fontCharOffset = 192;
     textLib->charAttrFilter = 0xFF;

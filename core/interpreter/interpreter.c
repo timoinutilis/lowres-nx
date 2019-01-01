@@ -1404,6 +1404,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenKEYBOARD:
             return cmd_KEYBOARD(core);
             
+        case TokenTOUCH:
+            return cmd_TOUCH(core);
+            
         case TokenTRACE:
             return cmd_TRACE(core);
             
