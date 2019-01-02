@@ -43,17 +43,13 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_TOUCH(struct Core *core)
+enum ErrorCode cmd_TOUCHSCREEN(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // TOUCH
+    // TOUCHSCREEN
     ++interpreter->pc;
-    
-    // ON
-    if (interpreter->pc->type != TokenON) return ErrorUnexpectedToken;
-    ++interpreter->pc;
-    
+        
     if (interpreter->pass == PassRun)
     {
         if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) return ErrorInputChangeNotAllowed;

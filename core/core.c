@@ -134,9 +134,11 @@ void core_update(struct Core *core, struct CoreInput *input)
 
 void core_handleInput(struct Core *core, struct CoreInput *input)
 {
+    union IOAttributes ioAttr = core->machine->ioRegisters.attr;
+    
     if (input->key != 0)
     {
-        if (core->machine->ioRegisters.attr.keyboardEnabled)
+        if (ioAttr.keyboardEnabled)
         {
             char key = input->key;
             if (   (key >= 32 && key < 127)
@@ -151,7 +153,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
     
     if (input->touch)
     {
-        if (core->machine->ioRegisters.attr.touchEnabled)
+        if (ioAttr.touchEnabled)
         {
             core->machine->ioRegisters.status.touch = 1;
             int x = input->touchX;
@@ -174,7 +176,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
     for (int i = 0; i < NUM_GAMEPADS; i++)
     {
         union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[i];
-        if (core->machine->ioRegisters.attr.gamepadsEnabled > i)
+        if (ioAttr.gamepadsEnabled > i && !ioAttr.keyboardEnabled)
         {
             struct CoreInputGamepad *inputGamepad = &input->gamepads[i];
             gamepad->up = inputGamepad->up;
@@ -197,7 +199,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
             core->interpreter->state = StateEvaluate;
             overlay_updateState(core);
         }
-        else if (core->machine->ioRegisters.attr.gamepadsEnabled > 0) {
+        else if (ioAttr.gamepadsEnabled > 0 && !ioAttr.keyboardEnabled) {
             core->machine->ioRegisters.status.pause = 1;
         }
         input->pause = false;
@@ -213,16 +215,6 @@ void core_setDebug(struct Core *core, bool enabled)
 bool core_getDebug(struct Core *core)
 {
     return core->interpreter->debug;
-}
-
-bool core_getKeyboardEnabled(struct Core *core)
-{
-    return core->machine->ioRegisters.attr.keyboardEnabled;
-}
-
-int core_getNumGamepads(struct Core *core)
-{
-    return core->machine->ioRegisters.attr.gamepadsEnabled;
 }
 
 void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB)

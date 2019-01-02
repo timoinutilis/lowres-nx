@@ -73,8 +73,6 @@ void core_willRunProgram(struct Core *core, long secondsSincePowerOn);
 void core_update(struct Core *core, struct CoreInput *input);
 void core_setDebug(struct Core *core, bool enabled);
 bool core_getDebug(struct Core *core);
-bool core_getKeyboardEnabled(struct Core *core);
-int core_getNumGamepads(struct Core *core);
 
 void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
 

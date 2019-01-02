@@ -50,7 +50,8 @@ void delegate_controlsDidChange(struct Core *core)
     if (core->delegate->controlsDidChange)
     {
         struct ControlsInfo info;
-        if (core->machine->ioRegisters.attr.keyboardEnabled)
+        union IOAttributes ioAttr = core->machine->ioRegisters.attr;
+        if (ioAttr.keyboardEnabled)
         {
             if (core->interpreter->isKeyboardOptional)
             {
@@ -65,8 +66,8 @@ void delegate_controlsDidChange(struct Core *core)
         {
             info.keyboardMode = KeyboardModeOff;
         }
-        info.numGamepadsEnabled = core->machine->ioRegisters.attr.gamepadsEnabled;
-        info.isTouchEnabled = core->machine->ioRegisters.attr.touchEnabled;
+        info.numGamepadsEnabled = ioAttr.keyboardEnabled ? 0 : ioAttr.gamepadsEnabled;
+        info.isTouchEnabled = ioAttr.touchEnabled;
         info.isAudioEnabled = core->machineInternals->audioInternals.audioEnabled;
         core->delegate->controlsDidChange(core->delegate->context, info);
     }
