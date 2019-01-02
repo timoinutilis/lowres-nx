@@ -385,7 +385,7 @@ void update(void *arg)
                 }
                 
                 // console buttons
-                if (!core_getKeyboardEnabled(runner.core) && (keycode == SDLK_RETURN || keycode == SDLK_p))
+                if (keycode == SDLK_RETURN || keycode == SDLK_p)
                 {
                     coreInput.pause = true;
                 }
