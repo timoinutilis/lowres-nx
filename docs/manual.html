@@ -693,8 +693,8 @@ end of the output, otherwise a new line is started.</p>
 
 <p>Lets the user enter a text or number on the keyboard and stores it
 in the variable var. Optionally it can show a prompt text before
-(cannot be a variable).
-This enables automatically the keyboard.</p>
+(cannot be a variable).</p>
+<p>INPUT automatically enables the keyboard.</p>
 
 
 <h3 id="_LOCATE" name="LOCATE">LOCATE</h3>
@@ -813,10 +813,10 @@ because it won't support the keyboard or a real gamepad. Always
 consider using the standard gamepad functions.</p>
 
 
-<h3 id="_TOUCH-ON-OFF" name="TOUCH ON,TOUCH,ON">TOUCH ON</h3>
+<h3 id="_TOUCHSCREEN" name="TOUCHSCREEN">TOUCHSCREEN</h3>
 
 <pre>
-TOUCH ON
+TOUCHSCREEN
 </pre>
 
 <p>Enables the touchscreen/mouse support. Once it's enabled, the
@@ -857,7 +857,8 @@ KEYBOARD ON
 KEYBOARD OFF
 </pre>
 
-<p>Enables or disables the keyboard.</p>
+<p>Enables or disables the keyboard. While the keyboard is enabled,
+gamepads don't work.</p>
 
 <pre>
 KEYBOARD OPTIONAL
