@@ -122,7 +122,6 @@ void txtlib_scrollWindowIfNeeded(struct TextLib *lib)
         struct Interpreter *interpreter = lib->core->interpreter;
         if (interpreter->state == StateEvaluate && lib->windowBg != OVERLAY_BG)
         {
-            interpreter->state = StateWait;
             interpreter->waitCount = 1;
             interpreter->exitEvaluation = true;
             interpreter->cycles += lib->windowWidth * lib->windowHeight * 2;

@@ -49,7 +49,6 @@ enum Pass {
 enum State {
     StateNoProgram,
     StateEvaluate,
-    StateWait,
     StateInput,
     StatePaused,
     StateWaitForDisk,

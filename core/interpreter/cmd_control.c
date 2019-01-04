@@ -474,6 +474,7 @@ enum ErrorCode cmd_WAIT(struct Core *core)
     // WAIT
     ++interpreter->pc;
     
+    int wait = 0;
     if (interpreter->pc->type == TokenVBL)
     {
         // VBL
@@ -482,19 +483,15 @@ enum ErrorCode cmd_WAIT(struct Core *core)
     else
     {
         // value
-        struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
+        struct TypedValue value = itp_evaluateNumericExpression(core, 1, 0xFFFF);
         if (value.type == ValueTypeError) return value.v.errorCode;
-        
-        if (interpreter->pass == PassRun)
-        {
-            interpreter->state = StateWait;
-            interpreter->waitCount = value.v.floatValue - 1;
-        }
+        wait = value.v.floatValue - 1;
     }
     
     if (interpreter->pass == PassRun)
     {
         interpreter->exitEvaluation = true;
+        interpreter->waitCount = wait;
     }
     return itp_endOfCommand(interpreter);
 }

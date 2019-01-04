@@ -571,7 +571,13 @@ like the main game loop.</p>
 
 <pre>WAIT n</pre>
 
-<p>Waits n frames (n/60 seconds).</p>
+<p>Waits n frames (n/60 seconds), where the minimum for n is 1.
+Subprograms running from interrupts (ON VBL/RASTER, MUSIC) will
+continue to work as normal during this period.</p>
+<p>WAIT 1 is the same as WAIT VBL, so why is there WAIT VBL? Because
+it looks cooler and nerdier! A little guideline: Use WAIT VBL in loops
+for smooth animations and input handling, and WAIT n if you actually
+want to wait some time.</p>
 
 
 <h2 id="Loops">Loops</h2>

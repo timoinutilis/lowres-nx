@@ -196,6 +196,12 @@ void itp_runProgram(struct Core *core)
     {
         case StateEvaluate:
         {
+            if (interpreter->waitCount > 0)
+            {
+                --interpreter->waitCount;
+                break;
+            }
+            
             interpreter->mode = ModeMain;
             interpreter->exitEvaluation = false;
             enum ErrorCode errorCode = ErrorNone;
@@ -213,19 +219,6 @@ void itp_runProgram(struct Core *core)
             {
                 itp_endProgram(core);
                 delegate_interpreterDidFail(core, err_makeCoreError(errorCode, interpreter->pc->sourcePosition));
-            }
-            break;
-        }
-            
-        case StateWait:
-        {
-            if (interpreter->waitCount > 0)
-            {
-                --interpreter->waitCount;
-            }
-            else
-            {
-                interpreter->state = StateEvaluate;
             }
             break;
         }
@@ -255,7 +248,6 @@ void itp_runInterrupt(struct Core *core, enum InterruptType type)
     switch (interpreter->state)
     {
         case StateEvaluate:
-        case StateWait:
         case StateInput:
         case StatePaused:
         case StateWaitForDisk:
@@ -358,7 +350,7 @@ void itp_didFinishVBL(struct Core *core)
     // pause
     if (core->machine->ioRegisters.status.pause)
     {
-        if (interpreter->handlesPause && (interpreter->state == StateEvaluate || interpreter->state == StateWait))
+        if (interpreter->handlesPause && interpreter->state == StateEvaluate)
         {
             interpreter->state = StatePaused;
             overlay_updateState(core);
