@@ -7,12 +7,6 @@
 body {
 	font-family: sans-serif;
 }
-h1 {
-	margin-top: 2em;
-}
-h2 {
-	margin-top: 2em;
-}
 td, th {
     padding-right: 1em;
     vertical-align: top;
@@ -29,10 +23,37 @@ ul {
 li {
     margin-bottom: 0.5em;
 }
+h1 {
+	border-top: 6px solid black;
+	/*border-bottom: 2px solid black;*/
+	padding-top: 6px;
+	text-transform: uppercase;
+}
+h2 {
+	border-top: 2px solid black;
+	padding: 4px 0;
+}
+p + h1, ul + h1, pre + h1, table + h1 {
+	margin-top: 3em;
+}
+p + h2, ul + h2, pre + h2, table + h2 {
+	margin-top: 2em;
+}
+p + h3, ul + h3, pre + h3, table + h3 {
+	margin-top: 1.5em;
+}
+.container {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 640px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
 </style>
 </head>
 
 <body>
+<div class="container">
 
 <h1 id="Introduction">Introduction</h1>
 
@@ -52,6 +73,7 @@ program video, audio and I/O directly by accessing the memory.</p>
 <p>Imagine LowRes NX as a handheld game console with a d-pad, two action
 buttons and a little rubber keyboard below a slidable touchscreen.</p>
 
+
 <h2 id="Specifications">Specifications</h2>
 
 <ul>
@@ -63,7 +85,7 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 <li>Colors: 8 dynamic 6-bit palettes with 4 colors each</li>
 <li>Sound: 4 voices, saw/tri/pulse/noise, pulse width, volume, ADSR, LFO</li>
 <li>Input: Two game controllers with d-pad and two buttons + pause</li>
-<li>Optional input: Keyboard and touch/mouse</li>
+<li>Optional input: Keyboard and touchscreen/mouse</li>
 </ul>
 
 
@@ -571,7 +593,8 @@ like the main game loop.</p>
 
 <pre>WAIT n</pre>
 
-<p>Waits n frames (n/60 seconds), where the minimum for n is 1.
+<p>Waits <em>n</em> frames (n/60 seconds), where the minimum for
+<em>n</em> is 1.
 Subprograms running from interrupts (ON VBL/RASTER, MUSIC) will
 continue to work as normal during this period.</p>
 <p>WAIT 1 is the same as WAIT VBL, so why is there WAIT VBL? Because
@@ -590,13 +613,13 @@ NEXT var
 </pre>
 
 <p>Performs a series of commands in a loop a given number of times.
-The FOR command uses the variable var as a counter, starting with the
-value a. All commands until NEXT are executed, then the counter is
-increased by s (or +1 if STEP is omitted). A check is performed to see
-if the counter is now greater than b. If not, the process is repeated.
+The FOR command uses the variable <em>var</em> as a counter, starting with the
+value <em>a</em>. All commands until NEXT are executed, then the counter is
+increased by <em>s</em> (or +1 if STEP is omitted). A check is performed to see
+if the counter is now greater than <em>b</em>. If not, the process is repeated.
 If it is greater, the program continues with the lines after NEXT. If
-STEP s is negative, the loop is executed until the counter is less
-than value b.</p>
+STEP <em>s</em> is negative, the loop is executed until the counter is less
+than value <em>b</em>.</p>
 
 
 <h3 id="_DO-LOOP" name="DO,LOOP">DO...LOOP</h3>
@@ -698,25 +721,25 @@ end of the output, otherwise a new line is started.</p>
 <pre>INPUT ["prompt";]var</pre>
 
 <p>Lets the user enter a text or number on the keyboard and stores it
-in the variable var. Optionally it can show a prompt text before
+in the variable <em>var</em>. Optionally it can show a prompt text before
 (cannot be a variable).</p>
 <p>INPUT automatically enables the keyboard.</p>
 
 
 <h3 id="_LOCATE" name="LOCATE">LOCATE</h3>
 
-<pre>LOCATE x,y</pre>
+<pre>LOCATE cx,cy</pre>
 
-<p>Moves the text cursor to column x and row y inside the current
-window.</p>
+<p>Moves the text cursor to column <em>cx</em> and row <em>cy</em>
+relative to the current window.</p>
 
 
 <h3 id="_WINDOW" name="WINDOW">WINDOW</h3>
 
-<pre>WINDOW x,y,w,h,b</pre>
+<pre>WINDOW cx,cy,w,h,b</pre>
 
-<p>Sets the text output window to cell position x,y and sets the size
-to w columns and h rows. Text will be written to background b (0
+<p>Sets the text output window to cell position <em>cx,cy</em> and sets the size
+to <em>w</em> columns and <em>h</em> rows. Text will be written to background <em>b</em> (0
 or 1).</p>
 
 <h3 id="_CLW" name="CLW">CLW</h3>
@@ -735,7 +758,7 @@ or 1).</p>
     
 <pre>GAMEPAD n</pre>
 
-<p>Enables gamepads for n (1 or 2) players. Once the gamepad is
+<p>Enables gamepads for <em>n</em> (1 or 2) players. Once the gamepad is
 enabled, the program cannot change to touchscreen/mouse input anymore.
 </p>
 
@@ -750,7 +773,7 @@ RIGHT(p)
 </pre>
 
 <p>Returns true if the given direction is currently pressed on the
-direction pad of player p (0/1).</p>
+direction pad of player <em>p</em> (0/1).</p>
 
 <pre>
 UP TAP(p)
@@ -767,8 +790,8 @@ the first frame the button is pressed.</p>
 
 <pre>BUTTON(p,n)</pre>
 
-<p>Returns true if button A (n=0) or B (n=1) is currently pressed by
-player p (0/1).</p>
+<p>Returns true if button A (<em>n</em>=0) or B (<em>n</em>=1) is currently pressed by
+player <em>p</em> (0/1).</p>
 
 <pre>BUTTON TAP(p,n)</pre>
 
@@ -810,9 +833,9 @@ each button tap only once. The automatic pause handling needs to
 be disabled for this function.</p>
 
 
-<h2 id="Touch">Touch</h2>
+<h2 id="Touchscreen-Mouse">Touchscreen/Mouse</h2>
 
-<p>Use touch support only if you think it will work well with a
+<p>Use touchscreen/mouse support only if you think it will work well with a
 computer mouse, too. If you want to create your own game buttons,
 keep in mind that your game might be unplayable on a computer,
 because it won't support the keyboard or a real gamepad. Always
@@ -926,9 +949,9 @@ standard character attributes (color palette, flip X/Y, priority) and additional
 
 <h3 id="_SPRITE" name="SPRITE">SPRITE</h3>
 
-<pre>SPRITE n,x,y,c</pre>
+<pre>SPRITE n,[x],[y],[c]</pre>
 
-<p>Sets the position (x,y) and character (c) of sprite n (0-63).
+<p>Sets the position <em>(x,y)</em> and character <em>(c)</em> of sprite <em>n</em> (0-63).
 All parameters can be omitted to keep their current settings.</p>
 
 
@@ -939,14 +962,14 @@ SPRITE OFF [n]
 SPRITE OFF a TO b
 </pre>
 
-<p>Hides one or more sprites. If all parameters are omitted, all sprites (0 - 63) are hidden. With one parameter only the given sprite is hidden. The last option is to hide sprites in the range from a to b.</p>
+<p>Hides one or more sprites. If all parameters are omitted, all sprites (0 - 63) are hidden. With one parameter only the given sprite is hidden. The last option is to hide sprites in the range from <em>a</em> to <em>b</em>.</p>
 
 
 <h3 id="_SPRITE.A" name="SPRITE.A">SPRITE.A</h3>
 
 <pre>SPRITE.A n,(pal,fx,fy,pri,s)</pre>
 
-<p>Sets the attributes of sprite n (0-63). All attribute parameters
+<p>Sets the attributes of sprite <em>n</em> (0-63). All attribute parameters
 can be omitted to keep their current settings.</p>
 
 <table>
@@ -973,32 +996,32 @@ SPRITE.X(n)
 SPRITE.Y(n)
 </pre>
 
-<p>Return the position of sprite n.</p>
+<p>Return the position of sprite <em>n</em>.</p>
 
 
 <h3 id="_=SPRITE.C" name="SPRITE.C">=SPRITE.C</h3>
 
 <pre>SPRITE.C(n)</pre>
 
-<p>Returns the character of sprite n.</p>
+<p>Returns the character of sprite <em>n</em>.</p>
 
 
 <h3 id="_=SPRITE.A" name="SPRITE.A">=SPRITE.A</h3>
 
 <pre>SPRITE.A(n)</pre>
 
-<p>Returns the attributes of sprite n as an 8-bit value.</p>
+<p>Returns the attributes of sprite <em>n</em> as an 8-bit value.</p>
 
 
 <h3 id="_=SPRITE-HIT" name="SPRITE HIT,SPRITE,HIT">=SPRITE HIT</h3>
 
 <pre>SPRITE HIT(n[,a [TO b]])</pre>
 
-<p>Returns true if sprite n collides with another sprite (which means
+<p>Returns true if sprite <em>n</em> collides with another sprite (which means
 that pixels overlap). If no more parameters are given, it will
-check with all other visible sprites. If the a parameter is added,
-it will check only with that sprite a. If all parameters are
-given, it will check with all sprites from number a to number b.</p>
+check with all other visible sprites. If the <em>a</em> parameter is added,
+it will check only with that sprite <em>a</em>. If all parameters are
+given, it will check with all sprites from number <em>a</em> to number <em>b</em>.</p>
 
 
 <h3 id="_=HIT" name="HIT">=HIT</h3>
@@ -1037,7 +1060,7 @@ window to the default one.</p>
 
 <pre>CLS b</pre>
 
-<p>Clears background b with character 0.</p>
+<p>Clears background <em>b</em> with character 0.</p>
 
 
 <h3 id="_ATTR" name="ATTR">ATTR</h3>
@@ -1056,7 +1079,7 @@ settings.</p>
 <tr><td>s</td> <td>unused (0-3)</td></tr>
 </table>
 
-<p>The optional parameter m is an 8-bit binary number used as a mask.
+<p>The optional parameter <em>m</em> is an 8-bit binary number used as a mask.
 It defines which bits of a cell attribute should actually be changed.</p>
 
 
@@ -1074,35 +1097,35 @@ It defines which bits of a cell attribute should actually be changed.</p>
 
 <h3 id="_CELL" name="CELL">CELL</h3>
 
-<pre>CELL x,y,[c]</pre>
+<pre>CELL cx,cy,[c]</pre>
 
-<p>Sets the cell at position x,y of the current background to
-character c. If c is omitted, only the attributes of the cell get
+<p>Sets the cell at position <em>cx,cy</em> of the current background to
+character <em>c</em>. If <em>c</em> is omitted, only the attributes of the cell get
 changed.</p>
 
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
 
-<pre>CELL.C(x,y)</pre>
+<pre>CELL.C(cx,cy)</pre>
 
-<p>Returns the character of the cell at position x,y of the current
+<p>Returns the character of the cell at position <em>cx,cy</em> of the current
 background.</p>
 
 
 <h3 id="_CELL.A" name="CELL.A">=CELL.A</h3>
 
-<pre>CELL.A(x,y)</pre>
+<pre>CELL.A(cx,cy)</pre>
 
-<p>Returns the attributes of the cell at position x,y of the current
+<p>Returns the attributes of the cell at position <em>cx,cy</em> of the current
 background as an 8-bit value.</p>
 
 
 <h3 id="_BG-FILL" name="BG FILL,BG,FILL,TO,CHAR">BG FILL</h3>
 
-<pre>BG FILL x1,y1 TO x2,y2 [CHAR c]</pre>
+<pre>BG FILL cx1,cy1 TO cx2,cy2 [CHAR c]</pre>
 
-<p>Sets all cells in the area from x1,y1 to x2,y2 of the current
-background to character c. If CHAR c is omitted, only the attributes
+<p>Sets all cells in the area from <em>cx1,cy1</em> to <em>cx2,cy2</em> of the current
+background to character <em>c</em>. If CHAR <em>c</em> is omitted, only the attributes
 of the cells get changed.</p>
 
 
@@ -1110,20 +1133,20 @@ of the cells get changed.</p>
 
 <pre>BG SOURCE a[,w]</pre>
 
-<p>Sets the current source for the BG COPY command. The two-
-dimensional map starts at memory address "a" and has a width of w
+<p>Sets the current source for the BG COPY command. The two-dimensional
+map starts at memory address <em>a</em> and has a width of <em>w</em>
 cells.</p>
 
 <p>Without the width parameter, Background Designer's data
-format is assumed: The width is read from address a+2 and
-the actual map data starts at a+4.</p>
+format is assumed: The width is read from address <em>a</em>+2 and
+the actual map data starts at <em>a</em>+4.</p>
 
 <p>By default ROM entry 3 is used as source.</p>
 
 
 <h3 id="_BG-COPY" name="BG COPY,BG,COPY">BG COPY</h3>
 
-<pre>BG COPY x1,y1,w,h TO x2,y2</pre>
+<pre>BG COPY cx1,cy1,w,h TO cx2,cy2</pre>
 
 <p>Copies a two-dimensional part of the current source to the
 current background. The destination co-ordinates can be outside of
@@ -1133,26 +1156,26 @@ edges (32->0, 33->1, etc.).</p>
 
 <h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL,STEP">BG SCROLL</h3>
 
-<pre>BG SCROLL x1,y1 TO x2,y2 STEP dx,dy</pre>
+<pre>BG SCROLL cx1,cy1 TO cx2,cy2 STEP dx,dy</pre>
 
-<p>Moves the content of all cells in the area from x1,y1 to x2,y2
-horizontally by dx and vertically by dy cells.</p>
+<p>Moves the content of all cells in the area from <em>cx1,cy1</em> to <em>cx2,cy2</em>
+horizontally by <em>dx</em> and vertically by <em>dy</em> cells.</p>
 
 
 <h3 id="_TEXT" name="TEXT">TEXT</h3>
 
-<pre>TEXT x,y,s$</pre>
+<pre>TEXT cx,cy,s$</pre>
 
-<p>Outputs the string s$ to the current background at cell position
-x,y.</p>
+<p>Outputs the string <em>s$</em> to the current background at cell position
+<em>cx,cy</em>.</p>
 
 
 <h3 id="_NUMBER" name="NUMBER">NUMBER</h3>
 
-<pre>NUMBER x,y,n,d</pre>
+<pre>NUMBER cx,cy,n,d</pre>
 
-<p>Outputs the number n to the current background at cell position
-x,y. The number is formatted to show always d digits.
+<p>Outputs the number <em>n</em> to the current background at cell position
+<em>cx,cy</em>. The number is formatted to show always <em>d</em> digits.
 This command is preferred over TEXT to show numbers, as it
 doesn't need to convert numbers to strings.</p>
 
@@ -1162,7 +1185,7 @@ doesn't need to convert numbers to strings.</p>
 <pre>FONT c</pre>
 
 <p>Sets the current character range used for text output.
-c is the character where the font starts (space).</p>
+<em>c</em> is the character where the font starts (space).</p>
 
 <p>The default value is 192, which points to the standard font,
 if available.</p>
@@ -1172,8 +1195,8 @@ if available.</p>
 
 <pre>SCROLL b,x,y</pre>
 
-<p>Sets the scroll offset of background b (0/1) to pixel
-co-ordinates x,y.</p>
+<p>Sets the scroll offset of background <em>b</em> (0/1) to pixel
+co-ordinates <em>x,y</em>.</p>
 
 
 <h3 id="_SCROLL.X-SCROLL.Y" name="SCROLL.X,SCROLL.Y">=SCROLL.X/Y</h3>
@@ -1183,7 +1206,7 @@ SCROLL.X(b)
 SCROLL.Y(b)
 </pre>
 
-<p>Return the scroll offset of background b.</p>
+<p>Return the scroll offset of background <em>b</em>.</p>
 
 
 <h2 id="Display-Settings">Display Settings</h2>
@@ -1218,9 +1241,9 @@ SCROLL.Y(b)
 
 <h3 id="_PALETTE" name="PALETTE">PALETTE</h3>
 
-<pre>PALETTE n,c0,c1,c2,c3</pre>
+<pre>PALETTE n,[c0],[c1],[c2],[c3]</pre>
 
-<p>Sets all four colors of palette n (0-7). Color 0 is only used for
+<p>Sets all four colors of palette <em>n</em> (0-7). Color 0 is only used for
 palette 0 and shown as the screen's backdrop color. The color
 parameters can be omitted to keep their current settings.
 Valid color values are 0-63 and can be calculated like this:</p>
@@ -1236,7 +1259,7 @@ VALUE = RED * 16 + GREEN * 4 + BLUE
 
 <pre>COLOR(p,n)</pre>
 
-<p>Returns the value of color n (0-3) from palette p (0-7).
+<p>Returns the value of color <em>n</em> (0-3) from palette <em>p</em> (0-7).
 You can get the RED, GREEN and BLUE values like this:</p>
 <pre>
 RED = INT(VALUE / 16)
@@ -1305,7 +1328,7 @@ create music, tracks and sound presets.</p>
 
 <pre>MUSIC [p]</pre>
 
-<p>Starts playback of a song at pattern p. If the parameter p is
+<p>Starts playback of a song at pattern <em>p</em>. If the parameter <em>p</em> is
 omitted, it starts at pattern 0.</p>
 
 
@@ -1313,16 +1336,16 @@ omitted, it starts at pattern 0.</p>
 
 <pre>TRACK n,v</pre>
 
-<p>Plays track n once on voice v. Each voice can play a track
+<p>Plays track <em>n</em> once on voice <em>v</em>. Each voice can play a track
 independently, so this can be used for sound effects, even while music
 is playing.</p>
 
 
 <h3 id="_PLAY" name="PLAY">PLAY</h3>
 
-<pre>PLAY v,p[,l] [SOUND s]</pre>
+<pre>PLAY v,p[,len] [SOUND s]</pre>
 
-<p>Plays a sound on voice v (0-3). p is the pitch:</p>
+<p>Plays a sound on voice <em>v</em> (0-3). <em>p</em> is the pitch:</p>
 <table>
     <tr><th>Note</th><th colspan="8">Pitch (with different octaves)</th></tr>
     <tr><th>C</th><td>1</td><td>13</td><td>25</td><td>37</td><td>49</td><td>61</td><td>73</td><td>85</td></tr>
@@ -1339,12 +1362,12 @@ is playing.</p>
     <tr><th>B</th><td>12</td><td>24</td><td>36</td><td>48</td><td>60</td><td>72</td><td>84</td><td>96</td></tr>
 </table>
 
-<p>The optional parameter l is the length in 1/60 seconds, the maximum
+<p>The optional parameter <em>len</em> is the length in 1/60 seconds, the maximum
 is 255. 0 means, that the the sound won't stop automatically. If the
 parameter is omitted, the current value of the voice is kept.</p>
 
 <p>By default the current sound settings of the voice are used. Add
-the SOUND parameter to use the sound number s from the Sound Composer
+the SOUND parameter to use the sound number <em>s</em> from the Sound Composer
 tool.</p>
 
 
@@ -1352,7 +1375,7 @@ tool.</p>
 
 <pre>STOP [v]</pre>
 
-<p>Stops the current sound and track on voice v. If the parameter is
+<p>Stops the current sound and track on voice <em>v</em>. If the parameter is
 omitted, all voices, tracks and music are stopped. If a voice's
 envelope has a release time, the sound won't stop immediately, but
 fade out.</p>
@@ -1360,10 +1383,10 @@ fade out.</p>
 
 <h3 id="_VOLUME" name="VOLUME">VOLUME</h3>
 
-<pre>VOLUME v,vol,mix</pre>
+<pre>VOLUME v,[vol],[mix]</pre>
 
-<p>Sets the volume of voice n (0-3) to vol (0-15) and its outputs to
-mix (0-3):</p>
+<p>Sets the volume of voice <em>n</em> (0-3) to <em>vol</em> (0-15) and its outputs to
+<em>mix</em> (0-3):</p>
 
 <table>
 <tr><td>0</td><td>Muted</td></tr>
@@ -1377,10 +1400,10 @@ mix (0-3):</p>
 
 <h3 id="_SOUND" name="SOUND">SOUND</h3>
 
-<pre>SOUND v,w,pw,l</pre>
+<pre>SOUND v,[w],[pw],[len]</pre>
 
-<p>Sets the basic sound parameters of voice v (0-3).</p>
-<p>w is the waveform:</p>
+<p>Sets the basic sound parameters of voice <em>v</em> (0-3).</p>
+<p><em>w</em> is the waveform:</p>
 
 <table>
 <tr><td>0</td><td>Sawtooth</td></tr>
@@ -1389,9 +1412,9 @@ mix (0-3):</p>
 <tr><td>3</td><td>Noise</td></tr>
 </table>
 
-<p>pw is the pulse width (0-15), a value of 8 results in a square
+<p><em>pw</em> is the pulse width (0-15), a value of 8 results in a square
 wave. This parameter only has an effect for the pulse waveform.</p>
-<p>l is the sound length in 1/60 seconds, the maximum is 255. 0 means,
+<p><em>len</em> is the sound length in 1/60 seconds, the maximum is 255. 0 means,
 that the sound won't stop automatically. If the length is set using
 this command, the length parameter of PLAY can be omitted.</p>
 <p>All parameters can be omitted to keep their current settings.</p>
@@ -1399,25 +1422,25 @@ this command, the length parameter of PLAY can be omitted.</p>
 
 <h3 id="_ENVELOPE" name="ENVELOPE">ENVELOPE</h3>
 
-<pre>ENVELOPE v,a,d,s,r</pre>
+<pre>ENVELOPE v,[a],[d],[s],[r]</pre>
 
-<p>Sets the volume envelope generator of voice v (0-3).</p>
-<p>a is the attack time, d is the decay time, and r is the release
+<p>Sets the volume envelope generator of voice <em>v</em> (0-3).</p>
+<p><em>a</em> is the attack time, <em>d</em> is the decay time, and <em>r</em> is the release
 time. All times are non-linear and range from 0 (2 ms) to 15 (12 s)</p>
-<p>s is the sustain level (0-15), which is the volume after the decay
+<p><em>s</em> is the sustain level (0-15), which is the volume after the decay
 time and before the sound gets released.</p>
 <p>All parameters can be omitted to keep their current settings.</p>
 
 
 <h3 id="_LFO" name="LFO">LFO</h3>
 
-<pre>LFO v,r,fr,vol,pw</pre>
+<pre>LFO v,[r],[fr],[vol],[pw]</pre>
 
-<p>Sets the LFO (low frequency oscillator) of voice v (0-3).</p>
-<p>r is the LFO rate and ranges from 0 (0.12 Hz) to 15 (18 Hz) in a
+<p>Sets the LFO (low frequency oscillator) of voice <em>v</em> (0-3).</p>
+<p><em>r</em> is the LFO rate and ranges from 0 (0.12 Hz) to 15 (18 Hz) in a
 non-linear manner.</p>
 <p>The other paramters set the amount of the effect on different sound
-parameters: fr for frequency/pitch, vol for volume and pw for pulse
+parameters: <em>fr</em> for frequency/pitch, <em>vol</em> for volume and <em>pw</em> for pulse
 width. These values range from 0 to 15.</p>
 <p>All parameters can be omitted to keep their current settings.</p>
 
@@ -1426,7 +1449,7 @@ width. These values range from 0 to 15.</p>
 
 <pre>LFO.A v,(w,r,e,t)</pre>
 
-<p>Sets additional LFO attributes of voice v (0-3).
+<p>Sets additional LFO attributes of voice <em>v</em> (0-3).
 All attribute parameters can be omitted to keep their current settings.</p>
 
 <table>
@@ -1453,7 +1476,7 @@ continuously. Trigger is enabled implicitly with the env mode.</p>
 <pre>SOUND SOURCE a</pre>
 
 <p>Sets the current data source for the PLAY, MUSIC and TRACK
-commands to the memory address "a". This only affects the following
+commands to the memory address <em>a</em>. This only affects the following
 calls to these commands, already started playback keeps its own data
 source. The data is assumed to be in the format of the Sound Composer
 tool.</p>
@@ -1481,7 +1504,7 @@ one continuous list of items.</p>
 <pre>READ var-list</pre>
 
 <p>Reads values from DATA commands and assigns them to the
-comma separated variables in var-list. The program has an internal
+comma separated variables in <em>var-list</em>. The program has an internal
 pointer to the current DATA value. With each value read, the
 pointer will move to the next DATA value.</p>
 
@@ -1502,14 +1525,14 @@ Otherwise the pointer will be set to the jump label.</p>
 
 <pre>PEEK(a)</pre>
 
-<p>Returns the current 8-bit value (0-255) at memory address a.</p>
+<p>Returns the current 8-bit value (0-255) at memory address <em>a</em>.</p>
 
 
 <h3 id="_POKE" name="POKE">POKE</h3>
 
 <pre>POKE a,v</pre>
 
-<p>Sets the memory at address a to value v. v can be any integer
+<p>Sets the memory at address <em>a</em> to value <em>v</em>. <em>v</em> can be any integer
 number, but only the lowest 8 bits are written to memory.</p>
 
 
@@ -1517,7 +1540,7 @@ number, but only the lowest 8 bits are written to memory.</p>
 
 <pre>COPY a,n TO d</pre>
 
-<p>Copies n bytes starting from memory address a to address d.
+<p>Copies <em>n</em> bytes starting from memory address <em>a</em> to address <em>d</em>.
 The source and the destination areas may overlap.</p>
 
 
@@ -1525,7 +1548,7 @@ The source and the destination areas may overlap.</p>
 
 <pre>FILL a,n[,v]</pre>
 
-<p>Sets n bytes starting from memory address a to value v, or 0 if
+<p>Sets <em>n</em> bytes starting from memory address <em>a</em> to value <em>v</em>, or 0 if
 the parameter is omitted.</p>
 
 
@@ -1533,14 +1556,14 @@ the parameter is omitted.</p>
 
 <pre>ROM(n)</pre>
 
-<p>Returns the memory address of ROM entry n.</p>
+<p>Returns the memory address of ROM entry <em>n</em>.</p>
 
 
 <h3 id="_=SIZE" name="SIZE">=SIZE</h3>
 
 <pre>SIZE(n)</pre>
 
-<p>Returns the number of bytes of ROM entry n.</p>
+<p>Returns the number of bytes of ROM entry <em>n</em>.</p>
 
 
 <h1 id="Files">Files</h1>
@@ -1560,8 +1583,8 @@ wouldn't have a disk drive.</p>
 
 <pre>LOAD f,a</pre>
 
-<p>Loads the file number f from the current virtual disk to memory starting
-at address a.</p>
+<p>Loads the file number <em>f</em> from the current virtual disk to memory starting
+at address <em>a</em>.</p>
 
 <p>LOAD is meant to be used for tools only. Use ROM entries for game
 data.</p>
@@ -1571,8 +1594,8 @@ data.</p>
 
 <pre>SAVE f,c$,a,n</pre>
 
-<p>Saves n bytes starting at memory address a to the current virtual
-disk as a file number f (0-15) with comment c$ (up to 31 characters).</p>
+<p>Saves <em>n</em> bytes starting at memory address <em>a</em> to the current virtual
+disk as a file number <em>f</em> (0-15) with comment <em>c$</em> (up to 31 characters).</p>
 
 <p>If this file was loaded before, consider keeping its original comment or
 allow the user to edit it before saving. If the file is new, the comment
@@ -1593,14 +1616,14 @@ store game states.</p>
 
 <pre>FILE$(f)</pre>
 
-<p>Returns the comment string of file number f. Call FILES before accessing the file directory to update its content, or use FILE$ directly after LOAD or SAVE.</p>
+<p>Returns the comment string of file number <em>f</em>. Call FILES before accessing the file directory to update its content, or use FILE$ directly after LOAD or SAVE.</p>
 
 
 <h3 id="_=FSIZE" name="FSIZE">=FSIZE</h3>
 
 <pre>FSIZE(n)</pre>
 
-<p>Returns the number of bytes of file number n. Call FILES before accessing the file directory to update its content, or use FSIZE directly after LOAD or SAVE.</p>
+<p>Returns the number of bytes of file number <em>n</em>. Call FILES before accessing the file directory to update its content, or use FSIZE directly after LOAD or SAVE.</p>
 
 
 <h1 id="Debugging">Debugging</h1>
@@ -1630,29 +1653,29 @@ mode is not enabled.</p>
 
 <pre>SIN(x)</pre>
 
-<p>The sine of x, where x is in radians.</p>
+<p>The sine of <em>x</em>, where <em>x</em> is in radians.</p>
 
 
 <h3 id="_COS" name="COS">=COS</h3>
 
 <pre>COS(x)</pre>
 
-<p>The cosine of x, where x is in radians.</p>
+<p>The cosine of <em>x</em>, where <em>x</em> is in radians.</p>
 
 
 <h3 id="_TAN" name="TAN">=TAN</h3>
 
 <pre>TAN(x)</pre>
 
-<p>The tangent of x, where x is in radians.</p>
+<p>The tangent of <em>x</em>, where <em>x</em> is in radians.</p>
 
 
 <h3 id="_ATN" name="ATN">=ATN</h3>
 
 <pre>ATN(x)</pre>
 
-<p>The arctangent of x in radians, i.e. the angle whose tangent is x.
-The range of the function is -(PI/2) &lt; ATN(X) &lt; (PI/2).</p>
+<p>The arctangent of <em>x</em> in radians, i.e. the angle whose tangent is <em>x</em>.
+The range of the function is -(PI/2) &lt; ATN(x) &lt; (PI/2).</p>
 
 
 <h2 id="Standard-Math">Standard Math</h2>
@@ -1661,21 +1684,21 @@ The range of the function is -(PI/2) &lt; ATN(X) &lt; (PI/2).</p>
 
 <pre>ABS(x)</pre>
 
-<p>The absolute value of x.</p>
+<p>The absolute value of <em>x</em>.</p>
 
 
 <h3 id="_SGN" name="SGN">=SGN</h3>
 
 <pre>SGN(x)</pre>
 
-<p>The sign of x: -1 if x &lt; 0, 0 if x = 0 and +1 if x &gt; 0.</p>
+<p>The sign of <em>x</em>: -1 if <em>x</em> &lt; 0, 0 if <em>x</em> = 0 and +1 if <em>x</em> &gt; 0.</p>
 
 
 <h3 id="_INT" name="INT">=INT</h3>
 
 <pre>INT(x)</pre>
 
-<p>The largest integer not greater than x; e.g. INT(1.3) = 1 and
+<p>The largest integer not greater than <em>x</em>; e.g. INT(1.3) = 1 and
 INT(-1.3) = -2.</p>
 
 
@@ -1683,22 +1706,22 @@ INT(-1.3) = -2.</p>
 
 <pre>EXP(x)</pre>
 
-<p>The exponential of x, i.e. the value of the base of natural
-logarithms (e = 2,71828...) raised to the power x.</p>
+<p>The exponential of <em>x</em>, i.e. the value of the base of natural
+logarithms (e = 2,71828...) raised to the power <em>x</em>.</p>
 
 
 <h3 id="_LOG" name="LOG">=LOG</h3>
 
 <pre>LOG(x)</pre>
 
-<p>The natural logarithm of x; x must be greater than zero.</p>
+<p>The natural logarithm of <em>x</em>; <em>x</em> must be greater than zero.</p>
 
 
 <h3 id="_SQR" name="SQR">=SQR</h3>
 
 <pre>SQR(x)</pre>
 
-<p>The nonnegative square root of x; x must be nonnegative.</p>
+<p>The nonnegative square root of <em>x</em>; <em>x</em> must be nonnegative.</p>
 
 
 <h2 id="Random-Sequences">Random Sequences</h2>
@@ -1714,7 +1737,7 @@ distributed in the range 0 &lt;= RND &lt; 1.</p>
 <h3 id="_RANDOMIZE" name="RANDOMIZE,TIMER">RANDOMIZE</h3>
 <pre>RANDOMIZE x</pre>
 
-<p>Sets the seed for random numbers to x, which should be an integer
+<p>Sets the seed for random numbers to <em>x</em>, which should be an integer
 value. By default a program starts with seed 0, so the sequence of
 random numbers is always the same.</p>
 
@@ -1753,96 +1776,96 @@ program, you should insert this line at the beginning.</p>
 
 <pre>LEFT$(s$,n)</pre>
 
-<p>Returns a new string with the first n characters of s$.</p>
+<p>Returns a new string with the first <em>n</em> characters of <em>s$</em>.</p>
 
 <pre>LEFT$(s$,n)=a$</pre>
 
-<p>Overwrites the first characters in the variable s$ with the first
-n characters of a$.</p>
+<p>Overwrites the first characters in the variable <em>s$</em> with the first
+<em>n</em> characters of <em>a$</em>.</p>
 
 
 <h3 id="_RIGHT$" name="RIGHT$">=RIGHT$=</h3>
 
 <pre>RIGHT$(s$,n)</pre>
 
-<p>Returns a new string with the last n characters of s$.</p>
+<p>Returns a new string with the last <em>n</em> characters of <em>s$</em>.</p>
 
 <pre>RIGHT$(s$,n)=a$</pre>
 
-<p>Overwrites the last characters in the variable s$ with the last n
-characters of a$.</p>
+<p>Overwrites the last characters in the variable <em>s$</em> with the last <em>n</em>
+characters of <em>a$</em>.</p>
 
 
 <h3 id="_MID$" name="MID$">=MID$=</h3>
 
 <pre>MID$(s$,p,n)</pre>
 
-<p>Returns a new string with n characters of s$, starting at
-character p. The first character has the position 1.</p>
+<p>Returns a new string with <em>n</em> characters of <em>s$</em>, starting at
+character <em>p</em>. The first character has the position 1.</p>
 
 <pre>MID$(s$,p,n)=a$</pre>
 
-<p>Overwrites the given text range in the variable s$ with the first
-n characters of a$.</p>
+<p>Overwrites the given text range in the variable <em>s$</em> with the first
+<em>n</em> characters of <em>a$</em>.</p>
 
 
 <h3 id="_INSTR" name="INSTR">=INSTR</h3>
 
 <pre>INSTR(d$,s$[,p])</pre>
 
-<p>Searches the first occurrence of s$ inside of d$ and returns its
+<p>Searches the first occurrence of <em>s$</em> inside of <em>d$</em> and returns its
 start position. If it's not found, the function returns 0.
 Usually the function starts searching at the beginning of the
-string. Optionally it can start searching at position p.</p>
+string. Optionally it can start searching at position <em>p</em>.</p>
 
 
 <h3 id="_CHR$" name="CHR$">=CHR$</h3>
 
 <pre>CHR$(n)</pre>
 
-<p>Returns a string containing one character with ASCII code n.</p>
+<p>Returns a string containing one character with ASCII code <em>n</em>.</p>
 
 
 <h3 id="_ASC" name="ASC">=ASC</h3>
 
 <pre>ASC(a$)</pre>
 
-<p>Supplies you with the ASCII code of the first character of a$.</p>
+<p>Supplies you with the ASCII code of the first character of <em>a$</em>.</p>
 
 
 <h3 id="_LEN" name="LEN">=LEN</h3>
 
 <pre>LEN(a$)</pre>
 
-<p>Returns the number of characters in a$.</p>
+<p>Returns the number of characters in <em>a$</em>.</p>
 
 
 <h3 id="_VAL" name="VAL">=VAL</h3>
 
 <pre>VAL(a$)</pre>
 
-<p>Converts a number written in a$ into a numeric value.</p>
+<p>Converts a number written in <em>a$</em> into a numeric value.</p>
 
 
 <h3 id="_STR$" name="STR$">=STR$</h3>
 
 <pre>STR$(n)</pre>
 
-<p>Converts the number n into a string.</p>
+<p>Converts the number <em>n</em> into a string.</p>
 
 
 <h3 id="_BIN$" name="BIN$">=BIN$</h3>
 
 <pre>BIN$(n)</pre>
 
-<p>Converts the number n into a binary string.</p>
+<p>Converts the number <em>n</em> into a binary string.</p>
 
 
 <h3 id="_HEX$" name="HEX$">=HEX$</h3>
 
 <pre>HEX$(n)</pre>
 
-<p>Converts the number n into a hexadecimal string.</p>
+<p>Converts the number <em>n</em> into a hexadecimal string.</p>
 
 
 <h1 id="Advanced-Topics">Advanced Topics</h1>
@@ -2140,5 +2163,6 @@ bytes:</p>
     4-7  Command
 </pre>
 
+</div>
 </body>
 </html>
