@@ -179,10 +179,10 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
         if (ioAttr.gamepadsEnabled > i && !ioAttr.keyboardEnabled)
         {
             struct CoreInputGamepad *inputGamepad = &input->gamepads[i];
-            gamepad->up = inputGamepad->up;
-            gamepad->down = inputGamepad->down;
-            gamepad->left = inputGamepad->left;
-            gamepad->right = inputGamepad->right;
+            gamepad->up = inputGamepad->up && !inputGamepad->down;
+            gamepad->down = inputGamepad->down && !inputGamepad->up;
+            gamepad->left = inputGamepad->left && !inputGamepad->right;
+            gamepad->right = inputGamepad->right && !inputGamepad->left;
             gamepad->buttonA = inputGamepad->buttonA;
             gamepad->buttonB = inputGamepad->buttonB;
         }
