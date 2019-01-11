@@ -2,25 +2,7 @@
 * First Steps *
 ***************
 
-To run a program, just open the LowRes NX application and drag and
-drop any .nx file into its window. You can also select LowRes NX as
-default application for .nx files, so programs can be started simply
-by double clicking them.
-
-For writing your own programs, use any text editor and save your files
-with the .nx extension. On Windows make sure the text editor supports
-Mac/Linux line ends, otherwise you may see everything in one line.
-
-If you open NX tools (Character Designer, Background Designer, etc.)
-directly like other NX programs, they will use the "Disk.nx" file in
-the tool's folder for loading and saving their data.
-
-To edit your program's data directly (without the "Disk.nx" file),
-run your program in the normal way. Then press Esc to enter the
-Development Menu. There click on "ED" and select a tool. It will use
-the current program for its data. When done, press Esc again to
-return to the Development Menu, or Ctrl+R to run your program
-directly.
+Please read the introduction of the manual.
 
 
 ************

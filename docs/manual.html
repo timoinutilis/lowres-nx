@@ -25,7 +25,6 @@ li {
 }
 h1 {
 	border-top: 6px solid black;
-	/*border-bottom: 2px solid black;*/
 	padding-top: 6px;
 	text-transform: uppercase;
 }
@@ -33,13 +32,13 @@ h2 {
 	border-top: 2px solid black;
 	padding: 4px 0;
 }
-p + h1, ul + h1, pre + h1, table + h1 {
+p + h1, ul + h1, pre + h1, table + h1, div + h1 {
 	margin-top: 3em;
 }
-p + h2, ul + h2, pre + h2, table + h2 {
+p + h2, ul + h2, pre + h2, table + h2, div + h2 {
 	margin-top: 2em;
 }
-p + h3, ul + h3, pre + h3, table + h3 {
+p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 	margin-top: 1.5em;
 }
 .container {
@@ -48,6 +47,17 @@ p + h3, ul + h3, pre + h3, table + h3 {
 	max-width: 640px;
 	padding-left: 15px;
 	padding-right: 15px;
+}
+.info-mobile, .info-desktop {
+	background-color: #DDD;
+	padding: 8px;
+	margin: 1em 0;
+}
+.info-mobile:before {
+   content: "Mobile: ";
+}
+.info-desktop:before {
+   content: "Desktop: ";
 }
 </style>
 </head>
@@ -91,8 +101,36 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 
 <h2 id="Getting-Started">Getting Started</h2>
 
-<p>Create a new program using the Plus button and type these lines:
-</p>
+<p>Try some of the included programs to see how LowRes NX
+can look like. Have a look at the action game <i>LowRes Galaxy 2</i>,
+the text adventure <i>LowRes Adventure</i>, and the demo <i>Star Scroller</i>.
+
+<div class="info-mobile">
+On the "My Programs" screen select a program to open the source code
+editor. Then tap on the Play button to run it.
+</div>
+
+<div class="info-desktop">
+Find the examples in the folder "programs".  Open the LowRes NX
+application and drag and drop any .nx file into its window. You can
+also select LowRes NX as default application for .nx files, so
+programs can be started simply by double clicking them.
+</div>
+
+<p>Once you have played enough, you can create your first own program.</p>
+
+<div class="info-mobile">
+On the "My Programs" screen tap on the Plus button to create a new
+program. Select it to open the source code editor.
+</div>
+
+<div class="info-desktop">
+Use any text editor to create a new file.
+On Windows make sure the text editor supports Mac/Linux line ends,
+otherwise you may see everything in one line.
+</div>
+
+<p>Type these lines:</p>
 
 <pre>
 PRINT "WELCOME!"
@@ -101,9 +139,13 @@ INPUT ">";N$
 PRINT "HELLO ";N$;"!"
 </pre>
 
-<p>Now tap the Play button to run your program! This is a little
-example using the keyboard. Let's try something with a gamepad. Create
-another new program and type this:</p>
+<div class="info-desktop">
+Save your program file with a useful name and the extension ".nx".
+</div>
+
+<p>Now run your program. This is a little example using the keyboard.
+Let's try something with a gamepad. Create another new program and
+type this:</p>
 
 <pre>
 GAMEPAD 1
@@ -120,12 +162,15 @@ LOOP
 </pre>
 
 <p>Run this program and you will see an "A" on the screen which you can
-move around using the gamepad. With the program still running, tap the
-menu button on the top right and select "Capture Program Icon".</p>
+move around using the gamepad.</p>
 
-<p>Now exit the program and return to the "My Programs" screen. There
+<div class="info-mobile">
+With the program still running, tap the menu button on the top right
+and select "Capture Program Icon".
+Now exit the program and return to the "My Programs" screen. There
 you will see your program with a new image. Long tap the icon and
-select "Rename..." to give it a better name.</p>
+select "Rename..." to give it a better name.
+</div>
 
 
 <h1 id="Editing">Editing</h1>
@@ -137,24 +182,56 @@ its data, stored as simple text. The first part is the BASIC source code.
 Please read the programming chapters for further explanation.</p>
 
 <p>The second part are the cartridge ROM entries. These are up to 16
-numbered data blocks, which can contain any kind of binary data, for
-example graphics, level maps, music, etc. When the program is running,
-all ROM entries are accessable in the first 32 KB of the memory.</p>
+numbered data blocks, which can contain any kind of data, for
+example graphics, level maps, music, etc. When a program is running,
+all its ROM entries are accessable in the first 32 KB of the memory.</p>
 
-<p>To create and edit ROM entries, just open your program, tap the
-Tools button and select a program. It will run and use your current program as a virtual disk to load and save data. Tools don't save
-automatically, so don't forget to save before you exit them.</p>
+<p>You can easily create and edit ROM entries by using tools.
+Tools are normal NX programs, but they are specifically
+made for editing data. They can access any NX file as a "virtual disk"
+and use its ROM entries like files.</p>
 
-<p>Open your previous program with the moving "A" and select
-"Character Designer" from the Tools menu. Draw something as character
-#1 (keep #0 empty), then tap on "Disk" and save as file 2 ("Main
-Characters"). Now exit the Character Designer and you will see some
-hexadecimal data below your program. This is your image! To see it,
-change the line</p>
+<p>There are two ways of using tools:</p>
+
+<ul>
+<li>You can open tools directly like other NX programs. They will use
+the "Disk.nx" file in the tool's folder for loading and saving their
+data.</li>
+<li>You can open any program you want to edit and select a tool from a
+menu. This way the tool will access directly the data of the current
+program.</li>
+</ul>
+
+<p>Let's try it. Open your program with the moving "A" (from the
+"Getting Started" chapter) and select "Char Designer" from the Tools
+menu.</p>
+
+<div class="info-mobile">
+Open your program, tap the Tools button and select the tool.
+</div>
+
+<div class="info-desktop">
+Run your program and press the Escape key to enter the development
+menu. Then press the Edit (ED) button and select the tool.
+By default the tools menu is empty, so drag and drop the programs
+"Char Designer", "BG Designer" and "Sound Designer" into the window.
+</div>
+
+<p>Draw something as character #1 (keep #0 empty), then tap on "Disk"
+and save as file 2 ("Main Characters"). Now return to the source code editor and you will see some hexadecimal data below your program.
+This is your image! To see it, change the line</p>
 <pre>SPRITE 0,X,Y,225</pre>
 <p>to</p>
 <pre>SPRITE 0,X,Y,1</pre>
 <p>and run your program. There it is!</p>
+
+<div class="info-desktop">
+Press Ctrl+R in the LowRes NX application to reload and run your
+current program. The Run button in the developer menu does the same.
+</div>
+
+<p>Keep in mind that tools don't save automatically, so never forget
+to save before you exit them.</p>
 
 
 <h2 id="Standard-ROM-Entries">Standard ROM Entries</h2>
@@ -189,7 +266,7 @@ keep in mind that it does not save automatically.</p>
 
 <h3 id="CD-Main-Screen">Main Screen</h3>
 
-<p>In the bottom part you see the 256 characters split into four pages.
+<p>At the bottom part you see the 256 characters split into four pages.
 There you can select the current one for editing. Keep the last page
 empty, if you want to use the default font. Also character #0 should
 be empty for a clean background.</p>
@@ -297,7 +374,7 @@ with the TRACK command. Tracks are also used to create songs.</p>
 <p>- 64 Patterns</p>
 <p>A pattern is a block of music, which defines which track should be
 played on each of the four voices. Patterns will be played one after
-another, except in the following cases: If the next pattern is empty,
+another, except for the following cases: If the next pattern is empty,
 the song is stopped. When the current pattern finishes and has a "loop
 end" flag, the player jumps back to the previous pattern with a "loop
 start" flag. When a pattern finishes and has a "stop" flag, the player
@@ -835,7 +912,7 @@ be disabled for this function.</p>
 
 <h2 id="Touchscreen-Mouse">Touchscreen/Mouse</h2>
 
-<p>Use touchscreen/mouse support only if you think it will work well with a
+<p>Use touchscreen support only if you think it will work well with a
 computer mouse, too. If you want to create your own game buttons,
 keep in mind that your game might be unplayable on a computer,
 because it won't support the keyboard or a real gamepad. Always
