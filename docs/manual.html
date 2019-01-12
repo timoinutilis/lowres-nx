@@ -27,10 +27,12 @@ h1 {
 	border-top: 6px solid black;
 	padding-top: 6px;
 	text-transform: uppercase;
+	clear: both;
 }
 h2 {
 	border-top: 2px solid black;
 	padding: 4px 0;
+	clear: both;
 }
 p + h1, ul + h1, pre + h1, table + h1, div + h1 {
 	margin-top: 3em;
@@ -49,15 +51,37 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 	padding-right: 15px;
 }
 .info-mobile, .info-desktop {
-	background-color: #DDD;
-	padding: 8px;
+	padding-left: 44px;
 	margin: 1em 0;
+	min-height: 44px;
 }
-.info-mobile:before {
-   content: "Mobile: ";
+.info-mobile {
+	background-image: url(manual-images/icon_mobile.png);
+	background-repeat: no-repeat;
+	background-position: top left;
 }
-.info-desktop:before {
-   content: "Desktop: ";
+.info-desktop {
+	background-image: url(manual-images/icon_desktop.png);
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+.illustration {
+	/*margin: 0.5em;*/
+	float: right;
+}
+.illustration-center {
+	display: block;
+	float: none;
+/*	margin-left: auto;
+	margin-right: auto;*/
+}
+@media (max-width: 480px) {
+	.illustration, .illustration-center {
+		display: block;
+		float: none;
+		margin-left: auto;
+		margin-right: auto;
+	}
 }
 </style>
 </head>
@@ -68,6 +92,8 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 <h1 id="Introduction">Introduction</h1>
 
 <h2 id="What-is-LowRes-NX">What is LowRes NX?</h2>
+
+<img class="illustration" src="manual-images/illustration_hello.png"/>
 
 <p>LowRes NX is a simulated retro game console, which can be programmed
 in the classic BASIC language. It has its own technical
@@ -82,6 +108,8 @@ program video, audio and I/O directly by accessing the memory.</p>
 
 <p>Imagine LowRes NX as a handheld game console with a d-pad, two action
 buttons and a little rubber keyboard below a slidable touchscreen.</p>
+
+<img class="illustration-center" src="manual-images/illustration_open.png"/>
 
 
 <h2 id="Specifications">Specifications</h2>
@@ -100,6 +128,8 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 
 
 <h2 id="Getting-Started">Getting Started</h2>
+
+<img class="illustration" src="manual-images/illustration_playing.png"/>
 
 <p>Try some of the included programs to see how LowRes NX
 can look like. Have a look at the action game <i>LowRes Galaxy 2</i>,
@@ -176,6 +206,8 @@ select "Rename..." to give it a better name.
 <h1 id="Editing">Editing</h1>
 
 <h2 id="Programs-And-Data">Programs And Data</h2>
+
+<img class="illustration" src="manual-images/illustration_disk.png"/>
 
 <p>A program file contains a complete game or application, including all
 its data, stored as simple text. The first part is the BASIC source code.
@@ -256,6 +288,8 @@ unused.</p>
 
 <h2 id="Character-Designer">Character Designer</h2>
 
+<img class="illustration" src="manual-images/illustration_painting.png"/>
+
 <p>Use the Character Designer to draw your sprites and background
 tiles. It shows images in grayscale only, black is used as
 transparent background. Color palettes can be created later in the
@@ -293,6 +327,8 @@ other words the ROM entries of the program you are editing. Select one
 
 
 <h2 id="Background-Designer">Background Designer</h2>
+
+<img class="illustration" src="manual-images/illustration_building.png"/>
 
 <p>The Background Designer allows you to create tile-based screens or
 level maps of different sizes. Additionally it's for creating color palettes. On the bottom right there are three tabs for the different
@@ -350,6 +386,8 @@ the width and height of the background (in cells), as well as the cell size (8x8
 
 
 <h2 id="Sound-Composer">Sound Composer</h2>
+
+<img class="illustration" src="manual-images/illustration_music.png"/>
 
 <p>The Sound Composer serves to create sound presets, sequences
 ("tracks") and complete songs.</p>
