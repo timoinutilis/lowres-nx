@@ -43,7 +43,7 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
     char filename[FILENAME_MAX];
     if (settings_filename(filename))
     {
-        FILE *file = fopen(filename, "r");
+        FILE *file = fopen_utf8(filename, "r");
         if (file)
         {
             char line[FILENAME_MAX];
@@ -174,7 +174,7 @@ void settings_save(struct Settings *settings)
 void settings_saveAs(struct Settings *settings, const char *filename)
 {
 #if SETTINGS_FILE
-    FILE *file = fopen(filename, "w");
+    FILE *file = fopen_utf8(filename, "w");
     if (file)
     {
         fputs("# Start the application in fullscreen mode.\n# fullscreen yes/no\n", file);

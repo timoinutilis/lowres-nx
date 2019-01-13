@@ -81,11 +81,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\BARBARA\Documents\Timo\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -106,14 +106,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\BARBARA\Documents\Timo\SDL2-2.0.8\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\BARBARA\Documents\Timo\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>

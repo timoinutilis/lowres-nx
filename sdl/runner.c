@@ -20,6 +20,7 @@
 #include "runner.h"
 #include "main.h"
 #include "sdl_include.h"
+#include "system_paths.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -70,7 +71,7 @@ struct CoreError runner_loadProgram(struct Runner *runner, const char *filename)
 {
     struct CoreError error = err_noCoreError();
     
-    FILE *file = fopen(filename, "rb");
+    FILE *file = fopen_utf8(filename, "rb");
     if (file)
     {
         fseek(file, 0, SEEK_END);
@@ -126,7 +127,7 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
     char diskFilename[FILENAME_MAX];
     getDiskFilename(diskFilename);
     
-    FILE *file = fopen(diskFilename, "rb");
+    FILE *file = fopen_utf8(diskFilename, "rb");
     if (file)
     {
         fseek(file, 0, SEEK_END);
@@ -173,7 +174,7 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
         char diskFilename[FILENAME_MAX];
         getDiskFilename(diskFilename);
         
-        FILE *file = fopen(diskFilename, "wb");
+        FILE *file = fopen_utf8(diskFilename, "wb");
         if (file)
         {
             fwrite(output, 1, strlen(output), file);
