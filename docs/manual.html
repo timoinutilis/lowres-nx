@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>LowRes NX Manual</title>
 <style>
 body {
@@ -51,36 +52,38 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 	padding-right: 15px;
 }
 .info-mobile, .info-desktop {
-	padding-left: 44px;
+	padding-left: 38px;
 	margin: 1em 0;
-	min-height: 44px;
+	min-height: 30px;
+	background-repeat: no-repeat;
+	background-position: top left;
 }
 .info-mobile {
 	background-image: url(manual-images/icon_mobile.png);
-	background-repeat: no-repeat;
-	background-position: top left;
+	background-image: -webkit-image-set(url(manual-images/icon_mobile.png) 1x, url(manual-images/icon_mobile@2x.png) 2x);
 }
 .info-desktop {
 	background-image: url(manual-images/icon_desktop.png);
-	background-repeat: no-repeat;
-	background-position: top left;
+	background-image: -webkit-image-set(url(manual-images/icon_desktop.png) 1x, url(manual-images/icon_desktop@2x.png) 2x);
 }
 .illustration {
-	/*margin: 0.5em;*/
 	float: right;
 }
-.illustration-center {
+.illustration-nofloat {
 	display: block;
 	float: none;
-/*	margin-left: auto;
-	margin-right: auto;*/
 }
 @media (max-width: 480px) {
-	.illustration, .illustration-center {
+	.illustration, .illustration-nofloat {
 		display: block;
 		float: none;
 		margin-left: auto;
 		margin-right: auto;
+	}
+}
+@media (max-width: 400px) {
+	.bigtable td {
+		font-size: 0.7em;
 	}
 }
 </style>
@@ -93,7 +96,7 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 
 <h2 id="What-is-LowRes-NX">What is LowRes NX?</h2>
 
-<img class="illustration" src="manual-images/illustration_hello.png"/>
+<img class="illustration" src="manual-images/illustration_hello.png" srcset="manual-images/illustration_hello.png 1x, manual-images/illustration_hello@2x.png 2x"/>
 
 <p>LowRes NX is a simulated retro game console, which can be programmed
 in the classic BASIC language. It has its own technical
@@ -109,7 +112,7 @@ program video, audio and I/O directly by accessing the memory.</p>
 <p>Imagine LowRes NX as a handheld game console with a d-pad, two action
 buttons and a little rubber keyboard below a slidable touchscreen.</p>
 
-<img class="illustration-center" src="manual-images/illustration_open.png"/>
+<img class="illustration-nofloat" src="manual-images/illustration_open.png" srcset="manual-images/illustration_open.png 1x, manual-images/illustration_open@2x.png 2x"/>
 
 
 <h2 id="Specifications">Specifications</h2>
@@ -129,7 +132,7 @@ buttons and a little rubber keyboard below a slidable touchscreen.</p>
 
 <h2 id="Getting-Started">Getting Started</h2>
 
-<img class="illustration" src="manual-images/illustration_playing.png"/>
+<img class="illustration" src="manual-images/illustration_playing.png" srcset="manual-images/illustration_playing.png 1x, manual-images/illustration_playing@2x.png 2x"/>
 
 <p>Try some of the included programs to see how LowRes NX
 can look like. Have a look at the action game <i>LowRes Galaxy 2</i>,
@@ -207,7 +210,7 @@ select "Rename..." to give it a better name.
 
 <h2 id="Programs-And-Data">Programs And Data</h2>
 
-<img class="illustration" src="manual-images/illustration_disk.png"/>
+<img class="illustration" src="manual-images/illustration_disk.png" srcset="manual-images/illustration_disk.png 1x, manual-images/illustration_disk@2x.png 2x"/>
 
 <p>A program file contains a complete game or application, including all
 its data, stored as simple text. The first part is the BASIC source code.
@@ -288,7 +291,7 @@ unused.</p>
 
 <h2 id="Character-Designer">Character Designer</h2>
 
-<img class="illustration" src="manual-images/illustration_painting.png"/>
+<img class="illustration" src="manual-images/illustration_painting.png"  srcset="manual-images/illustration_painting.png 1x, manual-images/illustration_painting@2x.png 2x"/>
 
 <p>Use the Character Designer to draw your sprites and background
 tiles. It shows images in grayscale only, black is used as
@@ -328,7 +331,7 @@ other words the ROM entries of the program you are editing. Select one
 
 <h2 id="Background-Designer">Background Designer</h2>
 
-<img class="illustration" src="manual-images/illustration_building.png"/>
+<img class="illustration" src="manual-images/illustration_building.png" srcset="manual-images/illustration_building.png 1x, manual-images/illustration_building@2x.png 2x"/>
 
 <p>The Background Designer allows you to create tile-based screens or
 level maps of different sizes. Additionally it's for creating color palettes. On the bottom right there are three tabs for the different
@@ -387,7 +390,7 @@ the width and height of the background (in cells), as well as the cell size (8x8
 
 <h2 id="Sound-Composer">Sound Composer</h2>
 
-<img class="illustration" src="manual-images/illustration_music.png"/>
+<img class="illustration" src="manual-images/illustration_music.png" srcset="manual-images/illustration_music.png 1x, manual-images/illustration_music@2x.png 2x"/>
 
 <p>The Sound Composer serves to create sound presets, sequences
 ("tracks") and complete songs.</p>
@@ -1461,7 +1464,7 @@ is playing.</p>
 <pre>PLAY v,p[,len] [SOUND s]</pre>
 
 <p>Plays a sound on voice <em>v</em> (0-3). <em>p</em> is the pitch:</p>
-<table>
+<table class="bigtable">
     <tr><th>Note</th><th colspan="8">Pitch (with different octaves)</th></tr>
     <tr><th>C</th><td>1</td><td>13</td><td>25</td><td>37</td><td>49</td><td>61</td><td>73</td><td>85</td></tr>
     <tr><th>C#</th><td>2</td><td>14</td><td>26</td><td>38</td><td>50</td><td>62</td><td>74</td><td>86</td></tr>
