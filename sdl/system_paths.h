@@ -31,5 +31,6 @@
 #endif
 
 void desktop_path(char *buffer, size_t size);
+FILE* fopen_utf8(const char* filename, const char* mode);
 
 #endif /* system_paths_h */
