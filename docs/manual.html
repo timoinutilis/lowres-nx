@@ -85,6 +85,10 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 	.bigtable td {
 		font-size: 0.7em;
 	}
+    .container {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
 }
 </style>
 </head>
@@ -2252,19 +2256,23 @@ audio registers of one voice, but without the first 4 bytes.</p>
 <pre>
 - Voice 0:
     Bit  Purpose
-    0-6  Track index (64 = voice unused)
+    0-6  Track index
+         (64 = voice unused)
     7    Flag loop start
 - Voice 1:
     Bit  Purpose
-    0-6  Track index (64 = voice unused)
+    0-6  Track index
+         (64 = voice unused)
     7    Flag loop end
 - Voice 2:
     Bit  Purpose
-    0-6  Track index (64 = voice unused)
+    0-6  Track index
+         (64 = voice unused)
     7    Flag song stop
 - Voice 3:
     Bit  Purpose
-    0-6  Track index (64 = voice unused)
+    0-6  Track index
+         (64 = voice unused)
 </pre>
 
 <p>Each track occupies 96 bytes and consists of 32 entries with each 3
