@@ -40,7 +40,7 @@ void runStartupSequence(struct Core *core)
         memcpy(&core->machine->videoRam.characters[FONT_CHAR_OFFSET], &core->machine->cartridgeRom[entries[0].start], entries[0].length);
     }
     
-    // main palettes
+    // default palettes
     uint8_t *colors = core->machine->colorRegisters.colors;
     
     colors[0] = (0 << 4) | (1 << 2) | 1;
@@ -71,7 +71,10 @@ void runStartupSequence(struct Core *core)
         colors[19 + i] = (1 << 4) | (1 << 2) | 1;
     }
     
-    memcpy(core->machine->colorRegisters.colors, &core->machine->cartridgeRom[entries[1].start], entries[1].length);
+    // main palettes
+    int palLen = entries[1].length;
+    if (palLen > 32) palLen = 32;
+    memcpy(core->machine->colorRegisters.colors, &core->machine->cartridgeRom[entries[1].start], palLen);
     
     // main characters
     memcpy(core->machine->videoRam.characters, &core->machine->cartridgeRom[entries[2].start], entries[2].length);
