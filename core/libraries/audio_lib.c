@@ -371,6 +371,9 @@ void audlib_command(struct AudioLib *lib, struct Voice *voice, struct ComposerPl
         case 0x09:
             voice->attr.pulseWidth = parameter;
             break;
+        case 0x0D:
+            player->speed = 0x10 | parameter;
+            break;
         case 0x0E:
             player->speed = parameter;
             break;
