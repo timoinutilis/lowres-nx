@@ -116,6 +116,8 @@ void dev_show(struct DevMenu *devMenu, bool reload)
     {
         dev_showInfo(devMenu);
     }
+    
+    setMouseEnabled(true);
 }
 
 void dev_update(struct DevMenu *devMenu, struct CoreInput *input)

@@ -40,5 +40,6 @@ void runToolProgram(const char *filename);
 void showDevMenu(void);
 bool usesMainProgramAsDisk(void);
 void getDiskFilename(char *outputString);
+void setMouseEnabled(bool enabled);
 
 #endif /* main_h */

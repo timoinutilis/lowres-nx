@@ -89,6 +89,7 @@ SDL_Rect screenRect;
 bool quit = false;
 bool releasedTouch = false;
 bool audioStarted = false;
+bool mouseEnabled = false;
 
 int main(int argc, const char * argv[])
 {
@@ -305,6 +306,24 @@ void getDiskFilename(char *outputString)
     }
 }
 
+void updateMouseMode()
+{
+    if (!mouseEnabled && (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP))
+    {
+        SDL_ShowCursor(SDL_DISABLE);
+    }
+    else
+    {
+        SDL_ShowCursor(SDL_ENABLE);
+    }
+}
+
+void setMouseEnabled(bool enabled)
+{
+    mouseEnabled = enabled;
+    updateMouseMode();
+}
+
 void update(void *arg)
 {
     SDL_Event event;
@@ -416,6 +435,7 @@ void update(void *arg)
                         {
                             SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                         }
+                        updateMouseMode();
                     }
                     else if (keycode == SDLK_r)
                     {

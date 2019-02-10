@@ -120,6 +120,7 @@ void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
 {
     runStartupSequence(core);
     core->interpreter->timer = (float)(secondsSincePowerOn * 60 % TIMER_WRAP_VALUE);
+    delegate_controlsDidChange(core);
 }
 
 void core_update(struct Core *core, struct CoreInput *input)

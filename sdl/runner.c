@@ -208,4 +208,5 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
     {
         SDL_StopTextInput();
     }
+    setMouseEnabled(controlsInfo.isTouchEnabled);
 }
