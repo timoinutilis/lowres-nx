@@ -380,6 +380,30 @@ void audio_renderAudioBuffer(struct AudioRegisters *lifeRegisters, struct AudioR
                     rightOutput += voiceSample;
                 }
             }
+            
+            // filter
+            if (internals->filterEnabled)
+            {
+                int32_t *filterBuffer = internals->filterBuffer;
+                for (int f = AUDIO_FILTER_BUFFER_SIZE - 1; f > 0; f--)
+                {
+                    filterBuffer[f] = filterBuffer[f - 1];
+                }
+                filterBuffer[0] = leftOutput;
+                
+                leftOutput = ( (filterBuffer[0] >> 2)
+                             + (filterBuffer[1] >> 2)
+                             + (filterBuffer[2] >> 2)
+                             + (filterBuffer[3] >> 2) );
+//                leftOutput =   (  (filterBuffer[0] >> 3)
+//                                + (filterBuffer[1] >> 2)
+//                                + (filterBuffer[2] >> 1)
+//                                + (filterBuffer[3])
+//                                + (filterBuffer[4] >> 1)
+//                                + (filterBuffer[5] >> 2)
+//                                + (filterBuffer[6] >> 3)) / 3;
+                rightOutput = leftOutput;
+            }
         }
         
         stereoOutput[i++] = leftOutput;
