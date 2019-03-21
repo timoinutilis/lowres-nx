@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2019 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -114,6 +114,9 @@ const char *TokenStrings[] = {
     "LOG",
     "LOOP",
     "MAX",
+    "MCELL.A",
+    "MCELL.C",
+    "MCELL",
     "MID$",
     "MIN",
     "MUSIC",

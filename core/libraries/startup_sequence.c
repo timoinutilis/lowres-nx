@@ -83,6 +83,7 @@ void runStartupSequence(struct Core *core)
     int bgStart = entries[3].start;
     core->interpreter->textLib.sourceAddress = bgStart + 4;
     core->interpreter->textLib.sourceWidth = core->machine->cartridgeRom[bgStart + 2];
+    core->interpreter->textLib.sourceHeight = core->machine->cartridgeRom[bgStart + 3];
     
     // voices
     for (int i = 0; i < NUM_VOICES; i++)

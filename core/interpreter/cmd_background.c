@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2019 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -23,6 +23,7 @@
 #include "cmd_text.h"
 #include "interpreter_utils.h"
 #include <assert.h>
+#include <math.h>
 
 enum ErrorCode cmd_BG(struct Core *core)
 {
@@ -68,6 +69,19 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
         w = wValue.v.floatValue;
     }
     
+    int h = 0;
+    if (interpreter->pc->type == TokenComma)
+    {
+        // comma
+        ++interpreter->pc;
+        
+        // height value
+        struct TypedValue hValue = itp_evaluateNumericExpression(core, 1, 0xFFFF);
+        if (hValue.type == ValueTypeError) return hValue.v.errorCode;
+        
+        h = hValue.v.floatValue;
+    }
+    
     if (interpreter->pass == PassRun)
     {
         int address = aValue.v.floatValue;
@@ -75,12 +89,14 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core)
         {
             core->interpreter->textLib.sourceAddress = address;
             core->interpreter->textLib.sourceWidth = w;
+            core->interpreter->textLib.sourceHeight = h;
         }
         else
         {
             // data with preceding size (W x H)
             core->interpreter->textLib.sourceAddress = address + 4;
             core->interpreter->textLib.sourceWidth = machine_peek(core, address + 2);
+            core->interpreter->textLib.sourceHeight = machine_peek(core, address + 3);
         }
     }
     
@@ -380,6 +396,87 @@ struct TypedValue fnc_CELL(struct Core *core)
         {
             assert(0);
         }
+    }
+    return value;
+}
+
+enum ErrorCode cmd_MCELL(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // MCELL
+    ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, interpreter->textLib.sourceWidth - 1);
+    if (xValue.type == ValueTypeError) return xValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // y value
+    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, interpreter->textLib.sourceHeight - 1);
+    if (yValue.type == ValueTypeError) return yValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // character value
+    int character = -1;
+    struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
+    if (cValue.type == ValueTypeError) return cValue.v.errorCode;
+    if (cValue.type == ValueTypeFloat)
+    {
+        character = cValue.v.floatValue;
+    }
+    
+    if (interpreter->pass == PassRun)
+    {
+        bool success = txtlib_setSourceCell(&interpreter->textLib, xValue.v.floatValue, yValue.v.floatValue, character);
+        if (!success) return ErrorIllegalMemoryAccess;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+struct TypedValue fnc_MCELL(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // MCELL.?
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+        ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (xValue.type == ValueTypeError) return xValue;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+        ++interpreter->pc;
+    
+    // y value
+    struct TypedValue yValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (yValue.type == ValueTypeError) return yValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int x = floorf(xValue.v.floatValue);
+        int y = floorf(yValue.v.floatValue);
+        value.v.floatValue = txtlib_getSourceCell(&interpreter->textLib, x, y, (type == TokenMCELLA));
     }
     return value;
 }

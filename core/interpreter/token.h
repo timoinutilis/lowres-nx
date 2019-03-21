@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2019 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -118,6 +118,9 @@ enum TokenType {
     TokenLOG,
     TokenLOOP,
     TokenMAX,
+    TokenMCELLA,
+    TokenMCELLC,
+    TokenMCELL,
     TokenMID,
     TokenMIN,
     TokenMUSIC,

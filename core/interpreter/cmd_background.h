@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Timo Kloss
+// Copyright 2017-2019 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -34,5 +34,7 @@ enum ErrorCode cmd_ATTR(struct Core *core);
 enum ErrorCode cmd_BG_FILL(struct Core *core);
 enum ErrorCode cmd_CELL(struct Core *core);
 struct TypedValue fnc_CELL(struct Core *core);
+enum ErrorCode cmd_MCELL(struct Core *core);
+struct TypedValue fnc_MCELL(struct Core *core);
 
 #endif /* cmd_background_h */

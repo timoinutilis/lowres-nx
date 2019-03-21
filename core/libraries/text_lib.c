@@ -429,6 +429,39 @@ void txtlib_copyBackground(struct TextLib *lib, int srcX, int srcY, int width, i
     lib->core->interpreter->cycles += width * height * 2;
 }
 
+int txtlib_getSourceCell(struct TextLib *lib, int x, int y, bool getAttrs)
+{
+    if (x >= 0 && y >= 0 && x < lib->sourceWidth && y < lib->sourceHeight)
+    {
+        int address = lib->sourceAddress + ((y * lib->sourceWidth) + x) * 2;
+        if (getAttrs)
+        {
+            return machine_peek(lib->core, address + 1);
+        }
+        else
+        {
+            return machine_peek(lib->core, address);
+        }
+    }
+    return -1;
+}
+
+bool txtlib_setSourceCell(struct TextLib *lib, int x, int y, int character)
+{
+    int address = lib->sourceAddress + ((y * lib->sourceWidth) + x) * 2;
+    
+    int attr = machine_peek(lib->core, address + 1);
+    attr = (attr & ~lib->charAttrFilter) | (lib->charAttr.value & lib->charAttrFilter);
+    bool success = machine_poke(lib->core, address + 1, attr);
+    if (!success) return false;
+    
+    if (character != -1)
+    {
+        return machine_poke(lib->core, address, character);
+    }
+    return true;
+}
+
 void txtlib_itobin(char *buffer, size_t buffersize, size_t width, int value)
 {
     if (width < 1)

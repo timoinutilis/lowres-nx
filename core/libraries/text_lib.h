@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2019 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -45,6 +45,7 @@ struct TextLib {
     int bg;
     int sourceAddress;
     int sourceWidth;
+    int sourceHeight;
     char inputBuffer[INPUT_BUFFER_SIZE];
     int inputLength;
     int blink;
@@ -64,6 +65,8 @@ void txtlib_setCell(struct TextLib *lib, int x, int y, int character);
 void txtlib_setCells(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int character);
 void txtlib_scrollBackground(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY);
 void txtlib_copyBackground(struct TextLib *lib, int srcX, int srcY, int width, int height, int dstX, int dstY);
+int txtlib_getSourceCell(struct TextLib *lib, int x, int y, bool getAttrs);
+bool txtlib_setSourceCell(struct TextLib *lib, int x, int y, int character);
 
 void txtlib_itobin(char *buffer, size_t buffersize, size_t width, int value);
 

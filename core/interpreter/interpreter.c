@@ -1,5 +1,5 @@
 //
-// Copyright 2016-2017 Timo Kloss
+// Copyright 2016-2019 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -1132,6 +1132,10 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenCELLC:
             return fnc_CELL(core);
             
+        case TokenMCELLA:
+        case TokenMCELLC:
+            return fnc_MCELL(core);
+            
         case TokenUP:
         case TokenDOWN:
         case TokenLEFT:
@@ -1363,6 +1367,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenCELL:
             return cmd_CELL(core);
+            
+        case TokenMCELL:
+            return cmd_MCELL(core);
             
         case TokenPALETTE:
             return cmd_PALETTE(core);
