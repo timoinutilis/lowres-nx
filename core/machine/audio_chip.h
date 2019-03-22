@@ -26,6 +26,7 @@
 
 #define NUM_VOICES 4
 #define NUM_AUDIO_BUFFERS 6
+#define AUDIO_FILTER_BUFFER_SIZE 3
 
 // audio output channels for stereo
 #define NUM_CHANNELS 2
@@ -129,6 +130,7 @@ struct AudioInternals {
     int readBufferIndex;
     int writeBufferIndex;
     bool audioEnabled;
+    int32_t filterBuffer[NUM_CHANNELS][AUDIO_FILTER_BUFFER_SIZE];
 };
 
 void audio_reset(struct Core *core);
