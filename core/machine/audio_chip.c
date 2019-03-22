@@ -382,28 +382,20 @@ void audio_renderAudioBuffer(struct AudioRegisters *lifeRegisters, struct AudioR
             }
             
             // filter
-            if (internals->filterEnabled)
+            
+            int32_t *filterBufferL = internals->filterBuffer[0];
+            int32_t *filterBufferR = internals->filterBuffer[1];
+            
+            for (int f = AUDIO_FILTER_BUFFER_SIZE - 1; f > 0; f--)
             {
-                int32_t *filterBuffer = internals->filterBuffer;
-                for (int f = AUDIO_FILTER_BUFFER_SIZE - 1; f > 0; f--)
-                {
-                    filterBuffer[f] = filterBuffer[f - 1];
-                }
-                filterBuffer[0] = leftOutput;
-                
-                leftOutput = ( (filterBuffer[0] >> 2)
-                             + (filterBuffer[1] >> 2)
-                             + (filterBuffer[2] >> 2)
-                             + (filterBuffer[3] >> 2) );
-//                leftOutput =   (  (filterBuffer[0] >> 3)
-//                                + (filterBuffer[1] >> 2)
-//                                + (filterBuffer[2] >> 1)
-//                                + (filterBuffer[3])
-//                                + (filterBuffer[4] >> 1)
-//                                + (filterBuffer[5] >> 2)
-//                                + (filterBuffer[6] >> 3)) / 3;
-                rightOutput = leftOutput;
+                filterBufferL[f] = filterBufferL[f - 1];
+                filterBufferR[f] = filterBufferR[f - 1];
             }
+            filterBufferL[0] = leftOutput;
+            filterBufferR[0] = rightOutput;
+            
+            leftOutput  = ((filterBufferL[0] >> 4) + (filterBufferL[1] >> 1) + (filterBufferL[2] >> 4));
+            rightOutput = ((filterBufferR[0] >> 4) + (filterBufferR[1] >> 1) + (filterBufferR[2] >> 4));
         }
         
         stereoOutput[i++] = leftOutput;

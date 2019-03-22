@@ -454,20 +454,6 @@ void update(void *arg)
                         int scale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 3;
                         saveScreenshot(scale);
                     }
-                    else if (keycode == SDLK_a)
-                    {
-                        struct AudioInternals *audioInternals = &runner.core->machineInternals->audioInternals;
-                        if (audioInternals->filterEnabled)
-                        {
-                            audioInternals->filterEnabled = false;
-                            overlay_message(runner.core, "FILTER OFF");
-                        }
-                        else
-                        {
-                            audioInternals->filterEnabled = true;
-                            overlay_message(runner.core, "FILTER ON");
-                        }
-                    }
                 }
                 else if (keycode == SDLK_ESCAPE)
                 {
