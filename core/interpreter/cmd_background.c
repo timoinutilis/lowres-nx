@@ -318,7 +318,7 @@ enum ErrorCode cmd_CELL(struct Core *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -326,7 +326,7 @@ enum ErrorCode cmd_CELL(struct Core *core)
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue yValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
@@ -344,7 +344,7 @@ enum ErrorCode cmd_CELL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_setCell(&interpreter->textLib, xValue.v.floatValue, yValue.v.floatValue, character);
+        txtlib_setCell(&interpreter->textLib, floorf(xValue.v.floatValue), floorf(yValue.v.floatValue), character);
     }
     
     return itp_endOfCommand(interpreter);
@@ -363,7 +363,7 @@ struct TypedValue fnc_CELL(struct Core *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (xValue.type == ValueTypeError) return xValue;
     
     // comma
@@ -371,7 +371,7 @@ struct TypedValue fnc_CELL(struct Core *core)
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue yValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (yValue.type == ValueTypeError) return yValue;
     
     // bracket close
@@ -383,7 +383,7 @@ struct TypedValue fnc_CELL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        struct Cell *cell = txtlib_getCell(&interpreter->textLib, xValue.v.floatValue, yValue.v.floatValue);
+        struct Cell *cell = txtlib_getCell(&interpreter->textLib, floorf(xValue.v.floatValue), floorf(yValue.v.floatValue));
         if (type == TokenCELLA)
         {
             value.v.floatValue = cell->attr.value;

@@ -1224,7 +1224,8 @@ It defines which bits of a cell attribute should actually be changed.</p>
 
 <p>Sets the cell at position <em>cx,cy</em> of the current background to
 character <em>c</em>. If <em>c</em> is omitted, only the attributes of the cell get
-changed.</p>
+changed. The co-ordinates can be outside of the background size (32x32),
+but they will be wrapped around the edges (32->0, 33->1, etc.).</p>
 
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
@@ -1283,7 +1284,8 @@ edges (32->0, 33->1, etc.).</p>
 <pre>MCELL.A(cx,cy)</pre>
 
 <p>Work like the CELL.C and CELL.A functions, but get a cell from the
-source map (BG SOURCE) instead of the current background.</p>
+source map (BG SOURCE) instead of the current background. If the
+co-ordinates are outside of the map bounds, the functions return -1.</p>
 
 
 <h3 id="_MCELL" name="MCELL">MCELL</h3>

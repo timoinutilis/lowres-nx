@@ -379,13 +379,13 @@ void txtlib_clearBackground(struct TextLib *lib, int bg)
 struct Cell *txtlib_getCell(struct TextLib *lib, int x, int y)
 {
     struct Plane *plane = txtlib_getBackground(lib, lib->bg);
-    return &plane->cells[y][x];
+    return &plane->cells[y & 0x1F][x & 0x1F];
 }
 
 void txtlib_setCell(struct TextLib *lib, int x, int y, int character)
 {
     struct Plane *plane = txtlib_getBackground(lib, lib->bg);
-    struct Cell *cell = &plane->cells[y][x];
+    struct Cell *cell = &plane->cells[y & 0x1F][x & 0x1F];
     txtlib_modifyCell(lib, cell, character);
 }
 
