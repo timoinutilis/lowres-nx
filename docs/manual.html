@@ -1254,15 +1254,15 @@ of the cells get changed.</p>
 
 <h3 id="_BG-SOURCE" name="BG SOURCE,BG,SOURCE">BG SOURCE</h3>
 
-<pre>BG SOURCE a[,w]</pre>
+<pre>BG SOURCE a[,w,h]</pre>
 
 <p>Sets the current source for the BG COPY command. The two-dimensional
-map starts at memory address <em>a</em> and has a width of <em>w</em>
-cells.</p>
+map starts at memory address <em>a</em>, has a width of <em>w</em> and
+a height of <em>h</em> cells.</p>
 
-<p>Without the width parameter, Background Designer's data
-format is assumed: The width is read from address <em>a</em>+2 and
-the actual map data starts at <em>a</em>+4.</p>
+<p>Without the size parameters, Background Designer's data
+format is assumed: The width is read from address <em>a</em>+2, the
+height from <em>a</em>+3 and the actual map data starts at <em>a</em>+4.</p>
 
 <p>By default ROM entry 3 is used as source.</p>
 
@@ -1275,6 +1275,24 @@ the actual map data starts at <em>a</em>+4.</p>
 current background. The destination co-ordinates can be outside of
 the background size (32x32), but they will be wrapped around the
 edges (32->0, 33->1, etc.).</p>
+
+
+<h3 id="_MCELL.C-MCELL.A" name="MCELL.C,MCELL.A,MCELL">=MCELL.C/A</h3>
+
+<pre>MCELL.C(cx,cy)</pre>
+<pre>MCELL.A(cx,cy)</pre>
+
+<p>Work like the CELL.C and CELL.A functions, but get a cell from the
+source map (BG SOURCE) instead of the current background.</p>
+
+
+<h3 id="_MCELL" name="MCELL">MCELL</h3>
+
+<pre>MCELL cx,cy,[c]</pre>
+
+<p>Works like the CELL command, but sets a cell in the source map
+(BG SOURCE) instead of the current background. The source must be in
+working RAM, otherwise you will get an "Illegal Memory Access" error.</p>
 
 
 <h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL,STEP">BG SCROLL</h3>

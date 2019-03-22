@@ -449,15 +449,19 @@ int txtlib_getSourceCell(struct TextLib *lib, int x, int y, bool getAttrs)
 bool txtlib_setSourceCell(struct TextLib *lib, int x, int y, int character)
 {
     int address = lib->sourceAddress + ((y * lib->sourceWidth) + x) * 2;
+    // only working RAM is allowed
+    if (address < 0xA000 || address + 1 >= 0xE000)
+    {
+        return false;
+    }
     
     int attr = machine_peek(lib->core, address + 1);
     attr = (attr & ~lib->charAttrFilter) | (lib->charAttr.value & lib->charAttrFilter);
-    bool success = machine_poke(lib->core, address + 1, attr);
-    if (!success) return false;
+    machine_poke(lib->core, address + 1, attr);
     
     if (character != -1)
     {
-        return machine_poke(lib->core, address, character);
+        machine_poke(lib->core, address, character);
     }
     return true;
 }
