@@ -263,7 +263,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     ++interpreter->pc;
 
     // x1 value
-    struct TypedValue x1Value = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue x1Value = itp_evaluateExpression(core, TypeClassNumeric);
     if (x1Value.type == ValueTypeError) return x1Value.v.errorCode;
     
     // comma
@@ -271,7 +271,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     ++interpreter->pc;
     
     // y1 value
-    struct TypedValue y1Value = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue y1Value = itp_evaluateExpression(core, TypeClassNumeric);
     if (y1Value.type == ValueTypeError) return y1Value.v.errorCode;
     
     // TO
@@ -279,7 +279,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     ++interpreter->pc;
 
     // x2 value
-    struct TypedValue x2Value = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue x2Value = itp_evaluateExpression(core, TypeClassNumeric);
     if (x2Value.type == ValueTypeError) return x2Value.v.errorCode;
     
     // comma
@@ -287,7 +287,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     ++interpreter->pc;
     
     // y2 value
-    struct TypedValue y2Value = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue y2Value = itp_evaluateExpression(core, TypeClassNumeric);
     if (y2Value.type == ValueTypeError) return y2Value.v.errorCode;
 
     // CHAR
@@ -304,7 +304,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_setCells(&interpreter->textLib, x1Value.v.floatValue, y1Value.v.floatValue, x2Value.v.floatValue, y2Value.v.floatValue, character);
+        txtlib_setCells(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), character);
     }
     
     return itp_endOfCommand(interpreter);

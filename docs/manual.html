@@ -1160,18 +1160,26 @@ the last call of SPRITE HIT.</p>
 <p>A background is a map of 32x32 character cells, which is used for text
 and tile based maps or images. Each cell has the information of which
 character it contains and additional attributes (color palette, flip
-X/Y, priority).<br/>
-As a character has the size of 8x8 pixels, the resulting background
+X/Y, priority).</p>
+
+<p>As a character has the size of 8x8 pixels, the resulting background
 size is 256x256 pixels, which is larger than the actual screen
 (160x128). By modifying the scroll offset of a background, the visible
-area can be moved.<br/>
-If the visible area moves out of the borders of the background, the
+area can be moved.</p>
+
+<p>If the visible area moves out of the borders of the background, the
 display wraps around the edges. This can be used to achieve endless
-scrolling.<br/>
-There is a mode for 16x16-pixel cells. When active, each cell will show
+scrolling.</p>
+
+<p>There is a mode for 16x16-pixel cells. When active, each cell will show
 2x2 characters, similar to big sprites. This mode also increases the
 background size to 512x512 pixels. Use the DISPLAY command to enable
 it.</p>
+
+<p>For most of the commands and functions that access backgrounds
+their cell co-ordinates can be outside of the background size (32x32).
+They will be wrapped around the edges, so for example a character drawn
+at position 34,-2 will actually appear at position 2,30.</p>
 
 
 <h3 id="_CLS" name="CLS">CLS</h3>
@@ -1224,8 +1232,7 @@ It defines which bits of a cell attribute should actually be changed.</p>
 
 <p>Sets the cell at position <em>cx,cy</em> of the current background to
 character <em>c</em>. If <em>c</em> is omitted, only the attributes of the cell get
-changed. The co-ordinates can be outside of the background size (32x32),
-but they will be wrapped around the edges (32->0, 33->1, etc.).</p>
+changed.</p>
 
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
@@ -1273,9 +1280,7 @@ height from <em>a</em>+3 and the actual map data starts at <em>a</em>+4.</p>
 <pre>BG COPY cx1,cy1,w,h TO cx2,cy2</pre>
 
 <p>Copies a two-dimensional part of the current source to the
-current background. The destination co-ordinates can be outside of
-the background size (32x32), but they will be wrapped around the
-edges (32->0, 33->1, etc.).</p>
+current background.</p>
 
 
 <h3 id="_MCELL.C-MCELL.A" name="MCELL.C,MCELL.A,MCELL">=MCELL.C/A</h3>

@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "core.h"
 #include "text_lib.h"
 #include "interpreter_utils.h"
@@ -163,7 +164,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -171,7 +172,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     ++interpreter->pc;
 
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue yValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
@@ -185,7 +186,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         struct TextLib *lib = &interpreter->textLib;
-        txtlib_writeText(lib, stringValue.v.stringValue->chars, xValue.v.floatValue, yValue.v.floatValue);
+        txtlib_writeText(lib, stringValue.v.stringValue->chars, floorf(xValue.v.floatValue), floorf(yValue.v.floatValue));
     }
     
     return itp_endOfCommand(interpreter);
@@ -199,7 +200,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     ++interpreter->pc;
     
     // x value
-    struct TypedValue xValue = itp_evaluateNumericExpression(core, 0, PLANE_COLUMNS - 1);
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
@@ -207,7 +208,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     ++interpreter->pc;
     
     // y value
-    struct TypedValue yValue = itp_evaluateNumericExpression(core, 0, PLANE_ROWS - 1);
+    struct TypedValue yValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
     
     // comma
@@ -230,7 +231,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     {
         int digits = digitsValue.v.floatValue;
         struct TextLib *lib = &interpreter->textLib;
-        txtlib_writeNumber(lib, numberValue.v.floatValue, digits, xValue.v.floatValue, yValue.v.floatValue);
+        txtlib_writeNumber(lib, numberValue.v.floatValue, digits, floorf(xValue.v.floatValue), floorf(yValue.v.floatValue));
     }
     
     return itp_endOfCommand(interpreter);

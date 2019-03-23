@@ -212,7 +212,7 @@ void txtlib_writeText(struct TextLib *lib, const char *text, int x, int y)
             {
                 printableLetter -= 32;
             }
-            struct Cell *cell = &plane->cells[y][x];
+            struct Cell *cell = &plane->cells[y & 0x1F][x & 0x1F];
             txtlib_modifyCell(lib, cell, lib->fontCharOffset + (printableLetter - 32));
             if (lib->windowBg != OVERLAY_BG)
             {
@@ -232,7 +232,7 @@ void txtlib_writeNumber(struct TextLib *lib, int number, int digits, int x, int 
     {
         // negative number
         number *= -1;
-        struct Cell *cell = &plane->cells[y][x];
+        struct Cell *cell = &plane->cells[y & 0x1F][x & 0x1F];
         txtlib_modifyCell(lib, cell, lib->fontCharOffset + 13); // "-"
         x += digits;
         digits--;
@@ -246,7 +246,7 @@ void txtlib_writeNumber(struct TextLib *lib, int number, int digits, int x, int 
     for (int i = 0; i < digits; i++)
     {
         x--;
-        struct Cell *cell = &plane->cells[y][x];
+        struct Cell *cell = &plane->cells[y & 0x1F][x & 0x1F];
         txtlib_modifyCell(lib, cell, lib->fontCharOffset + ((number / div) % 10 + 16));
         div *= 10;
     }
@@ -396,7 +396,7 @@ void txtlib_setCells(struct TextLib *lib, int fromX, int fromY, int toX, int toY
     {
         for (int x = fromX; x <= toX; x++)
         {
-            struct Cell *cell = &plane->cells[y][x];
+            struct Cell *cell = &plane->cells[y & 0x1F][x & 0x1F];
             txtlib_modifyCell(lib, cell, character);
         }
     }
