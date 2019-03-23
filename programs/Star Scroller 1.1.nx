@@ -4,7 +4,7 @@
 DIM GLOBAL STARX(127)
 
 FOR I=0 TO 127
- STARX(I)=INT(RND*256)
+  STARX(I)=INT(RND*256)
 NEXT I
 BG 1
 BG FILL 0,0 TO 0,15 CHAR 1
@@ -23,55 +23,55 @@ L=LEN(T$)
 MUSIC
 
 DO
- IF SX MOD 16=0 THEN
-  P$=MID$(T$,P,1)
-  IF P$>="A" AND P$<="Z" THEN
-   N=ASC(P$)-ASC("A")
-   C=(N\8)*32+(N MOD 8)*2+64
-  ELSE
-   IF P$="." THEN C=164
-   IF P$="," THEN C=166
-   IF P$="!" THEN C=168
-   IF P$="?" THEN C=170
-   IF P$=" " THEN C=174
+  IF SX MOD 16=0 THEN
+    P$=MID$(T$,P,1)
+    IF P$>="A" AND P$<="Z" THEN
+      N=ASC(P$)-ASC("A")
+      C=(N\8)*32+(N MOD 8)*2+64
+    ELSE
+      IF P$="." THEN C=164
+      IF P$="," THEN C=166
+      IF P$="!" THEN C=168
+      IF P$="?" THEN C=170
+      IF P$=" " THEN C=174
+    END IF
+    CX=(SX\8+20) MOD 32
+    CELL CX,0,C
+    CELL CX+1,0,C+1
+    CELL CX,1,C+16
+    CELL CX+1,1,C+17
+    P=(P MOD L)+1
   END IF
-  CX=(SX\8+20) MOD 32
-  CELL CX,0,C
-  CELL CX+1,0,C+1
-  CELL CX,1,C+16
-  CELL CX+1,1,C+17
-  P=(P MOD L)+1
- END IF
  
- SCROLL 0,SX,SIN(T*0.02)*32-56
+  SCROLL 0,SX,SIN(T*0.02)*32-56
  
- P2=PEEK($FF5B)
+  P2=PEEK($FF5B)
  
- FOR I=0 TO 31
-  X1=SIN(T*0.02+I*PI/16)
-  Y1=COS(T*0.03+I*PI/16)
-  X2=COS(T*0.045+I*0.09)
-  Y2=SIN(T*0.035+I*0.1)
-  X3=SIN(T*0.025+I*0.12)
-  Y3=COS(T*0.015+I*0.13)
+  FOR I=0 TO 31
+    X1=SIN(T*0.02+I*PI/16)
+    Y1=COS(T*0.03+I*PI/16)
+    X2=COS(T*0.045+I*0.09)
+    Y2=SIN(T*0.035+I*0.1)
+    X3=SIN(T*0.025+I*0.12)
+    Y3=COS(T*0.015+I*0.13)
   
-  Z=1+P2/1536
-  X=(X1*X2*60+X3*32)*Z
-  Y=(Y1*Y2*60+Y3*32)*Z
-  SPRITE.A I,(2+(I/4) MOD 2)
-  SPRITE I,X+76,Y+60,2
- NEXT I
+    Z=1+P2/1536
+    X=(X1*X2*60+X3*32)*Z
+    Y=(Y1*Y2*60+Y3*32)*Z
+    SPRITE.A I,(2+(I/4) MOD 2)
+    SPRITE I,X+76,Y+60,2
+  NEXT I
  
- T=T+1
- SX=SX+1
- WAIT VBL
+  T=T+1
+  SX=SX+1
+  WAIT VBL
 LOOP
 
 SUB RASTERFX
- F=0.5
- REM (RASTER MOD 8)/8+1
- D=((RASTER MOD 4)+1)
- SCROLL 1,TIMER*F/D+STARX(RASTER),0
+  F=0.5
+  REM (RASTER MOD 8)/8+1
+  D=((RASTER MOD 4)+1)
+  SCROLL 1,TIMER*F/D+STARX(RASTER),0
 END SUB
 
 
