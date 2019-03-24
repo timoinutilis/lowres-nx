@@ -215,13 +215,18 @@ struct TypedValue fnc_BUTTON(struct Core *core)
     struct TypedValue pValue = itp_evaluateNumericExpression(core, 0, 1);
     if (pValue.type == ValueTypeError) return pValue;
     
-    // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
-    ++interpreter->pc;
+    int n = -1;
+    if (interpreter->pc->type == TokenComma)
+    {
+        // comma
+        ++interpreter->pc;
     
-    // n expression
-    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, 1);
-    if (nValue.type == ValueTypeError) return nValue;
+        // n expression
+        struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, 1);
+        if (nValue.type == ValueTypeError) return nValue;
+        
+        n = nValue.v.floatValue;
+    }
     
     // bracket close
     if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
@@ -235,16 +240,15 @@ struct TypedValue fnc_BUTTON(struct Core *core)
         if (core->machine->ioRegisters.attr.gamepadsEnabled == 0) return val_makeError(ErrorGamepadNotEnabled);
         
         int p = pValue.v.floatValue;
-        int n = nValue.v.floatValue;
         union Gamepad *gamepad = &core->machine->ioRegisters.gamepads[p];
 
-        int active = (n == 0) ? gamepad->buttonA : gamepad->buttonB;
+        int active = (n == -1) ? (gamepad->buttonA || gamepad->buttonB) : (n == 0) ? gamepad->buttonA : gamepad->buttonB;
         
         if (active && tap)
         {
             // invalidate button if it was already pressed last frame
             union Gamepad *lastFrameGamepad = &core->interpreter->lastFrameGamepads[p];
-            if ((n == 0) ? lastFrameGamepad->buttonA : lastFrameGamepad->buttonB)
+            if ((n == -1) ? (lastFrameGamepad->buttonA || lastFrameGamepad->buttonB) : (n == 0) ? lastFrameGamepad->buttonA : lastFrameGamepad->buttonB)
             {
                 active = 0;
             }

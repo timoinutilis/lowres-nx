@@ -911,12 +911,13 @@ the first frame the button is pressed.</p>
 
 <h3 id="_BUTTON" name="BUTTON,TAP">=BUTTON</h3>
 
-<pre>BUTTON(p,n)</pre>
+<pre>BUTTON(p[,n])</pre>
 
 <p>Returns true if button A (<em>n</em>=0) or B (<em>n</em>=1) is currently pressed by
-player <em>p</em> (0/1).</p>
+player <em>p</em> (0/1). If the parameter <em>n</em> is omitted, both buttons
+(A and B) are checked.</p>
 
-<pre>BUTTON TAP(p,n)</pre>
+<pre>BUTTON TAP(p[,n])</pre>
 
 <p>With the optional TAP keyword, this function returns true only for
 the first frame the button is pressed.</p>
