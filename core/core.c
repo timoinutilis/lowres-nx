@@ -229,6 +229,12 @@ void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool dow
     gamepad->buttonB = buttonB;
 }
 
+bool core_hasGamepadInput(struct CoreInput *input, int player)
+{
+    struct CoreInputGamepad *gamepad = &input->gamepads[player];
+    return (gamepad->up || gamepad->down || gamepad->left || gamepad->right || gamepad->buttonA || gamepad->buttonB);
+}
+
 void core_diskLoaded(struct Core *core)
 {
     core->interpreter->state = StateEvaluate;

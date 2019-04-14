@@ -90,6 +90,7 @@ bool quit = false;
 bool releasedTouch = false;
 bool audioStarted = false;
 bool mouseEnabled = false;
+int messageNumber = 0;
 
 int main(int argc, const char * argv[])
 {
@@ -327,6 +328,7 @@ void setMouseEnabled(bool enabled)
 void update(void *arg)
 {
     SDL_Event event;
+    bool hasInput = false;
     
     if (releasedTouch)
     {
@@ -376,6 +378,11 @@ void update(void *arg)
             case SDL_KEYDOWN: {
                 SDL_Keycode keycode = event.key.keysym.sym;
                 SDL_Scancode scancode = event.key.keysym.scancode;
+                
+                if (event.key.keysym.mod == 0)
+                {
+                    hasInput = true;
+                }
                 
                 // text input
                 if (keycode == SDLK_RETURN)
@@ -469,10 +476,6 @@ void update(void *arg)
                             showDevMenu();
                         }
                     }
-                    else
-                    {
-                        overlay_message(runner.core, "NO PROGRAM");
-                    }
 #endif
                 }
 #endif
@@ -481,6 +484,7 @@ void update(void *arg)
                 
             case SDL_TEXTINPUT: {
                 char key = event.text.text[0];
+                hasInput = true;
                 if (key >= ' ' && key <= '_')
                 {
                     coreInput.key = key;
@@ -493,6 +497,7 @@ void update(void *arg)
             }
             
             case SDL_MOUSEBUTTONDOWN: {
+                hasInput = true;
                 setTouchPosition(event.button.x, event.button.y);
                 coreInput.touch = true;
                 break;
@@ -515,6 +520,7 @@ void update(void *arg)
             }
                 
             case SDL_JOYBUTTONDOWN: {
+                hasInput = true;
                 if (event.jbutton.button == 2)
                 {
                     coreInput.pause = true;
@@ -559,6 +565,11 @@ void update(void *arg)
             break;
             
         case MainStateBootIntro:
+            if (hasInput)
+            {
+                // user hint
+                overlay_message(runner.core, "DRAG .NX INTO WINDOW");
+            }
             core_update(runner.core, &coreInput);
             if (machine_peek(runner.core, bootIntroStateAddress) == 2)
             {
@@ -573,6 +584,41 @@ void update(void *arg)
             
         case MainStateRunningProgram:
         case MainStateRunningTool:
+            if (hasInput)
+            {
+                // user hints for controls
+                union IOAttributes attr = runner.core->machine->ioRegisters.attr;
+                if (attr.touchEnabled && !attr.keyboardEnabled && coreInput.touch == 0)
+                {
+                    overlay_message(runner.core, "TOUCH/MOUSE");
+                }
+                if (attr.keyboardEnabled && !attr.touchEnabled && coreInput.key == 0)
+                {
+                    overlay_message(runner.core, "KEYBOARD");
+                }
+                if (attr.gamepadsEnabled && !attr.keyboardEnabled)
+                {
+                    if (attr.gamepadsEnabled == 2)
+                    {
+                        if (!core_hasGamepadInput(&coreInput, 0) && !core_hasGamepadInput(&coreInput, 1))
+                        {
+                            if (messageNumber % 2 == 1)
+                            {
+                                overlay_message(runner.core, "P2 ESDF A:TAB B:Q");
+                            }
+                            else
+                            {
+                                overlay_message(runner.core, "P1 ARROWS A:Z B:X");
+                            }
+                            messageNumber++;
+                        }
+                    }
+                    else if (!core_hasGamepadInput(&coreInput, 0))
+                    {
+                        overlay_message(runner.core, "ARROWS A:Z B:X");
+                    }
+                }
+            }
             core_update(runner.core, &coreInput);
             break;
             

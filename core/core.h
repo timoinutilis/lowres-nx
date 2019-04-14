@@ -20,7 +20,7 @@
 #ifndef core_h
 #define core_h
 
-#define CORE_VERSION "0.13"
+#define CORE_VERSION "0.14"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -75,6 +75,7 @@ void core_setDebug(struct Core *core, bool enabled);
 bool core_getDebug(struct Core *core);
 
 void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
+bool core_hasGamepadInput(struct CoreInput *input, int player);
 
 void core_diskLoaded(struct Core *core);
 
