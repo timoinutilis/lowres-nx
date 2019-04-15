@@ -604,18 +604,18 @@ void update(void *arg)
                         {
                             if (messageNumber % 2 == 1)
                             {
-                                overlay_message(runner.core, "P2 ESDF A:TAB B:Q");
+                                overlay_message(runner.core, "P2 ]:ESDF [:TAB \\:Q");
                             }
                             else
                             {
-                                overlay_message(runner.core, "P1 ARROWS A:Z B:X");
+                                overlay_message(runner.core, "P1 ]:ARROWS [:N \\:M");
                             }
                             messageNumber++;
                         }
                     }
                     else if (!core_hasGamepadInput(&coreInput, 0))
                     {
-                        overlay_message(runner.core, "ARROWS A:Z B:X");
+                        overlay_message(runner.core, "]:ARROWS [:Z \\:X");
                     }
                 }
             }
