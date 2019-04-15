@@ -279,7 +279,7 @@ bool txtlib_inputUpdate(struct TextLib *lib)
     bool done = false;
     if (key)
     {
-        if (key == '\b')
+        if (key == CoreInputKeyBackspace)
         {
             if (lib->inputLength > 0)
             {
@@ -289,7 +289,7 @@ bool txtlib_inputUpdate(struct TextLib *lib)
                 }
             }
         }
-        else if (key == '\n')
+        else if (key == CoreInputKeyReturn)
         {
             // clear cursor
             struct Cell *cell = &plane->cells[lib->cursorY + lib->windowY][lib->cursorX + lib->windowX];
@@ -297,7 +297,7 @@ bool txtlib_inputUpdate(struct TextLib *lib)
             txtlib_printText(lib, "\n");
             done = true;
         }
-        else
+        else if (key >= 32)
         {
             if (lib->inputLength < INPUT_BUFFER_SIZE - 2)
             {

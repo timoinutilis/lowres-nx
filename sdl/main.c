@@ -565,7 +565,7 @@ void update(void *arg)
             break;
             
         case MainStateBootIntro:
-            if (hasInput)
+            if (hasInput && !hasProgram())
             {
                 // user hint
                 overlay_message(runner.core, "DRAG .NX INTO WINDOW");
