@@ -584,15 +584,16 @@ void update(void *arg)
             
         case MainStateRunningProgram:
         case MainStateRunningTool:
-            if (hasInput)
+            core_update(runner.core, &coreInput);
+            if (hasInput && !coreInput.out_hasUsedInput)
             {
                 // user hints for controls
                 union IOAttributes attr = runner.core->machine->ioRegisters.attr;
-                if (attr.touchEnabled && !attr.keyboardEnabled && coreInput.touch == 0)
+                if (attr.touchEnabled && !attr.keyboardEnabled)
                 {
                     overlay_message(runner.core, "TOUCH/MOUSE");
                 }
-                if (attr.keyboardEnabled && !attr.touchEnabled && coreInput.key == 0)
+                if (attr.keyboardEnabled && !attr.touchEnabled)
                 {
                     overlay_message(runner.core, "KEYBOARD");
                 }
@@ -600,26 +601,22 @@ void update(void *arg)
                 {
                     if (attr.gamepadsEnabled == 2)
                     {
-                        if (!core_hasGamepadInput(&coreInput, 0) && !core_hasGamepadInput(&coreInput, 1))
+                        if (messageNumber % 2 == 1)
                         {
-                            if (messageNumber % 2 == 1)
-                            {
-                                overlay_message(runner.core, "P2 ]:ESDF [:TAB \\:Q");
-                            }
-                            else
-                            {
-                                overlay_message(runner.core, "P1 ]:ARROWS [:N \\:M");
-                            }
-                            messageNumber++;
+                            overlay_message(runner.core, "P2 ]:ESDF [:TAB \\:Q");
                         }
+                        else
+                        {
+                            overlay_message(runner.core, "P1 ]:ARROWS [:N \\:M");
+                        }
+                        messageNumber++;
                     }
-                    else if (!core_hasGamepadInput(&coreInput, 0))
+                    else
                     {
                         overlay_message(runner.core, "]:ARROWS [:Z \\:X");
                     }
                 }
             }
-            core_update(runner.core, &coreInput);
             break;
             
         case MainStateDevMenu:

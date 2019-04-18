@@ -55,6 +55,7 @@ struct CoreInput {
     int touchY;
     bool touch;
     char key;
+    bool out_hasUsedInput;
 };
 
 extern const char CoreInputKeyReturn;
@@ -75,7 +76,6 @@ void core_setDebug(struct Core *core, bool enabled);
 bool core_getDebug(struct Core *core);
 
 void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB);
-bool core_hasGamepadInput(struct CoreInput *input, int player);
 
 void core_diskLoaded(struct Core *core);
 
