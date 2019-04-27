@@ -138,6 +138,8 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
     struct IORegisters *ioRegisters = &core->machine->ioRegisters;
     union IOAttributes ioAttr = ioRegisters->attr;
     
+    bool processedOtherInput = false;
+    
     if (input->key != 0)
     {
         if (ioAttr.keyboardEnabled)
@@ -187,6 +189,12 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
             gamepad->right = inputGamepad->right && !inputGamepad->left;
             gamepad->buttonA = inputGamepad->buttonA;
             gamepad->buttonB = inputGamepad->buttonB;
+            
+            if (inputGamepad->up || inputGamepad->down || inputGamepad->left || inputGamepad->right)
+            {
+                // some d-pad combinations are not registered as I/O, but mark them anyway.
+                processedOtherInput = true;
+            }
         }
         else
         {
@@ -194,15 +202,13 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
         }
     }
     
-    bool hasUnpaused = false;
-    
     if (input->pause)
     {
         if (core->interpreter->state == StatePaused)
         {
             core->interpreter->state = StateEvaluate;
             overlay_updateState(core);
-            hasUnpaused = true;
+            processedOtherInput = true;
         }
         else if (ioAttr.gamepadsEnabled > 0 && !ioAttr.keyboardEnabled) {
             ioRegisters->status.pause = 1;
@@ -210,7 +216,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
         input->pause = false;
     }
     
-    input->out_hasUsedInput = hasUnpaused || ioRegisters->key || ioRegisters->status.value || ioRegisters->gamepads[0].value || ioRegisters->gamepads[1].value;
+    input->out_hasUsedInput = processedOtherInput || ioRegisters->key || ioRegisters->status.value || ioRegisters->gamepads[0].value || ioRegisters->gamepads[1].value;
 }
 
 void core_setDebug(struct Core *core, bool enabled)
