@@ -71,7 +71,7 @@ void overlay_message(struct Core *core, const char *message)
     struct TextLib *lib = &core->overlay->textLib;
     txtlib_setCells(lib, 0, 15, 19, 15, 0);
     txtlib_writeText(lib, message, 0, 15);
-    core->overlay->messageTimer = 90;
+    core->overlay->messageTimer = 120;
 }
 
 void overlay_draw(struct Core *core, bool ingame)

@@ -91,6 +91,7 @@ bool releasedTouch = false;
 bool audioStarted = false;
 bool mouseEnabled = false;
 int messageNumber = 0;
+bool hasUsedInputLastUpdate = false;
 
 int main(int argc, const char * argv[])
 {
@@ -585,7 +586,7 @@ void update(void *arg)
         case MainStateRunningProgram:
         case MainStateRunningTool:
             core_update(runner.core, &coreInput);
-            if (hasInput && !coreInput.out_hasUsedInput)
+            if (hasInput && !coreInput.out_hasUsedInput && !hasUsedInputLastUpdate)
             {
                 // user hints for controls
                 union IOAttributes attr = runner.core->machine->ioRegisters.attr;
@@ -625,6 +626,8 @@ void update(void *arg)
 #endif
             break;
     }
+    
+    hasUsedInputLastUpdate = coreInput.out_hasUsedInput;
     
     if (!audioStarted && audioDevice)
     {
