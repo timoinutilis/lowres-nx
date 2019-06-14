@@ -45,6 +45,7 @@ struct DevButton devButtons[] = {
     {3,4},
     {5,4},
     {7,4},
+    {9,4},
     {17,4}
 };
 
@@ -53,7 +54,9 @@ void dev_showError(struct DevMenu *devMenu, struct CoreError error);
 void dev_updateButtons(struct DevMenu *devMenu);
 void dev_onButtonTap(struct DevMenu *devMenu);
 void dev_showToolsMenu(struct DevMenu *devMenu);
+void dev_showClearRamMenu(struct DevMenu *devMenu);
 void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons, int numRemoveButtons);
+void dev_clearPersistentRam(struct DevMenu *devMenu);
 
 void dev_init(struct DevMenu *devMenu, struct Runner *runner, struct Settings *settings)
 {
@@ -152,7 +155,7 @@ void dev_update(struct DevMenu *devMenu, struct CoreInput *input)
         }
         else if (touch && !devMenu->lastTouch)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 int bcx = devButtons[i].cx;
                 int bcy = devButtons[i].cy;
@@ -313,6 +316,10 @@ void dev_onButtonTap(struct DevMenu *devMenu)
         }
         else if (button == 4)
         {
+            dev_showClearRamMenu(devMenu);
+        }
+        else if (button == 5)
+        {
             // Eject
             rebootNX();
         }
@@ -338,6 +345,14 @@ void dev_onButtonTap(struct DevMenu *devMenu)
             dev_show(devMenu, false);
         }
     }
+    else if (devMenu->currentMenu == DevModeMenuClearRam)
+    {
+        if (devMenu->currentButton == 0)
+        {
+            dev_clearPersistentRam(devMenu);
+        }
+        dev_show(devMenu, false);
+    }
 }
 
 void dev_showToolsMenu(struct DevMenu *devMenu)
@@ -351,7 +366,7 @@ void dev_showToolsMenu(struct DevMenu *devMenu)
     {
         menu[count++] = devMenu->settings->toolNames[i];
     }
-    menu[count++] = "Cancel";
+    menu[count++] = "CANCEL";
     dev_showMenu(devMenu, "EDIT ROM WITH TOOL", menu, count, count - 1);
     if (count < MENU_SIZE)
     {
@@ -359,6 +374,23 @@ void dev_showToolsMenu(struct DevMenu *devMenu)
         txtlib_writeText(textLib, "DRAG & DROP PROGRAM", 0, 14);
         txtlib_writeText(textLib, "TO ADD AS TOOL", 3, 15);
     }
+}
+
+void dev_showClearRamMenu(struct DevMenu *devMenu)
+{
+    struct TextLib *textLib = &devMenu->textLib;
+    
+    devMenu->currentMenu = DevModeMenuClearRam;
+    const char *menu[MENU_SIZE];
+    menu[0] = "CLEAR";
+    menu[1] = "CANCEL";
+    dev_showMenu(devMenu, "CLEAR PERSIST. RAM?", menu, 2, 0);
+    
+    textLib->charAttr.palette = 5;
+    txtlib_writeText(textLib, "MAY DELETE DATA LIKE", 0, 12);
+    txtlib_writeText(textLib, "GAME STATE OR", 3, 13);
+    txtlib_writeText(textLib, "HIGH SCORES", 4, 14);
+    txtlib_writeText(textLib, "OF THIS PROGRAM", 2, 15);
 }
 
 void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *buttons[], int numButtons, int numRemoveButtons)
@@ -387,6 +419,13 @@ void dev_showMenu(struct DevMenu *devMenu, const char *message, const char *butt
         }
     }
     devMenu->currentMenuSize = numButtons;
+}
+
+void dev_clearPersistentRam(struct DevMenu *devMenu)
+{
+    char ramFilename[FILENAME_MAX];
+    getRamFilename(ramFilename);
+    remove(ramFilename);
 }
 
 #endif

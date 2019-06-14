@@ -33,7 +33,8 @@
 
 enum DevModeMenu {
     DevModeMenuMain,
-    DevModeMenuTools
+    DevModeMenuTools,
+    DevModeMenuClearRam
 };
 
 struct DevMenu {
