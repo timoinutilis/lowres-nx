@@ -41,6 +41,16 @@ int machine_peek(struct Core *core, int address)
     {
         return -1;
     }
+    if (address >= 0xE000 && address < 0xE100) // persistent
+    {
+        if (!core->machineInternals->hasAccessedPersistent)
+        {
+            delegate_persistentRamWillAccess(core);
+            core->machineInternals->hasAccessedPersistent = true;
+        }
+    }
+    
+    // read byte
     return *(uint8_t *)((uint8_t *)core->machine + address);
 }
 
@@ -76,6 +86,17 @@ bool machine_poke(struct Core *core, int address, int value)
             return false;
         }
     }
+    else if (address >= 0xE000 && address < 0xE100) // persistent
+    {
+        if (!core->machineInternals->hasAccessedPersistent)
+        {
+            delegate_persistentRamWillAccess(core);
+            core->machineInternals->hasAccessedPersistent = true;
+        }
+        core->machineInternals->hasChangedPersistent = true;
+    }
+    
+    // write byte
     *(uint8_t *)((uint8_t *)core->machine + address) = value & 0xFF;
     
     if (address == 0xFF76) // IO attributes

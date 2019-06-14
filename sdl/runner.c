@@ -28,6 +28,8 @@ void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager);
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
+void persistentRamWillAccess(void *context);
+void persistentRamDidChange(void *context, uint8_t *data, int size);
 
 
 void runner_init(struct Runner *runner)
@@ -44,6 +46,8 @@ void runner_init(struct Runner *runner)
         runner->coreDelegate.diskDriveWillAccess = diskDriveWillAccess;
         runner->coreDelegate.diskDriveDidSave = diskDriveDidSave;
         runner->coreDelegate.controlsDidChange = controlsDidChange;
+        runner->coreDelegate.persistentRamWillAccess = persistentRamWillAccess;
+        runner->coreDelegate.persistentRamDidChange = persistentRamDidChange;
         
         core_setDelegate(core, &runner->coreDelegate);
 
@@ -209,4 +213,47 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
         SDL_StopTextInput();
     }
     setMouseEnabled(controlsInfo.isTouchEnabled);
+}
+
+/** Called when persistent RAM will be accessed the first time */
+void persistentRamWillAccess(void *context)
+{
+#ifndef __EMSCRIPTEN__
+    struct Runner *runner = context;
+    
+    char ramFilename[FILENAME_MAX];
+    getRamFilename(ramFilename);
+    
+    FILE *file = fopen_utf8(ramFilename, "rb");
+    if (file)
+    {
+        fread(runner->core->machine->persistentRam, sizeof(uint8_t), PERSISTENT_RAM_SIZE, file);
+        fclose(file);
+    }
+#endif
+}
+
+/** Called when persistent RAM should be saved */
+void persistentRamDidChange(void *context, uint8_t *data, int size)
+{
+#ifndef __EMSCRIPTEN__
+    struct Runner *runner = context;
+    
+    char ramFilename[FILENAME_MAX];
+    getRamFilename(ramFilename);
+    
+    FILE *file = fopen_utf8(ramFilename, "wb");
+    if (file)
+    {
+        fwrite(data, 1, size, file);
+        fclose(file);
+    }
+    else
+    {
+        struct TextLib *lib = &runner->core->overlay->textLib;
+        txtlib_printText(lib, "COULD NOT SAVE:\n");
+        txtlib_printText(lib, ramFilename);
+        txtlib_printText(lib, "\n");
+    }
+#endif
 }

@@ -219,6 +219,15 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
     input->out_hasUsedInput = processedOtherInput || ioRegisters->key || ioRegisters->status.value || ioRegisters->gamepads[0].value || ioRegisters->gamepads[1].value;
 }
 
+void core_willSuspendProgram(struct Core *core)
+{
+    if (core->machineInternals->hasChangedPersistent)
+    {
+        delegate_persistentRamDidChange(core, core->machine->persistentRam, PERSISTENT_RAM_SIZE);
+        core->machineInternals->hasChangedPersistent = false;
+    }
+}
+
 void core_setDebug(struct Core *core, bool enabled)
 {
     core->interpreter->debug = enabled;

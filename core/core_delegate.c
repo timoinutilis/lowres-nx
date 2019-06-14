@@ -72,3 +72,19 @@ void delegate_controlsDidChange(struct Core *core)
         core->delegate->controlsDidChange(core->delegate->context, info);
     }
 }
+
+void delegate_persistentRamWillAccess(struct Core *core)
+{
+    if (core->delegate->persistentRamWillAccess)
+    {
+        core->delegate->persistentRamWillAccess(core->delegate->context);
+    }
+}
+
+void delegate_persistentRamDidChange(struct Core *core, uint8_t *data, int size)
+{
+    if (core->delegate->persistentRamDidChange)
+    {
+        core->delegate->persistentRamDidChange(core->delegate->context, data, size);
+    }
+}

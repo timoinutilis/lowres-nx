@@ -27,6 +27,8 @@
 #include "video_chip.h"
 #include "audio_chip.h"
 
+#define PERSISTENT_RAM_SIZE 256
+
 struct Core;
 
 // 64 KB
@@ -42,7 +44,7 @@ struct Machine {
     uint8_t workingRam[0x4000]; // 16 KB
     
     // 0xE000
-    uint8_t persistentRam[0x100]; // 256 B
+    uint8_t persistentRam[PERSISTENT_RAM_SIZE]; // 256 B
     uint8_t reserved1[0xF00];
     
     // 0xF000
@@ -72,6 +74,8 @@ struct Machine {
 
 struct MachineInternals {
     struct AudioInternals audioInternals;
+    bool hasAccessedPersistent;
+    bool hasChangedPersistent;
 };
 
 void machine_init(struct Core *core);

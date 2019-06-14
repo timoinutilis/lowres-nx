@@ -174,6 +174,8 @@ int main(int argc, const char * argv[])
                 SDL_Delay(16 - ticksDelta);
             }
         }
+        
+        core_willSuspendProgram(runner.core);
 #endif
     }
     
@@ -208,6 +210,8 @@ void bootNX()
 
 void rebootNX()
 {
+    core_willSuspendProgram(runner.core);
+    
     mainProgramFilename[0] = 0;
     bootNX();
 }
@@ -237,6 +241,8 @@ void selectProgram(const char *filename)
 
 void runMainProgram()
 {
+    core_willSuspendProgram(runner.core);
+    
     struct CoreError error = runner_loadProgram(&runner, mainProgramFilename);
 #if DEV_MENU
     devMenu.lastError = error;
@@ -258,6 +264,8 @@ void runMainProgram()
 
 void runToolProgram(const char *filename)
 {
+    core_willSuspendProgram(runner.core);
+    
     struct CoreError error = runner_loadProgram(&runner, filename);
     if (error.code == ErrorNone)
     {
@@ -274,6 +282,8 @@ void runToolProgram(const char *filename)
 void showDevMenu()
 {
 #if DEV_MENU
+    core_willSuspendProgram(runner.core);
+    
     bool reload = (mainState == MainStateRunningTool);
     mainState = MainStateDevMenu;
     dev_show(&devMenu, reload);
@@ -305,6 +315,36 @@ void getDiskFilename(char *outputString)
         {
             strncpy(outputString, defaultDisk, FILENAME_MAX - 1);
         }
+    }
+}
+
+void getRamFilename(char *outputString)
+{
+    char *prefPath = SDL_GetPrefPath("Inutilis Software", "LowRes NX");
+    if (prefPath)
+    {
+        strncpy(outputString, prefPath, FILENAME_MAX - 1);
+        
+        char *separator = strrchr(mainProgramFilename, PATH_SEPARATOR_CHAR);
+        if (separator)
+        {
+            separator++;
+            strncat(outputString, separator, FILENAME_MAX - 1);
+        }
+        else
+        {
+            strncat(outputString, mainProgramFilename, FILENAME_MAX - 1);
+        }
+        
+        char *postfix = strrchr(outputString, '.');
+        if (postfix)
+        {
+            *postfix = 0;
+        }
+        strncat(outputString, ".dat", FILENAME_MAX - 1);
+        
+    } else {
+        outputString[0] = 0;
     }
 }
 

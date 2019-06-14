@@ -2,7 +2,7 @@
 * First Steps *
 ***************
 
-Please read the introduction of the manual.
+Please read the introduction (at least "Getting Started") of the manual.
 
 
 ************

@@ -52,11 +52,19 @@ struct CoreDelegate {
     
     /** Called when keyboard or gamepad settings changed */
     void (*controlsDidChange)(void *context, struct ControlsInfo controlsInfo);
+    
+    /** Called when persistent RAM will be accessed the first time */
+    void (*persistentRamWillAccess)(void *context);
+    
+    /** Called when persistent RAM should be saved */
+    void (*persistentRamDidChange)(void *context, uint8_t *data, int size);
 };
 
 void delegate_interpreterDidFail(struct Core *core, struct CoreError coreError);
 bool delegate_diskDriveWillAccess(struct Core *core);
 void delegate_diskDriveDidSave(struct Core *core);
 void delegate_controlsDidChange(struct Core *core);
+void delegate_persistentRamWillAccess(struct Core *core);
+void delegate_persistentRamDidChange(struct Core *core, uint8_t *data, int size);
 
 #endif /* core_delegate_h */
