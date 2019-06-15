@@ -1090,9 +1090,8 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             return fnc_PEEK(core);
             
         case TokenPI:
-        case TokenRND:
             return fnc_math0(core);
-            
+
         case TokenABS:
         case TokenACOS:
         case TokenASIN:
@@ -1113,6 +1112,9 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenMAX:
         case TokenMIN:
             return fnc_math2(core);
+            
+        case TokenRND:
+            return fnc_RND(core);
             
         case TokenINKEY:
             return fnc_INKEY(core);

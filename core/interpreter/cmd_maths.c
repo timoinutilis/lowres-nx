@@ -43,13 +43,6 @@ struct TypedValue fnc_math0(struct Core *core)
                 value.v.floatValue = M_PI;
                 break;
                 
-            case TokenRND: {
-                int seed = (1140671485 * interpreter->seed + 12820163) & 0xFFFFFF;
-                interpreter->seed = seed;
-                value.v.floatValue = seed / ((float)0x1000000);
-                break;
-            }
-                
             default:
                 assert(0);
                 break;
@@ -228,6 +221,52 @@ enum ErrorCode cmd_RANDOMIZE(struct Core *core)
     }
     
     return itp_endOfCommand(interpreter);
+}
+
+struct TypedValue fnc_RND(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // RND
+    ++interpreter->pc;
+    
+    int x = -1;
+    if (interpreter->pc->type == TokenBracketOpen)
+    {
+        // bracket open
+        ++interpreter->pc;
+    
+        // expression
+        struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (xValue.type == ValueTypeError) return xValue;
+        x = xValue.v.floatValue;
+        
+        // bracket close
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        ++interpreter->pc;
+    }
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int seed = (1140671485 * interpreter->seed + 12820163) & 0xFFFFFF;
+        interpreter->seed = seed;
+        float rnd = seed / (float)0x1000000;
+        
+        if (x >= 0)
+        {
+            // integer 0...x
+            value.v.floatValue = floorf(rnd * (x + 1));
+        }
+        else
+        {
+            // float 0..<1
+            value.v.floatValue = rnd;
+        }
+    }
+    return value;
 }
 
 enum ErrorCode cmd_ADD(struct Core *core)

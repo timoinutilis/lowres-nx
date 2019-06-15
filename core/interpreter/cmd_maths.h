@@ -29,6 +29,7 @@ struct TypedValue fnc_math0(struct Core *core);
 struct TypedValue fnc_math1(struct Core *core);
 struct TypedValue fnc_math2(struct Core *core);
 enum ErrorCode cmd_RANDOMIZE(struct Core *core);
+struct TypedValue fnc_RND(struct Core *core);
 enum ErrorCode cmd_ADD(struct Core *core);
 enum ErrorCode cmd_INC_DEC(struct Core *core);
 
