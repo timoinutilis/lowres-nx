@@ -1094,9 +1094,14 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             return fnc_math0(core);
             
         case TokenABS:
-        case TokenATN:
+        case TokenACOS:
+        case TokenASIN:
+        case TokenATAN:
         case TokenCOS:
         case TokenEXP:
+        case TokenHCOS:
+        case TokenHSIN:
+        case TokenHTAN:
         case TokenINT:
         case TokenLOG:
         case TokenSGN:
@@ -1287,6 +1292,10 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenCOPY:
             return cmd_COPY(core);
             
+        case TokenROL:
+        case TokenROR:
+            return cmd_ROL_ROR(core);
+            
         case TokenWAIT:
             return cmd_WAIT(core);
             
@@ -1295,7 +1304,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenSWAP:
             return cmd_SWAP(core);
-        
+            
         case TokenTEXT:
             return cmd_TEXT(core);
 
@@ -1322,6 +1331,13 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
 
         case TokenRANDOMIZE:
             return cmd_RANDOMIZE(core);
+            
+        case TokenADD:
+            return cmd_ADD(core);
+            
+        case TokenINC:
+        case TokenDEC:
+            return cmd_INC_DEC(core);
             
         case TokenLEFTStr:
         case TokenRIGHTStr:

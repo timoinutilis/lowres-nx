@@ -20,6 +20,7 @@
 #include "cmd_memory.h"
 #include "core.h"
 #include "data_manager.h"
+#include <assert.h>
 
 struct TypedValue fnc_PEEK(struct Core *core)
 {
@@ -215,4 +216,45 @@ struct TypedValue fnc_ROM_SIZE(struct Core *core)
         }
     }
     return value;
+}
+
+enum ErrorCode cmd_ROL_ROR(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // ROL/ROR
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    // address value
+    struct TypedValue addressValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (addressValue.type == ValueTypeError) return addressValue.v.errorCode;
+    
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // n vale
+    struct TypedValue nValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int value = machine_peek(core, addressValue.v.floatValue);
+        if (value == -1) return ErrorIllegalMemoryAccess;
+        
+        int n = (int)nValue.v.floatValue;
+        if (type == TokenROR)
+        {
+            n = -n;
+        }
+        n &= 0x07;
+        
+        value = value << n;
+        value = value | (value >> 8);
+        
+        bool poke = machine_poke(core, addressValue.v.floatValue, value);
+        if (!poke) return ErrorIllegalMemoryAccess;
+    }
+    
+    return itp_endOfCommand(interpreter);
 }

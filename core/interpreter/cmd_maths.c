@@ -89,7 +89,17 @@ struct TypedValue fnc_math1(struct Core *core)
                 value.v.floatValue = fabsf(xValue.v.floatValue);
                 break;
                 
-            case TokenATN:
+            case TokenACOS:
+                if (xValue.v.floatValue < -1.0 || xValue.v.floatValue > 1.0) return val_makeError(ErrorInvalidParameter);
+                value.v.floatValue = acosf(xValue.v.floatValue);
+                break;
+                
+            case TokenASIN:
+                if (xValue.v.floatValue < -1.0 || xValue.v.floatValue > 1.0) return val_makeError(ErrorInvalidParameter);
+                value.v.floatValue = asinf(xValue.v.floatValue);
+                break;
+                
+            case TokenATAN:
                 value.v.floatValue = atanf(xValue.v.floatValue);
                 break;
                 
@@ -99,6 +109,18 @@ struct TypedValue fnc_math1(struct Core *core)
                 
             case TokenEXP:
                 value.v.floatValue = expf(xValue.v.floatValue);
+                break;
+                
+            case TokenHCOS:
+                value.v.floatValue = coshf(xValue.v.floatValue);
+                break;
+                
+            case TokenHSIN:
+                value.v.floatValue = sinhf(xValue.v.floatValue);
+                break;
+                
+            case TokenHTAN:
+                value.v.floatValue = tanhf(xValue.v.floatValue);
                 break;
                 
             case TokenINT:
@@ -203,6 +225,104 @@ enum ErrorCode cmd_RANDOMIZE(struct Core *core)
     if (interpreter->pass == PassRun)
     {
         interpreter->seed = value.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_ADD(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // ADD
+    ++interpreter->pc;
+    
+    enum ErrorCode errorCode = ErrorNone;
+    
+    // Variable
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, false);
+    if (!varValue) return errorCode;
+    if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
+    
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // n vale
+    struct TypedValue nValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    bool hasRange = false;
+    float base = 0;
+    float top = 0;
+    
+    if (interpreter->pc->type == TokenComma)
+    {
+        // comma
+        ++interpreter->pc;
+        
+        // base value
+        struct TypedValue baseValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (baseValue.type == ValueTypeError) return baseValue.v.errorCode;
+        base = baseValue.v.floatValue;
+        
+        // TO
+        if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+        ++interpreter->pc;
+        
+        // top value
+        struct TypedValue topValue = itp_evaluateExpression(core, TypeClassNumeric);
+        if (topValue.type == ValueTypeError) return topValue.v.errorCode;
+        top = topValue.v.floatValue;
+        
+        hasRange = true;
+    }
+    
+    if (interpreter->pass == PassRun)
+    {
+        varValue->floatValue += nValue.v.floatValue;
+        if (hasRange)
+        {
+            if (varValue->floatValue < base) varValue->floatValue = top;
+            if (varValue->floatValue > top) varValue->floatValue = base;
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_INC_DEC(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // INC/DEC
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+    
+    enum ErrorCode errorCode = ErrorNone;
+    
+    // Variable
+    enum ValueType valueType = ValueTypeNull;
+    union Value *varValue = itp_readVariable(core, &valueType, &errorCode, false);
+    if (!varValue) return errorCode;
+    if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
+    
+    if (interpreter->pass == PassRun)
+    {
+        switch (type)
+        {
+            case TokenINC:
+                ++varValue->floatValue;
+                break;
+                
+            case TokenDEC:
+                --varValue->floatValue;
+                break;
+                
+            default:
+                assert(0);
+                break;
+        }
     }
     
     return itp_endOfCommand(interpreter);

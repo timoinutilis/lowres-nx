@@ -30,5 +30,6 @@ enum ErrorCode cmd_POKE(struct Core *core);
 enum ErrorCode cmd_FILL(struct Core *core);
 enum ErrorCode cmd_COPY(struct Core *core);
 struct TypedValue fnc_ROM_SIZE(struct Core *core);
+enum ErrorCode cmd_ROL_ROR(struct Core *core);
 
 #endif /* cmd_memory_h */
