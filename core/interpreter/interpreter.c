@@ -172,7 +172,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     interpreter->mode = ModeNone;
     interpreter->handlesPause = true;
     interpreter->currentDataToken = interpreter->firstData;
-    interpreter->currentDataValueToken = interpreter->firstData + 1;
+    interpreter->currentDataValueToken = interpreter->firstData ? interpreter->firstData + 1 : NULL;
     interpreter->isSingleLineIf = false;
     interpreter->lastFrameIOStatus.value = 0;
     interpreter->seed = 0;
