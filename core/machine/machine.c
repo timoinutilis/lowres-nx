@@ -45,7 +45,7 @@ int machine_peek(struct Core *core, int address)
     {
         if (!core->machineInternals->hasAccessedPersistent)
         {
-            delegate_persistentRamWillAccess(core);
+            delegate_persistentRamWillAccess(core, core->machine->persistentRam, PERSISTENT_RAM_SIZE);
             core->machineInternals->hasAccessedPersistent = true;
         }
     }
@@ -90,7 +90,7 @@ bool machine_poke(struct Core *core, int address, int value)
     {
         if (!core->machineInternals->hasAccessedPersistent)
         {
-            delegate_persistentRamWillAccess(core);
+            delegate_persistentRamWillAccess(core, core->machine->persistentRam, PERSISTENT_RAM_SIZE);
             core->machineInternals->hasAccessedPersistent = true;
         }
         core->machineInternals->hasChangedPersistent = true;

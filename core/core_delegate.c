@@ -73,11 +73,11 @@ void delegate_controlsDidChange(struct Core *core)
     }
 }
 
-void delegate_persistentRamWillAccess(struct Core *core)
+void delegate_persistentRamWillAccess(struct Core *core, uint8_t *target, int size)
 {
     if (core->delegate->persistentRamWillAccess)
     {
-        core->delegate->persistentRamWillAccess(core->delegate->context);
+        core->delegate->persistentRamWillAccess(core->delegate->context, target, size);
     }
 }
 
