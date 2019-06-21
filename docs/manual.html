@@ -90,6 +90,11 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
         padding-right: 8px;
     }
 }
+.nobr {
+	white-space: nowrap;
+	hyphens: none;
+}
+
 </style>
 </head>
 
@@ -1695,6 +1700,20 @@ The source and the destination areas may overlap.</p>
 the parameter is omitted.</p>
 
 
+<h3 id="_ROL" name="ROL">ROL</h3>
+
+<pre>ROL a,n</pre>
+
+<p>Takes the byte at address <em>a</em> and rotates its bits left by <em>n</em> places.</p>
+
+
+<h3 id="_ROR" name="ROR">ROR</h3>
+
+<pre>ROR a,n</pre>
+
+<p>Takes the byte at address <em>a</em> and rotates its bits right by <em>n</em> places.</p>
+
+
 <h3 id="_=ROM" name="ROM">=ROM</h3>
 
 <pre>ROM(n)</pre>
@@ -1813,12 +1832,47 @@ mode is not enabled.</p>
 <p>The tangent of <em>x</em>, where <em>x</em> is in radians.</p>
 
 
-<h3 id="_ATN" name="ATN">=ATN</h3>
+<h3 id="_ASIN" name="ASIN">=ASIN</h3>
 
-<pre>ATN(x)</pre>
+<pre>ASIN(x)</pre>
+
+<p>The arc sine of <em>x</em>, where <em>x</em> must be in the range of -1 to +1. The range of the function is <span class="nobr">-(PI/2)</span> &lt; ASIN(x) &lt; (PI/2).</p>
+
+
+<h3 id="_ACOS" name="ACOS">=ACOS</h3>
+
+<pre>ACOS(x)</pre>
+
+<p>The arc cosine of <em>x</em>, where <em>x</em> must be in the range of -1 to +1. The range of the function is <span class="nobr">-(PI/2)</span> &lt; ACOS(x) &lt; (PI/2).</p>
+
+
+<h3 id="_ATAN" name="ATAN">=ATAN</h3>
+
+<pre>ATAN(x)</pre>
 
 <p>The arctangent of <em>x</em> in radians, i.e. the angle whose tangent is <em>x</em>.
-The range of the function is -(PI/2) &lt; ATN(x) &lt; (PI/2).</p>
+The range of the function is <span class="nobr">-(PI/2)</span> &lt; ATAN(x) &lt; (PI/2).</p>
+
+
+<h3 id="_HSIN" name="HSIN">=HSIN</h3>
+
+<pre>HSIN(x)</pre>
+
+<p>The hyperbolic sine of <em>x</em>.</p>
+
+
+<h3 id="_HCOS" name="HCOS">=HCOS</h3>
+
+<pre>HCOS(x)</pre>
+
+<p>The hyperbolic cosine of <em>x</em>.</p>
+
+
+<h3 id="_HTAN" name="HTAN">=HTAN</h3>
+
+<pre>HTAN(x)</pre>
+
+<p>The hyperbolic tangent of <em>x</em>.</p>
 
 
 <h2 id="Standard-Math">Standard Math</h2>
@@ -1876,6 +1930,10 @@ logarithms (e = 2,71828...) raised to the power <em>x</em>.</p>
 <p>The next number in a sequence of random numbers uniformly
 distributed in the range 0 &lt;= RND &lt; 1.</p>
 
+<pre>RND(n)</pre>
+
+<p>The second syntax generates a random integer between 0 and <em>n</em> inclusive.</p>
+
 
 <h3 id="_RANDOMIZE" name="RANDOMIZE,TIMER">RANDOMIZE</h3>
 <pre>RANDOMIZE x</pre>
@@ -1911,6 +1969,41 @@ program, you should insert this line at the beginning.</p>
 <pre>SWAP var1,var2</pre>
 
 <p>Swaps the data between any two variables of the same type.</p>
+
+
+<h3 id="_INC" name="INC">INC</h3>
+
+<pre>INC var</pre>
+
+<p>Increases the value of the variable by one. INC A does the same as A=A+1, but costs less CPU cycles.</p>
+
+
+<h3 id="_DEC" name="DEC">DEC</h3>
+
+<pre>DEC var</pre>
+
+<p>Decreases the value of the variable by one. DEC A does the same as A=A-1, but costs less CPU cycles.</p>
+
+<p></p>
+
+
+<h3 id="_ADD" name="ADD">ADD</h3>
+
+<pre>ADD var,x</pre>
+
+<p>Adds the value <em>x</em> to the variable, where <em>x</em> can the positive or negative. ADD A,X does the same as A=A+X, but costs less CPU cycles.</p>
+
+<pre>ADD var,x,base TO top</pre>
+
+<p>The second syntax of ADD helps with repeating counters. It's the same as:</p>
+
+<pre>
+A=A+X
+IF A&gt;TOP THEN A=BASE
+IF A&lt;BASE THEN A=TOP
+</pre>
+
+<p>But again the ADD command costs less CPU cycles.</p>
 
 
 <h1 id="String-Functions">String Functions</h1>
@@ -1999,16 +2092,18 @@ string. Optionally it can start searching at position <em>p</em>.</p>
 
 <h3 id="_BIN$" name="BIN$">=BIN$</h3>
 
-<pre>BIN$(n)</pre>
+<pre>BIN$(n[,len])</pre>
 
-<p>Converts the number <em>n</em> into a binary string.</p>
+<p>Converts the number <em>n</em> into a binary string with at least
+<em>len</em> digits.</p>
 
 
 <h3 id="_HEX$" name="HEX$">=HEX$</h3>
 
-<pre>HEX$(n)</pre>
+<pre>HEX$(n[,len])</pre>
 
-<p>Converts the number <em>n</em> into a hexadecimal string.</p>
+<p>Converts the number <em>n</em> into a hexadecimal string with at least
+<em>len</em> digits.</p>
 
 
 <h1 id="Advanced-Topics">Advanced Topics</h1>
