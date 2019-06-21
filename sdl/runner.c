@@ -28,7 +28,7 @@ void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager);
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
-void persistentRamWillAccess(void *context);
+void persistentRamWillAccess(void *context, uint8_t *destination, int size);
 void persistentRamDidChange(void *context, uint8_t *data, int size);
 
 
@@ -216,18 +216,16 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 }
 
 /** Called when persistent RAM will be accessed the first time */
-void persistentRamWillAccess(void *context)
+void persistentRamWillAccess(void *context, uint8_t *destination, int size)
 {
 #ifndef __EMSCRIPTEN__
-    struct Runner *runner = context;
-    
     char ramFilename[FILENAME_MAX];
     getRamFilename(ramFilename);
     
     FILE *file = fopen_utf8(ramFilename, "rb");
     if (file)
     {
-        fread(runner->core->machine->persistentRam, sizeof(uint8_t), PERSISTENT_RAM_SIZE, file);
+        fread(destination, sizeof(uint8_t), size, file);
         fclose(file);
     }
 #endif
