@@ -26,7 +26,8 @@ struct TypedValue fnc_PEEK(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // PEEK
+    // PEEK/W/L
+    enum TokenType type = interpreter->pc->type;
     ++interpreter->pc;
     
     // bracket open
@@ -46,9 +47,43 @@ struct TypedValue fnc_PEEK(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        int peek = machine_peek(core, addressValue.v.floatValue);
-        if (peek == -1) return val_makeError(ErrorIllegalMemoryAccess);
-        resultValue.v.floatValue = peek;
+        switch (type)
+        {
+            case TokenPEEK:
+            {
+                int peek = machine_peek(core, addressValue.v.floatValue);
+                if (peek == -1) return val_makeError(ErrorIllegalMemoryAccess);
+                resultValue.v.floatValue = peek;
+                break;
+            }
+            
+            case TokenPEEKW:
+            {
+                int peek1 = machine_peek(core, addressValue.v.floatValue);
+                int peek2 = machine_peek(core, addressValue.v.floatValue + 1);
+                if (peek1 == -1 || peek2 == -1) return val_makeError(ErrorIllegalMemoryAccess);
+                
+                int16_t value = (peek1 << 8) | peek2;
+                resultValue.v.floatValue = value;
+                break;
+            }
+            
+            case TokenPEEKL:
+            {
+                int peek1 = machine_peek(core, addressValue.v.floatValue);
+                int peek2 = machine_peek(core, addressValue.v.floatValue + 1);
+                int peek3 = machine_peek(core, addressValue.v.floatValue + 2);
+                int peek4 = machine_peek(core, addressValue.v.floatValue + 3);
+                if (peek1 == -1 || peek2 == -1 || peek3 == -1 || peek4 == -1) return val_makeError(ErrorIllegalMemoryAccess);
+                
+                int32_t value = (peek1 << 24) | (peek2 << 16) | (peek3 << 8) | peek4;
+                resultValue.v.floatValue = value;
+                break;
+            }
+            
+            default:
+                assert(0);
+        }
     }
     return resultValue;
 }
@@ -57,7 +92,8 @@ enum ErrorCode cmd_POKE(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // POKE
+    // POKE/W/L
+    enum TokenType type = interpreter->pc->type;
     ++interpreter->pc;
     
     // address value
@@ -73,8 +109,39 @@ enum ErrorCode cmd_POKE(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        bool poke = machine_poke(core, addressValue.v.floatValue, pokeValue.v.floatValue);
-        if (!poke) return ErrorIllegalMemoryAccess;
+        switch (type)
+        {
+            case TokenPOKE:
+            {
+                bool poke = machine_poke(core, addressValue.v.floatValue, pokeValue.v.floatValue);
+                if (!poke) return ErrorIllegalMemoryAccess;
+                break;
+            }
+            
+            case TokenPOKEW:
+            {
+                int16_t value = pokeValue.v.floatValue;
+                bool poke1 = machine_poke(core, addressValue.v.floatValue, value >> 8);
+                bool poke2 = machine_poke(core, addressValue.v.floatValue + 1, value);
+                if (!poke1 || !poke2) return ErrorIllegalMemoryAccess;
+                break;
+            }
+            
+            case TokenPOKEL:
+            {
+                int32_t value = pokeValue.v.floatValue;
+                bool poke1 = machine_poke(core, addressValue.v.floatValue, value >> 24);
+                bool poke2 = machine_poke(core, addressValue.v.floatValue + 1, value >> 16);
+                bool poke3 = machine_poke(core, addressValue.v.floatValue + 2, value >> 8);
+                bool poke4 = machine_poke(core, addressValue.v.floatValue + 3, value);
+                if (!poke1 || !poke2 || !poke3 || !poke4) return ErrorIllegalMemoryAccess;
+                break;
+            }
+                
+            default:
+                assert(0);
+        }
+
     }
     
     return itp_endOfCommand(interpreter);

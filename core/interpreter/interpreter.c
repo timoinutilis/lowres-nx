@@ -1087,6 +1087,8 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             return fnc_VAL(core);
 
         case TokenPEEK:
+        case TokenPEEKW:
+        case TokenPEEKL:
             return fnc_PEEK(core);
             
         case TokenPI:
@@ -1286,6 +1288,8 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_RESTORE(core);
 
         case TokenPOKE:
+        case TokenPOKEW:
+        case TokenPOKEL:
             return cmd_POKE(core);
             
         case TokenFILL:

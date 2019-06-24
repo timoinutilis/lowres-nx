@@ -1680,8 +1680,43 @@ Otherwise the pointer will be set to the jump label.</p>
 
 <pre>POKE a,v</pre>
 
-<p>Sets the memory at address <em>a</em> to value <em>v</em>. <em>v</em> can be any integer
-number, but only the lowest 8 bits are written to memory.</p>
+<p>Sets the memory at address <em>a</em> to value <em>v</em>.
+<em>v</em> is a numeric expression from 0 to 255;
+numeric expressions outside this range are truncated to 8 bits.</p>
+
+
+<h3 id="_=PEEKW" name="PEEKW">=PEEKW</h3>
+
+<pre>PEEKW(a)</pre>
+
+<p>Returns the current 16-bit value (-65536 to 65535) at memory
+address <em>a</em>.</p>
+
+
+<h3 id="_POKEW" name="POKEW">POKEW</h3>
+
+<pre>POKEW a,v</pre>
+
+Writes a 16-bit integer into memory location <em>a</em>.
+<em>v</em> is a numeric expression from -65536 to 65535;
+numeric expressions outside this range are truncated to 16 bits.</p>
+
+
+<h3 id="_=PEEKL" name="PEEKL">=PEEKL</h3>
+
+<pre>PEEKL(a)</pre>
+
+<p>Returns the current 32-bit value (-2147483648 to 2147483647) at
+memory address <em>a</em>.</p>
+
+
+<h3 id="_POKEL" name="POKEL">POKEL</h3>
+
+<pre>POKEL a,v</pre>
+
+Writes a 32-bit integer into memory location <em>a</em>.
+<em>v</em> is a numeric expression from -2147483648 to 2147483647;
+numeric expressions outside this range are truncated to 32 bits.</p>
 
 
 <h3 id="_COPY" name="COPY">COPY</h3>
