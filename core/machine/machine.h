@@ -27,7 +27,7 @@
 #include "video_chip.h"
 #include "audio_chip.h"
 
-#define PERSISTENT_RAM_SIZE 256
+#define PERSISTENT_RAM_SIZE 4096
 
 struct Core;
 
@@ -39,17 +39,16 @@ struct Machine {
     
     // 0x8000
     struct VideoRam videoRam; // 8 KB
-
+    
     // 0xA000
     uint8_t workingRam[0x4000]; // 16 KB
     
     // 0xE000
-    uint8_t persistentRam[PERSISTENT_RAM_SIZE]; // 256 B
-    uint8_t reserved1[0xF00];
+    uint8_t persistentRam[PERSISTENT_RAM_SIZE]; // 4 KB
     
     // 0xF000
     uint8_t reservedMemory[0xFE00 - 0xF000];
-
+    
     // 0xFE00
     struct SpriteRegisters spriteRegisters; // 256 B
     
@@ -62,8 +61,7 @@ struct Machine {
     
     // 0xFF40
     struct AudioRegisters audioRegisters;
-//    uint8_t reservedAudio[0x30 - sizeof(struct AudioRegisters)];
-
+    
     // 0xFF70
     struct IORegisters ioRegisters;
     uint8_t reservedIO[0x10 - sizeof(struct IORegisters)];

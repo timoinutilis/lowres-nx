@@ -1669,11 +1669,17 @@ Otherwise the pointer will be set to the jump label.</p>
 
 <h1 id="Memory-Access">Memory Access</h1>
 
+<p>LowRes NX simulates chips for graphics, sound and I/O, the cartridge
+ROM, working RAM and persistent RAM. Everything is accessible in a
+64 KB memory map, which is described in the chapter "Hardware
+Reference".</p>
+
+
 <h3 id="_=PEEK" name="PEEK">=PEEK</h3>
 
 <pre>PEEK(a)</pre>
 
-<p>Returns the current 8-bit value (0-255) at memory address <em>a</em>.</p>
+<p>Returns the byte value (0-255) at memory address <em>a</em>.</p>
 
 
 <h3 id="_POKE" name="POKE">POKE</h3>
@@ -1689,7 +1695,7 @@ numeric expressions outside this range are truncated to 8 bits.</p>
 
 <pre>PEEKW(a)</pre>
 
-<p>Returns the current 16-bit value (-65536 to 65535) at memory
+<p>Returns the two-byte value (-65536 to 65535) at memory
 address <em>a</em>.</p>
 
 
@@ -1697,7 +1703,7 @@ address <em>a</em>.</p>
 
 <pre>POKEW a,v</pre>
 
-Writes a 16-bit integer into memory location <em>a</em>.
+Writes a two-byte value at memory address <em>a</em>.
 <em>v</em> is a numeric expression from -65536 to 65535;
 numeric expressions outside this range are truncated to 16 bits.</p>
 
@@ -1706,7 +1712,7 @@ numeric expressions outside this range are truncated to 16 bits.</p>
 
 <pre>PEEKL(a)</pre>
 
-<p>Returns the current 32-bit value (-2147483648 to 2147483647) at
+<p>Returns the four-byte value (-2147483648 to 2147483647) at
 memory address <em>a</em>.</p>
 
 
@@ -1714,7 +1720,7 @@ memory address <em>a</em>.</p>
 
 <pre>POKEL a,v</pre>
 
-Writes a 32-bit integer into memory location <em>a</em>.
+Writes a four-byte value at memory address <em>a</em>.
 <em>v</em> is a numeric expression from -2147483648 to 2147483647;
 numeric expressions outside this range are truncated to 32 bits.</p>
 
@@ -2188,7 +2194,7 @@ $9800 - BG1 Data (2 KB)
 
 $A000 - Working RAM (16 KB)
 
-$E000 - Persistent RAM (256 B)
+$E000 - Persistent RAM (4 KB)
 
 $FE00 - Sprite Registers (256 B)
 $FF00 - Color Registers (32 B)

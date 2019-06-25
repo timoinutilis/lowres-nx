@@ -41,7 +41,7 @@ int machine_peek(struct Core *core, int address)
     {
         return -1;
     }
-    if (address >= 0xE000 && address < 0xE100) // persistent
+    if (address >= 0xE000 && address < 0xF000) // persistent
     {
         if (!core->machineInternals->hasAccessedPersistent)
         {
@@ -86,7 +86,7 @@ bool machine_poke(struct Core *core, int address, int value)
             return false;
         }
     }
-    else if (address >= 0xE000 && address < 0xE100) // persistent
+    else if (address >= 0xE000 && address < 0xF000) // persistent
     {
         if (!core->machineInternals->hasAccessedPersistent)
         {
