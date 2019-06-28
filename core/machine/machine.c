@@ -61,7 +61,7 @@ bool machine_poke(struct Core *core, int address, int value)
         // cartridge ROM or outside RAM
         return false;
     }
-    if (address >= 0xE100 && address < 0xFE00)
+    if (address >= 0xF000 && address < 0xFE00)
     {
         // reserved memory
         return false;
