@@ -63,7 +63,7 @@ struct TypedValue fnc_PEEK(struct Core *core)
                 int peek2 = machine_peek(core, addressValue.v.floatValue + 1);
                 if (peek1 == -1 || peek2 == -1) return val_makeError(ErrorIllegalMemoryAccess);
                 
-                int16_t value = (peek1 << 8) | peek2;
+                int16_t value = peek1 | (peek2 << 8);
                 resultValue.v.floatValue = value;
                 break;
             }
@@ -76,7 +76,7 @@ struct TypedValue fnc_PEEK(struct Core *core)
                 int peek4 = machine_peek(core, addressValue.v.floatValue + 3);
                 if (peek1 == -1 || peek2 == -1 || peek3 == -1 || peek4 == -1) return val_makeError(ErrorIllegalMemoryAccess);
                 
-                int32_t value = (peek1 << 24) | (peek2 << 16) | (peek3 << 8) | peek4;
+                int32_t value = peek1 | (peek2 << 8) | (peek3 << 16) | (peek4 << 24);
                 resultValue.v.floatValue = value;
                 break;
             }
@@ -121,8 +121,8 @@ enum ErrorCode cmd_POKE(struct Core *core)
             case TokenPOKEW:
             {
                 int16_t value = pokeValue.v.floatValue;
-                bool poke1 = machine_poke(core, addressValue.v.floatValue, value >> 8);
-                bool poke2 = machine_poke(core, addressValue.v.floatValue + 1, value);
+                bool poke1 = machine_poke(core, addressValue.v.floatValue    , value);
+                bool poke2 = machine_poke(core, addressValue.v.floatValue + 1, value >> 8);
                 if (!poke1 || !poke2) return ErrorIllegalMemoryAccess;
                 break;
             }
@@ -130,10 +130,10 @@ enum ErrorCode cmd_POKE(struct Core *core)
             case TokenPOKEL:
             {
                 int32_t value = pokeValue.v.floatValue;
-                bool poke1 = machine_poke(core, addressValue.v.floatValue, value >> 24);
-                bool poke2 = machine_poke(core, addressValue.v.floatValue + 1, value >> 16);
-                bool poke3 = machine_poke(core, addressValue.v.floatValue + 2, value >> 8);
-                bool poke4 = machine_poke(core, addressValue.v.floatValue + 3, value);
+                bool poke1 = machine_poke(core, addressValue.v.floatValue    , value);
+                bool poke2 = machine_poke(core, addressValue.v.floatValue + 1, value >> 8);
+                bool poke3 = machine_poke(core, addressValue.v.floatValue + 2, value >> 16);
+                bool poke4 = machine_poke(core, addressValue.v.floatValue + 3, value >> 24);
                 if (!poke1 || !poke2 || !poke3 || !poke4) return ErrorIllegalMemoryAccess;
                 break;
             }
