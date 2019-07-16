@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>LowRes NX</title>
+    <style>
+    body {
+      background-color: #000;
+      margin: 0;
+      padding: 0;
+    }
+    .emscripten_border {
+    }
+    .emscripten {
+      display: block;
+      margin: auto;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="emscripten_border">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" onmousedown="window.focus()"></canvas>
+    </div>
+
+    <script type='text/javascript'>
+      var Module = {
+        canvas: document.getElementById('canvas'),
+        arguments: ["program.nx"],
+        print: function(t) {
+          console.log(t);
+        },
+        printErr: function(t) {
+          console.log(t);
+        }
+      };
+      function onKeyDown_blocker(event) {
+        event = event || window.event;
+        if (event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 39 || event.keyCode == 40) {
+          if (event.preventDefault) event.preventDefault();
+        }
+      }
+      document.addEventListener('keydown', onKeyDown_blocker, false);
+    </script>
+    <script async type="text/javascript" src="LowResNX015.js"></script>
+  </body>
+</html>
