@@ -1334,6 +1334,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenWEND:
             return cmd_WEND(core);
+            
+        case TokenSYSTEM:
+            return cmd_SYSTEM(core);
 
         case TokenRANDOMIZE:
             return cmd_RANDOMIZE(core);

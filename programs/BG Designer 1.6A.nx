@@ -10,6 +10,9 @@ USERPALS  = $D004
 TEMPMEM   = $D024
 '======================
 
+'ENERGY SAVING MODE
+SYSTEM 0,1
+
 DIM GLOBAL MENU$(4)
 
 R=0

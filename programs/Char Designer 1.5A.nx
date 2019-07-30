@@ -7,6 +7,9 @@
 '$D022 - TEMP
 '======================
 
+'ENERGY SAVING MODE
+SYSTEM 0,1
+
 DIM GLOBAL PXL(15,15)
 DIM GLOBAL MENU$(4)
 

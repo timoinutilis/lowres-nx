@@ -74,6 +74,8 @@ struct MachineInternals {
     struct AudioInternals audioInternals;
     bool hasAccessedPersistent;
     bool hasChangedPersistent;
+    bool isEnergySaving;
+    int touchIdleTimer;
 };
 
 void machine_init(struct Core *core);

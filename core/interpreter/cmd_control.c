@@ -719,3 +719,36 @@ enum ErrorCode cmd_WEND(struct Core *core)
     
     return ErrorNone;
 }
+
+enum ErrorCode cmd_SYSTEM(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // SYSTEM
+    ++interpreter->pc;
+    
+    // type value
+    struct TypedValue tValue = itp_evaluateNumericExpression(core, 0, 0);
+    if (tValue.type == ValueTypeError) return tValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // setting value
+    struct TypedValue sValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (sValue.type == ValueTypeError) return sValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        switch ((int)tValue.v.floatValue)
+        {
+            case 0:
+                core->machineInternals->isEnergySaving = (sValue.v.floatValue != 0.0f);
+                break;
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+
+}

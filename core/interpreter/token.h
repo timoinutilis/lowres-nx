@@ -181,6 +181,7 @@ enum TokenType {
     TokenSTR,
     TokenSUB,
     TokenSWAP,
+    TokenSYSTEM,
     TokenTAN,
     TokenTAP,
     TokenTEXT,

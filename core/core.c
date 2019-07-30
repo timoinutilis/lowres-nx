@@ -171,10 +171,12 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
         {
             ioRegisters->status.touch = 0;
         }
+        core->machineInternals->touchIdleTimer = 0;
     }
     else
     {
         ioRegisters->status.touch = 0;
+        core->machineInternals->touchIdleTimer++;
     }
     
     for (int i = 0; i < NUM_GAMEPADS; i++)
@@ -237,6 +239,13 @@ void core_setDebug(struct Core *core, bool enabled)
 bool core_getDebug(struct Core *core)
 {
     return core->interpreter->debug;
+}
+
+bool core_shouldRender(struct Core *core)
+{
+    return !core->machineInternals->isEnergySaving
+    || core->machineInternals->touchIdleTimer < 3
+    || (int)core->interpreter->timer % 20 == 0;
 }
 
 void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB)

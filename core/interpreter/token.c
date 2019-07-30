@@ -177,6 +177,7 @@ const char *TokenStrings[] = {
     "STR$",
     "SUB",
     "SWAP",
+    "SYSTEM",
     "TAN",
     "TAP",
     "TEXT",
