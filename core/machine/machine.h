@@ -75,7 +75,7 @@ struct MachineInternals {
     bool hasAccessedPersistent;
     bool hasChangedPersistent;
     bool isEnergySaving;
-    int touchIdleTimer;
+    int energySavingTimer;
 };
 
 void machine_init(struct Core *core);

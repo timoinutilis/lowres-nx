@@ -675,18 +675,21 @@ void update(void *arg)
         SDL_PauseAudioDevice(audioDevice, 0);
     }
     
-    SDL_RenderClear(renderer);
-    
-    void *pixels = NULL;
-    int pitch = 0;
-    SDL_LockTexture(texture, NULL, &pixels, &pitch);
-    
-    video_renderScreen(runner.core, pixels);
-    
-    SDL_UnlockTexture(texture);
-    SDL_RenderCopy(renderer, texture, NULL, &screenRect);
-    
-    SDL_RenderPresent(renderer);
+    if (core_shouldRender(runner.core))
+    {
+        SDL_RenderClear(renderer);
+        
+        void *pixels = NULL;
+        int pitch = 0;
+        SDL_LockTexture(texture, NULL, &pixels, &pitch);
+        
+        video_renderScreen(runner.core, pixels);
+        
+        SDL_UnlockTexture(texture);
+        SDL_RenderCopy(renderer, texture, NULL, &screenRect);
+        
+        SDL_RenderPresent(renderer);
+    }
 }
 
 void updateScreenRect(int winW, int winH)

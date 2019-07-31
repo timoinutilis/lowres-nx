@@ -120,6 +120,7 @@ void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
 {
     runStartupSequence(core);
     core->interpreter->timer = (float)(secondsSincePowerOn * 60 % TIMER_WRAP_VALUE);
+    core->machineInternals->energySavingTimer = 30;
     delegate_controlsDidChange(core);
 }
 
@@ -153,6 +154,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
             }
         }
         input->key = 0;
+        core->machineInternals->energySavingTimer = 2;
     }
     
     if (input->touch)
@@ -171,12 +173,11 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
         {
             ioRegisters->status.touch = 0;
         }
-        core->machineInternals->touchIdleTimer = 0;
+        core->machineInternals->energySavingTimer = 2;
     }
     else
     {
         ioRegisters->status.touch = 0;
-        core->machineInternals->touchIdleTimer++;
     }
     
     for (int i = 0; i < NUM_GAMEPADS; i++)
@@ -243,9 +244,12 @@ bool core_getDebug(struct Core *core)
 
 bool core_shouldRender(struct Core *core)
 {
-    return !core->machineInternals->isEnergySaving
-    || core->machineInternals->touchIdleTimer < 3
-    || (int)core->interpreter->timer % 20 == 0;
+    bool shouldRender = !core->machineInternals->isEnergySaving
+    || core->machineInternals->energySavingTimer > 0
+    || core->machineInternals->energySavingTimer % 20 == 0;
+    
+    core->machineInternals->energySavingTimer--;
+    return shouldRender;
 }
 
 void core_setInputGamepad(struct CoreInput *input, int player, bool up, bool down, bool left, bool right, bool buttonA, bool buttonB)
