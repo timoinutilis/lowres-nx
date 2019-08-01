@@ -198,12 +198,12 @@ GAMEPAD 1
 X=76
 Y=60
 DO
- IF UP(0) THEN Y=Y-1
- IF DOWN(0) THEN Y=Y+1
- IF LEFT(0) THEN X=X-1
- IF RIGHT(0) THEN X=X+1
- SPRITE 0,X,Y,225
- WAIT VBL
+  IF UP(0) THEN Y=Y-1
+  IF DOWN(0) THEN Y=Y+1
+  IF LEFT(0) THEN X=X-1
+  IF RIGHT(0) THEN X=X+1
+  SPRITE 0,X,Y,225
+  WAIT VBL
 LOOP
 </pre>
 
@@ -664,11 +664,11 @@ END IF.</p>
 
 <pre>
 IF expression THEN
-    commands
+  commands
 [ELSE IF expression THEN]
-    commands
+  commands
 [ELSE]
-    commands
+  commands
 END IF
 </pre>
 
@@ -742,7 +742,7 @@ want to wait some time.</p>
 <h3 id="_FOR-NEXT" name="FOR,TO,STEP,NEXT">FOR...NEXT</h3>
 <pre>
 FOR var=a TO b [STEP s]
-    commands
+  commands
 NEXT var
 </pre>
 
@@ -770,7 +770,7 @@ LOOP
 <h3 id="_REPEAT-UNTIL" name="REPEAT,UNTIL">REPEAT...UNTIL</h3>
 <pre>
 REPEAT
-    commands
+  commands
 UNTIL expression
 </pre>
 
@@ -781,7 +781,7 @@ The loop is executed at least once.</p>
 <h3 id="_WHILE-WEND" name="WHILE,WEND">WHILE...WEND</h3>
 <pre>
 WHILE expression
-    commands
+  commands
 WEND
 </pre>
 
@@ -1841,24 +1841,6 @@ store game states.</p>
 <p>Returns the number of bytes of file number <em>n</em>. Call FILES before accessing the file directory to update its content, or use FSIZE directly after LOAD or SAVE.</p>
 
 
-<h1 id="System">System</h1>
-
-<h3 id="_TRACE" name="TRACE">TRACE</h3>
-
-<pre>TRACE expression-list</pre>
-
-<p>Outputs text to the debugging window. Expressions can be strings or
-numbers, separated by commas. This command is ignored if the debugging
-mode is not enabled.</p>
-
-
-<h3 id="_SYSTEM" name="SYSTEM">SYSTEM</h3>
-
-<pre>SYSTEM n,v</pre>
-
-<p>TODO</p>
-
-
 <h1 id="Math-Functions">Math Functions</h1>
 
 <h2 id="Trigonometric">Trigonometric</h2>
@@ -2164,6 +2146,40 @@ string. Optionally it can start searching at position <em>p</em>.</p>
 
 <p>Converts the number <em>n</em> into a hexadecimal string with at least
 <em>len</em> digits.</p>
+
+
+<h1 id="System">System</h1>
+
+<p>System commands are a link between the virtual console and the
+LowRes NX application.</p>
+
+
+<h3 id="_TRACE" name="TRACE">TRACE</h3>
+
+<pre>TRACE expression-list</pre>
+
+<p>Outputs text to the debugging window. Expressions can be strings or
+numbers, separated by commas. This command is ignored if the debugging
+mode is not enabled.</p>
+
+
+<h3 id="_SYSTEM" name="SYSTEM">SYSTEM</h3>
+
+<pre>SYSTEM n,v</pre>
+
+<p>Sets the system status <em>n</em> to value <em>v</em>. Currently
+only one status is available:</p>
+
+<table>
+    <tr>
+        <td>0</td>
+        <td>Energy Saving Mode:<br/>
+            Enable with <em>v</em> different from 0. In this mode the program
+            runs with a very low screen refresh rate whenever there is no user
+            input (touch/mouse/keyboard).
+        </td>
+    </tr>
+</table>
 
 
 <h1 id="Advanced-Topics">Advanced Topics</h1>
