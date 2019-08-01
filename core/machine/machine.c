@@ -118,3 +118,11 @@ void machine_enableAudio(struct Core *core)
         delegate_controlsDidChange(core);
     }
 }
+
+void machine_suspendEnergySaving(struct Core *core, int numUpdates)
+{
+    if (core->machineInternals->energySavingTimer < numUpdates)
+    {
+        core->machineInternals->energySavingTimer = numUpdates;
+    }
+}

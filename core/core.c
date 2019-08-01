@@ -120,7 +120,7 @@ void core_willRunProgram(struct Core *core, long secondsSincePowerOn)
 {
     runStartupSequence(core);
     core->interpreter->timer = (float)(secondsSincePowerOn * 60 % TIMER_WRAP_VALUE);
-    core->machineInternals->energySavingTimer = 30;
+    machine_suspendEnergySaving(core, 30);
     delegate_controlsDidChange(core);
 }
 
@@ -154,7 +154,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
             }
         }
         input->key = 0;
-        core->machineInternals->energySavingTimer = 2;
+        machine_suspendEnergySaving(core, 2);
     }
     
     if (input->touch)
@@ -173,7 +173,7 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
         {
             ioRegisters->status.touch = 0;
         }
-        core->machineInternals->energySavingTimer = 2;
+        machine_suspendEnergySaving(core, 2);
     }
     else
     {

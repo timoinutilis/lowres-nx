@@ -83,5 +83,6 @@ void machine_reset(struct Core *core);
 int machine_peek(struct Core *core, int address);
 bool machine_poke(struct Core *core, int address, int value);
 void machine_enableAudio(struct Core *core);
+void machine_suspendEnergySaving(struct Core *core, int numUpdates);
 
 #endif /* machine_h */

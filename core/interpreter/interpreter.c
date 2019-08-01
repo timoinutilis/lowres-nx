@@ -214,6 +214,11 @@ void itp_runProgram(struct Core *core)
                 errorCode = itp_evaluateCommand(core);
             }
             
+            if (interpreter->cycles >= MAX_CYCLES_TOTAL_PER_FRAME)
+            {
+                machine_suspendEnergySaving(core, 2);
+            }
+            
             interpreter->mode = ModeNone;
             if (errorCode != ErrorNone)
             {

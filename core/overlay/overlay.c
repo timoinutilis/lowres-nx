@@ -72,7 +72,7 @@ void overlay_message(struct Core *core, const char *message)
     txtlib_setCells(lib, 0, 15, 19, 15, 0);
     txtlib_writeText(lib, message, 0, 15);
     core->overlay->messageTimer = 120;
-    core->machineInternals->energySavingTimer = 120;
+    machine_suspendEnergySaving(core, 120);
 }
 
 void overlay_draw(struct Core *core, bool ingame)
