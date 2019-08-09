@@ -473,3 +473,50 @@ enum ErrorCode cmd_SOUND_SOURCE(struct Core *core)
     
     return itp_endOfCommand(interpreter);
 }
+
+struct TypedValue fnc_MUSIC(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // MUSIC
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    ++interpreter->pc;
+    
+    // x value
+    struct TypedValue xValue = itp_evaluateExpression(core, TypeClassNumeric);
+    if (xValue.type == ValueTypeError) return xValue;
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int x = xValue.v.floatValue;
+        struct ComposerPlayer *player = &interpreter->audioLib.musicPlayer;
+        switch (x)
+        {
+            case 0:
+                value.v.floatValue = player->index;
+                break;
+            case 1:
+                value.v.floatValue = player->row;
+                break;
+            case 2:
+                value.v.floatValue = player->tick;
+                break;
+            case 3:
+                value.v.floatValue = player->speed;
+                break;
+            default:
+                return val_makeError(ErrorInvalidParameter);
+        }
+    }
+    return value;
+}

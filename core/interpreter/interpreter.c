@@ -1189,7 +1189,10 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenPAUSE:
             return fnc_PAUSE(core);
-                        
+            
+        case TokenMUSIC:
+            return fnc_MUSIC(core);
+            
         default:
             break;
     }

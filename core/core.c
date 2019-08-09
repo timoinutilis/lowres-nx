@@ -249,7 +249,8 @@ bool core_getDebug(struct Core *core)
 
 bool core_shouldRender(struct Core *core)
 {
-    bool shouldRender = !core->machineInternals->isEnergySaving
+    enum State state = core->interpreter->state;
+    bool shouldRender = (!core->machineInternals->isEnergySaving && state != StateEnd && state != StateNoProgram)
     || core->machineInternals->energySavingTimer > 0
     || core->machineInternals->energySavingTimer % 20 == 0;
     
@@ -272,4 +273,3 @@ void core_diskLoaded(struct Core *core)
 {
     core->interpreter->state = StateEvaluate;
 }
-
