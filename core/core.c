@@ -198,6 +198,11 @@ void core_handleInput(struct Core *core, struct CoreInput *input)
                 // some d-pad combinations are not registered as I/O, but mark them anyway.
                 processedOtherInput = true;
             }
+            
+            if (gamepad->value)
+            {
+                machine_suspendEnergySaving(core, 2);
+            }
         }
         else
         {
