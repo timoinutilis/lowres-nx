@@ -59,7 +59,7 @@ void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
 void audioCallback(void *userdata, Uint8 *stream, int len);
-void saveScreenshot(int scale);
+void saveScreenshot(void *pixels, int scale);
 
 #ifdef __EMSCRIPTEN__
 void onloaded(const char *filename);
@@ -92,6 +92,7 @@ bool audioStarted = false;
 bool mouseEnabled = false;
 int messageNumber = 0;
 bool hasUsedInputLastUpdate = false;
+int screenshotRequestedWithScale = 0;
 
 int main(int argc, const char * argv[])
 {
@@ -370,6 +371,7 @@ void update(void *arg)
 {
     SDL_Event event;
     bool hasInput = false;
+    bool forceRender = false;
     
     if (releasedTouch)
     {
@@ -390,6 +392,7 @@ void update(void *arg)
                 {
                     case SDL_WINDOWEVENT_RESIZED: {
                         updateScreenRect(event.window.data1, event.window.data2);
+                        forceRender = true;
                         break;
                     }
                 }
@@ -407,6 +410,7 @@ void update(void *arg)
 #else
                     selectProgram(event.drop.file);
 #endif
+                    forceRender = true;
                 }
                 else
                 {
@@ -484,6 +488,7 @@ void update(void *arg)
                             SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                         }
                         updateMouseMode();
+                        forceRender = true;
                     }
                     else if (keycode == SDLK_r)
                     {
@@ -499,8 +504,8 @@ void update(void *arg)
                     }
                     else if (keycode == SDLK_s)
                     {
-                        int scale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 3;
-                        saveScreenshot(scale);
+                        screenshotRequestedWithScale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 4;
+                        forceRender = true;
                     }
                 }
                 else if (keycode == SDLK_ESCAPE)
@@ -675,7 +680,7 @@ void update(void *arg)
         SDL_PauseAudioDevice(audioDevice, 0);
     }
     
-    if (core_shouldRender(runner.core))
+    if (core_shouldRender(runner.core) || forceRender)
     {
         SDL_RenderClear(renderer);
         
@@ -684,6 +689,12 @@ void update(void *arg)
         SDL_LockTexture(texture, NULL, &pixels, &pitch);
         
         video_renderScreen(runner.core, pixels);
+        
+        if (screenshotRequestedWithScale > 0)
+        {
+            saveScreenshot(pixels, screenshotRequestedWithScale);
+            screenshotRequestedWithScale = 0;
+        }
         
         SDL_UnlockTexture(texture);
         SDL_RenderCopy(renderer, texture, NULL, &screenRect);
@@ -739,14 +750,10 @@ void audioCallback(void *userdata, Uint8 *stream, int len)
     audio_renderAudio(userdata, samples, numSamples, audioSpec.freq);
 }
 
-void saveScreenshot(int scale)
+void saveScreenshot(void *pixels, int scale)
 {
 #if SCREENSHOTS
-    void *pixels = NULL;
-    int pitch = 0;
-    SDL_LockTexture(texture, NULL, &pixels, &pitch);
     bool succeeded = screenshot_save(pixels, scale);
-    SDL_UnlockTexture(texture);
     if (succeeded)
     {
         overlay_message(runner.core, "SCREENSHOT SAVED");
