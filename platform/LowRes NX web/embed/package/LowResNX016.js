@@ -1441,9 +1441,9 @@ function integrateWasmJS() {
 
   var method = 'native-wasm';
 
-  var wasmTextFile = 'LowResNX015.wast';
-  var wasmBinaryFile = 'LowResNX015.wasm';
-  var asmjsCodeFile = 'LowResNX015.temp.asm.js';
+  var wasmTextFile = 'LowResNX016.wast';
+  var wasmBinaryFile = 'LowResNX016.wasm';
+  var asmjsCodeFile = 'LowResNX016.temp.asm.js';
 
   if (typeof Module['locateFile'] === 'function') {
     if (!isDataURI(wasmTextFile)) {
