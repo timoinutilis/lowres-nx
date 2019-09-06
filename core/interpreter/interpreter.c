@@ -1390,6 +1390,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
                 case TokenFILL:
                     return cmd_BG_FILL(core);
                     
+                case TokenVIEW:
+                    return cmd_BG_VIEW(core);
+                    
                 default:
                     return cmd_BG(core);
             }
@@ -1398,8 +1401,25 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenATTR:
             return cmd_ATTR(core);
             
+        case TokenPAL:
+            return cmd_PAL(core);
+            
+        case TokenFLIP:
+            return cmd_FLIP(core);
+            
+        case TokenPRIO:
+            return cmd_PRIO(core);
+            
         case TokenCELL:
-            return cmd_CELL(core);
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenSIZE:
+                    return cmd_CELL_SIZE(core);
+                    
+                default:
+                    return cmd_CELL(core);
+            }
+            break;
             
         case TokenMCELL:
             return cmd_MCELL(core);
@@ -1421,6 +1441,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             {
                 case TokenOFF:
                     return cmd_SPRITE_OFF(core);
+                    
+                case TokenVIEW:
+                    return cmd_SPRITE_VIEW(core);
                     
                 default:
                     return cmd_SPRITE(core);
@@ -1487,7 +1510,15 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_ENVELOPE(core);
             
         case TokenLFO:
-            return cmd_LFO(core);
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenATTR:
+                    return cmd_LFO_XXX(core);
+                    
+                default:
+                    return cmd_LFO(core);
+            }
+            break;
             
         case TokenLFOA:
             return cmd_LFO_A(core);

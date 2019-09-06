@@ -325,6 +325,64 @@ enum ErrorCode cmd_LFO_A(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_LFO_XXX(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // LFO XXX
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // n value
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // wave value
+    struct TypedValue wavValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
+    if (wavValue.type == ValueTypeError) return wavValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // inv value
+    struct TypedValue invValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
+    if (invValue.type == ValueTypeError) return invValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // env value
+    struct TypedValue envValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
+    if (envValue.type == ValueTypeError) return envValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // tri value
+    struct TypedValue triValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
+    if (triValue.type == ValueTypeError) return triValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int n = nValue.v.floatValue;
+        struct Voice *voice = &core->machine->audioRegisters.voices[n];
+        
+        if (wavValue.type != ValueTypeNull) voice->lfoAttr.wave = wavValue.v.floatValue;
+        if (invValue.type != ValueTypeNull) voice->lfoAttr.invert = invValue.v.floatValue ? 1 : 0;
+        if (envValue.type != ValueTypeNull) voice->lfoAttr.envMode = envValue.v.floatValue ? 1 : 0;
+        if (triValue.type != ValueTypeNull) voice->lfoAttr.trigger = triValue.v.floatValue ? 1 : 0;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
 enum ErrorCode cmd_PLAY(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;

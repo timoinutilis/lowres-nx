@@ -150,6 +150,95 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_SPRITE_VIEW(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // SPRITE VIEW
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // ON/OFF
+    enum TokenType type = interpreter->pc->type;
+    if (type != TokenON && type != TokenOFF) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        core->machine->videoRegisters.attr.spritesEnabled = type == TokenON ? 1 : 0;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_BG_VIEW(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // BG VIEW
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // ON/OFF
+    enum TokenType type = interpreter->pc->type;
+    if (type != TokenON && type != TokenOFF) return ErrorUnexpectedToken;
+    ++interpreter->pc;
+    
+    // bg value
+    struct TypedValue bgValue = itp_evaluateNumericExpression(core, 0, 1);
+    if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int value = type == TokenON ? 1 : 0;
+        if (bgValue.v.floatValue == 0)
+        {
+            core->machine->videoRegisters.attr.planeAEnabled = value;
+        }
+        else
+        {
+            core->machine->videoRegisters.attr.planeBEnabled = value;
+        }
+    }
+
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_CELL_SIZE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // CELL SIZE
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // bg value
+    struct TypedValue bgValue = itp_evaluateNumericExpression(core, 0, 1);
+    if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    ++interpreter->pc;
+    
+    // size value
+    struct TypedValue sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+    if (sValue.type == ValueTypeError) return sValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (bgValue.v.floatValue == 0)
+        {
+            core->machine->videoRegisters.attr.planeACellSize = sValue.v.floatValue;
+        }
+        else
+        {
+            core->machine->videoRegisters.attr.planeBCellSize = sValue.v.floatValue;
+        }
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
 struct TypedValue fnc_COLOR(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;

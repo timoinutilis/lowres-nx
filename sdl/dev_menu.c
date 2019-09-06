@@ -90,7 +90,6 @@ void dev_show(struct DevMenu *devMenu, bool reload)
     
     txtlib_clearScreen(textLib);
     textLib->fontCharOffset = 192;
-    textLib->charAttrFilter = 0xFF;
     textLib->windowY = 7;
     textLib->windowHeight = 9;
     
@@ -144,8 +143,7 @@ void dev_update(struct DevMenu *devMenu, struct CoreInput *input)
             bool isInside = (cx >= bcx && cy >= bcy && cx <= bcx + 1 && cy <= bcy + 1);
             if (!touch || !isInside)
             {
-                textLib->charAttr.palette = 0;
-                txtlib_setCells(textLib, bcx, bcy, bcx + 1, bcy + 1, -1);
+                txtlib_setCellsAttr(textLib, bcx, bcy, bcx + 1, bcy + 1, 0, -1, -1, -1);
                 
                 if (isInside)
                 {
@@ -162,8 +160,7 @@ void dev_update(struct DevMenu *devMenu, struct CoreInput *input)
                 int bcy = devButtons[i].cy;
                 if (cx >= bcx && cy >= bcy && cx <= bcx + 1 && cy <= bcy + 1)
                 {
-                    textLib->charAttr.palette = 1;
-                    txtlib_setCells(textLib, bcx, bcy, bcx + 1, bcy + 1, -1);
+                    txtlib_setCellsAttr(textLib, bcx, bcy, bcx + 1, bcy + 1, 1, -1, -1, -1);
                     devMenu->currentButton = i;
                 }
             }
@@ -177,8 +174,7 @@ void dev_update(struct DevMenu *devMenu, struct CoreInput *input)
             bool isInside = (cy >= bcy && cy <= bcy + 2);
             if (!touch || !isInside)
             {
-                textLib->charAttr.palette = 0;
-                txtlib_setCells(textLib, 0, bcy, 19, bcy + 2, -1);
+                txtlib_setCellsAttr(textLib, 0, bcy, 19, bcy + 2, 0, -1, -1, -1);
                 
                 if (isInside)
                 {
@@ -193,8 +189,7 @@ void dev_update(struct DevMenu *devMenu, struct CoreInput *input)
             if (button >= 0 && button < devMenu->currentMenuSize)
             {
                 int bcy = 1 + button * 3;
-                textLib->charAttr.palette = 1;
-                txtlib_setCells(textLib, 0, bcy, 19, bcy + 2, -1);
+                txtlib_setCellsAttr(textLib, 0, bcy, 19, bcy + 2, 1, -1, -1, -1);
                 devMenu->currentButton = button;
             }
         }

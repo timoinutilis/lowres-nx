@@ -1082,12 +1082,28 @@ screen. They can have a size of 8x8 pixels (one character) or up to
 standard character attributes (color palette, flip X/Y, priority) and additionally its size.</p>
 
 
-<h3 id="_SPRITE" name="SPRITE">SPRITE</h3>
+<h3 id="_SPRITE" name="SPRITE,PAL,FLIP,PRIO">SPRITE</h3>
 
 <pre>SPRITE n,[x],[y],[c]</pre>
 
 <p>Sets the position <em>(x,y)</em> and character <em>(c)</em> of sprite <em>n</em> (0-63).
 All parameters can be omitted to keep their current settings.</p>
+
+<pre>SPRITE n [PAL pal] [FLIP fx,fy] [PRIO pri] [SIZE s]</pre>
+
+<p>Sets one or more attributes of sprite <em>n</em> (0 - 63):</p>
+
+<table>
+<tr><td>pal</td> <td>palette number (0-7)</td></tr>
+<tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
+<tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
+<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
+<tr><td>s</td> <td>size (0-3):<br/>
+0: 1 character (8x8 px)<br/>
+1: 2x2 characters (16x16 px)<br/>
+2: 3x3 characters (24x24 px)<br/>
+3: 4x4 characters (32x32 px)</td></tr>
+</table>
 
 
 <h3 id="_SPRITE-OFF" name="SPRITE OFF,SPRITE,OFF">SPRITE OFF</h3>
@@ -1102,26 +1118,9 @@ SPRITE OFF a TO b
 
 <h3 id="_SPRITE.A" name="SPRITE.A">SPRITE.A</h3>
 
-<pre>SPRITE.A n,(pal,fx,fy,pri,s)</pre>
-
-<p>Sets the attributes of sprite <em>n</em> (0-63). All attribute parameters
-can be omitted to keep their current settings.</p>
-
-<table>
-<tr><td>pal</td> <td>palette number (0-7)</td></tr>
-<tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
-<tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
-<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
-<tr><td>s</td> <td>size (0-3):<br/>
-0: 1 character (8x8 px)<br/>
-1: 2x2 characters (16x16 px)<br/>
-2: 3x3 characters (24x24 px)<br/>
-3: 4x4 characters (32x32 px)</td></tr>
-</table>
-
 <pre>SPRITE.A n,a</pre>
 
-<p>Allows setting the attributes as a single 8-bit value.</p>
+<p>Sets the attributes of sprite <em>n</em> (0-63) as a single 8-bit value.</p>
 
 
 <h3 id="_=SPRITE.X-Y" name="SPRITE.X,SPRITE.Y">=SPRITE.X/Y</h3>
@@ -1185,7 +1184,7 @@ scrolling.</p>
 
 <p>There is a mode for 16x16-pixel cells. When active, each cell will show
 2x2 characters, similar to big sprites. This mode also increases the
-background size to 512x512 pixels. Use the DISPLAY command to enable
+background size to 512x512 pixels. Use the CELL SIZE command to enable
 it.</p>
 
 <p>For most of the commands and functions that access backgrounds
@@ -1206,29 +1205,34 @@ window to the default one.</p>
 <p>Clears background <em>b</em> with character 0.</p>
 
 
+<h3 id="_PAL" name="PAL">PAL</h3>
+
+<pre>PAL p</pre>
+
+<p>Sets the palette number (0-7) for cell and text commands.</p>
+
+
+<h3 id="_FLIP" name="FLIP">FLIP</h3>
+
+<pre>FLIP fx,fy</pre>
+
+<p>Sets the values (0/1) for horizontal (<em>fx</em>) and vertical (<em>fy</em>)
+flip for cell and text commands.</p>
+
+
+<h3 id="_PRIO" name="PRIO">PRIO</h3>
+
+<pre>PRIO p</pre>
+
+<p>Sets the priority flag (0/1) for cell and text commands.</p>
+
+
 <h3 id="_ATTR" name="ATTR">ATTR</h3>
 
-<pre>ATTR (pal,fx,fy,pri,s)[,m]</pre>
+<pre>ATTR a</pre>
 
-<p>Sets the current attributes for cell and text commands.
-All attribute parameters can be omitted to keep their current
-settings.</p>
-
-<table>
-<tr><td>pal</td> <td>palette number (0-7)</td></tr>
-<tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
-<tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
-<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
-<tr><td>s</td> <td>unused (0-3)</td></tr>
-</table>
-
-<p>The optional parameter <em>m</em> is an 8-bit binary number used as a mask.
-It defines which bits of a cell attribute should actually be changed.</p>
-
-
-<pre>ATTR a[,m]</pre>
-
-<p>Allows setting the attributes as a single 8-bit value.</p>
+<p>Sets all attributes for cell and text commands as a single
+8-bit value.</p>
 
 
 <h3 id="_BG" name="BG">BG</h3>
@@ -1240,11 +1244,10 @@ It defines which bits of a cell attribute should actually be changed.</p>
 
 <h3 id="_CELL" name="CELL">CELL</h3>
 
-<pre>CELL cx,cy,[c]</pre>
+<pre>CELL cx,cy,c</pre>
 
 <p>Sets the cell at position <em>cx,cy</em> of the current background to
-character <em>c</em>. If <em>c</em> is omitted, only the attributes of the cell get
-changed.</p>
+character <em>c</em> using the current attributes (palette, flip, priority).</p>
 
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
@@ -1263,13 +1266,16 @@ background.</p>
 background as an 8-bit value.</p>
 
 
-<h3 id="_BG-FILL" name="BG FILL,BG,FILL,TO,CHAR">BG FILL</h3>
+<h3 id="_BG-FILL" name="BG FILL,BG,FILL,TO,CHAR,PAL,FLIP,PRIO">BG FILL</h3>
 
-<pre>BG FILL cx1,cy1 TO cx2,cy2 [CHAR c]</pre>
+<pre>BG FILL cx1,cy1 TO cx2,cy2 CHAR c</pre>
 
 <p>Sets all cells in the area from <em>cx1,cy1</em> to <em>cx2,cy2</em> of the current
-background to character <em>c</em>. If CHAR <em>c</em> is omitted, only the attributes
-of the cells get changed.</p>
+background to character <em>c</em> using the current attributes.</p>
+
+<pre>BG FILL cx1,cy1 TO cx2,cy2 [PAL pal] [FLIP fx,fy] [PRIO pri]</pre>
+
+<p>Sets one or more attributes of all cells in the given area.</p>
 
 
 <h3 id="_BG-SOURCE" name="BG SOURCE,BG,SOURCE">BG SOURCE</h3>
@@ -1307,7 +1313,7 @@ co-ordinates are outside of the map bounds, the functions return -1.</p>
 
 <h3 id="_MCELL" name="MCELL">MCELL</h3>
 
-<pre>MCELL cx,cy,[c]</pre>
+<pre>MCELL cx,cy,c</pre>
 
 <p>Works like the CELL command, but sets a cell in the source map
 (BG SOURCE) instead of the current background. The source must be in
@@ -1371,32 +1377,34 @@ SCROLL.Y(b)
 
 <h2 id="Display-Settings">Display Settings</h2>
 
-<h3 id="_DISPLAY" name="DISPLAY">DISPLAY</h3>
+<h3 id="_SPRITE_VIEW" name="SPRITE VIEW ON,SPRITE VIEW OFF,SPRITE,VIEW,ON,OFF,SPRITE VIEW">SPRITE VIEW ON/OFF</h3>
 
-<pre>DISPLAY (s,b0,b1,c0,c1)</pre>
+<pre>SPRITE VIEW ON</pre>
+<pre>SPRITE VIEW OFF</pre>
 
-<p>Sets the display attributes. All attribute parameters can be omitted to keep their current settings.</p>
+<p>Shows or hides the complete sprite layer without changing any of
+the sprites' settings.</p>
+
+
+<h3 id="_BG_VIEW" name="BG VIEW ON,BG VIEW OFF,BG,VIEW,ON,OFF,BG VIEW">BG VIEW ON/OFF</h3>
+
+<pre>BG VIEW ON n</pre>
+<pre>BG VIEW OFF n</pre>
+
+<p>Shows or hides background <em>n</em> (0 or 1).</p>
+
+
+<h3 id="_CELL_SIZE" name="CELL SIZE,CELL,SIZE">CELL SIZE</h3>
+
+<pre>CELL SIZE b,s</pre>
+
+<p>Sets the cell size for background <em>b</em> (0 or 1), where <em>s</em>
+can be:</p>
 
 <table>
-<tr><td>s</td> <td>sprites enabled (0/1)</td></tr>
-<tr><td>b0</td> <td>background 0 enabled (0/1)</td></tr>
-<tr><td>b1</td> <td>background 1 enabled (0/1)</td></tr>
-<tr><td>c0</td> <td>BG 0 cell size,</td></tr>
-<tr><td>c1</td> <td>BG 1 cell size:<br/> 
-0: 1 character (8x8 pixels)<br/>
-1: 2x2 characters (16x16 pixels)</td></tr>
+<tr><td>0</td> <td>1 character (8x8 pixels)</td></tr>
+<tr><td>1</td> <td>2x2 characters (16x16 pixels)</td></tr>
 </table>
-
-<pre>DISPLAY a</pre>
-
-<p>Allows setting the attributes as a single 8-bit value.</p>
-
-
-<h3 id="_=DISPLAY" name="DISPLAY">=DISPLAY</h3>
-
-<pre>DISPLAY</pre>
-
-<p>Returns the display attributes as an 8-bit value.</p>
 
 
 <h3 id="_PALETTE" name="PALETTE">PALETTE</h3>
@@ -1607,10 +1615,10 @@ width. These values range from 0 to 15.</p>
 
 <h3 id="_LFO.A" name="LFO.A">LFO.A</h3>
 
-<pre>LFO.A v,(w,r,e,t)</pre>
+<pre>LFO.A v,[w],[r],[e],[t]</pre>
 
 <p>Sets additional LFO attributes of voice <em>v</em> (0-3).
-All attribute parameters can be omitted to keep their current settings.</p>
+All parameters can be omitted to keep their current settings.</p>
 
 <table>
 <tr><td>w</td> <td>wave (0-3):<br/>

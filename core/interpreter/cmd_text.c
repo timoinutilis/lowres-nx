@@ -24,7 +24,6 @@
 #include <math.h>
 #include "core.h"
 #include "text_lib.h"
-#include "interpreter_utils.h"
 
 enum ErrorCode cmd_PRINT(struct Core *core)
 {
