@@ -1,0 +1,51 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+file_extensions:
+  - nx
+name: LowRes NX
+scope: source.lowres-nx
+contexts:
+  main:
+    # Strings
+    - match: '"'
+      scope: punctuation.definition.string.begin.lowres-nx
+      push: double_quoted_string
+
+    # Comments begin with 'REM', # or ' and finish at the end of the line
+    - match: '^\s*(REM|#|'')'
+      scope: punctuation.definition.comment.lowres-nx
+      push: line_comment
+
+    # Keywords
+    - match: '\b(ABS|ACOS|ADD|ASC|ASIN|ATAN|ATTR|BG|BIN|BUTTON|CALL|CELL\.A|CELL\.C|CELL|CHAR|CHR|CLS|CLW|COLOR|COPY|COS|DATA|DEC|DIM|DISPLAY|DOWN|DO|ELSE|END|ENVELOPE|EXIT|EXP|FILE|FILES|FILL|FONT|FOR|FSIZE|GAMEPAD|GLOBAL|GOSUB|GOTO|HEX|HCOS|HIT|HSIN|HTAN|IF|INC|INKEY|INPUT|INSTR|INT|KEYBOARD|LEFT|LEN|LET|LFO\.A|LFO|LOAD|LOCATE|LOG|LOOP|MAX|MID|MIN|NEXT|NUMBER|OFF|ON|PALETTE|PAUSE|PEEK|PEEKL|PEEKW|PI|PLAY|POKE|POKEL|POKEW|PRINT|RANDOMIZE|RASTER|READ|REPEAT|RESTORE|RETURN|RIGHT|RND|ROL|ROM|ROR|SAVE|SCROLL\.X|SCROLL\.Y|SCROLL|SGN|SIN|SIZE|SOUND|SOURCE|SPRITE\.A|SPRITE\.C|SPRITE\.X|SPRITE\.Y|SPRITE|SQR|STEP|STOP|STR|SUB|SWAP|SYSTEM|TAN|TAP|TEXT|THEN|TIMER|TO|TOUCH\.X|TOUCH\.Y|TOUCH|TRACE|UNTIL|UP|VAL|VBL|VOLUME|WAIT|WEND|WHILE|WINDOW|PAL|FLIP|PRIO|VIEW|WAVE)\b'
+      scope: keyword.control.lowres-nx
+
+    # Numbers
+    - match: '\b(-)?[0-9.]+\b'
+      scope: constant.numeric.lowres-nx
+
+    # Operators
+    - match: '\b(AND|OR|XOR|NOT|MOD)\b'
+      scope: keyword.operator.word.lowres-nx
+    - match: <\=|>\=|\=|<|>|<>
+      scope: keyword.operator.comparison.lowres-nx
+    - match: \+|\-|\*|/|\\
+      scope: keyword.operator.arithmetic.lowres-nx
+
+    # Punctuation
+    - match: ','
+      scope: punctuation.separator.lowres-nx
+
+  double_quoted_string:
+    - meta_scope: string.quoted.double.lowres-nx
+    - match: '\\.'
+      scope: constant.character.escape.lowres-nx
+    - match: '"'
+      scope: punctuation.definition.string.end.lowres-nx
+      pop: true
+
+  line_comment:
+    - meta_scope: comment.line.lowres-nx
+    - match: $
+      pop: true
