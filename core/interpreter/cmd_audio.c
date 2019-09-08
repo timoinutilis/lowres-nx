@@ -325,11 +325,11 @@ enum ErrorCode cmd_LFO_A(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
-enum ErrorCode cmd_LFO_XXX(struct Core *core)
+enum ErrorCode cmd_LFO_WAVE(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
     
-    // LFO XXX
+    // LFO WAVE
     ++interpreter->pc;
     ++interpreter->pc;
     

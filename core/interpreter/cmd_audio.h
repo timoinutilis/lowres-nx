@@ -32,7 +32,7 @@ enum ErrorCode cmd_VOLUME(struct Core *core);
 enum ErrorCode cmd_ENVELOPE(struct Core *core);
 enum ErrorCode cmd_LFO(struct Core *core);
 enum ErrorCode cmd_LFO_A(struct Core *core);
-enum ErrorCode cmd_LFO_XXX(struct Core *core);
+enum ErrorCode cmd_LFO_WAVE(struct Core *core);
 enum ErrorCode cmd_PLAY(struct Core *core);
 enum ErrorCode cmd_STOP(struct Core *core);
 enum ErrorCode cmd_MUSIC(struct Core *core);

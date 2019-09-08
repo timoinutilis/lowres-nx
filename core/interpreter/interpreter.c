@@ -1512,8 +1512,8 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenLFO:
             switch (itp_getNextTokenType(interpreter))
             {
-                case TokenATTR:
-                    return cmd_LFO_XXX(core);
+                case TokenWAVE:
+                    return cmd_LFO_WAVE(core);
                     
                 default:
                     return cmd_LFO(core);

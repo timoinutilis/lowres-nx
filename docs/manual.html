@@ -1097,7 +1097,7 @@ All parameters can be omitted to keep their current settings.</p>
 <tr><td>pal</td> <td>palette number (0-7)</td></tr>
 <tr><td>fx</td> <td>flip horizontally (0/1)</td></tr>
 <tr><td>fy</td> <td>flip vertically (0/1)</td></tr>
-<tr><td>pri</td> <td>priority flag (0/1)</td></tr>
+<tr><td>pri</td> <td>priority (0/1)</td></tr>
 <tr><td>s</td> <td>size (0-3):<br/>
 0: 1 character (8x8 px)<br/>
 1: 2x2 characters (16x16 px)<br/>
@@ -1209,7 +1209,7 @@ window to the default one.</p>
 
 <pre>PAL p</pre>
 
-<p>Sets the palette number (0-7) for cell and text commands.</p>
+<p>Sets the palette number (0-7) attribute for cell and text commands.</p>
 
 
 <h3 id="_FLIP" name="FLIP">FLIP</h3>
@@ -1217,14 +1217,14 @@ window to the default one.</p>
 <pre>FLIP fx,fy</pre>
 
 <p>Sets the values (0/1) for horizontal (<em>fx</em>) and vertical (<em>fy</em>)
-flip for cell and text commands.</p>
+flip attributes for cell and text commands.</p>
 
 
 <h3 id="_PRIO" name="PRIO">PRIO</h3>
 
 <pre>PRIO p</pre>
 
-<p>Sets the priority flag (0/1) for cell and text commands.</p>
+<p>Sets the priority (0/1) attribute for cell and text commands.</p>
 
 
 <h3 id="_ATTR" name="ATTR">ATTR</h3>
@@ -1247,7 +1247,7 @@ flip for cell and text commands.</p>
 <pre>CELL cx,cy,c</pre>
 
 <p>Sets the cell at position <em>cx,cy</em> of the current background to
-character <em>c</em> using the current attributes (palette, flip, priority).</p>
+character <em>c</em> using the current attributes.</p>
 
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
@@ -1333,7 +1333,7 @@ horizontally by <em>dx</em> and vertically by <em>dy</em> cells.</p>
 <pre>TEXT cx,cy,s$</pre>
 
 <p>Outputs the string <em>s$</em> to the current background at cell position
-<em>cx,cy</em>.</p>
+<em>cx,cy</em> using the current attributes.</p>
 
 
 <h3 id="_NUMBER" name="NUMBER">NUMBER</h3>
@@ -1341,7 +1341,8 @@ horizontally by <em>dx</em> and vertically by <em>dy</em> cells.</p>
 <pre>NUMBER cx,cy,n,d</pre>
 
 <p>Outputs the number <em>n</em> to the current background at cell position
-<em>cx,cy</em>. The number is formatted to show always <em>d</em> digits.
+<em>cx,cy</em> using the current attributes. The number is formatted to show
+always <em>d</em> digits.
 This command is preferred over TEXT to show numbers, as it
 doesn't need to convert numbers to strings.</p>
 
@@ -1613,11 +1614,11 @@ width. These values range from 0 to 15.</p>
 <p>All parameters can be omitted to keep their current settings.</p>
 
 
-<h3 id="_LFO.A" name="LFO.A">LFO.A</h3>
+<h3 id="_LFO_WAVE" name="LFO WAVE,LFO,WAVE">LFO WAVE</h3>
 
-<pre>LFO.A v,[w],[r],[e],[t]</pre>
+<pre>LFO WAVE v,[w],[r],[e],[t]</pre>
 
-<p>Sets additional LFO attributes of voice <em>v</em> (0-3).
+<p>Sets options for the LFO wave of voice <em>v</em> (0-3).
 All parameters can be omitted to keep their current settings.</p>
 
 <table>

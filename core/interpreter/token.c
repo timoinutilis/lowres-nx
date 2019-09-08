@@ -200,6 +200,7 @@ const char *TokenStrings[] = {
     "VIEW",
     "VOLUME",
     "WAIT",
+    "WAVE",
     "WEND",
     "WHILE",
     "WINDOW",

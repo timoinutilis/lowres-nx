@@ -204,6 +204,7 @@ enum TokenType {
     TokenVIEW,
     TokenVOLUME,
     TokenWAIT,
+    TokenWAVE,
     TokenWEND,
     TokenWHILE,
     TokenWINDOW,
