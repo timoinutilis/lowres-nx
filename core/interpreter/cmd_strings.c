@@ -633,24 +633,26 @@ enum ErrorCode cmd_MID(struct Core *core)
             varValue->stringValue = resultRCString;
         }
         
-        char *resultString = resultRCString->chars;
-        char *replaceString = replaceValue.v.stringValue->chars;
-        size_t replaceLen = strlen(replaceString);
-        if (number > replaceLen)
+        if (index < resultLen)
         {
-            number = replaceLen;
+            char *resultString = resultRCString->chars;
+            char *replaceString = replaceValue.v.stringValue->chars;
+            size_t replaceLen = strlen(replaceString);
+            if (number > replaceLen)
+            {
+                number = replaceLen;
+            }
+            if (index + number > resultLen)
+            {
+                number = resultLen - index;
+            }
+            
+            for (size_t i = 0; i < number; i++)
+            {
+                resultString[index + i] = replaceString[i];
+            }
+            interpreter->cycles += number;
         }
-        if (index + number > resultLen)
-        {
-            number = resultLen - index;
-        }
-        
-        for (size_t i = 0; i < number; i++)
-        {
-            resultString[index + i] = replaceString[i];
-        }
-        interpreter->cycles += number;
-        
         rcstring_release(replaceValue.v.stringValue);
     }
     
