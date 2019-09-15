@@ -234,6 +234,15 @@ enum ErrorCode cmd_ATTR(struct Core *core)
     struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.charAttr);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
+    // filter value (obsolete syntax!)
+    if (interpreter->pc->type == TokenComma)
+    {
+        ++interpreter->pc;
+        
+        struct TypedValue fValue = itp_evaluateNumericExpression(core, 0, 0xFF);
+        if (fValue.type == ValueTypeError) return fValue.v.errorCode;
+    }
+    
     if (interpreter->pass == PassRun)
     {
         interpreter->textLib.charAttr.value = aValue.v.floatValue;
@@ -252,7 +261,7 @@ enum ErrorCode cmd_PAL(struct Core *core)
     // value
     struct TypedValue value = itp_evaluateNumericExpression(core, 0, NUM_PALETTES - 1);
     if (value.type == ValueTypeError) return value.v.errorCode;
-
+    
     if (interpreter->pass == PassRun)
     {
         interpreter->textLib.charAttr.palette = value.v.floatValue;
@@ -365,8 +374,6 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
         int flipY = -1;
         int prio = -1;
         
-        if (itp_isEndOfCommand(interpreter)) return ErrorExpectedParameter;
-        
         // PAL
         if (interpreter->pc->type == TokenPAL)
         {
@@ -407,7 +414,15 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
         
         if (interpreter->pass == PassRun)
         {
-            txtlib_setCellsAttr(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), pal, flipX, flipY, prio);
+            if (pal >= 0 || flipX >= 0 || flipY >= 0 || prio >= 0)
+            {
+                txtlib_setCellsAttr(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), pal, flipX, flipY, prio);
+            }
+            else
+            {
+                // obsolete syntax!
+                txtlib_setCells(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), -1);
+            }
         }
     }
     
@@ -438,12 +453,13 @@ enum ErrorCode cmd_CELL(struct Core *core)
     ++interpreter->pc;
     
     // character value
-    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, NUM_CHARACTERS - 1);
+    struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
     if (cValue.type == ValueTypeError) return cValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        txtlib_setCell(&interpreter->textLib, floorf(xValue.v.floatValue), floorf(yValue.v.floatValue), cValue.v.floatValue);
+        int c = (cValue.type == ValueTypeFloat) ? cValue.v.floatValue : -1;
+        txtlib_setCell(&interpreter->textLib, floorf(xValue.v.floatValue), floorf(yValue.v.floatValue), c);
     }
     
     return itp_endOfCommand(interpreter);
@@ -523,12 +539,13 @@ enum ErrorCode cmd_MCELL(struct Core *core)
     ++interpreter->pc;
     
     // character value
-    struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, NUM_CHARACTERS - 1);
+    struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
     if (cValue.type == ValueTypeError) return cValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        bool success = txtlib_setSourceCell(&interpreter->textLib, xValue.v.floatValue, yValue.v.floatValue, cValue.v.floatValue);
+        int c = (cValue.type == ValueTypeFloat) ? cValue.v.floatValue : -1;
+        bool success = txtlib_setSourceCell(&interpreter->textLib, xValue.v.floatValue, yValue.v.floatValue, c);
         if (!success) return ErrorIllegalMemoryAccess;
     }
     

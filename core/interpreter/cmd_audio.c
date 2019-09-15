@@ -295,6 +295,8 @@ enum ErrorCode cmd_LFO_A(struct Core *core)
     // LFO.A
     ++interpreter->pc;
     
+    // obsolete syntax!
+    
     // n value
     struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;

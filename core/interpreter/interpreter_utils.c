@@ -28,6 +28,8 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         // bracket open
         interpreter->pc++;
         
+        // obsolete syntax!
+        
         union CharacterAttributes resultAttr = oldAttr;
         
         struct TypedValue palValue = {ValueTypeNull, 0};

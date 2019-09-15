@@ -138,6 +138,8 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
     // DISPLAY
     ++interpreter->pc;
     
+    // obsolete syntax!
+    
     // atrb value
     struct TypedValue aValue = itp_evaluateDisplayAttributes(core, core->machine->videoRegisters.attr);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
@@ -302,6 +304,7 @@ struct TypedValue fnc_screen0(struct Core *core)
                 break;
                 
             case TokenDISPLAY:
+                // obsolete syntax!
                 value.v.floatValue = core->machine->videoRegisters.attr.value;
                 break;
                 

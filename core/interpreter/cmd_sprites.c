@@ -78,8 +78,6 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
         int prio = -1;
         int size = -1;
         
-        if (itp_isEndOfCommand(interpreter)) return ErrorExpectedParameter;
-        
         // PAL
         if (interpreter->pc->type == TokenPAL)
         {

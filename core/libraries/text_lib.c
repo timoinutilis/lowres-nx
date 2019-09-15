@@ -43,7 +43,10 @@ struct Plane *txtlib_getBackground(struct TextLib *lib, int bg)
 void txtlib_setCellAt(struct Plane *plane, int x, int y, int character, union CharacterAttributes attr)
 {
     struct Cell *cell = &plane->cells[y & 0x1F][x & 0x1F];
-    cell->character = character;
+    if (character >= 0)
+    {
+        cell->character = character;
+    }
     cell->attr = attr;
 }
 
@@ -458,7 +461,10 @@ bool txtlib_setSourceCell(struct TextLib *lib, int x, int y, int character)
         return false;
     }
     
-    machine_poke(lib->core, address, character);
+    if (character >= 0)
+    {
+        machine_poke(lib->core, address, character);
+    }
     machine_poke(lib->core, address + 1, lib->charAttr.value);
     return true;
 }
