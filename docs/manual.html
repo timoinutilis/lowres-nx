@@ -1089,7 +1089,10 @@ standard character attributes (color palette, flip X/Y, priority) and additional
 <p>Sets the position <em>(x,y)</em> and character <em>(c)</em> of sprite <em>n</em> (0-63).
 All parameters can be omitted to keep their current settings.</p>
 
-<pre>SPRITE n [PAL pal] [FLIP fx,fy] [PRIO pri] [SIZE s]</pre>
+<pre>
+SPRITE n [PAL pal] [FLIP fx,fy] ...
+[PRIO pri] [SIZE s]
+</pre>
 
 <p>Sets one or more attributes of sprite <em>n</em> (0 - 63):</p>
 
@@ -1110,7 +1113,7 @@ All parameters can be omitted to keep their current settings.</p>
 
 <pre>SPRITE.A n,a</pre>
 
-<p>Sets the attributes of sprite <em>n</em> (0-63) as a single 8-bit value.</p>
+<p>Sets all attributes of sprite <em>n</em> (0-63) as a single 8-bit value.</p>
 
 
 <h3 id="_SPRITE-OFF" name="SPRITE OFF,SPRITE,OFF">SPRITE OFF</h3>
@@ -1277,7 +1280,10 @@ of the current background to character <em>c</em> using the current attributes.
 If CHAR <em>c</em> is omitted, only the attributes
 of the cells get changed.</p>
 
-<pre>BG FILL cx1,cy1 TO cx2,cy2 [PAL pal] [FLIP fx,fy] [PRIO pri]</pre>
+<pre>
+BG FILL cx1,cy1 TO cx2,cy2 ...
+[PAL pal] [FLIP fx,fy] [PRIO pri]
+</pre>
 
 <p>Sets one or more attributes of all cells in the given area.</p>
 
@@ -1830,7 +1836,7 @@ wouldn't have a disk drive.</p>
 at address <em>a</em>.</p>
 
 <p>LOAD is meant to be used for tools only. Use ROM entries for game
-data.</p>
+data or persistent memory for game states.</p>
 
 
 <h3 id="_SAVE" name="SAVE">SAVE</h3>
@@ -2210,7 +2216,7 @@ It does not affect the virtual CPU, the code still runs at full speed.
 </table>
 
 
-<h1 id="System" name="SPRITE.A,ATTR,DISPLAY,LFO.A">Obsolete Syntaxes</h1>
+<h1 id="Obsolete-Syntaxes" name="SPRITE.A,ATTR,DISPLAY,LFO.A">Obsolete Syntaxes</h1>
 
 <p>These commands, functions and syntaxes should not be used anymore
 and may be removed in future versions.</p>
