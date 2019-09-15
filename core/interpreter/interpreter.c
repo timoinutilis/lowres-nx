@@ -656,12 +656,10 @@ bool itp_isTokenLevel(enum TokenType token, int level)
         case 5:
             return token == TokenMOD;
         case 6:
-            return token == TokenDivInt;
-        case 7:
-            return token == TokenMul || token == TokenDiv;
-//        case 8:
+            return token == TokenMul || token == TokenDiv || token == TokenDivInt;
+//        case 7:
 //            return token == TokenPlus || token == TokenMinus; // unary
-        case 9:
+        case 8:
             return token == TokenPow;
     }
     return false;
@@ -691,7 +689,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         interpreter->lastVariableValue = NULL;
         return value;
     }
-    if (level == 8 && (type == TokenPlus || type == TokenMinus)) // unary
+    if (level == 7 && (type == TokenPlus || type == TokenMinus)) // unary
     {
         ++interpreter->pc;
         ++interpreter->cycles;
@@ -710,7 +708,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         interpreter->lastVariableValue = NULL;
         return value;
     }
-    if (level == 10)
+    if (level == 9)
     {
         return itp_evaluatePrimaryExpression(core);
     }
