@@ -52,7 +52,7 @@ enum ErrorCode cmd_IF(struct Core *core, bool isAfterBlockElse)
     if (value.type == ValueTypeError) return value.v.errorCode;
     
     // THEN
-    if (interpreter->pc->type != TokenTHEN) return ErrorExpectedThen;
+    if (interpreter->pc->type != TokenTHEN) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -209,7 +209,7 @@ enum ErrorCode cmd_FOR(struct Core *core)
     if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
     
     // Eq
-    if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
+    if (interpreter->pc->type != TokenEq) return ErrorSyntax;
     ++interpreter->pc;
     
     // start value
@@ -217,7 +217,7 @@ enum ErrorCode cmd_FOR(struct Core *core)
     if (startValue.type == ValueTypeError) return startValue.v.errorCode;
     
     // TO
-    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+    if (interpreter->pc->type != TokenTO) return ErrorSyntax;
     ++interpreter->pc;
 
     // limit value
@@ -505,7 +505,7 @@ enum ErrorCode cmd_ON(struct Core *core)
     
     // RASTER/VBL
     enum TokenType type = interpreter->pc->type;
-    if (type != TokenRASTER && type != TokenVBL) return ErrorUnexpectedToken;
+    if (type != TokenRASTER && type != TokenVBL) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pc->type == TokenOFF)
@@ -528,7 +528,7 @@ enum ErrorCode cmd_ON(struct Core *core)
     else
     {
         // CALL
-        if (interpreter->pc->type != TokenCALL) return ErrorUnexpectedToken;
+        if (interpreter->pc->type != TokenCALL) return ErrorSyntax;
         struct Token *tokenCALL = interpreter->pc;
         ++interpreter->pc;
         

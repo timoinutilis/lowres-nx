@@ -1049,7 +1049,7 @@ enum ErrorCode itp_endOfCommand(struct Interpreter *interpreter)
         ++interpreter->pc;
         return ErrorNone;
     }
-    return (type == TokenELSE) ? ErrorNone : ErrorUnexpectedToken;
+    return (type == TokenELSE) ? ErrorNone : ErrorSyntax;
 }
 
 enum TokenType itp_getNextTokenType(struct Interpreter *interpreter)
@@ -1537,7 +1537,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
-            return ErrorUnexpectedToken;
+            return ErrorSyntax;
     }
     return ErrorNone;
 }

@@ -36,7 +36,7 @@ enum ErrorCode cmd_LET(struct Core *core)
     enum ValueType valueType = ValueTypeNull;
     union Value *varValue = itp_readVariable(core, &valueType, &errorCode, true);
     if (!varValue) return errorCode;
-    if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
+    if (interpreter->pc->type != TokenEq) return ErrorSyntax;
     ++interpreter->pc;
     
     // value

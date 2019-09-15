@@ -306,7 +306,7 @@ enum ErrorCode cmd_ADD(struct Core *core)
         base = baseValue.v.floatValue;
         
         // TO
-        if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+        if (interpreter->pc->type != TokenTO) return ErrorSyntax;
         ++interpreter->pc;
         
         // top value

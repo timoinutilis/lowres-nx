@@ -390,7 +390,7 @@ enum ErrorCode cmd_EXIT_SUB(struct Core *core)
     ++interpreter->pc;
     
     // SUB
-    if (interpreter->pc->type != TokenSUB) return ErrorUnexpectedToken;
+    if (interpreter->pc->type != TokenSUB) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)

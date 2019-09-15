@@ -162,7 +162,7 @@ enum ErrorCode cmd_SPRITE_VIEW(struct Core *core)
     
     // ON/OFF
     enum TokenType type = interpreter->pc->type;
-    if (type != TokenON && type != TokenOFF) return ErrorUnexpectedToken;
+    if (type != TokenON && type != TokenOFF) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassRun)
@@ -183,7 +183,7 @@ enum ErrorCode cmd_BG_VIEW(struct Core *core)
     
     // ON/OFF
     enum TokenType type = interpreter->pc->type;
-    if (type != TokenON && type != TokenOFF) return ErrorUnexpectedToken;
+    if (type != TokenON && type != TokenOFF) return ErrorSyntax;
     ++interpreter->pc;
     
     // bg value

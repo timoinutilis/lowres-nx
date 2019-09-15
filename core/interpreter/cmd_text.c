@@ -76,7 +76,7 @@ enum ErrorCode cmd_PRINT(struct Core *core)
         }
         else
         {
-            return ErrorUnexpectedToken;
+            return ErrorSyntax;
         }
     }
     
@@ -107,7 +107,7 @@ enum ErrorCode cmd_INPUT(struct Core *core)
         ++interpreter->pc;
         
         // semicolon
-        if (interpreter->pc->type != TokenSemicolon) return ErrorExpectedSemicolon;
+        if (interpreter->pc->type != TokenSemicolon) return ErrorSyntax;
         ++interpreter->pc;
     }
     

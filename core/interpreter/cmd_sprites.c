@@ -194,7 +194,7 @@ enum ErrorCode cmd_SPRITE_OFF(struct Core *core)
     ++interpreter->pc;
     
     // OFF
-    if (interpreter->pc->type != TokenOFF) return ErrorUnexpectedToken;
+    if (interpreter->pc->type != TokenOFF) return ErrorSyntax;
     ++interpreter->pc;
     
     int from = 0;
@@ -294,7 +294,7 @@ struct TypedValue fnc_SPRITE_HIT(struct Core *core)
     ++interpreter->pc;
     
     // HIT
-    if (interpreter->pc->type != TokenHIT) return val_makeError(ErrorUnexpectedToken);
+    if (interpreter->pc->type != TokenHIT) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // bracket open

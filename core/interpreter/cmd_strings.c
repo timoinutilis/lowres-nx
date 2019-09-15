@@ -515,7 +515,7 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
     ++interpreter->pc;
     
     // equal sign
-    if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
+    if (interpreter->pc->type != TokenEq) return ErrorSyntax;
     ++interpreter->pc;
     
     // replace expression
@@ -612,7 +612,7 @@ enum ErrorCode cmd_MID(struct Core *core)
     ++interpreter->pc;
     
     // equal sign
-    if (interpreter->pc->type != TokenEq) return ErrorExpectedEqualSign;
+    if (interpreter->pc->type != TokenEq) return ErrorSyntax;
     ++interpreter->pc;
     
     // replace expression

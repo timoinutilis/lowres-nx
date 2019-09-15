@@ -30,7 +30,7 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
     
     // ON/OFF/OPTIONAL
     enum TokenType type = interpreter->pc->type;
-    if (type != TokenON && type != TokenOFF && type != TokenOPTIONAL) return ErrorUnexpectedToken;
+    if (type != TokenON && type != TokenOFF && type != TokenOPTIONAL) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassRun)

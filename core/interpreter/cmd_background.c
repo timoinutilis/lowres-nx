@@ -140,7 +140,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     if (hValue.type == ValueTypeError) return hValue.v.errorCode;
     
     // TO
-    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+    if (interpreter->pc->type != TokenTO) return ErrorSyntax;
     ++interpreter->pc;
     
     // dst X value
@@ -184,7 +184,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
     if (y1Value.type == ValueTypeError) return y1Value.v.errorCode;
     
     // TO
-    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+    if (interpreter->pc->type != TokenTO) return ErrorSyntax;
     ++interpreter->pc;
     
     // x2 value
@@ -200,7 +200,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
     if (y2Value.type == ValueTypeError) return y2Value.v.errorCode;
 
     // STEP
-    if (interpreter->pc->type != TokenSTEP) return ErrorUnexpectedToken;
+    if (interpreter->pc->type != TokenSTEP) return ErrorSyntax;
     ++interpreter->pc;
 
     // dx value
@@ -338,7 +338,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     if (y1Value.type == ValueTypeError) return y1Value.v.errorCode;
     
     // TO
-    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+    if (interpreter->pc->type != TokenTO) return ErrorSyntax;
     ++interpreter->pc;
 
     // x2 value

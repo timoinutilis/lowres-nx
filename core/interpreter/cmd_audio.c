@@ -92,7 +92,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
 //    if (sValue.type == ValueTypeError) return sValue.v.errorCode;
 //    
 //    // TO
-//    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+//    if (interpreter->pc->type != TokenTO) return ErrorSyntax;
 //    ++interpreter->pc;
 //    
 //    // voice value

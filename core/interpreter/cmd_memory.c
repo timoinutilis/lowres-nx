@@ -209,7 +209,7 @@ enum ErrorCode cmd_COPY(struct Core *core)
     struct TypedValue lengthValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (lengthValue.type == ValueTypeError) return lengthValue.v.errorCode;
 
-    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+    if (interpreter->pc->type != TokenTO) return ErrorSyntax;
     ++interpreter->pc;
     
     // destination value

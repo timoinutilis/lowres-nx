@@ -52,12 +52,12 @@ enum ErrorCode cmd_DATA(struct Core *core)
         else if (interpreter->pc->type == TokenMinus)
         {
             ++interpreter->pc;
-            if (interpreter->pc->type != TokenFloat) return ErrorUnexpectedToken;
+            if (interpreter->pc->type != TokenFloat) return ErrorSyntax;
             ++interpreter->pc;
         }
         else
         {
-            return ErrorUnexpectedToken;
+            return ErrorSyntax;
         }
     }
     while (interpreter->pc->type == TokenComma);
