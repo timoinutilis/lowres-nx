@@ -234,15 +234,6 @@ enum ErrorCode cmd_ATTR(struct Core *core)
     struct TypedValue aValue = itp_evaluateCharAttributes(core, interpreter->textLib.charAttr);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
     
-    // filter value (obsolete syntax!)
-    if (interpreter->pc->type == TokenComma)
-    {
-        ++interpreter->pc;
-        
-        struct TypedValue fValue = itp_evaluateNumericExpression(core, 0, 0xFF);
-        if (fValue.type == ValueTypeError) return fValue.v.errorCode;
-    }
-    
     if (interpreter->pass == PassRun)
     {
         interpreter->textLib.charAttr.value = aValue.v.floatValue;
@@ -357,6 +348,8 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     if (interpreter->pc->type == TokenCHAR)
     {
         ++interpreter->pc;
+        
+        // write character with current attributes
     
         // character value
         struct TypedValue cValue = itp_evaluateNumericExpression(core, 0, NUM_CHARACTERS - 1);
@@ -367,8 +360,19 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
             txtlib_setCells(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), cValue.v.floatValue);
         }
     }
+    else if (itp_isEndOfCommand(interpreter))
+    {
+        // write current attributes
+        
+        if (interpreter->pass == PassRun)
+        {
+            txtlib_setCells(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), -1);
+        }
+    }
     else
     {
+        // modify specific attributes
+        
         int pal = -1;
         int flipX = -1;
         int flipY = -1;
@@ -414,15 +418,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
         
         if (interpreter->pass == PassRun)
         {
-            if (pal >= 0 || flipX >= 0 || flipY >= 0 || prio >= 0)
-            {
-                txtlib_setCellsAttr(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), pal, flipX, flipY, prio);
-            }
-            else
-            {
-                // obsolete syntax!
-                txtlib_setCells(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), -1);
-            }
+            txtlib_setCellsAttr(&interpreter->textLib, floorf(x1Value.v.floatValue), floorf(y1Value.v.floatValue), floorf(x2Value.v.floatValue), floorf(y2Value.v.floatValue), pal, flipX, flipY, prio);
         }
     }
     
