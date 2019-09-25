@@ -94,6 +94,15 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 	white-space: nowrap;
 	hyphens: none;
 }
+.example {
+	background-color: #eee;
+	padding: 4px 0px 4px 4px;
+}
+@media (max-width: 320px) {
+	.example {
+		font-size: 0.9em;
+	}
+}
 
 </style>
 </head>
@@ -178,7 +187,7 @@ otherwise you may see everything in one line.
 
 <p>Type these lines:</p>
 
-<pre>
+<pre class="example">
 PRINT "WELCOME!"
 PRINT "WHAT IS YOUR NAME?"
 INPUT ">";N$
@@ -193,7 +202,7 @@ Save your program file with a useful name and the extension ".nx".
 Let's try something with a gamepad. Create another new program and
 type this:</p>
 
-<pre>
+<pre class="example">
 GAMEPAD 1
 X=76
 Y=60
@@ -517,28 +526,48 @@ second-generation, structured BASIC (1985 style).</p>
 
 <h2 id="Types-and-Variables">Types and Variables</h2>
 
-<p>Available data types are strings and numbers (floating point).
-Variable names can contain letters (A-Z), digits (0-9) and underscores
-(_), but cannot begin with a digit. Reserved keywords cannot be used
-as names, but they can contain them, for example:</p>
-<p>
-Valid: <code>ENDING</code><br/>
-Invalid: <code>END</code>
-</p>
+<p>Available value types are strings and numbers (floating point).</p>
 
-<p>String variable names must end with a $ symbol, for example:</p>
-<pre>NAME$</pre>
+<p>Variable names can contain letters (A-Z), digits (0-9) and underscores
+(_), but cannot begin with a digit. Reserved keywords
+(commands, functions) cannot be used as variable names, but they can
+be part of them.</p>
+
+<p>Valid variable names:</p>
+
+<pre class="example">
+X
+A1
+LONG_VARIABLE_NAME
+PRINTER
+</pre>
+
+<p>Invalid variable names:</p>
+
+<pre class="example">
+2B
+PRINT
+</pre>
+
+<p>String variable names end with a $ symbol, for example:</p>
+
+<pre class="example">
+A$
+NAME$
+</pre>
 
 <p>Variables are not explicitly declared, but they need to be
 initialized with a value before you can read from them. Values are
 assigned to variables using the equal symbol:</p>
-<pre>
+
+<pre class="example">
 NAME$="LOWRES NX"
 LIVES=3
 </pre>
 
 <p>Hexadecimal and binary notation can be used for number values:</p>
-<pre>
+
+<pre class="example">
 $FF02
 %11001011
 </pre>
@@ -550,13 +579,16 @@ $FF02
 <pre>DIM [GLOBAL] var-list</pre>
 
 <p>Defines arrays with the highest index for each dimension:</p>
-<pre>
+
+<pre class="example">
 DIM A(100)
 DIM MAP(31,23,1),NAMES$(9),SCORES(9)
 </pre>
 
 <p>Access elements from arrays, indices start from 0:</p>
-<pre>
+
+<pre class="example">
+DIM SCORES(9)
 SCORES(0)=100
 SCORES(9)=5
 PRINT SCORES(0),SCORES(9)
@@ -572,9 +604,10 @@ from all subprograms.</p>
 
 <p>A label marks a position in a program and is used for commands
 like GOTO. It consists of a name, using the same rules as for
-variables, followed by a colon:</p>
-<pre>
-GAMEOVER:
+variables, followed by a colon.</p>
+
+<pre class="example">
+TESTLABEL:
 </pre>
 
 <h2 id="Operators">Operators</h2>
@@ -595,8 +628,18 @@ GAMEOVER:
 
 <p>Operations are performed in mathematical order, for example
 multiplications and divisions are performed before additions and
-subtractions. The order can be specified explicitly through the use of
-parentheses, for example: (3+4*3)/5</p>
+subtractions.</p>
+
+<pre class="example">
+PRINT 10+2*5-8/4+5^2
+</pre>
+
+<p>The order can be specified explicitly through the use of
+parentheses, for example:</p>
+
+<pre class="example">
+PRINT (3+4)*5
+</pre>
 
 <h3 id="Operators-Rel">Relational</h3>
 
@@ -627,7 +670,8 @@ false (0). For example: (2=3)=0, (4=4)=-1, (1&lt;3)=-1</p>
 
 <p>All operators are available for numbers. Relational and addition
 operators are usable with strings, too:</p>
-<pre>
+
+<pre class="example">
 SUM=1+3
 IF SUM&lt;5 THEN PRINT "LESS THAN 5"
 NAME$="LOWRES NX"
@@ -649,6 +693,14 @@ REM remark
 <p>Allows you to put comments into your program. REM lines are not
 executed. You can use an apostrophe (') in place of the word REM.</p>
 
+<pre class="example">
+REM THIS IS A TEST PROGRAM
+REM WRITTEN BY TIMO KLOSS
+PRINT "HELLO"
+'SHOW MORE TEXT...
+PRINT "BYE"
+</pre>
+
 
 <h3 id="_IF-THEN-ELSE" name="IF,THEN,ELSE">IF...THEN...ELSE</h3>
 <pre>
@@ -658,9 +710,19 @@ IF expr THEN command [ELSE command]
 <p>Checks if the given expression is true or false. If it's true, the
 command after THEN is executed, otherwise the one after ELSE. The ELSE
 part is optional.</p>
-<p>If you want to execute more than one command, you can use the
-block version of the IF command. It must be closed with the line
-END IF.</p>
+
+<pre class="example">
+INPUT "NUMBER A:";A
+INPUT "NUMBER B:";B
+PRINT "SAME? ";
+IF A=B THEN PRINT "YES" ELSE PRINT "NO"
+IF A&lt;B THEN PRINT "A LESS THAN B"
+IF A&gt;B THEN PRINT "A GREATER THAN B"
+</pre>
+
+<p>If you want to execute more than one command (or avoid long lines),
+you can use the block version of the IF command. It must be closed
+with the line END IF.</p>
 
 <pre>
 IF expression THEN
@@ -672,6 +734,25 @@ IF expression THEN
 END IF
 </pre>
 
+<p>Blocks can be nested like in this example:</p>
+
+<pre class="example">
+PRINT "NUMBER OF PLAYERS"
+INPUT "1-4: ";N
+
+IF N<1 OR N>4 THEN
+  PRINT "WRONG INPUT"
+  PRINT "RESTART!"
+ELSE IF N=1 THEN
+  PRINT "SINGLE-PLAYER"
+ELSE
+  PRINT "MULTI-PLAYER"
+  IF N=4 THEN
+    PRINT "MAXIMUM"
+  END IF
+END IF
+</pre>
+
 
 <h3 id="_GOTO" name="GOTO">GOTO</h3>
 
@@ -679,6 +760,19 @@ END IF
 
 <p>Jumps to the given label and continues the program execution there.
 </p>
+
+<pre class="example">
+PRINT "START"
+GOTO GAMELEVEL
+
+GAMEOVER:
+PRINT "GAME OVER"
+END
+
+GAMELEVEL:
+PRINT "PLAYING"
+GOTO GAMEOVER
+</pre>
 
 
 <h3 id="_GOSUB" name="GOSUB">GOSUB</h3>
@@ -688,6 +782,17 @@ END IF
 <p>Adds the current program position to a stack and jumps to the
 given label. The program after the label is called a subroutine and
 must be finished using RETURN.</p>
+
+<pre class="example">
+FOR I=1 TO 5
+  GOSUB SHOWNUMBER
+NEXT I
+END
+
+SHOWNUMBER:
+PRINT "NUMBER "+I
+RETURN
+</pre>
 
 <p>NOTE: Subroutines exist mostly for historical reasons. You should
 prefer the more powerful and safer subprograms.</p>
@@ -705,6 +810,21 @@ it from the stack.</p>
 <p>Works like GOTO, but clears the whole stack. Use this to exit from
 a subroutine, if you want to continue your program somewhere else.</p>
 
+<pre class="example">
+FOR I=1 TO 5
+  GOSUB SHOWNUMBER
+NEXT I
+END
+
+SHOWNUMBER:
+IF I=4 THEN RETURN GAMEOVER
+PRINT "NUMBER "+I
+RETURN
+
+GAMEOVER:
+PRINT "GAME OVER"
+</pre>
+
 
 <h3 id="_END" name="END">END</h3>
 
@@ -712,6 +832,12 @@ a subroutine, if you want to continue your program somewhere else.</p>
 
 <p>Stops the program from any position. The program is also stopped
 automatically after the last line of code.</p>
+
+<pre class="example">
+PRINT "THIS HAPPENS"
+END
+PRINT "THIS DOESN'T"
+</pre>
 
 
 <h3 id="_WAIT-VBL" name="WAIT VBL,WAIT,VBL">WAIT VBL</h3>
@@ -736,6 +862,13 @@ it looks cooler and nerdier! A little guideline: Use WAIT VBL in loops
 for smooth animations and input handling, and WAIT n if you actually
 want to wait some time.</p>
 
+<pre class="example">
+PRINT "INUTILIS"
+PRINT "PRESENTS..."
+WAIT 60
+PRINT "THE WAIT PROGRAM!"
+</pre>
+
 
 <h2 id="Loops">Loops</h2>
 
@@ -749,11 +882,41 @@ NEXT var
 <p>Performs a series of commands in a loop a given number of times.
 The FOR command uses the variable <em>var</em> as a counter, starting with the
 value <em>a</em>. All commands until NEXT are executed, then the counter is
-increased by <em>s</em> (or +1 if STEP is omitted). A check is performed to see
+increased by <em>s</em> (or 1 if STEP is omitted). A check is performed to see
 if the counter is now greater than <em>b</em>. If not, the process is repeated.
-If it is greater, the program continues with the lines after NEXT. If
-STEP <em>s</em> is negative, the loop is executed until the counter is less
-than value <em>b</em>.</p>
+If it is greater, the program continues with the lines after NEXT.</p>
+
+<pre class="example">
+FOR I=1 TO 8
+  PRINT I
+NEXT I
+</pre>
+
+<pre class="example">
+FOR I=2 TO 16 STEP 2
+  PRINT I
+NEXT I
+</pre>
+
+<p>If STEP <em>s</em> is negative, the loop is executed until the
+counter is less than value <em>b</em>.</p>
+
+<pre class="example">
+FOR I=8 TO 1 STEP -1
+  PRINT I
+NEXT I
+</pre>
+
+<p>Loops can be placed inside of others:</p>
+
+<pre class="example">
+FOR P=0 TO 3
+  PAL P
+  FOR N=1 TO 4
+    PRINT N
+  NEXT N
+NEXT P
+</pre>
 
 
 <h3 id="_DO-LOOP" name="DO,LOOP">DO...LOOP</h3>
@@ -766,6 +929,13 @@ LOOP
 <p>Performs commands in an endless loop. You can use GOTO to exit it.
 </p>
 
+<pre class="example">
+DO
+  PAL RND(3)
+  PRINT "FOREVER"
+LOOP
+</pre>
+
 
 <h3 id="_REPEAT-UNTIL" name="REPEAT,UNTIL">REPEAT...UNTIL</h3>
 <pre>
@@ -777,6 +947,13 @@ UNTIL expression
 <p>Executes the commands in a loop until the given expression is true.
 The loop is executed at least once.</p>
 
+<pre class="example">
+REPEAT
+  A=RND(9)
+  PRINT A
+UNTIL A=0
+</pre>
+
 
 <h3 id="_WHILE-WEND" name="WHILE,WEND">WHILE...WEND</h3>
 <pre>
@@ -787,6 +964,14 @@ WEND
 
 <p>Executes the commands in a loop as long as the given expression is
 true.</p>
+
+<pre class="example">
+A=4
+WHILE A<10
+  PRINT A
+  A=A+1
+WEND
+</pre>
 
 
 <h2 id="Subprograms">Subprograms</h2>
@@ -818,6 +1003,24 @@ must match the parameters of the SUB definition. Simple variables,
 single array elements and entire arrays (followed by an empty parentheses pair) are passed by reference to the subprogram. Other
 expressions are passed by value.</p>
 
+<pre class="example">
+CALL GREET("LOWRES NX",3)
+CALL GREET("YOU",1)
+CALL BYE
+
+SUB BYE
+  PAL 1
+  PRINT "BYE"
+END SUB
+
+SUB GREET(N$,A)
+  FOR I=1 TO A
+    PAL RND(3)
+    PRINT "HELLO",N$
+  NEXT I
+END SUB
+</pre>
+
 
 <h3 id="_EXIT-SUB" name="EXIT SUB,EXIT,SUB">EXIT SUB</h3>
 <pre>
@@ -836,6 +1039,20 @@ GLOBAL variable-list
 The list can contain simple variables only. For arrays you should use
 DIM GLOBAL. This command cannot be used within a subprogram.</p>
 
+<pre class="example">
+GLOBAL SCORE,TRIES
+
+TRIES=3
+
+CALL WIN(10)
+CALL WIN(20)
+
+SUB WIN(N)
+  SCORE=SCORE+N
+  PRINT "SCORE:",SCORE,"TRIES:",TRIES
+END SUB
+</pre>
+
 
 <h1 id="Text">Text</h1>
 
@@ -849,6 +1066,15 @@ output with a space, a semicolon outputs without space.
 End the list with a comma or semicolon to keep the cursor at the
 end of the output, otherwise a new line is started.</p>
 
+<pre class="example">
+PRINT "HELLO WORLD"
+PRINT 42
+PRINT 1+3
+PRINT "SCORE:",100
+PRINT "ONE ";
+PRINT "LINE"
+</pre>
+
 
 <h3 id="_INPUT" name="INPUT">INPUT</h3>
 
@@ -859,6 +1085,13 @@ in the variable <em>var</em>. Optionally it can show a prompt text before
 (cannot be a variable).</p>
 <p>INPUT automatically enables the keyboard.</p>
 
+<pre class="example">
+INPUT "NAME:";N$
+INPUT "AGE:";AGE
+PRINT "HELLO ";N$;"!"
+PRINT "SOON YOU ARE ";AGE+1
+</pre>
+
 
 <h3 id="_LOCATE" name="LOCATE">LOCATE</h3>
 
@@ -866,6 +1099,11 @@ in the variable <em>var</em>. Optionally it can show a prompt text before
 
 <p>Moves the text cursor to column <em>cx</em> and row <em>cy</em>
 relative to the current window.</p>
+
+<pre class="example">
+LOCATE 2,4
+PRINT "HELLO"
+</pre>
 
 
 <h3 id="_WINDOW" name="WINDOW">WINDOW</h3>
@@ -876,12 +1114,24 @@ relative to the current window.</p>
 to <em>w</em> columns and <em>h</em> rows. Text will be written to background <em>b</em> (0
 or 1).</p>
 
+<pre class="example">
+WINDOW 6,4,8,4,0
+PRINT "LONG TEXT IN A SMALL WINDOW"
+</pre>
+
+
 <h3 id="_CLW" name="CLW">CLW</h3>
 
 <pre>CLW</pre>
 
 <p>Clears the window with spaces and resets the text cursor position.
 </p>
+
+<pre class="example">
+PRINT "HELLO"
+CLW
+PRINT "BYE"
+</pre>
 
 
 <h1 id="User-Input">User Input</h1>
@@ -919,6 +1169,17 @@ RIGHT TAP(p)
 <p>With the optional TAP keyword, this function returns true only for
 the first frame the button is pressed.</p>
 
+<pre class="example">
+GAMEPAD 1
+DO
+  IF UP(0) THEN PRINT "UP"
+  IF DOWN(0) THEN PRINT "DOWN"
+  IF LEFT TAP(0) THEN PRINT "TAP <"
+  IF RIGHT TAP(0) THEN PRINT "TAP >"
+  WAIT VBL
+LOOP
+</pre>
+
 
 <h3 id="_BUTTON" name="BUTTON,TAP">=BUTTON</h3>
 
@@ -932,6 +1193,15 @@ player <em>p</em> (0/1). If the parameter <em>n</em> is omitted, both buttons
 
 <p>With the optional TAP keyword, this function returns true only for
 the first frame the button is pressed.</p>
+
+<pre class="example">
+GAMEPAD 1
+DO
+  IF BUTTON(0,0) THEN PRINT "A"
+  IF BUTTON TAP(0,1) THEN PRINT "TAP B"
+  WAIT VBL
+LOOP
+</pre>
 
 
 <h3 id="_PAUSE-ON-OFF" name="PAUSE ON,PAUSE OFF,PAUSE,ON,OFF">PAUSE ON/OFF</h3>
@@ -966,6 +1236,15 @@ PAUSE
 After calling this function its value is cleared, so it returns
 each button tap only once. The automatic pause handling needs to
 be disabled for this function.</p>
+
+<pre class="example">
+GAMEPAD 1
+PAUSE OFF
+DO
+  IF PAUSE THEN PRINT "PAUSE PRESSED"
+  WAIT VBL
+LOOP
+</pre>
 
 
 <h2 id="Touchscreen-Mouse">Touchscreen/Mouse</h2>
@@ -1003,6 +1282,14 @@ the screen, or where it was touched the last time.</p>
 
 <p>Returns true if the screen is currently touched.</p>
 
+<pre class="example">
+TOUCHSCREEN
+DO
+  IF TOUCH THEN PRINT TOUCH.X,TOUCH.Y
+  WAIT VBL
+LOOP
+</pre>
+
 
 <h3 id="_TAP" name="TAP">=TAP</h3>
 
@@ -1010,6 +1297,14 @@ the screen, or where it was touched the last time.</p>
 
 <p>Returns true if the screen is currently touched and was not
 touched the last frame.</p>
+
+<pre class="example">
+TOUCHSCREEN
+DO
+  IF TAP THEN PRINT TOUCH.X,TOUCH.Y
+  WAIT VBL
+LOOP
+</pre>
 
 
 <h2 id="Keyboard">Keyboard</h2>
@@ -1042,6 +1337,15 @@ alternative input only.</p>
 it returns an empty string (""). After calling this function its
 value is cleared, so it returns each pressed key only once.
 The keyboard needs to be enabled for this function.</p>
+
+<pre class="example">
+KEYBOARD ON
+DO
+  I$=INKEY$
+  IF I$&lt;&gt;"" THEN PRINT I$
+  WAIT VBL
+LOOP
+</pre>
 
 
 <h1 id="Graphics">Graphics</h1>
@@ -1108,6 +1412,17 @@ SPRITE n [PAL pal] [FLIP fx,fy] ...
 3: 4x4 characters (32x32 px)</td></tr>
 </table>
 
+<pre class="example">
+SPRITE 0,32,64,193
+SPRITE 1,64,64,193
+SPRITE 1 PAL 1 SIZE 3
+FOR X=64 TO 128
+  SPRITE 1,X,,
+  IF X=96 THEN SPRITE 1 FLIP 1,0
+  WAIT VBL
+NEXT X
+</pre>
+
 
 <h3 id="_SPRITE.A" name="SPRITE.A">SPRITE.A</h3>
 
@@ -1159,6 +1474,20 @@ that pixels overlap). If no more parameters are given, it will
 check with all other visible sprites. If the <em>a</em> parameter is added,
 it will check only with that sprite <em>a</em>. If all parameters are
 given, it will check with all sprites from number <em>a</em> to number <em>b</em>.</p>
+
+<pre class="example">
+SPRITE 0,32,64,225
+SPRITE 1,96,68,226
+FOR X=32 TO 128
+  SPRITE 0,X,,
+  IF SPRITE HIT(0,1) THEN
+    SPRITE 0 PAL 1
+  ELSE
+    SPRITE 0 PAL 0
+  END IF
+  WAIT VBL
+NEXT X
+</pre>
 
 
 <h3 id="_=HIT" name="HIT">=HIT</h3>
@@ -1214,6 +1543,12 @@ window to the default one.</p>
 
 <p>Sets the palette number (0-7) attribute for cell and text commands.</p>
 
+<pre class="example">
+PRINT "HELLO"
+PAL 1
+PRINT "LOWRES NX!"
+</pre>
+
 
 <h3 id="_FLIP" name="FLIP">FLIP</h3>
 
@@ -1221,6 +1556,14 @@ window to the default one.</p>
 
 <p>Sets the values (0/1) for horizontal (<em>fx</em>) and vertical (<em>fy</em>)
 flip attributes for cell and text commands.</p>
+
+<pre class="example">
+PRINT "LOWRES NX"
+FLIP 1,0
+PRINT "LOWRES NX"
+FLIP 0,1
+PRINT "LOWRES NX"
+</pre>
 
 
 <h3 id="_PRIO" name="PRIO">PRIO</h3>
@@ -1253,6 +1596,15 @@ flip attributes for cell and text commands.</p>
 character <em>c</em> using the current attributes.
 If <em>c</em> is omitted, only the attributes of the cell get
 changed.</p>
+
+<pre class="example">
+PAL 2
+CELL 1,1,225
+CELL 2,1,226
+CELL 3,1,227
+PAL 1
+CELL 3,1,
+</pre>
 
 
 <h3 id="_CELL.C" name="CELL.C">=CELL.C</h3>
@@ -1287,6 +1639,13 @@ BG FILL cx1,cy1 TO cx2,cy2 ...
 
 <p>Sets one or more attributes of all cells in the given area.</p>
 
+<pre class="example">
+PAL 2
+BG FILL 2,2 TO 17,6 CHAR 225
+BG FILL 10,4 TO 17,6 CHAR 226
+BG FILL 8,3 TO 11,5 PAL 1 FLIP 0,1
+</pre>
+
 
 <h3 id="_BG-SOURCE" name="BG SOURCE,BG,SOURCE">BG SOURCE</h3>
 
@@ -1302,6 +1661,13 @@ height from <em>a</em>+3 and the actual map data starts at <em>a</em>+4.</p>
 
 <p>By default ROM entry 3 is used as source.</p>
 
+<pre class="example">
+'USE A MAP FROM ROM ENTRY 4
+BG SOURCE ROM(4)
+'USE A MAP FROM WORKING RAM
+BG SOURCE $A000,32,32
+</pre>
+
 
 <h3 id="_BG-COPY" name="BG COPY,BG,COPY">BG COPY</h3>
 
@@ -1309,6 +1675,11 @@ height from <em>a</em>+3 and the actual map data starts at <em>a</em>+4.</p>
 
 <p>Copies a two-dimensional part of the current source to the
 current background.</p>
+
+<pre class="example">
+'SHOW SCREEN FROM BG DESIGNER
+BG COPY 0,0,20,16 TO 0,0
+</pre>
 
 
 <h3 id="_MCELL.C-MCELL.A" name="MCELL.C,MCELL.A,MCELL">=MCELL.C/A</h3>
@@ -1345,6 +1716,11 @@ horizontally by <em>dx</em> and vertically by <em>dy</em> cells.</p>
 <p>Outputs the string <em>s$</em> to the current background at cell position
 <em>cx,cy</em> using the current attributes.</p>
 
+<pre class="example">
+PAL 3
+TEXT 15,15,"HELLO"
+</pre>
+
 
 <h3 id="_NUMBER" name="NUMBER">NUMBER</h3>
 
@@ -1355,6 +1731,10 @@ horizontally by <em>dx</em> and vertically by <em>dy</em> cells.</p>
 always <em>d</em> digits.
 This command is preferred over TEXT to show numbers, as it
 doesn't need to convert numbers to strings.</p>
+
+<pre class="example">
+NUMBER 15,0,321,5
+</pre>
 
 
 <h3 id="_FONT" name="FONT">FONT</h3>
@@ -1374,6 +1754,14 @@ if available.</p>
 
 <p>Sets the scroll offset of background <em>b</em> (0/1) to pixel
 co-ordinates <em>x,y</em>.</p>
+
+<pre class="example">
+TEXT 0,7,"SCROLLING BACKGROUND"
+FOR I=0 TO 256
+  SCROLL 0,I,0
+  WAIT VBL
+NEXT I
+</pre>
 
 
 <h3 id="_SCROLL.X-SCROLL.Y" name="SCROLL.X,SCROLL.Y">=SCROLL.X/Y</h3>
@@ -1460,6 +1848,16 @@ short (see "CPU Cycles").</p>
 
 <p>Removes the current subprogram.</p>
 
+<pre class="example">
+ON RASTER CALL RAINBOW
+PRINT "RAINBOW WRITER"
+INPUT A$
+
+SUB RAINBOW
+  PALETTE 0,(RASTER+TIMER) MOD 64,,,
+END SUB
+</pre>
+
 
 <h3 id="_=RASTER" name="RASTER">=RASTER</h3>
 
@@ -1481,6 +1879,16 @@ blocked by WAIT or INPUT. VBL subprograms should not be very long
 <pre>ON VBL OFF</pre>
 
 <p>Removes the current subprogram.</p>
+
+<pre class="example">
+ON VBL CALL BLINK
+PRINT "BLINK WRITER"
+INPUT A$
+
+SUB BLINK
+  PALETTE 0,TIMER MOD 64,,,
+END SUB
+</pre>
 
 
 <h3 id="_=TIMER" name="TIMER">=TIMER</h3>
@@ -1549,6 +1957,15 @@ parameter is omitted, the current value of the voice is kept.</p>
 the SOUND parameter to use the sound number <em>s</em> from the Sound Composer
 tool.</p>
 
+<pre class="example">
+PLAY 0,49,20
+WAIT 30
+PLAY 0,53,20
+WAIT 30
+PLAY 0,56,40
+WAIT 60
+</pre>
+
 
 <h3 id="_STOP" name="STOP">STOP</h3>
 
@@ -1610,6 +2027,16 @@ time. All times are non-linear and range from 0 (2 ms) to 15 (12 s)</p>
 time and before the sound gets released.</p>
 <p>All parameters can be omitted to keep their current settings.</p>
 
+<pre class="example">
+ENVELOPE 0,1,6,8,8
+PLAY 0,49,20
+WAIT 30
+PLAY 0,53,20
+WAIT 30
+PLAY 0,56,40
+WAIT 120
+</pre>
+
 
 <h3 id="_LFO" name="LFO">LFO</h3>
 
@@ -1622,6 +2049,16 @@ non-linear manner.</p>
 parameters: <em>fr</em> for frequency/pitch, <em>vol</em> for volume and <em>pw</em> for pulse
 width. These values range from 0 to 15.</p>
 <p>All parameters can be omitted to keep their current settings.</p>
+
+<pre class="example">
+LFO 0,12,4,0,0
+PLAY 0,49,20
+WAIT 30
+PLAY 0,53,20
+WAIT 30
+PLAY 0,56,40
+WAIT 120
+</pre>
 
 
 <h3 id="_LFO_WAVE" name="LFO WAVE,LFO,WAVE">LFO WAVE</h3>
@@ -1702,6 +2139,15 @@ comma separated variables in <em>var-list</em>. The program has an internal
 pointer to the current DATA value. With each value read, the
 pointer will move to the next DATA value.</p>
 
+<pre class="example">
+FOR I=0 TO 3
+  READ TYPE$,POWER
+  PRINT TYPE$;":",POWER
+NEXT I
+DATA "LASER",10,"BLASTER",15
+DATA "PLASMA",20,"FUSION",30
+</pre>
+
 
 <h3 id="_RESTORE" name="RESTORE">RESTORE</h3>
 
@@ -1711,6 +2157,17 @@ pointer will move to the next DATA value.</p>
 to reread data or to select specific data. If the label parameter
 is omitted, READ will start again from the top of the program.
 Otherwise the pointer will be set to the jump label.</p>
+
+<pre class="example">
+RESTORE SHIELDS
+FOR I=0 TO 1
+  READ TYPE$,POWER
+  PRINT TYPE$;":",POWER
+NEXT I
+DATA "LASER",10,"BLASTER",15
+SHIELDS:
+DATA "SIMPLE",30,"ADVANCED",60
+</pre>
 
 
 <h1 id="Memory-Access">Memory Access</h1>
@@ -1727,6 +2184,16 @@ Reference".</p>
 
 <p>Returns the byte value (0-255) at memory address <em>a</em>.</p>
 
+<pre class="example">
+TOUCHSCREEN
+PRINT "TOUCH!"
+DO
+  IF PEEK($FF75) AND %10 THEN
+    PRINT PEEK($FF72),PEEK($FF73)
+  END IF
+  WAIT VBL
+LOOP
+</pre>
 
 <h3 id="_POKE" name="POKE">POKE</h3>
 
@@ -1735,6 +2202,11 @@ Reference".</p>
 <p>Sets the memory at address <em>a</em> to value <em>v</em>.
 <em>v</em> is a numeric expression from 0 to 255;
 numeric expressions outside this range are truncated to 8 bits.</p>
+
+<pre class="example">
+POKE $9000,232
+POKE $9002,233
+</pre>
 
 
 <h3 id="_=PEEKW" name="PEEKW">=PEEKW</h3>
@@ -1770,6 +2242,16 @@ memory address <em>a</em>.</p>
 <em>v</em> is a numeric expression from -2147483648 to 2147483647;
 numeric expressions outside this range are truncated to 32 bits.</p>
 
+<pre class="example">
+'EXAMPLE USES PERSISTENT RAM
+HI=PEEKL($E000)
+PRINT "HIGHSCORE:"
+PRINT HI
+INPUT "SCORE:";SC
+IF SC>HI THEN POKEL $E000,SC
+PRINT "RESTART!"
+</pre>
+
 
 <h3 id="_COPY" name="COPY">COPY</h3>
 
@@ -1777,6 +2259,12 @@ numeric expressions outside this range are truncated to 32 bits.</p>
 
 <p>Copies <em>n</em> bytes starting from memory address <em>a</em> to address <em>d</em>.
 The source and the destination areas may overlap.</p>
+
+<pre class="example">
+'COPY CHARACTERS FROM ROM
+'ENTRY 4 TO VIDEO RAM
+COPY ROM(4),SIZE(4) TO $8000
+</pre>
 
 
 <h3 id="_FILL" name="FILL">FILL</h3>
@@ -1866,6 +2354,13 @@ store game states.</p>
 <pre>FILE$(f)</pre>
 
 <p>Returns the comment string of file number <em>f</em>. Call FILES before accessing the file directory to update its content, or use FILE$ directly after LOAD or SAVE.</p>
+
+<pre class="example">
+FILES
+FOR I=0 TO 15
+  PRINT I,FILE$(I)
+NEXT I
+</pre>
 
 
 <h3 id="_=FSIZE" name="FSIZE">=FSIZE</h3>
@@ -2023,6 +2518,13 @@ random numbers is always the same.</p>
 <p>If you want different random numbers each time you run your
 program, you should insert this line at the beginning.</p>
 
+<pre class="example">
+RANDOMIZE TIMER
+FOR I=1 TO 16
+  PRINT RND(1000)
+NEXT I
+</pre>
+
 
 <h2 id="Manipulating-Numbers">Manipulating Numbers</h2>
 
@@ -2045,6 +2547,14 @@ program, you should insert this line at the beginning.</p>
 <pre>SWAP var1,var2</pre>
 
 <p>Swaps the data between any two variables of the same type.</p>
+
+<pre class="example">
+A=10
+B=40
+SWAP A,B
+PRINT A
+PRINT B
+</pre>
 
 
 <h3 id="_INC" name="INC">INC</h3>
@@ -2090,10 +2600,20 @@ IF A&lt;BASE THEN A=TOP
 
 <p>Returns a new string with the first <em>n</em> characters of <em>s$</em>.</p>
 
+<pre class="example">
+PRINT LEFT$("LOWRES NX",3)
+</pre>
+
 <pre>LEFT$(s$,n)=a$</pre>
 
 <p>Overwrites the first characters in the variable <em>s$</em> with the first
 <em>n</em> characters of <em>a$</em>.</p>
+
+<pre class="example">
+A$="FOORES NX"
+LEFT$(A$,3)="LOWER"
+PRINT A$
+</pre>
 
 
 <h3 id="_RIGHT$" name="RIGHT$">=RIGHT$=</h3>
@@ -2115,10 +2635,20 @@ characters of <em>a$</em>.</p>
 <p>Returns a new string with <em>n</em> characters of <em>s$</em>, starting at
 character <em>p</em>. The first character has the position 1.</p>
 
+<pre class="example">
+PRINT MID$("LOWRES NX",4,3)
+</pre>
+
 <pre>MID$(s$,p,n)=a$</pre>
 
 <p>Overwrites the given text range in the variable <em>s$</em> with the first
 <em>n</em> characters of <em>a$</em>.</p>
+
+<pre class="example">
+A$="LOWFOO NX"
+MID$(A$,4,3)="RESTAURANT"
+PRINT A$
+</pre>
 
 
 <h3 id="_INSTR" name="INSTR">=INSTR</h3>
@@ -2130,6 +2660,10 @@ start position. If it's not found, the function returns 0.
 Usually the function starts searching at the beginning of the
 string. Optionally it can start searching at position <em>p</em>.</p>
 
+<pre class="example">
+PRINT INSTR("LOWRES NX","RES")
+</pre>
+
 
 <h3 id="_CHR$" name="CHR$">=CHR$</h3>
 
@@ -2137,12 +2671,22 @@ string. Optionally it can start searching at position <em>p</em>.</p>
 
 <p>Returns a string containing one character with ASCII code <em>n</em>.</p>
 
+<pre class="example">
+FOR I=32 TO 90
+  PRINT CHR$(I)
+NEXT I
+</pre>
+
 
 <h3 id="_ASC" name="ASC">=ASC</h3>
 
 <pre>ASC(a$)</pre>
 
 <p>Supplies you with the ASCII code of the first character of <em>a$</em>.</p>
+
+<pre class="example">
+PRINT ASC("L")
+</pre>
 
 
 <h3 id="_LEN" name="LEN">=LEN</h3>
@@ -2195,6 +2739,12 @@ LowRes NX application.</p>
 <p>Outputs text to the debugging window. Expressions can be strings or
 numbers, separated by commas. This command is ignored if the debugging
 mode is not enabled.</p>
+
+<pre class="example">
+A=13
+B$="GO"
+TRACE "TEST",A,B$
+</pre>
 
 
 <h3 id="_SYSTEM" name="SYSTEM">SYSTEM</h3>
