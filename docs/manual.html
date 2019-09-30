@@ -17,6 +17,7 @@ th {
 }
 a {
     text-decoration: none;
+    color: #055;
 }
 ul {
     padding-left: 25px;
@@ -109,6 +110,30 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 
 <body>
 <div class="container">
+
+<h1>Contents</h1>
+
+<ul>
+	<li><a href="#Introduction">Introduction</a></li>
+	<li><a href="#Editing">Editing</a></li>
+	<li><a href="#Character-Designer">Character Designer</a></li>
+	<li><a href="#Background-Designer">Background Designer</a></li>
+	<li><a href="#Sound-Composer">Sound Composer</a></li>
+	<li><a href="#Language-Basics">Language Basics</a></li>
+	<li><a href="#Program-Flow-Control">Program Flow Control</a></li>
+	<li><a href="#Text">Text</a></li>
+	<li><a href="#User-Input">User Input</a></li>
+	<li><a href="#Graphics">Graphics</a></li>
+	<li><a href="#Sound">Sound</a></li>
+	<li><a href="#Data">Data</a></li>
+	<li><a href="#Memory-Access">Memory Access</a></li>
+	<li><a href="#Files">Files</a></li>
+	<li><a href="#Math-Functions">Math Functions</a></li>
+	<li><a href="#String-Functions">String Functions</a></li>
+	<li><a href="#System">System</a></li>
+	<li><a href="#Advanced-Topics">Advanced Topics</a></li>
+</ul>
+
 
 <h1 id="Introduction">Introduction</h1>
 
@@ -311,7 +336,7 @@ If you want to use the default font, make sure to keep ROM entry 0
 unused.</p>
 
 
-<h2 id="Character-Designer">Character Designer</h2>
+<h1 id="Character-Designer">Character Designer</h1>
 
 <img class="illustration" src="manual-images/illustration_painting.png"  srcset="manual-images/illustration_painting.png 1x, manual-images/illustration_painting@2x.png 2x"/>
 
@@ -323,7 +348,7 @@ Background Designer.</p>
 keep in mind that it does not save automatically.</p>
 
 
-<h3 id="CD-Main-Screen">Main Screen</h3>
+<h2 id="CD-Main-Screen">Main Screen</h2>
 
 <p>At the bottom part you see the 256 characters split into four pages.
 There you can select the current one for editing. Keep the last page
@@ -346,14 +371,14 @@ color.</td></tr>
 <tr><td>NEW</td><td>Clear all characters.</td></tr>
 </table>
 
-<h3 id="CD-Disk-Menu">Disk Menu</h3>
+<h2 id="CD-Disk-Menu">Disk Menu</h2>
 
 <p>The list shows all 16 files of the current virtual disk, or in
 other words the ROM entries of the program you are editing. Select one
 (usually number 2) and tap on Load or Save.</p>
 
 
-<h2 id="Background-Designer">Background Designer</h2>
+<h1 id="Background-Designer">Background Designer</h1>
 
 <img class="illustration" src="manual-images/illustration_building.png" srcset="manual-images/illustration_building.png 1x, manual-images/illustration_building@2x.png 2x"/>
 
@@ -366,7 +391,7 @@ palettes (file 2) and background (file 3) on startup, but keep in
 mind that it doesn't save automatically.</p>
 
 
-<h3 id="BD-Selection-Screen">Selection Screen</h3>
+<h2 id="BD-Selection-Screen">Selection Screen</h2>
 
 <p>On the top there is the character selector. Drag to select several
 characters at once. In the box at the left you select the current
@@ -377,7 +402,7 @@ screen backdrop color.
 </p>
 
 
-<h3 id="BD-Map-Editor">Map Editor</h3>
+<h2 id="BD-Map-Editor">Map Editor</h2>
 
 <p>Here you draw your background using the character and color palette
 currently selected on the selection screen. On the bottom appear some
@@ -398,7 +423,7 @@ palette, using the selected flip and priority attributes.</td></tr>
 NX on a computer.</p>
 
 
-<h3 id="BD-Disk-Menu">Disk Menu</h3>
+<h2 id="BD-Disk-Menu">Disk Menu</h2>
 
 <p>From here you load and save characters, color palettes and the
 background separately. There is no option to save everything at once.
@@ -412,7 +437,7 @@ the width and height of the background (in cells), as well as the cell size (8x8
 </table>
 
 
-<h2 id="Sound-Composer">Sound Composer</h2>
+<h1 id="Sound-Composer">Sound Composer</h1>
 
 <img class="illustration" src="manual-images/illustration_music.png" srcset="manual-images/illustration_music.png 1x, manual-images/illustration_music@2x.png 2x"/>
 
@@ -423,20 +448,23 @@ that it doesn't save automatically. A sound file includes all sound
 and music data.</p>
 
 
-<h3 id="SC-Structure">Structure</h3>
+<h2 id="SC-Structure">Structure</h2>
 
-<p>- 16 Sounds</p>
+<h3>16 Sounds</h3>
+
 <p>A sound is a preset with all available sound parameters (waveform,
 envelope, LFO, etc.). It can be used directly with the PLAY command in
 your program or as an instrument in a track/song.</p>
 
-<p>- 64 Tracks</p>
+<h3>64 Tracks</h3>
+
 <p>A track is a sequence of 32 steps for a single voice, where each
 step can play a note or modify the sound. It can be used in your
 program for complex sound effects and short melodies (e.g. "level up")
 with the TRACK command. Tracks are also used to create songs.</p>
 
-<p>- 64 Patterns</p>
+<h3>64 Patterns</h3>
+
 <p>A pattern is a block of music, which defines which track should be
 played on each of the four voices. Patterns will be played one after
 another, except for the following cases: If the next pattern is empty,
@@ -447,14 +475,15 @@ stops.<br/>
 If you want to create music for a game and you plan to use
 additional sound effects, you should leave at least one voice empty.</p>
 
-- Songs
+<h3>Songs</h3>
+
 <p>The 64 patterns can be used for one long song or several shorter
 ones. By using the "loop" and "stop" flags songs can be separated. To
 play one specific song, just start at its first pattern. To play a
 song in your program use the MUSIC command.</p>
 
 
-<h3 id="SC-Editors">Editors</h3>
+<h2 id="SC-Editors">Editors</h2>
 
 <p>The Sound Composer has three tabs in the top right corner for the
 different sections: The pattern editor, the track editor and the sound
@@ -470,6 +499,7 @@ toggles between play (pattern/track) and stop.
 </p>
 
 <h3 id="SC-The-Pattern-Editor">The Pattern Editor</h3>
+
 <p>Here you can select a pattern, choose its tracks for all voices and
 edit directly the notes of each selected track. There is also a toggle
 button for the "loop" and "stop" flags for the current pattern. If you
@@ -478,6 +508,7 @@ track. Use the star symbol from the musical keyboard, if you want to
 stop/release a note in a track.</p>
 
 <h3 id="SC-The-Track-Editor">The Track Editor</h3>
+
 <p>Here you can select and edit a single track with additional
 parameters:</p>
 <table>
@@ -494,7 +525,7 @@ parameters:</p>
 be used in the other editors for new notes.</p>
 
 
-<h3 id="SC-Sound-Commands">Sound Commands</h3>
+<h2 id="SC-Sound-Commands">Sound Commands</h2>
 
 <p>These commands allow you to change parameters dynamically while
 playback. Use them in the track editor.</p>
@@ -653,8 +684,8 @@ PRINT (3+4)*5
 <tr><td>&lt;=</td> <td><code>X&lt;=30</code></td> <td>Less than or equal</td></tr>
 </table>
 
-<p>Relational operator expressions have a value of true (-1) or
-false (0). For example: (2=3)=0, (4=4)=-1, (1&lt;3)=-1</p>
+<p>A relational operator expression returns the value true (-1) or
+false (0).</p>
 
 <h3 id="Operators-Log">Logical/Bitwise</h3>
 
@@ -677,6 +708,7 @@ IF SUM&lt;5 THEN PRINT "LESS THAN 5"
 NAME$="LOWRES NX"
 GREET$="HELLO "+NAME$+"!"
 IF NAME$&gt;"LOWRES" THEN PRINT GREET$
+IF SUM=4 AND NAME$&lt;&gt;"" THEN PRINT "OK"
 </pre>
 
 
@@ -1394,8 +1426,7 @@ standard character attributes (color palette, flip X/Y, priority) and additional
 All parameters can be omitted to keep their current settings.</p>
 
 <pre>
-SPRITE n [PAL pal] [FLIP fx,fy] ...
-[PRIO pri] [SIZE s]
+SPRITE n [PAL pal] [FLIP fx,fy] [PRIO pri] [SIZE s]
 </pre>
 
 <p>Sets one or more attributes of sprite <em>n</em> (0 - 63):</p>
@@ -1428,7 +1459,8 @@ NEXT X
 
 <pre>SPRITE.A n,a</pre>
 
-<p>Sets all attributes of sprite <em>n</em> (0-63) as a single 8-bit value.</p>
+<p>Sets all attributes of sprite <em>n</em> (0-63) as a single 8-bit value.
+See <a href="#Sprite-Registers">"Sprite Registers"</a> for more information.</p>
 
 
 <h3 id="_SPRITE-OFF" name="SPRITE OFF,SPRITE,OFF">SPRITE OFF</h3>
@@ -1462,7 +1494,9 @@ SPRITE.Y(n)
 
 <pre>SPRITE.A(n)</pre>
 
-<p>Returns the attributes of sprite <em>n</em> as an 8-bit value.</p>
+<p>Returns the attributes of sprite <em>n</em> as an 8-bit value.
+See <a href="#Sprite-Registers">"Sprite Registers"</a> for more
+information.</p>
 
 
 <h3 id="_=SPRITE-HIT" name="SPRITE HIT,SPRITE,HIT">=SPRITE HIT</h3>
@@ -1578,7 +1612,7 @@ PRINT "LOWRES NX"
 <pre>ATTR a</pre>
 
 <p>Sets all attributes for cell and text commands as a single
-8-bit value.</p>
+8-bit value. See <a href="#BG-Data">"BG Data"</a> for more information.</p>
 
 
 <h3 id="_BG" name="BG">BG</h3>
@@ -1590,20 +1624,17 @@ PRINT "LOWRES NX"
 
 <h3 id="_CELL" name="CELL">CELL</h3>
 
-<pre>CELL cx,cy,[c]</pre>
+<pre>CELL cx,cy,c</pre>
 
 <p>Sets the cell at position <em>cx,cy</em> of the current background to
-character <em>c</em> using the current attributes.
-If <em>c</em> is omitted, only the attributes of the cell get
-changed.</p>
+character <em>c</em> using the current attributes.</p>
 
 <pre class="example">
 PAL 2
 CELL 1,1,225
 CELL 2,1,226
-CELL 3,1,227
 PAL 1
-CELL 3,1,
+CELL 3,1,227
 </pre>
 
 
@@ -1620,30 +1651,55 @@ background.</p>
 <pre>CELL.A(cx,cy)</pre>
 
 <p>Returns the attributes of the cell at position <em>cx,cy</em> of the current
-background as an 8-bit value.</p>
+background as an 8-bit value. See <a href="#BG-Data">"BG Data"</a> for
+more information.</p>
 
 
-<h3 id="_BG-FILL" name="BG FILL,BG,FILL,TO,CHAR,PAL,FLIP,PRIO">BG FILL</h3>
+<h3 id="_BG-FILL" name="BG FILL,BG,FILL,TO,CHAR">BG FILL</h3>
 
-<pre>BG FILL cx1,cy1 TO cx2,cy2 [CHAR c]</pre>
+<pre>BG FILL cx1,cy1 TO cx2,cy2 CHAR c</pre>
 
 <p>Sets all cells in the area from <em>cx1,cy1</em> to <em>cx2,cy2</em>
-of the current background to character <em>c</em> using the current attributes.
-If CHAR <em>c</em> is omitted, only the attributes
-of the cells get changed.</p>
-
-<pre>
-BG FILL cx1,cy1 TO cx2,cy2 ...
-[PAL pal] [FLIP fx,fy] [PRIO pri]
-</pre>
-
-<p>Sets one or more attributes of all cells in the given area.</p>
+of the current background to character <em>c</em> using the current attributes.</p>
 
 <pre class="example">
 PAL 2
-BG FILL 2,2 TO 17,6 CHAR 225
-BG FILL 10,4 TO 17,6 CHAR 226
-BG FILL 8,3 TO 11,5 PAL 1 FLIP 0,1
+BG FILL 2,2 TO 17,13 CHAR 225
+PAL 1
+BG FILL 10,8 TO 17,13 CHAR 226
+</pre>
+
+
+<h3 id="_TINT" name="TINT,PAL,FLIP,PRIO">TINT</h3>
+
+<pre>
+TINT cx,cy [PAL pal] [FLIP fx,fy] [PRIO pri]
+</pre>
+
+<p>Changes the palette and/or other attributes of the cell at position
+<em>cx,cy</em> of the current background. The cell's character and
+omitted attributes stay unchanged.</p>
+
+<pre class="example">
+BG FILL 2,2 TO 17,13 CHAR 225
+TINT 10,8 PAL 1 FLIP 0,1
+</pre>
+
+
+<h3 id="_BG-TINT" name="BG TINT,BG,TINT,TO,PAL,FLIP,PRIO">BG TINT</h3>
+
+<pre>
+BG TINT cx1,cy1 TO cx2,cy2 [PAL pal] [FLIP fx,fy] [PRIO pri]
+</pre>
+
+<p>Changes the palette and/or other attributes of all cells in the
+area from <em>cx1,cy1</em> to <em>cx2,cy2</em> of the current
+background. The cells' characters and omitted attributes stay
+unchanged.</p>
+
+<pre class="example">
+BG FILL 2,2 TO 17,13 CHAR 225
+BG TINT 10,8 TO 15,11 PAL 1
 </pre>
 
 
@@ -1694,7 +1750,7 @@ co-ordinates are outside of the map bounds, the functions return -1.</p>
 
 <h3 id="_MCELL" name="MCELL">MCELL</h3>
 
-<pre>MCELL cx,cy,[c]</pre>
+<pre>MCELL cx,cy,c</pre>
 
 <p>Works like the CELL command, but sets a cell in the source map
 (BG SOURCE) instead of the current background. The source must be in
@@ -1776,7 +1832,7 @@ SCROLL.Y(b)
 
 <h2 id="Display-Settings">Display Settings</h2>
 
-<h3 id="_SPRITE_VIEW" name="SPRITE VIEW ON,SPRITE VIEW OFF,SPRITE,VIEW,ON,OFF,SPRITE VIEW">SPRITE VIEW ON/OFF</h3>
+<h3 id="_SPRITE-VIEW" name="SPRITE VIEW ON,SPRITE VIEW OFF,SPRITE,VIEW,ON,OFF,SPRITE VIEW">SPRITE VIEW ON/OFF</h3>
 
 <pre>SPRITE VIEW ON</pre>
 <pre>SPRITE VIEW OFF</pre>
@@ -1785,7 +1841,7 @@ SCROLL.Y(b)
 the sprites' settings.</p>
 
 
-<h3 id="_BG_VIEW" name="BG VIEW ON,BG VIEW OFF,BG,VIEW,ON,OFF,BG VIEW">BG VIEW ON/OFF</h3>
+<h3 id="_BG-VIEW" name="BG VIEW ON,BG VIEW OFF,BG,VIEW,ON,OFF,BG VIEW">BG VIEW ON/OFF</h3>
 
 <pre>BG VIEW ON n</pre>
 <pre>BG VIEW OFF n</pre>
@@ -1793,7 +1849,7 @@ the sprites' settings.</p>
 <p>Shows or hides background <em>n</em> (0 or 1).</p>
 
 
-<h3 id="_CELL_SIZE" name="CELL SIZE,CELL,SIZE">CELL SIZE</h3>
+<h3 id="_CELL-SIZE" name="CELL SIZE,CELL,SIZE">CELL SIZE</h3>
 
 <pre>CELL SIZE b,s</pre>
 
@@ -1841,8 +1897,8 @@ BLUE = VALUE MOD 4
 
 <p>Sets a subprogram which is executed for every screen line before
 it's drawn. Usually used to change color palettes or scroll
-offsets to achieve graphical effects. Raster subprograms must be
-short (see "CPU Cycles").</p>
+offsets to achieve graphical effects. Raster subprograms should be
+short (see <a href="#CPU-Cycles">"CPU Cycles"</a>).</p>
 
 <pre>ON RASTER OFF</pre>
 
@@ -1874,7 +1930,7 @@ subprogram.</p>
 <p>Sets a subprogram which is executed each frame. Can be used
 to update animations or sounds, even if the main program is
 blocked by WAIT or INPUT. VBL subprograms should not be very long
-(see "CPU Cycles").</p>
+(see <a href="#CPU-Cycles">"CPU Cycles"</a>).</p>
 
 <pre>ON VBL OFF</pre>
 
@@ -1907,7 +1963,7 @@ can play sawtooth, triangle, pulse and noise waveforms, and has
 frequency, volume and pulse width settings. An additional envelope
 generator and LFO per voice makes complex sounds and instruments
 possible.</p>
-<p>You can use the tool "Sound Composer" (or compatible programs) to
+<p>You can use the tool <a href="#Sound-Composer">"Sound Composer"</a> (or compatible programs) to
 create music, tracks and sound presets.</p>
 
 
@@ -2061,7 +2117,7 @@ WAIT 120
 </pre>
 
 
-<h3 id="_LFO_WAVE" name="LFO WAVE,LFO,WAVE">LFO WAVE</h3>
+<h3 id="_LFO-WAVE" name="LFO WAVE,LFO,WAVE">LFO WAVE</h3>
 
 <pre>LFO WAVE v,[w],[i],[e],[t]</pre>
 
@@ -2174,8 +2230,8 @@ DATA "SIMPLE",30,"ADVANCED",60
 
 <p>LowRes NX simulates chips for graphics, sound and I/O, the cartridge
 ROM, working RAM and persistent RAM. Everything is accessible in a
-64 KB memory map, which is described in the chapter "Hardware
-Reference".</p>
+64 KB memory map, which is described in the chapter
+<a href="#Hardware-Reference">"Hardware Reference"</a>.</p>
 
 
 <h3 id="_=PEEK" name="PEEK">=PEEK</h3>
@@ -2766,35 +2822,6 @@ It does not affect the virtual CPU, the code still runs at full speed.
 </table>
 
 
-<h1 id="Obsolete-Syntaxes" name="SPRITE.A,ATTR,DISPLAY,LFO.A">Obsolete Syntaxes</h1>
-
-<p>These commands, functions and syntaxes should not be used anymore
-and may be removed in future versions.</p>
-
-<pre>SPRITE.A n,(pal,fx,fy,pri,s)</pre>
-
-<p>Use SPRITE (new syntax) or SPRITE.A (single value only) instead.</p>
-
-<pre>ATTR (pal,fx,fy,pri,s)[,m]</pre>
-<pre>ATTR a,m</pre>
-
-<p>Use PAL, FLIP, PRIO or ATTR (single value only) instead.
-See new BG FILL syntax for replacing attribute masks.</p>
-
-<pre>DISPLAY (s,b0,b1,c0,c1)</pre>
-<pre>DISPLAY a</pre>
-
-<p>Use BG VIEW ON/OFF, SPRITE VIEW ON/OFF and CELL SIZE instead.</p>
-
-<pre>DISPLAY</pre>
-
-<p>Use PEEK($FF20) instead.</p>
-
-<pre>LFO.A v,(w,r,e,t)</pre>
-
-<p>Use LFO WAVE instead.</p>
-
-
 <h1 id="Advanced-Topics">Advanced Topics</h1>
 
 <h2 id="CPU-Cycles">CPU Cycles</h2>
@@ -3100,6 +3127,36 @@ bytes:</p>
     0-3  Parameter
     4-7  Command
 </pre>
+
+
+<h2 id="Obsolete-Syntaxes" name="SPRITE.A,ATTR,DISPLAY,LFO.A">Obsolete Syntaxes</h2>
+
+<p>These commands, functions and syntaxes should not be used anymore
+and may be removed in future versions.</p>
+
+<pre>SPRITE.A n,(pal,fx,fy,pri,s)</pre>
+
+<p>Use <a href="#_SPRITE">SPRITE</a> (new syntax) or <a href="#_SPRITE.A">SPRITE.A</a>
+(single value only) instead.</p>
+
+<pre>ATTR (pal,fx,fy,pri,s)[,m]</pre>
+<pre>ATTR a,m</pre>
+
+<p>Use <a href="#_PAL">PAL</a>, <a href="#_FLIP">FLIP</a>, <a href="#_PRIO">PRIO</a> or <a href="#_ATTR">ATTR</a> (single value only) instead.
+Use <a href="#_TINT">TINT</a> and <a href="#_BG-TINT">BG TINT</a> for replacing attribute masks.</p>
+
+<pre>DISPLAY (s,b0,b1,c0,c1)</pre>
+<pre>DISPLAY a</pre>
+
+<p>Use <a href="#_BG-VIEW">BG VIEW ON/OFF</a>, <a href="#_SPRITE-VIEW">SPRITE VIEW ON/OFF</a> and <a href="#_CELL-SIZE">CELL SIZE</a> instead.</p>
+
+<pre>DISPLAY</pre>
+
+<p>Use <a href="#_=PEEK">PEEK($FF20)</a> instead.</p>
+
+<pre>LFO.A v,(w,r,e,t)</pre>
+
+<p>Use <a href="#_LFO-WAVE">LFO WAVE</a> instead.</p>
 
 </div>
 </body>

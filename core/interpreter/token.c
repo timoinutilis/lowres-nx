@@ -186,6 +186,7 @@ const char *TokenStrings[] = {
     "TEXT",
     "THEN",
     "TIMER",
+    "TINT",
     "TOUCHSCREEN",
     "TOUCH.X",
     "TOUCH.Y",

@@ -190,6 +190,7 @@ enum TokenType {
     TokenTEXT,
     TokenTHEN,
     TokenTIMER,
+    TokenTINT,
     TokenTOUCHSCREEN,
     TokenTOUCHX,
     TokenTOUCHY,

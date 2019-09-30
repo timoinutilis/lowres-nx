@@ -72,70 +72,20 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
     }
     else
     {
-        int pal = -1;
-        int flipX = -1;
-        int flipY = -1;
-        int prio = -1;
-        int size = -1;
-        
-        // PAL
-        if (interpreter->pc->type == TokenPAL)
-        {
-            ++interpreter->pc;
-            
-            struct TypedValue value = itp_evaluateNumericExpression(core, 0, NUM_PALETTES - 1);
-            if (value.type == ValueTypeError) return value.v.errorCode;
-            pal = value.v.floatValue;
-        }
-        
-        // FLIP
-        if (interpreter->pc->type == TokenFLIP)
-        {
-            ++interpreter->pc;
-            
-            struct TypedValue fxValue = itp_evaluateNumericExpression(core, -1, 1);
-            if (fxValue.type == ValueTypeError) return fxValue.v.errorCode;
-            flipX = fxValue.v.floatValue ? 1 : 0;
-            
-            // comma
-            if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-            ++interpreter->pc;
-            
-            struct TypedValue fyValue = itp_evaluateNumericExpression(core, -1, 1);
-            if (fyValue.type == ValueTypeError) return fyValue.v.errorCode;
-            flipY = fyValue.v.floatValue ? 1 : 0;
-        }
-        
-        // PRIO
-        if (interpreter->pc->type == TokenPRIO)
-        {
-            ++interpreter->pc;
-            
-            struct TypedValue value = itp_evaluateNumericExpression(core, -1, 1);
-            if (value.type == ValueTypeError) return value.v.errorCode;
-            prio = value.v.floatValue ? 1 : 0;
-        }
-        
-        // SIZE
-        if (interpreter->pc->type == TokenSIZE)
-        {
-            ++interpreter->pc;
-            
-            struct TypedValue value = itp_evaluateNumericExpression(core, 0, 3);
-            if (value.type == ValueTypeError) return value.v.errorCode;
-            size = value.v.floatValue;
-        }
+        struct SimpleAttributes attrs;
+        enum ErrorCode attrsError = itp_evaluateSimpleAttributes(core, &attrs);
+        if (attrsError != ErrorNone) return attrsError;
         
         if (interpreter->pass == PassRun)
         {
             int n = nValue.v.floatValue;
             struct Sprite *sprite = &core->machine->spriteRegisters.sprites[n];
             
-            if (pal >= 0) sprite->attr.palette = pal;
-            if (flipX >= 0) sprite->attr.flipX = flipX;
-            if (flipY >= 0) sprite->attr.flipY = flipY;
-            if (prio >= 0) sprite->attr.priority = prio;
-            if (size >= 0) sprite->attr.size = size;
+            if (attrs.pal >= 0) sprite->attr.palette = attrs.pal;
+            if (attrs.flipX >= 0) sprite->attr.flipX = attrs.flipX;
+            if (attrs.flipY >= 0) sprite->attr.flipY = attrs.flipY;
+            if (attrs.prio >= 0) sprite->attr.priority = attrs.prio;
+            if (attrs.size >= 0) sprite->attr.size = attrs.size;
         }
     }
     

@@ -1388,6 +1388,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
                 case TokenFILL:
                     return cmd_BG_FILL(core);
                     
+                case TokenTINT:
+                    return cmd_BG_TINT(core);
+                    
                 case TokenVIEW:
                     return cmd_BG_VIEW(core);
                     
@@ -1418,6 +1421,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
                     return cmd_CELL(core);
             }
             break;
+            
+        case TokenTINT:
+            return cmd_TINT(core);
             
         case TokenMCELL:
             return cmd_MCELL(core);
