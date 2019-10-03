@@ -63,7 +63,7 @@ enum ErrorCode cmd_DATA(struct Core *core)
     while (interpreter->pc->type == TokenComma);
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     return ErrorNone;

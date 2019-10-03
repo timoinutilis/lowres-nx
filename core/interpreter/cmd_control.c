@@ -141,7 +141,7 @@ enum ErrorCode cmd_ELSE(struct Core *core)
             else
             {
                 // Eol
-                if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+                if (interpreter->pc->type != TokenEol) return ErrorSyntax;
                 ++interpreter->pc;
             }
         }
@@ -162,7 +162,7 @@ enum ErrorCode cmd_END_IF(struct Core *core)
     ++interpreter->pc;
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -242,7 +242,7 @@ enum ErrorCode cmd_FOR(struct Core *core)
     }
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -303,7 +303,7 @@ enum ErrorCode cmd_NEXT(struct Core *core)
     }
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -337,7 +337,7 @@ enum ErrorCode cmd_NEXT(struct Core *core)
         }
         
         // Eol
-        if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+        if (interpreter->pc->type != TokenEol) return ErrorSyntax;
         ++interpreter->pc;
 
         varValue->floatValue += stepValue.v.floatValue;
@@ -567,7 +567,7 @@ enum ErrorCode cmd_DO(struct Core *core)
     ++interpreter->pc;
 
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -588,7 +588,7 @@ enum ErrorCode cmd_LOOP(struct Core *core)
     ++interpreter->pc;
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -614,7 +614,7 @@ enum ErrorCode cmd_REPEAT(struct Core *core)
     ++interpreter->pc;
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -639,7 +639,7 @@ enum ErrorCode cmd_UNTIL(struct Core *core)
     if (value.type == ValueTypeError) return value.v.errorCode;
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -678,7 +678,7 @@ enum ErrorCode cmd_WHILE(struct Core *core)
     if (value.type == ValueTypeError) return value.v.errorCode;
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassRun)
@@ -701,7 +701,7 @@ enum ErrorCode cmd_WEND(struct Core *core)
     ++interpreter->pc;
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -732,7 +732,7 @@ enum ErrorCode cmd_SYSTEM(struct Core *core)
     if (tValue.type == ValueTypeError) return tValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // setting value

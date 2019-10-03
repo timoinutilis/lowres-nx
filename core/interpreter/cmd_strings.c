@@ -33,7 +33,7 @@ struct TypedValue fnc_ASC(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -41,7 +41,7 @@ struct TypedValue fnc_ASC(struct Core *core)
     if (stringValue.type == ValueTypeError) return stringValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -67,7 +67,7 @@ struct TypedValue fnc_BIN_HEX(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // x expression
@@ -88,7 +88,7 @@ struct TypedValue fnc_BIN_HEX(struct Core *core)
     }
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;
@@ -123,7 +123,7 @@ struct TypedValue fnc_CHR(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -131,7 +131,7 @@ struct TypedValue fnc_CHR(struct Core *core)
     if (numericValue.type == ValueTypeError) return numericValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;
@@ -191,7 +191,7 @@ struct TypedValue fnc_INSTR(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // string expression
@@ -199,7 +199,7 @@ struct TypedValue fnc_INSTR(struct Core *core)
     if (stringValue.type == ValueTypeError) return stringValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // search value
@@ -220,7 +220,7 @@ struct TypedValue fnc_INSTR(struct Core *core)
     }
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;
@@ -262,7 +262,7 @@ struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -270,14 +270,14 @@ struct TypedValue fnc_LEFTStr_RIGHTStr(struct Core *core)
     if (stringValue.type == ValueTypeError) return stringValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue numberValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (numberValue.type == ValueTypeError) return numberValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;
@@ -318,7 +318,7 @@ struct TypedValue fnc_LEN(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -326,7 +326,7 @@ struct TypedValue fnc_LEN(struct Core *core)
     if (stringValue.type == ValueTypeError) return stringValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -348,7 +348,7 @@ struct TypedValue fnc_MID(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // string expression
@@ -356,7 +356,7 @@ struct TypedValue fnc_MID(struct Core *core)
     if (stringValue.type == ValueTypeError) return stringValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // position value
@@ -364,7 +364,7 @@ struct TypedValue fnc_MID(struct Core *core)
     if (posValue.type == ValueTypeError) return posValue;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // number value
@@ -372,7 +372,7 @@ struct TypedValue fnc_MID(struct Core *core)
     if (numberValue.type == ValueTypeError) return numberValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;
@@ -423,7 +423,7 @@ struct TypedValue fnc_STR(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -431,7 +431,7 @@ struct TypedValue fnc_STR(struct Core *core)
     if (numericValue.type == ValueTypeError) return numericValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;
@@ -457,7 +457,7 @@ struct TypedValue fnc_VAL(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -465,7 +465,7 @@ struct TypedValue fnc_VAL(struct Core *core)
     if (stringValue.type == ValueTypeError) return stringValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -488,7 +488,7 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return ErrorExpectedLeftParenthesis;
+    if (interpreter->pc->type != TokenBracketOpen) return ErrorSyntax;
     ++interpreter->pc;
     
     // variable
@@ -511,7 +511,7 @@ enum ErrorCode cmd_LEFT_RIGHT(struct Core *core)
     }
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+    if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
     ++interpreter->pc;
     
     // equal sign
@@ -577,7 +577,7 @@ enum ErrorCode cmd_MID(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return ErrorExpectedLeftParenthesis;
+    if (interpreter->pc->type != TokenBracketOpen) return ErrorSyntax;
     ++interpreter->pc;
     
     // variable
@@ -588,7 +588,7 @@ enum ErrorCode cmd_MID(struct Core *core)
     if (valueType != ValueTypeString) return ErrorTypeMismatch;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // position expression
@@ -608,7 +608,7 @@ enum ErrorCode cmd_MID(struct Core *core)
     }
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+    if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
     ++interpreter->pc;
     
     // equal sign

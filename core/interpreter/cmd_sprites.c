@@ -46,7 +46,7 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
         if (xValue.type == ValueTypeError) return xValue.v.errorCode;
         
         // comma
-        if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+        if (interpreter->pc->type != TokenComma) return ErrorSyntax;
         ++interpreter->pc;
         
         // y value
@@ -54,7 +54,7 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
         if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
         // comma
-        if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+        if (interpreter->pc->type != TokenComma) return ErrorSyntax;
         ++interpreter->pc;
         
         // c value
@@ -111,7 +111,7 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     }
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     union CharacterAttributes attr;
@@ -192,7 +192,7 @@ struct TypedValue fnc_SPRITE(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -200,7 +200,7 @@ struct TypedValue fnc_SPRITE(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -248,7 +248,7 @@ struct TypedValue fnc_SPRITE_HIT(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // sprite number
@@ -278,7 +278,7 @@ struct TypedValue fnc_SPRITE_HIT(struct Core *core)
     }
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;

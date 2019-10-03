@@ -116,7 +116,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     if (srcXValue.type == ValueTypeError) return srcXValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // src Y value
@@ -124,7 +124,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     if (srcYValue.type == ValueTypeError) return srcYValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // width value
@@ -132,7 +132,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     if (wValue.type == ValueTypeError) return wValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // height value
@@ -148,7 +148,7 @@ enum ErrorCode cmd_BG_COPY(struct Core *core)
     if (dstXValue.type == ValueTypeError) return dstXValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // dst Y value
@@ -176,7 +176,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
     if (x1Value.type == ValueTypeError) return x1Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y1 value
@@ -192,7 +192,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
     if (x2Value.type == ValueTypeError) return x2Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y2 value
@@ -208,7 +208,7 @@ enum ErrorCode cmd_BG_SCROLL(struct Core *core)
     if (dxValue.type == ValueTypeError) return dxValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // dy value
@@ -273,7 +273,7 @@ enum ErrorCode cmd_FLIP(struct Core *core)
     if (fxValue.type == ValueTypeError) return fxValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
@@ -321,7 +321,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     if (x1Value.type == ValueTypeError) return x1Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y1 value
@@ -337,7 +337,7 @@ enum ErrorCode cmd_BG_FILL(struct Core *core)
     if (x2Value.type == ValueTypeError) return x2Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y2 value
@@ -386,7 +386,7 @@ enum ErrorCode cmd_BG_TINT(struct Core *core)
     if (x1Value.type == ValueTypeError) return x1Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y1 value
@@ -402,7 +402,7 @@ enum ErrorCode cmd_BG_TINT(struct Core *core)
     if (x2Value.type == ValueTypeError) return x2Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y2 value
@@ -433,7 +433,7 @@ enum ErrorCode cmd_CELL(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
@@ -441,7 +441,7 @@ enum ErrorCode cmd_CELL(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // character value
@@ -466,7 +466,7 @@ struct TypedValue fnc_CELL(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // x value
@@ -474,7 +474,7 @@ struct TypedValue fnc_CELL(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // y value
@@ -482,7 +482,7 @@ struct TypedValue fnc_CELL(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -519,7 +519,7 @@ enum ErrorCode cmd_MCELL(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
@@ -527,7 +527,7 @@ enum ErrorCode cmd_MCELL(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // character value
@@ -553,7 +553,7 @@ struct TypedValue fnc_MCELL(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
         ++interpreter->pc;
     
     // x value
@@ -561,7 +561,7 @@ struct TypedValue fnc_MCELL(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
         ++interpreter->pc;
     
     // y value
@@ -569,7 +569,7 @@ struct TypedValue fnc_MCELL(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
         ++interpreter->pc;
     
     struct TypedValue value;
@@ -596,7 +596,7 @@ enum ErrorCode cmd_TINT(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value

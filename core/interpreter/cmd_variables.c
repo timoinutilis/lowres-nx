@@ -28,7 +28,7 @@ enum ErrorCode cmd_LET(struct Core *core)
     if (interpreter->pc->type == TokenLET)
     {
         ++interpreter->pc;
-        if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+        if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier) return ErrorSyntax;
     }
     
     // identifier
@@ -80,13 +80,13 @@ enum ErrorCode cmd_DIM(struct Core *core)
         ++interpreter->pc;
         if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier)
         {
-            return ErrorExpectedVariableIdentifier;
+            return ErrorSyntax;
         }
         
         int numDimensions = 0;
         int dimensionSizes[MAX_ARRAY_DIMENSIONS];
         
-        if (interpreter->pc->type != TokenBracketOpen) return ErrorExpectedLeftParenthesis;
+        if (interpreter->pc->type != TokenBracketOpen) return ErrorSyntax;
         ++interpreter->pc;
         
         for (int i = 0; i < MAX_ARRAY_DIMENSIONS; i++)
@@ -107,7 +107,7 @@ enum ErrorCode cmd_DIM(struct Core *core)
             }
         }
         
-        if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+        if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
         ++interpreter->pc;
         
         if (interpreter->pass == PassRun)
@@ -143,7 +143,7 @@ enum ErrorCode cmd_SWAP(struct Core *core)
     if (!xVarValue) return errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y identifier

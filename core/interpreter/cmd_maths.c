@@ -60,7 +60,7 @@ struct TypedValue fnc_math1(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -68,7 +68,7 @@ struct TypedValue fnc_math1(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -159,7 +159,7 @@ struct TypedValue fnc_math2(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
         ++interpreter->pc;
     
     // x expression
@@ -167,7 +167,7 @@ struct TypedValue fnc_math2(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
 
     // y expression
@@ -175,7 +175,7 @@ struct TypedValue fnc_math2(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue;
 
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -242,7 +242,7 @@ struct TypedValue fnc_RND(struct Core *core)
         x = xValue.v.floatValue;
         
         // bracket close
-        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
         ++interpreter->pc;
     }
     
@@ -284,7 +284,7 @@ enum ErrorCode cmd_ADD(struct Core *core)
     if (!varValue) return errorCode;
     if (valueType != ValueTypeFloat) return ErrorTypeMismatch;
     
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // n vale

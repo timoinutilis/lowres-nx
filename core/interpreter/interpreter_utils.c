@@ -30,53 +30,74 @@ enum ErrorCode itp_evaluateSimpleAttributes(struct Core *core, struct SimpleAttr
     attrs->prio = -1;
     attrs->size = -1;
     
-    // PAL
-    if (interpreter->pc->type == TokenPAL)
-    {
-        ++interpreter->pc;
-        
-        struct TypedValue value = itp_evaluateNumericExpression(core, 0, NUM_PALETTES - 1);
-        if (value.type == ValueTypeError) return value.v.errorCode;
-        attrs->pal = value.v.floatValue;
-    }
+    bool changed = false;
+    bool checked = false;
     
-    // FLIP
-    if (interpreter->pc->type == TokenFLIP)
+    do
     {
-        ++interpreter->pc;
+        checked = false;
         
-        struct TypedValue fxValue = itp_evaluateNumericExpression(core, -1, 1);
-        if (fxValue.type == ValueTypeError) return fxValue.v.errorCode;
-        attrs->flipX = fxValue.v.floatValue ? 1 : 0;
+        // PAL
+        if (interpreter->pc->type == TokenPAL && attrs->pal == -1)
+        {
+            ++interpreter->pc;
+            
+            struct TypedValue value = itp_evaluateNumericExpression(core, 0, NUM_PALETTES - 1);
+            if (value.type == ValueTypeError) return value.v.errorCode;
+            attrs->pal = value.v.floatValue;
+            
+            checked = true;
+        }
         
-        // comma
-        if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-        ++interpreter->pc;
+        // FLIP
+        if (interpreter->pc->type == TokenFLIP && attrs->flipX == -1)
+        {
+            ++interpreter->pc;
+            
+            struct TypedValue fxValue = itp_evaluateNumericExpression(core, -1, 1);
+            if (fxValue.type == ValueTypeError) return fxValue.v.errorCode;
+            attrs->flipX = fxValue.v.floatValue ? 1 : 0;
+            
+            // comma
+            if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+            ++interpreter->pc;
+            
+            struct TypedValue fyValue = itp_evaluateNumericExpression(core, -1, 1);
+            if (fyValue.type == ValueTypeError) return fyValue.v.errorCode;
+            attrs->flipY = fyValue.v.floatValue ? 1 : 0;
+            
+            checked = true;
+        }
         
-        struct TypedValue fyValue = itp_evaluateNumericExpression(core, -1, 1);
-        if (fyValue.type == ValueTypeError) return fyValue.v.errorCode;
-        attrs->flipY = fyValue.v.floatValue ? 1 : 0;
+        // PRIO
+        if (interpreter->pc->type == TokenPRIO && attrs->prio == -1)
+        {
+            ++interpreter->pc;
+            
+            struct TypedValue value = itp_evaluateNumericExpression(core, -1, 1);
+            if (value.type == ValueTypeError) return value.v.errorCode;
+            attrs->prio = value.v.floatValue ? 1 : 0;
+            
+            checked = true;
+        }
+        
+        // SIZE
+        if (interpreter->pc->type == TokenSIZE && attrs->size == -1)
+        {
+            ++interpreter->pc;
+            
+            struct TypedValue value = itp_evaluateNumericExpression(core, 0, 3);
+            if (value.type == ValueTypeError) return value.v.errorCode;
+            attrs->size = value.v.floatValue;
+            
+            checked = true;
+        }
+        
+        changed |= checked;
     }
+    while (checked);
     
-    // PRIO
-    if (interpreter->pc->type == TokenPRIO)
-    {
-        ++interpreter->pc;
-        
-        struct TypedValue value = itp_evaluateNumericExpression(core, -1, 1);
-        if (value.type == ValueTypeError) return value.v.errorCode;
-        attrs->prio = value.v.floatValue ? 1 : 0;
-    }
-    
-    // SIZE
-    if (interpreter->pc->type == TokenSIZE)
-    {
-        ++interpreter->pc;
-        
-        struct TypedValue value = itp_evaluateNumericExpression(core, 0, 3);
-        if (value.type == ValueTypeError) return value.v.errorCode;
-        attrs->size = value.v.floatValue;
-    }
+    if (!changed) return ErrorSyntax;
     
     return ErrorNone;
 }
@@ -144,7 +165,7 @@ struct TypedValue itp_evaluateCharAttributes(struct Core *core, union CharacterA
         }
         
         // bracket close
-        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
         interpreter->pc++;
         
         if (interpreter->pass == PassRun)
@@ -228,7 +249,7 @@ struct TypedValue itp_evaluateDisplayAttributes(struct Core *core, union Display
         }
         
         // bracket close
-        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
         interpreter->pc++;
         
         if (interpreter->pass == PassRun)
@@ -301,7 +322,7 @@ struct TypedValue itp_evaluateLFOAttributes(struct Core *core, union LFOAttribut
         }
         
         // bracket close
-        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+        if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
         interpreter->pc++;
         
         if (interpreter->pass == PassRun)

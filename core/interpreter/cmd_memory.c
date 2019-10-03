@@ -31,7 +31,7 @@ struct TypedValue fnc_PEEK(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -39,7 +39,7 @@ struct TypedValue fnc_PEEK(struct Core *core)
     if (addressValue.type == ValueTypeError) return addressValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;
@@ -100,7 +100,7 @@ enum ErrorCode cmd_POKE(struct Core *core)
     struct TypedValue addressValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (addressValue.type == ValueTypeError) return addressValue.v.errorCode;
     
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // poke vale
@@ -158,7 +158,7 @@ enum ErrorCode cmd_FILL(struct Core *core)
     struct TypedValue startValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (startValue.type == ValueTypeError) return startValue.v.errorCode;
 
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
 
     // length value
@@ -202,7 +202,7 @@ enum ErrorCode cmd_COPY(struct Core *core)
     struct TypedValue sourceValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (sourceValue.type == ValueTypeError) return sourceValue.v.errorCode;
     
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // length value
@@ -256,7 +256,7 @@ struct TypedValue fnc_ROM_SIZE(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // index expression
@@ -264,7 +264,7 @@ struct TypedValue fnc_ROM_SIZE(struct Core *core)
     if (indexValue.type == ValueTypeError) return indexValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -297,7 +297,7 @@ enum ErrorCode cmd_ROL_ROR(struct Core *core)
     struct TypedValue addressValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (addressValue.type == ValueTypeError) return addressValue.v.errorCode;
     
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // n vale

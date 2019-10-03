@@ -35,7 +35,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c0 value
@@ -43,7 +43,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (c0Value.type == ValueTypeError) return c0Value.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c1 value
@@ -51,7 +51,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (c1Value.type == ValueTypeError) return c1Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c2 value
@@ -59,7 +59,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (c2Value.type == ValueTypeError) return c2Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c3 value
@@ -91,7 +91,7 @@ enum ErrorCode cmd_SCROLL(struct Core *core)
     if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // x value
@@ -99,7 +99,7 @@ enum ErrorCode cmd_SCROLL(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
@@ -219,7 +219,7 @@ enum ErrorCode cmd_CELL_SIZE(struct Core *core)
     if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // size value
@@ -249,7 +249,7 @@ struct TypedValue fnc_COLOR(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // pal expression
@@ -257,7 +257,7 @@ struct TypedValue fnc_COLOR(struct Core *core)
     if (pValue.type == ValueTypeError) return pValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
 
     // pal expression
@@ -265,7 +265,7 @@ struct TypedValue fnc_COLOR(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -325,7 +325,7 @@ struct TypedValue fnc_SCROLL_X_Y(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // bg value
@@ -333,7 +333,7 @@ struct TypedValue fnc_SCROLL_X_Y(struct Core *core)
     if (bgValue.type == ValueTypeError) return bgValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;

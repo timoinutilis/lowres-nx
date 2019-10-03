@@ -443,7 +443,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
     
     if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier)
     {
-        *errorCode = ErrorExpectedVariableIdentifier;
+        *errorCode = ErrorSyntax;
         return NULL;
     }
     
@@ -510,7 +510,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
         
         if (interpreter->pc->type != TokenBracketClose)
         {
-            *errorCode = ErrorExpectedRightParenthesis;
+            *errorCode = ErrorSyntax;
             return NULL;
         }
         ++interpreter->pc;
@@ -563,11 +563,11 @@ enum ErrorCode itp_checkTypeClass(struct Interpreter *interpreter, enum ValueTyp
     {
         if (typeClass == TypeClassString && valueType != ValueTypeString)
         {
-            return ErrorExpectedStringExpression;
+            return ErrorTypeMismatch;
         }
         else if (typeClass == TypeClassNumeric && valueType != ValueTypeFloat)
         {
-            return ErrorExpectedNumericExpression;
+            return ErrorTypeMismatch;
         }
     }
     return ErrorNone;
@@ -598,7 +598,7 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int 
         {
             if (value.type != ValueTypeFloat)
             {
-                errorCode = ErrorExpectedNumericExpression;
+                errorCode = ErrorTypeMismatch;
             }
         }
         else if (core->interpreter->pass == PassRun)
@@ -1015,7 +1015,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
             if (interpreter->pc->type != TokenBracketClose)
             {
                 value.type = ValueTypeError;
-                value.v.errorCode = ErrorExpectedRightParenthesis;
+                value.v.errorCode = ErrorSyntax;
             }
             else
             {
@@ -1223,7 +1223,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenLabel:
             ++interpreter->pc;
-            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+            if (interpreter->pc->type != TokenEol) return ErrorSyntax;
             ++interpreter->pc;
             break;
         

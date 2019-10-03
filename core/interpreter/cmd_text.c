@@ -167,7 +167,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
 
     // y value
@@ -175,7 +175,7 @@ enum ErrorCode cmd_TEXT(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
 
     // string value
@@ -203,7 +203,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
@@ -211,7 +211,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // number value
@@ -219,7 +219,7 @@ enum ErrorCode cmd_NUMBER(struct Core *core)
     if (numberValue.type == ValueTypeError) return numberValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // digits value
@@ -283,7 +283,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
@@ -291,7 +291,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     if (yValue.type == ValueTypeError) return yValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // w value
@@ -299,7 +299,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     if (wValue.type == ValueTypeError) return wValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // h value
@@ -307,7 +307,7 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
     if (hValue.type == ValueTypeError) return hValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // bg value
@@ -358,7 +358,7 @@ enum ErrorCode cmd_LOCATE(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
