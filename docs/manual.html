@@ -111,30 +111,6 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 <body>
 <div class="container">
 
-<h1>Contents</h1>
-
-<ul>
-	<li><a href="#Introduction">Introduction</a></li>
-	<li><a href="#Editing">Editing</a></li>
-	<li><a href="#Character-Designer">Character Designer</a></li>
-	<li><a href="#Background-Designer">Background Designer</a></li>
-	<li><a href="#Sound-Composer">Sound Composer</a></li>
-	<li><a href="#Language-Basics">Language Basics</a></li>
-	<li><a href="#Program-Flow-Control">Program Flow Control</a></li>
-	<li><a href="#Text">Text</a></li>
-	<li><a href="#User-Input">User Input</a></li>
-	<li><a href="#Graphics">Graphics</a></li>
-	<li><a href="#Sound">Sound</a></li>
-	<li><a href="#Data">Data</a></li>
-	<li><a href="#Memory-Access">Memory Access</a></li>
-	<li><a href="#Files">Files</a></li>
-	<li><a href="#Math-Functions">Math Functions</a></li>
-	<li><a href="#String-Functions">String Functions</a></li>
-	<li><a href="#System">System</a></li>
-	<li><a href="#Advanced-Topics">Advanced Topics</a></li>
-</ul>
-
-
 <h1 id="Introduction">Introduction</h1>
 
 <img class="illustration" src="manual-images/illustration_hello.png" srcset="manual-images/illustration_hello.png 1x, manual-images/illustration_hello@2x.png 2x"/>
@@ -177,7 +153,31 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 </ul>
 
 
-<h2 id="Getting-Started">Getting Started</h2>
+<h1>Contents</h1>
+
+<ul>
+	<li><a href="#Getting-Started">Getting Started</a></li>
+	<li><a href="#Editing">Editing</a></li>
+	<li><a href="#Character-Designer">Character Designer</a></li>
+	<li><a href="#Background-Designer">Background Designer</a></li>
+	<li><a href="#Sound-Composer">Sound Composer</a></li>
+	<li><a href="#Language-Basics">Language Basics</a></li>
+	<li><a href="#Program-Flow-Control">Program Flow Control</a></li>
+	<li><a href="#Text">Text</a></li>
+	<li><a href="#User-Input">User Input</a></li>
+	<li><a href="#Graphics">Graphics</a></li>
+	<li><a href="#Sound">Sound</a></li>
+	<li><a href="#Data">Data</a></li>
+	<li><a href="#Memory-Access">Memory Access</a></li>
+	<li><a href="#Files">Files</a></li>
+	<li><a href="#Math-Functions">Math Functions</a></li>
+	<li><a href="#String-Functions">String Functions</a></li>
+	<li><a href="#System">System</a></li>
+	<li><a href="#Advanced-Topics">Advanced Topics</a></li>
+</ul>
+
+
+<h1 id="Getting-Started">Getting Started</h1>
 
 <img class="illustration" src="manual-images/illustration_playing.png" srcset="manual-images/illustration_playing.png 1x, manual-images/illustration_playing@2x.png 2x"/>
 
@@ -302,9 +302,16 @@ By default the tools menu is empty, so drag and drop the programs
 <p>Draw something as character #1 (keep #0 empty), then tap on "Disk"
 and save as file 2 ("Main Characters"). Now return to the source code editor and you will see some hexadecimal data below your program.
 This is your image! To see it, change the line</p>
-<pre>SPRITE 0,X,Y,225</pre>
+<pre class="example">
+SPRITE 0,X,Y,225
+</pre>
+
 <p>to</p>
-<pre>SPRITE 0,X,Y,1</pre>
+
+<pre class="example">
+SPRITE 0,X,Y,1
+</pre>
+
 <p>and run your program. There it is!</p>
 
 <div class="info-desktop">
@@ -555,6 +562,12 @@ playback. Use them in the track editor.</p>
 <p>The programming language of LowRes NX is based on
 second-generation, structured BASIC (1985 style).</p>
 
+<p>This manual is meant to be a reference for people
+with prior programming experience. If you are
+new to programming, you should look for tutorials on
+the <a href="https://lowresnx.inutilis.com/help.php" target="_blank">LowRes NX website</a>
+and then check this manual for further details.</p>
+
 <h2 id="Types-and-Variables">Types and Variables</h2>
 
 <p>Available value types are strings and numbers (floating point).</p>
@@ -562,9 +575,9 @@ second-generation, structured BASIC (1985 style).</p>
 <p>Variable names can contain letters (A-Z), digits (0-9) and underscores
 (_), but cannot begin with a digit. Reserved keywords
 (commands, functions) cannot be used as variable names, but they can
-be part of them.</p>
+be part of them. There is a list in the chapter <a href="#Reserved-Keywords">"Reserved Keywords"</a>.</p>
 
-<p>Valid variable names:</p>
+<p>Examples of valid variable names:</p>
 
 <pre class="example">
 X
@@ -573,7 +586,7 @@ LONG_VARIABLE_NAME
 PRINTER
 </pre>
 
-<p>Invalid variable names:</p>
+<p>Examples of invalid variable names:</p>
 
 <pre class="example">
 2B
@@ -822,7 +835,7 @@ NEXT I
 END
 
 SHOWNUMBER:
-PRINT "NUMBER "+I
+PRINT "NUMBER",I
 RETURN
 </pre>
 
@@ -850,7 +863,7 @@ END
 
 SHOWNUMBER:
 IF I=4 THEN RETURN GAMEOVER
-PRINT "NUMBER "+I
+PRINT "NUMBER",I
 RETURN
 
 GAMEOVER:
@@ -879,6 +892,14 @@ PRINT "THIS DOESN'T"
 <p>Waits for the next frame. This (or WAIT n) should be the last
 command in all loops which do animations and/or handle input,
 like the main game loop.</p>
+
+<pre class="example">
+DO
+  PAL RND(3)
+  TEXT RND(19),RND(15),"*"
+  WAIT VBL
+LOOP
+</pre>
 
 
 <h3 id="_WAIT" name="WAIT">WAIT</h3>
@@ -1426,7 +1447,8 @@ standard character attributes (color palette, flip X/Y, priority) and additional
 All parameters can be omitted to keep their current settings.</p>
 
 <pre>
-SPRITE n [PAL pal] [FLIP fx,fy] [PRIO pri] [SIZE s]
+SPRITE n [PAL pal] [FLIP fx,fy]
+... [PRIO pri] [SIZE s]
 </pre>
 
 <p>Sets one or more attributes of sprite <em>n</em> (0 - 63):</p>
@@ -1588,15 +1610,15 @@ PRINT "LOWRES NX!"
 
 <pre>FLIP fx,fy</pre>
 
-<p>Sets the values (0/1) for horizontal (<em>fx</em>) and vertical (<em>fy</em>)
+<p>Sets the values (0 or 1) for horizontal (<em>fx</em>) and vertical (<em>fy</em>)
 flip attributes for cell and text commands.</p>
 
 <pre class="example">
 PRINT "LOWRES NX"
-FLIP 1,0
-PRINT "LOWRES NX"
 FLIP 0,1
 PRINT "LOWRES NX"
+FLIP 1,0
+PRINT "XN SERWOL"
 </pre>
 
 
@@ -1604,7 +1626,7 @@ PRINT "LOWRES NX"
 
 <pre>PRIO p</pre>
 
-<p>Sets the priority (0/1) attribute for cell and text commands.</p>
+<p>Sets the priority (0 or 1) attribute for cell and text commands.</p>
 
 
 <h3 id="_ATTR" name="ATTR">ATTR</h3>
@@ -1619,7 +1641,7 @@ PRINT "LOWRES NX"
 
 <pre>BG n</pre>
 
-<p>Sets the current background (0 or 1).</p>
+<p>Sets the current background (0 or 1) for cell and text commands.</p>
 
 
 <h3 id="_CELL" name="CELL">CELL</h3>
@@ -1673,7 +1695,8 @@ BG FILL 10,8 TO 17,13 CHAR 226
 <h3 id="_TINT" name="TINT,PAL,FLIP,PRIO">TINT</h3>
 
 <pre>
-TINT cx,cy [PAL pal] [FLIP fx,fy] [PRIO pri]
+TINT cx,cy [PAL pal]
+... [FLIP fx,fy] [PRIO pri]
 </pre>
 
 <p>Changes the palette and/or other attributes of the cell at position
@@ -1689,7 +1712,8 @@ TINT 10,8 PAL 1 FLIP 0,1
 <h3 id="_BG-TINT" name="BG TINT,BG,TINT,TO,PAL,FLIP,PRIO">BG TINT</h3>
 
 <pre>
-BG TINT cx1,cy1 TO cx2,cy2 [PAL pal] [FLIP fx,fy] [PRIO pri]
+BG TINT cx1,cy1 TO cx2,cy2
+... [PAL pal] [FLIP fx,fy] [PRIO pri]
 </pre>
 
 <p>Changes the palette and/or other attributes of all cells in the
@@ -1738,6 +1762,22 @@ BG COPY 0,0,20,16 TO 0,0
 </pre>
 
 
+<h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL,STEP">BG SCROLL</h3>
+
+<pre>BG SCROLL cx1,cy1 TO cx2,cy2 STEP dx,dy</pre>
+
+<p>Moves the content of all cells in the area from <em>cx1,cy1</em> to <em>cx2,cy2</em>
+horizontally by <em>dx</em> and vertically by <em>dy</em> cells.</p>
+
+<pre class="example">
+DO
+  BG SCROLL 0,0 TO 19,15 STEP -1,0
+  CELL 18,RND(15),193+RND(62)
+  WAIT 5
+LOOP
+</pre>
+
+
 <h3 id="_MCELL.C-MCELL.A" name="MCELL.C,MCELL.A,MCELL">=MCELL.C/A</h3>
 
 <pre>MCELL.C(cx,cy)</pre>
@@ -1755,14 +1795,6 @@ co-ordinates are outside of the map bounds, the functions return -1.</p>
 <p>Works like the CELL command, but sets a cell in the source map
 (BG SOURCE) instead of the current background. The source must be in
 working RAM, otherwise you will get an "Illegal Memory Access" error.</p>
-
-
-<h3 id="_BG-SCROLL" name="BG SCROLL,BG,SCROLL,STEP">BG SCROLL</h3>
-
-<pre>BG SCROLL cx1,cy1 TO cx2,cy2 STEP dx,dy</pre>
-
-<p>Moves the content of all cells in the area from <em>cx1,cy1</em> to <em>cx2,cy2</em>
-horizontally by <em>dx</em> and vertically by <em>dy</em> cells.</p>
 
 
 <h3 id="_TEXT" name="TEXT">TEXT</h3>
@@ -1876,6 +1908,16 @@ VALUE = RED * 16 + GREEN * 4 + BLUE
 <p>RED, GREEN and BLUE are values from 0 to 3.</p>
 
 <p>By default all palettes are read from ROM entry 1.</p>
+
+<pre class="example">
+PRINT "COLORS!"
+WAIT 30
+PALETTE 0,48,63,63,0
+WAIT 30
+PALETTE 0,3,,,
+WAIT 30
+PALETTE 0,12,,,8
+</pre>
 
 
 <h3 id="_=COLOR" name="COLOR">=COLOR</h3>
@@ -2637,12 +2679,26 @@ PRINT B
 
 <pre>ADD var,x,base TO top</pre>
 
-<p>The second syntax of ADD helps with repeating counters. It's the same as:</p>
+<p>The second syntax of ADD helps with repeating counters.</p>
 
-<pre>
-A=A+X
-IF A&gt;TOP THEN A=BASE
-IF A&lt;BASE THEN A=TOP
+<pre class="example">
+A=0
+DO
+  ADD A,2,0 TO 10
+  PRINT A
+LOOP
+</pre>
+
+<p>It's the same as:</p>
+
+<pre class="example">
+A=0
+DO
+  A=A+2
+  IF A&gt;10 THEN A=0
+  IF A&lt;0 THEN A=10
+  PRINT A
+LOOP
 </pre>
 
 <p>But again the ADD command costs less CPU cycles.</p>
@@ -2793,10 +2849,11 @@ LowRes NX application.</p>
 <pre>TRACE expression-list</pre>
 
 <p>Outputs text to the debugging window. Expressions can be strings or
-numbers, separated by commas. This command is ignored if the debugging
+numbers, separated by commas. This command is ignored if the debug
 mode is not enabled.</p>
 
 <pre class="example">
+'RUN IN DEBUG MODE
 A=13
 B$="GO"
 TRACE "TEST",A,B$
@@ -3157,6 +3214,188 @@ Use <a href="#_TINT">TINT</a> and <a href="#_BG-TINT">BG TINT</a> for replacing 
 <pre>LFO.A v,(w,r,e,t)</pre>
 
 <p>Use <a href="#_LFO-WAVE">LFO WAVE</a> instead.</p>
+
+
+<h2 id="Reserved-Keywords">Reserved Keywords</h2>
+
+<p>The following is a list of reserved words used in LowRes NX BASIC.
+If you use these words as variable names, a syntax error will be
+generated.</p>
+
+<p>Keywords marked with an asterisk have no function yet, but
+are reserved for future versions.</p>
+
+<p>
+ABS,
+ACOS,
+ADD,
+AND,
+ANIM*,
+ASC,
+ASIN,
+ATAN,
+ATTR,
+BG,
+BIN$,
+BUTTON,
+CALL,
+CELL,
+CELL.A,
+CELL.C,
+CHAR,
+CHR$,
+CLOSE*,
+CLS,
+CLW,
+COLOR,
+COPY,
+COS,
+DATA,
+DEC,
+DECLARE*,
+DEF*,
+DIM,
+DISPLAY,
+DO,
+DOWN,
+ELSE,
+END,
+ENVELOPE,
+EXIT,
+EXP,
+FILE$,
+FILES,
+FILL,
+FLASH*,
+FLIP,
+FN*,
+FONT,
+FOR,
+FSIZE,
+FUNCTION*,
+GAMEPAD,
+GLOBAL,
+GOSUB,
+GOTO,
+HCOS,
+HEX$,
+HIT,
+HSIN,
+HTAN,
+IF,
+INC,
+INKEY$,
+INPUT,
+INSTR,
+INT,
+KEYBOARD,
+LBOUND*,
+LEFT$,
+LEFT,
+LEN,
+LET,
+LFO,
+LFO.A,
+LOAD,
+LOCATE,
+LOG,
+LOOP,
+MAX,
+MCELL,
+MCELL.A,
+MCELL.C,
+MID$,
+MIN,
+MOD,
+MUSIC,
+NEXT,
+NOT,
+NUMBER,
+OFF,
+ON,
+OPEN*,
+OPTIONAL,
+OR,
+OUTPUT*,
+PAL,
+PALETTE,
+PAUSE,
+PEEK,
+PEEKL,
+PEEKW,
+PI,
+PLAY,
+POKE,
+POKEL,
+POKEW,
+PRINT,
+PRIO,
+RANDOMIZE,
+RASTER,
+READ,
+REM,
+REPEAT,
+RESTORE,
+RETURN,
+RIGHT$,
+RIGHT,
+RND,
+ROL,
+ROM,
+ROR,
+SAVE,
+SCROLL,
+SCROLL.X,
+SCROLL.Y,
+SGN,
+SHARED*,
+SIN,
+SIZE,
+SOUND,
+SOURCE,
+SPRITE,
+SPRITE.A,
+SPRITE.C,
+SPRITE.X,
+SPRITE.Y,
+SQR,
+STATIC*,
+STEP,
+STOP,
+STR$,
+SUB,
+SWAP,
+SYSTEM,
+TAN,
+TAP,
+TEMPO*,
+TEXT,
+THEN,
+TIMER,
+TINT,
+TO,
+TOUCH,
+TOUCH.X,
+TOUCH.Y,
+TOUCHSCREEN,
+TRACE,
+TRACK,
+UBOUND*,
+UNTIL,
+UP,
+VAL,
+VBL,
+VIEW,
+VOICE*,
+VOLUME,
+WAIT,
+WAVE,
+WEND,
+WHILE,
+WINDOW,
+WRITE*,
+XOR
+</p>
 
 </div>
 </body>
