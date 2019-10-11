@@ -97,7 +97,7 @@ enum ErrorCode cmd_CALL(struct Core *core)
         }
         while (interpreter->pc->type == TokenComma);
         
-        if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+        if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
         ++interpreter->pc;
     }
 
@@ -122,7 +122,7 @@ enum ErrorCode cmd_CALL(struct Core *core)
                 
                 // parameter
                 struct Token *tokenIdentifier = interpreter->pc;
-                if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+                if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorSyntax;
                 enum ValueType varType = itp_getIdentifierTokenValueType(tokenIdentifier);
 
                 struct Token *nextToken = interpreter->pc + 1;
@@ -136,7 +136,7 @@ enum ErrorCode cmd_CALL(struct Core *core)
                     
                     interpreter->pc += 2;
                     
-                    if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+                    if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
                     ++interpreter->pc;
                 }
                 else
@@ -156,7 +156,7 @@ enum ErrorCode cmd_CALL(struct Core *core)
             
             if (parameterIndex < numArguments) return ErrorArgumentCountMismatch;
             
-            if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+            if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
             ++interpreter->pc;
         }
         else if (numArguments > 0)
@@ -191,24 +191,24 @@ enum ErrorCode cmd_SUB(struct Core *core)
             
             // parameter
             struct Token *tokenIdentifier = interpreter->pc;
-            if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+            if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorSyntax;
             ++interpreter->pc;
             
             if (interpreter->pc->type == TokenBracketOpen)
             {
                 ++interpreter->pc;
-                if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+                if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
                 ++interpreter->pc;
             }
         }
         while (interpreter->pc->type == TokenComma);
         
-        if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+        if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
         ++interpreter->pc;
     }
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -239,7 +239,7 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
     ++interpreter->pc;
     
     // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
@@ -311,7 +311,7 @@ enum ErrorCode cmd_SHARED(struct Core *core)
             // array
             ++interpreter->pc;
             
-            if (interpreter->pc->type != TokenBracketClose) return ErrorExpectedRightParenthesis;
+            if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
             ++interpreter->pc;
             
             if (interpreter->pass == PassRun)
@@ -356,7 +356,7 @@ enum ErrorCode cmd_GLOBAL(struct Core *core)
         
         // identifier
         struct Token *tokenIdentifier = interpreter->pc;
-        if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorExpectedVariableIdentifier;
+        if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier) return ErrorSyntax;
         ++interpreter->pc;
         
         int symbolIndex = tokenIdentifier->symbolIndex;
@@ -390,7 +390,7 @@ enum ErrorCode cmd_EXIT_SUB(struct Core *core)
     ++interpreter->pc;
     
     // SUB
-    if (interpreter->pc->type != TokenSUB) return ErrorUnexpectedToken;
+    if (interpreter->pc->type != TokenSUB) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)

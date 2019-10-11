@@ -443,7 +443,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
     
     if (tokenIdentifier->type != TokenIdentifier && tokenIdentifier->type != TokenStringIdentifier)
     {
-        *errorCode = ErrorExpectedVariableIdentifier;
+        *errorCode = ErrorSyntax;
         return NULL;
     }
     
@@ -510,7 +510,7 @@ union Value *itp_readVariable(struct Core *core, enum ValueType *type, enum Erro
         
         if (interpreter->pc->type != TokenBracketClose)
         {
-            *errorCode = ErrorExpectedRightParenthesis;
+            *errorCode = ErrorSyntax;
             return NULL;
         }
         ++interpreter->pc;
@@ -563,11 +563,11 @@ enum ErrorCode itp_checkTypeClass(struct Interpreter *interpreter, enum ValueTyp
     {
         if (typeClass == TypeClassString && valueType != ValueTypeString)
         {
-            return ErrorExpectedStringExpression;
+            return ErrorTypeMismatch;
         }
         else if (typeClass == TypeClassNumeric && valueType != ValueTypeFloat)
         {
-            return ErrorExpectedNumericExpression;
+            return ErrorTypeMismatch;
         }
     }
     return ErrorNone;
@@ -598,7 +598,7 @@ struct TypedValue itp_evaluateNumericExpression(struct Core *core, int min, int 
         {
             if (value.type != ValueTypeFloat)
             {
-                errorCode = ErrorExpectedNumericExpression;
+                errorCode = ErrorTypeMismatch;
             }
         }
         else if (core->interpreter->pass == PassRun)
@@ -656,12 +656,10 @@ bool itp_isTokenLevel(enum TokenType token, int level)
         case 5:
             return token == TokenMOD;
         case 6:
-            return token == TokenDivInt;
-        case 7:
-            return token == TokenMul || token == TokenDiv;
-//        case 8:
+            return token == TokenMul || token == TokenDiv || token == TokenDivInt;
+//        case 7:
 //            return token == TokenPlus || token == TokenMinus; // unary
-        case 9:
+        case 8:
             return token == TokenPow;
     }
     return false;
@@ -691,7 +689,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         interpreter->lastVariableValue = NULL;
         return value;
     }
-    if (level == 8 && (type == TokenPlus || type == TokenMinus)) // unary
+    if (level == 7 && (type == TokenPlus || type == TokenMinus)) // unary
     {
         ++interpreter->pc;
         ++interpreter->cycles;
@@ -710,7 +708,7 @@ struct TypedValue itp_evaluateExpressionLevel(struct Core *core, int level)
         interpreter->lastVariableValue = NULL;
         return value;
     }
-    if (level == 10)
+    if (level == 9)
     {
         return itp_evaluatePrimaryExpression(core);
     }
@@ -1017,7 +1015,7 @@ struct TypedValue itp_evaluatePrimaryExpression(struct Core *core)
             if (interpreter->pc->type != TokenBracketClose)
             {
                 value.type = ValueTypeError;
-                value.v.errorCode = ErrorExpectedRightParenthesis;
+                value.v.errorCode = ErrorSyntax;
             }
             else
             {
@@ -1049,7 +1047,7 @@ enum ErrorCode itp_endOfCommand(struct Interpreter *interpreter)
         ++interpreter->pc;
         return ErrorNone;
     }
-    return (type == TokenELSE) ? ErrorNone : ErrorUnexpectedToken;
+    return (type == TokenELSE) ? ErrorNone : ErrorSyntax;
 }
 
 enum TokenType itp_getNextTokenType(struct Interpreter *interpreter)
@@ -1225,7 +1223,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         case TokenLabel:
             ++interpreter->pc;
-            if (interpreter->pc->type != TokenEol) return ErrorExpectedEndOfLine;
+            if (interpreter->pc->type != TokenEol) return ErrorSyntax;
             ++interpreter->pc;
             break;
         
@@ -1390,6 +1388,12 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
                 case TokenFILL:
                     return cmd_BG_FILL(core);
                     
+                case TokenTINT:
+                    return cmd_BG_TINT(core);
+                    
+                case TokenVIEW:
+                    return cmd_BG_VIEW(core);
+                    
                 default:
                     return cmd_BG(core);
             }
@@ -1398,8 +1402,28 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
         case TokenATTR:
             return cmd_ATTR(core);
             
+        case TokenPAL:
+            return cmd_PAL(core);
+            
+        case TokenFLIP:
+            return cmd_FLIP(core);
+            
+        case TokenPRIO:
+            return cmd_PRIO(core);
+            
         case TokenCELL:
-            return cmd_CELL(core);
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenSIZE:
+                    return cmd_CELL_SIZE(core);
+                    
+                default:
+                    return cmd_CELL(core);
+            }
+            break;
+            
+        case TokenTINT:
+            return cmd_TINT(core);
             
         case TokenMCELL:
             return cmd_MCELL(core);
@@ -1421,6 +1445,9 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             {
                 case TokenOFF:
                     return cmd_SPRITE_OFF(core);
+                    
+                case TokenVIEW:
+                    return cmd_SPRITE_VIEW(core);
                     
                 default:
                     return cmd_SPRITE(core);
@@ -1487,7 +1514,15 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_ENVELOPE(core);
             
         case TokenLFO:
-            return cmd_LFO(core);
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenWAVE:
+                    return cmd_LFO_WAVE(core);
+                    
+                default:
+                    return cmd_LFO(core);
+            }
+            break;
             
         case TokenLFOA:
             return cmd_LFO_A(core);
@@ -1506,7 +1541,7 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             
         default:
             printf("Command not implemented: %s\n", TokenStrings[interpreter->pc->type]);
-            return ErrorUnexpectedToken;
+            return ErrorSyntax;
     }
     return ErrorNone;
 }

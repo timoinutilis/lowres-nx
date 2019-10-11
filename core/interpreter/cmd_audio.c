@@ -33,7 +33,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // wave value
@@ -41,7 +41,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
     if (waveValue.type == ValueTypeError) return waveValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // pulse width value
@@ -49,7 +49,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
     if (pwValue.type == ValueTypeError) return pwValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // length value
@@ -92,7 +92,7 @@ enum ErrorCode cmd_SOUND(struct Core *core)
 //    if (sValue.type == ValueTypeError) return sValue.v.errorCode;
 //    
 //    // TO
-//    if (interpreter->pc->type != TokenTO) return ErrorExpectedTo;
+//    if (interpreter->pc->type != TokenTO) return ErrorSyntax;
 //    ++interpreter->pc;
 //    
 //    // voice value
@@ -119,7 +119,7 @@ enum ErrorCode cmd_VOLUME(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // volume value
@@ -127,7 +127,7 @@ enum ErrorCode cmd_VOLUME(struct Core *core)
     if (volValue.type == ValueTypeError) return volValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // mix value
@@ -164,7 +164,7 @@ enum ErrorCode cmd_ENVELOPE(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // attack value
@@ -172,7 +172,7 @@ enum ErrorCode cmd_ENVELOPE(struct Core *core)
     if (attValue.type == ValueTypeError) return attValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // decay value
@@ -180,7 +180,7 @@ enum ErrorCode cmd_ENVELOPE(struct Core *core)
     if (decValue.type == ValueTypeError) return decValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // sustain value
@@ -188,7 +188,7 @@ enum ErrorCode cmd_ENVELOPE(struct Core *core)
     if (susValue.type == ValueTypeError) return susValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // release value
@@ -232,7 +232,7 @@ enum ErrorCode cmd_LFO(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // rate value
@@ -240,7 +240,7 @@ enum ErrorCode cmd_LFO(struct Core *core)
     if (rateValue.type == ValueTypeError) return rateValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // osc amount value
@@ -248,7 +248,7 @@ enum ErrorCode cmd_LFO(struct Core *core)
     if (oscValue.type == ValueTypeError) return oscValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // vol amount value
@@ -256,7 +256,7 @@ enum ErrorCode cmd_LFO(struct Core *core)
     if (volValue.type == ValueTypeError) return volValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // pw amount value
@@ -295,6 +295,8 @@ enum ErrorCode cmd_LFO_A(struct Core *core)
     // LFO.A
     ++interpreter->pc;
     
+    // obsolete syntax!
+    
     // n value
     struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
@@ -307,7 +309,7 @@ enum ErrorCode cmd_LFO_A(struct Core *core)
     }
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     union LFOAttributes attr;
@@ -325,6 +327,64 @@ enum ErrorCode cmd_LFO_A(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+enum ErrorCode cmd_LFO_WAVE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // LFO WAVE
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // n value
+    struct TypedValue nValue = itp_evaluateNumericExpression(core, 0, NUM_VOICES - 1);
+    if (nValue.type == ValueTypeError) return nValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+    ++interpreter->pc;
+    
+    // wave value
+    struct TypedValue wavValue = itp_evaluateOptionalNumericExpression(core, 0, 3);
+    if (wavValue.type == ValueTypeError) return wavValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+    ++interpreter->pc;
+    
+    // inv value
+    struct TypedValue invValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
+    if (invValue.type == ValueTypeError) return invValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+    ++interpreter->pc;
+    
+    // env value
+    struct TypedValue envValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
+    if (envValue.type == ValueTypeError) return envValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+    ++interpreter->pc;
+    
+    // tri value
+    struct TypedValue triValue = itp_evaluateOptionalNumericExpression(core, -1, 1);
+    if (triValue.type == ValueTypeError) return triValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int n = nValue.v.floatValue;
+        struct Voice *voice = &core->machine->audioRegisters.voices[n];
+        
+        if (wavValue.type != ValueTypeNull) voice->lfoAttr.wave = wavValue.v.floatValue;
+        if (invValue.type != ValueTypeNull) voice->lfoAttr.invert = invValue.v.floatValue ? 1 : 0;
+        if (envValue.type != ValueTypeNull) voice->lfoAttr.envMode = envValue.v.floatValue ? 1 : 0;
+        if (triValue.type != ValueTypeNull) voice->lfoAttr.trigger = triValue.v.floatValue ? 1 : 0;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
 enum ErrorCode cmd_PLAY(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;
@@ -337,7 +397,7 @@ enum ErrorCode cmd_PLAY(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // pitch value
@@ -437,7 +497,7 @@ enum ErrorCode cmd_TRACK(struct Core *core)
     if (tValue.type == ValueTypeError) return tValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // voice value
@@ -482,7 +542,7 @@ struct TypedValue fnc_MUSIC(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // x value
@@ -490,7 +550,7 @@ struct TypedValue fnc_MUSIC(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;

@@ -31,10 +31,15 @@ enum ErrorCode cmd_BG_SOURCE(struct Core *core);
 enum ErrorCode cmd_BG_COPY(struct Core *core);
 enum ErrorCode cmd_BG_SCROLL(struct Core *core);
 enum ErrorCode cmd_ATTR(struct Core *core);
+enum ErrorCode cmd_PAL(struct Core *core);
+enum ErrorCode cmd_FLIP(struct Core *core);
+enum ErrorCode cmd_PRIO(struct Core *core);
 enum ErrorCode cmd_BG_FILL(struct Core *core);
+enum ErrorCode cmd_BG_TINT(struct Core *core);
 enum ErrorCode cmd_CELL(struct Core *core);
 struct TypedValue fnc_CELL(struct Core *core);
 enum ErrorCode cmd_MCELL(struct Core *core);
 struct TypedValue fnc_MCELL(struct Core *core);
+enum ErrorCode cmd_TINT(struct Core *core);
 
 #endif /* cmd_background_h */

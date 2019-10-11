@@ -631,35 +631,42 @@ void update(void *arg)
         case MainStateRunningProgram:
         case MainStateRunningTool:
             core_update(runner.core, &coreInput);
-            if (hasInput && !coreInput.out_hasUsedInput && !hasUsedInputLastUpdate)
+            if (hasInput)
             {
-                // user hints for controls
-                union IOAttributes attr = runner.core->machine->ioRegisters.attr;
-                if (attr.touchEnabled && !attr.keyboardEnabled)
+                if (runner.core->interpreter->state == StateEnd)
                 {
-                    overlay_message(runner.core, "TOUCH/MOUSE");
+                    overlay_message(runner.core, "END OF PROGRAM");
                 }
-                if (attr.keyboardEnabled && !attr.touchEnabled)
+                else if (!coreInput.out_hasUsedInput && !hasUsedInputLastUpdate)
                 {
-                    overlay_message(runner.core, "KEYBOARD");
-                }
-                if (attr.gamepadsEnabled && !attr.keyboardEnabled)
-                {
-                    if (attr.gamepadsEnabled == 2)
+                    // user hints for controls
+                    union IOAttributes attr = runner.core->machine->ioRegisters.attr;
+                    if (attr.touchEnabled && !attr.keyboardEnabled)
                     {
-                        if (messageNumber % 2 == 1)
+                        overlay_message(runner.core, "TOUCH/MOUSE");
+                    }
+                    if (attr.keyboardEnabled && !attr.touchEnabled)
+                    {
+                        overlay_message(runner.core, "KEYBOARD");
+                    }
+                    if (attr.gamepadsEnabled && !attr.keyboardEnabled)
+                    {
+                        if (attr.gamepadsEnabled == 2)
                         {
-                            overlay_message(runner.core, "P2 ]:ESDF [:TAB \\:Q");
+                            if (messageNumber % 2 == 1)
+                            {
+                                overlay_message(runner.core, "P2 ]:ESDF [:TAB \\:Q");
+                            }
+                            else
+                            {
+                                overlay_message(runner.core, "P1 ]:ARROWS [:N \\:M");
+                            }
+                            messageNumber++;
                         }
                         else
                         {
-                            overlay_message(runner.core, "P1 ]:ARROWS [:N \\:M");
+                            overlay_message(runner.core, "]:ARROWS [:Z \\:X");
                         }
-                        messageNumber++;
-                    }
-                    else
-                    {
-                        overlay_message(runner.core, "]:ARROWS [:Z \\:X");
                     }
                 }
             }

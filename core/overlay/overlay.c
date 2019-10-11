@@ -33,7 +33,6 @@ void overlay_init(struct Core *core)
     lib->windowBg = OVERLAY_BG;
     lib->charAttr.priority = 1;
     lib->charAttr.palette = 1;
-    lib->charAttrFilter = 0xFF;
     lib->fontCharOffset = 0;
     lib->windowX = 0;
     lib->windowY = 0;

@@ -33,7 +33,6 @@ struct Core;
 struct TextLib {
     struct Core *core;
     union CharacterAttributes charAttr;
-    uint8_t charAttrFilter;
     int fontCharOffset;
     int windowX;
     int windowY;
@@ -63,6 +62,7 @@ void txtlib_clearBackground(struct TextLib *lib, int bg);
 struct Cell *txtlib_getCell(struct TextLib *lib, int x, int y);
 void txtlib_setCell(struct TextLib *lib, int x, int y, int character);
 void txtlib_setCells(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int character);
+void txtlib_setCellsAttr(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int pal, int flipX, int flipY, int prio);
 void txtlib_scrollBackground(struct TextLib *lib, int fromX, int fromY, int toX, int toY, int deltaX, int deltaY);
 void txtlib_copyBackground(struct TextLib *lib, int srcX, int srcY, int width, int height, int dstX, int dstY);
 int txtlib_getSourceCell(struct TextLib *lib, int x, int y, bool getAttrs);

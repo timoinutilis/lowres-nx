@@ -31,7 +31,6 @@ void runStartupSequence(struct Core *core)
     // init font and window
     struct TextLib *textLib = &core->interpreter->textLib;
     textLib->fontCharOffset = FONT_CHAR_OFFSET;
-    textLib->charAttrFilter = 0xFF;
     txtlib_clearScreen(textLib);
     
     // default characters/font

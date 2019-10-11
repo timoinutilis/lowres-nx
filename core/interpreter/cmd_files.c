@@ -36,7 +36,7 @@ enum ErrorCode cmd_LOAD(struct Core *core)
     if (fileValue.type == ValueTypeError) return fileValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // address value
@@ -74,7 +74,7 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     if (fileValue.type == ValueTypeError) return fileValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // comment value
@@ -82,7 +82,7 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     if (commentValue.type == ValueTypeError) return commentValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // address value
@@ -90,7 +90,7 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     if (addressValue.type == ValueTypeError) return addressValue.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // length value
@@ -149,7 +149,7 @@ struct TypedValue fnc_FILE(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // file value
@@ -157,7 +157,7 @@ struct TypedValue fnc_FILE(struct Core *core)
     if (fileValue.type == ValueTypeError) return fileValue;
 
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
 
     struct TypedValue resultValue;
@@ -186,7 +186,7 @@ struct TypedValue fnc_FSIZE(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // file value
@@ -194,7 +194,7 @@ struct TypedValue fnc_FSIZE(struct Core *core)
     if (fileValue.type == ValueTypeError) return fileValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue resultValue;

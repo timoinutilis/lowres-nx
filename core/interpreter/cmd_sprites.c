@@ -37,36 +37,56 @@ enum ErrorCode cmd_SPRITE(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-    ++interpreter->pc;
-    
-    // x value
-    struct TypedValue xValue = itp_evaluateOptionalExpression(core, TypeClassNumeric);
-    if (xValue.type == ValueTypeError) return xValue.v.errorCode;
-    
-    // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-    ++interpreter->pc;
-    
-    // y value
-    struct TypedValue yValue = itp_evaluateOptionalExpression(core, TypeClassNumeric);
-    if (yValue.type == ValueTypeError) return yValue.v.errorCode;
-
-    // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
-    ++interpreter->pc;
-    
-    // c value
-    struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
-    if (cValue.type == ValueTypeError) return cValue.v.errorCode;
-
-    if (interpreter->pass == PassRun)
+    if (interpreter->pc->type == TokenComma)
     {
-        int n = nValue.v.floatValue;
-        struct Sprite *sprite = &core->machine->spriteRegisters.sprites[n];
-        if (xValue.type != ValueTypeNull) sprite->x = ((int)xValue.v.floatValue + SPRITE_OFFSET_X) & 0xFF;
-        if (yValue.type != ValueTypeNull) sprite->y = ((int)yValue.v.floatValue + SPRITE_OFFSET_Y) & 0xFF;
-        if (cValue.type != ValueTypeNull) sprite->character = cValue.v.floatValue;
+        ++interpreter->pc;
+        
+        // x value
+        struct TypedValue xValue = itp_evaluateOptionalExpression(core, TypeClassNumeric);
+        if (xValue.type == ValueTypeError) return xValue.v.errorCode;
+        
+        // comma
+        if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+        ++interpreter->pc;
+        
+        // y value
+        struct TypedValue yValue = itp_evaluateOptionalExpression(core, TypeClassNumeric);
+        if (yValue.type == ValueTypeError) return yValue.v.errorCode;
+
+        // comma
+        if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+        ++interpreter->pc;
+        
+        // c value
+        struct TypedValue cValue = itp_evaluateOptionalNumericExpression(core, 0, NUM_CHARACTERS - 1);
+        if (cValue.type == ValueTypeError) return cValue.v.errorCode;
+
+        if (interpreter->pass == PassRun)
+        {
+            int n = nValue.v.floatValue;
+            struct Sprite *sprite = &core->machine->spriteRegisters.sprites[n];
+            if (xValue.type != ValueTypeNull) sprite->x = ((int)xValue.v.floatValue + SPRITE_OFFSET_X) & 0xFF;
+            if (yValue.type != ValueTypeNull) sprite->y = ((int)yValue.v.floatValue + SPRITE_OFFSET_Y) & 0xFF;
+            if (cValue.type != ValueTypeNull) sprite->character = cValue.v.floatValue;
+        }
+    }
+    else
+    {
+        struct SimpleAttributes attrs;
+        enum ErrorCode attrsError = itp_evaluateSimpleAttributes(core, &attrs);
+        if (attrsError != ErrorNone) return attrsError;
+        
+        if (interpreter->pass == PassRun)
+        {
+            int n = nValue.v.floatValue;
+            struct Sprite *sprite = &core->machine->spriteRegisters.sprites[n];
+            
+            if (attrs.pal >= 0) sprite->attr.palette = attrs.pal;
+            if (attrs.flipX >= 0) sprite->attr.flipX = attrs.flipX;
+            if (attrs.flipY >= 0) sprite->attr.flipY = attrs.flipY;
+            if (attrs.prio >= 0) sprite->attr.priority = attrs.prio;
+            if (attrs.size >= 0) sprite->attr.size = attrs.size;
+        }
     }
     
     return itp_endOfCommand(interpreter);
@@ -91,7 +111,7 @@ enum ErrorCode cmd_SPRITE_A(struct Core *core)
     }
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     union CharacterAttributes attr;
@@ -124,7 +144,7 @@ enum ErrorCode cmd_SPRITE_OFF(struct Core *core)
     ++interpreter->pc;
     
     // OFF
-    if (interpreter->pc->type != TokenOFF) return ErrorUnexpectedToken;
+    if (interpreter->pc->type != TokenOFF) return ErrorSyntax;
     ++interpreter->pc;
     
     int from = 0;
@@ -152,11 +172,11 @@ enum ErrorCode cmd_SPRITE_OFF(struct Core *core)
     
     if (interpreter->pass == PassRun)
     {
-        struct Sprite *sprites = core->machine->spriteRegisters.sprites;
         for (int i = from; i <= to; i++)
         {
-            sprites[i].x = 0;
-            sprites[i].y = 0;
+            struct Sprite *sprite = &core->machine->spriteRegisters.sprites[i];
+            sprite->x = 0;
+            sprite->y = 0;
         }
     }
     
@@ -172,7 +192,7 @@ struct TypedValue fnc_SPRITE(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // expression
@@ -180,7 +200,7 @@ struct TypedValue fnc_SPRITE(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -224,11 +244,11 @@ struct TypedValue fnc_SPRITE_HIT(struct Core *core)
     ++interpreter->pc;
     
     // HIT
-    if (interpreter->pc->type != TokenHIT) return val_makeError(ErrorUnexpectedToken);
+    if (interpreter->pc->type != TokenHIT) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // sprite number
@@ -258,7 +278,7 @@ struct TypedValue fnc_SPRITE_HIT(struct Core *core)
     }
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;

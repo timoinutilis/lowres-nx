@@ -35,7 +35,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c0 value
@@ -43,7 +43,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (c0Value.type == ValueTypeError) return c0Value.v.errorCode;
 
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c1 value
@@ -51,7 +51,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (c1Value.type == ValueTypeError) return c1Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c2 value
@@ -59,7 +59,7 @@ enum ErrorCode cmd_PALETTE(struct Core *core)
     if (c2Value.type == ValueTypeError) return c2Value.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // c3 value
@@ -91,7 +91,7 @@ enum ErrorCode cmd_SCROLL(struct Core *core)
     if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // x value
@@ -99,7 +99,7 @@ enum ErrorCode cmd_SCROLL(struct Core *core)
     if (xValue.type == ValueTypeError) return xValue.v.errorCode;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return ErrorExpectedComma;
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
     ++interpreter->pc;
     
     // y value
@@ -138,6 +138,8 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
     // DISPLAY
     ++interpreter->pc;
     
+    // obsolete syntax!
+    
     // atrb value
     struct TypedValue aValue = itp_evaluateDisplayAttributes(core, core->machine->videoRegisters.attr);
     if (aValue.type == ValueTypeError) return aValue.v.errorCode;
@@ -145,6 +147,95 @@ enum ErrorCode cmd_DISPLAY(struct Core *core)
     if (interpreter->pass == PassRun)
     {
          core->machine->videoRegisters.attr.value = aValue.v.floatValue;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_SPRITE_VIEW(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // SPRITE VIEW
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // ON/OFF
+    enum TokenType type = interpreter->pc->type;
+    if (type != TokenON && type != TokenOFF) return ErrorSyntax;
+    ++interpreter->pc;
+    
+    if (interpreter->pass == PassRun)
+    {
+        core->machine->videoRegisters.attr.spritesEnabled = type == TokenON ? 1 : 0;
+    }
+    
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_BG_VIEW(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // BG VIEW
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // ON/OFF
+    enum TokenType type = interpreter->pc->type;
+    if (type != TokenON && type != TokenOFF) return ErrorSyntax;
+    ++interpreter->pc;
+    
+    // bg value
+    struct TypedValue bgValue = itp_evaluateNumericExpression(core, 0, 1);
+    if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        int value = type == TokenON ? 1 : 0;
+        if (bgValue.v.floatValue == 0)
+        {
+            core->machine->videoRegisters.attr.planeAEnabled = value;
+        }
+        else
+        {
+            core->machine->videoRegisters.attr.planeBEnabled = value;
+        }
+    }
+
+    return itp_endOfCommand(interpreter);
+}
+
+enum ErrorCode cmd_CELL_SIZE(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // CELL SIZE
+    ++interpreter->pc;
+    ++interpreter->pc;
+    
+    // bg value
+    struct TypedValue bgValue = itp_evaluateNumericExpression(core, 0, 1);
+    if (bgValue.type == ValueTypeError) return bgValue.v.errorCode;
+    
+    // comma
+    if (interpreter->pc->type != TokenComma) return ErrorSyntax;
+    ++interpreter->pc;
+    
+    // size value
+    struct TypedValue sValue = itp_evaluateOptionalNumericExpression(core, 0, 1);
+    if (sValue.type == ValueTypeError) return sValue.v.errorCode;
+    
+    if (interpreter->pass == PassRun)
+    {
+        if (bgValue.v.floatValue == 0)
+        {
+            core->machine->videoRegisters.attr.planeACellSize = sValue.v.floatValue;
+        }
+        else
+        {
+            core->machine->videoRegisters.attr.planeBCellSize = sValue.v.floatValue;
+        }
     }
     
     return itp_endOfCommand(interpreter);
@@ -158,7 +249,7 @@ struct TypedValue fnc_COLOR(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // pal expression
@@ -166,7 +257,7 @@ struct TypedValue fnc_COLOR(struct Core *core)
     if (pValue.type == ValueTypeError) return pValue;
     
     // comma
-    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorExpectedComma);
+    if (interpreter->pc->type != TokenComma) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
 
     // pal expression
@@ -174,7 +265,7 @@ struct TypedValue fnc_COLOR(struct Core *core)
     if (nValue.type == ValueTypeError) return nValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -213,6 +304,7 @@ struct TypedValue fnc_screen0(struct Core *core)
                 break;
                 
             case TokenDISPLAY:
+                // obsolete syntax!
                 value.v.floatValue = core->machine->videoRegisters.attr.value;
                 break;
                 
@@ -233,7 +325,7 @@ struct TypedValue fnc_SCROLL_X_Y(struct Core *core)
     ++interpreter->pc;
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // bg value
@@ -241,7 +333,7 @@ struct TypedValue fnc_SCROLL_X_Y(struct Core *core)
     if (bgValue.type == ValueTypeError) return bgValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;

@@ -30,7 +30,7 @@ enum ErrorCode cmd_KEYBOARD(struct Core *core)
     
     // ON/OFF/OPTIONAL
     enum TokenType type = interpreter->pc->type;
-    if (type != TokenON && type != TokenOFF && type != TokenOPTIONAL) return ErrorUnexpectedToken;
+    if (type != TokenON && type != TokenOFF && type != TokenOPTIONAL) return ErrorSyntax;
     ++interpreter->pc;
     
     if (interpreter->pass == PassRun)
@@ -138,7 +138,7 @@ struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
     }
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // p expression
@@ -146,7 +146,7 @@ struct TypedValue fnc_UP_DOWN_LEFT_RIGHT(struct Core *core)
     if (pValue.type == ValueTypeError) return pValue;
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
@@ -208,7 +208,7 @@ struct TypedValue fnc_BUTTON(struct Core *core)
     }
     
     // bracket open
-    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorExpectedLeftParenthesis);
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     // p expression
@@ -229,7 +229,7 @@ struct TypedValue fnc_BUTTON(struct Core *core)
     }
     
     // bracket close
-    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorExpectedRightParenthesis);
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
     ++interpreter->pc;
     
     struct TypedValue value;
