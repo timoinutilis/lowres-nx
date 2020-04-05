@@ -124,6 +124,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
         {
             case LabelTypeIF:
             case LabelTypeELSEIF:
+            case LabelTypeELSE:
                 errorCode = ErrorIfWithoutEndIf;
                 break;
                 
@@ -149,11 +150,11 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
                 
             case LabelTypeFORVar:
             case LabelTypeFORLimit:
-            case LabelTypeELSE:
             case LabelTypeGOSUB:
             case LabelTypeCALL:
             case LabelTypeONCALL:
                 // should not happen in compile time
+                errorCode = ErrorSyntax;
                 break;
         }
         if (errorCode != ErrorNone)
