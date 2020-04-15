@@ -161,10 +161,6 @@ enum ErrorCode cmd_END_IF(struct Core *core)
     ++interpreter->pc;
     ++interpreter->pc;
     
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
     if (interpreter->pass == PassPrepare)
     {
         struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
@@ -189,6 +185,11 @@ enum ErrorCode cmd_END_IF(struct Core *core)
             return ErrorEndIfWithoutIf;
         }
     }
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+    ++interpreter->pc;
+    
     return ErrorNone;
 }
 
@@ -240,17 +241,17 @@ enum ErrorCode cmd_FOR(struct Core *core)
         stepValue.type = ValueTypeFloat;
         stepValue.v.floatValue = 1.0f;
     }
-    
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
+        
     if (interpreter->pass == PassPrepare)
     {
         lab_pushLabelStackItem(interpreter, LabelTypeFORLimit, tokenFORLimit);
         lab_pushLabelStackItem(interpreter, LabelTypeFORVar, tokenFORVar);
         enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeFOR, tokenFOR);
         if (errorCode != ErrorNone) return errorCode;
+        
+        // Eol
+        if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+        ++interpreter->pc;
     }
     else if (interpreter->pass == PassRun)
     {
@@ -260,6 +261,12 @@ enum ErrorCode cmd_FOR(struct Core *core)
         if ((stepValue.v.floatValue > 0 && varValue->floatValue > limitValue.v.floatValue) || (stepValue.v.floatValue < 0 && varValue->floatValue < limitValue.v.floatValue))
         {
             interpreter->pc = tokenFOR->jumpToken; // after NEXT's Eol
+        }
+        else
+        {
+            // Eol
+            if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+            ++interpreter->pc;
         }
     }
     
@@ -565,16 +572,16 @@ enum ErrorCode cmd_DO(struct Core *core)
     
     // DO
     ++interpreter->pc;
-
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
     
     if (interpreter->pass == PassPrepare)
     {
         enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeDO, interpreter->pc);
         if (errorCode != ErrorNone) return errorCode;
     }
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+    ++interpreter->pc;
     
     return ErrorNone;
 }
@@ -587,16 +594,16 @@ enum ErrorCode cmd_LOOP(struct Core *core)
     struct Token *tokenLOOP = interpreter->pc;
     ++interpreter->pc;
     
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
     if (interpreter->pass == PassPrepare)
     {
         struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
         if (!item || item->type != LabelTypeDO) return ErrorLoopWithoutDo;
         
         tokenLOOP->jumpToken = item->token;
+        
+        // Eol
+        if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+        ++interpreter->pc;
     }
     else if (interpreter->pass == PassRun)
     {
@@ -613,15 +620,15 @@ enum ErrorCode cmd_REPEAT(struct Core *core)
     // REPEAT
     ++interpreter->pc;
     
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
     if (interpreter->pass == PassPrepare)
     {
         enum ErrorCode errorCode = lab_pushLabelStackItem(interpreter, LabelTypeREPEAT, interpreter->pc);
         if (errorCode != ErrorNone) return errorCode;
     }
+    
+    // Eol
+    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+    ++interpreter->pc;
     
     return ErrorNone;
 }
@@ -637,23 +644,29 @@ enum ErrorCode cmd_UNTIL(struct Core *core)
     // Expression
     struct TypedValue value = itp_evaluateExpression(core, TypeClassNumeric);
     if (value.type == ValueTypeError) return value.v.errorCode;
-    
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
+        
     if (interpreter->pass == PassPrepare)
     {
         struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
         if (!item || item->type != LabelTypeREPEAT) return ErrorUntilWithoutRepeat;
         
         tokenUNTIL->jumpToken = item->token;
+        
+        // Eol
+        if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+        ++interpreter->pc;
     }
     else if (interpreter->pass == PassRun)
     {
         if (value.v.floatValue == 0)
         {
             interpreter->pc = tokenUNTIL->jumpToken; // after REPEAT
+        }
+        else
+        {
+            // Eol
+            if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+            ++interpreter->pc;
         }
     }
     
@@ -700,10 +713,6 @@ enum ErrorCode cmd_WEND(struct Core *core)
     struct Token *tokenWEND = interpreter->pc;
     ++interpreter->pc;
     
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
     if (interpreter->pass == PassPrepare)
     {
         struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
@@ -711,6 +720,10 @@ enum ErrorCode cmd_WEND(struct Core *core)
         
         tokenWEND->jumpToken = item->token;
         item->token->jumpToken = interpreter->pc;
+        
+        // Eol
+        if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+        ++interpreter->pc;
     }
     else if (interpreter->pass == PassRun)
     {

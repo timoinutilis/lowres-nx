@@ -206,11 +206,7 @@ enum ErrorCode cmd_SUB(struct Core *core)
         if (interpreter->pc->type != TokenBracketClose) return ErrorSyntax;
         ++interpreter->pc;
     }
-    
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
+        
     if (interpreter->pass == PassPrepare)
     {
         if (interpreter->numLabelStackItems > 0)
@@ -221,6 +217,10 @@ enum ErrorCode cmd_SUB(struct Core *core)
         if (errorCode != ErrorNone) return errorCode;
         
         interpreter->subLevel++;
+        
+        // Eol
+        if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+        ++interpreter->pc;
     }
     else if (interpreter->pass == PassRun)
     {
@@ -237,11 +237,7 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
     // END SUB
     ++interpreter->pc;
     ++interpreter->pc;
-    
-    // Eol
-    if (interpreter->pc->type != TokenEol) return ErrorSyntax;
-    ++interpreter->pc;
-    
+        
     if (interpreter->pass == PassPrepare)
     {
         struct LabelStackItem *item = lab_popLabelStackItem(interpreter);
@@ -255,8 +251,13 @@ enum ErrorCode cmd_END_SUB(struct Core *core)
         }
         else
         {
-            return ErrorEndSubWithoutSub;
+            enum ErrorCode errorCode = itp_labelStackError(item);
+            return errorCode != ErrorNone ? errorCode : ErrorEndSubWithoutSub;
         }
+        
+        // Eol
+        if (interpreter->pc->type != TokenEol) return ErrorSyntax;
+        ++interpreter->pc;
     }
     else if (interpreter->pass == PassRun)
     {

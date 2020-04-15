@@ -120,43 +120,7 @@ struct CoreError itp_compileProgram(struct Core *core, const char *sourceCode)
     if (interpreter->numLabelStackItems > 0)
     {
         struct LabelStackItem *item = &interpreter->labelStackItems[interpreter->numLabelStackItems - 1];
-        switch (item->type)
-        {
-            case LabelTypeIF:
-            case LabelTypeELSEIF:
-            case LabelTypeELSE:
-                errorCode = ErrorIfWithoutEndIf;
-                break;
-                
-            case LabelTypeFOR:
-                errorCode =  ErrorForWithoutNext;
-                break;
-                
-            case LabelTypeDO:
-                errorCode =  ErrorDoWithoutLoop;
-                break;
-                
-            case LabelTypeREPEAT:
-                errorCode =  ErrorRepeatWithoutUntil;
-                break;
-                
-            case LabelTypeWHILE:
-                errorCode =  ErrorWhileWithoutWend;
-                break;
-                
-            case LabelTypeSUB:
-                errorCode = ErrorSubWithoutEndSub;
-                break;
-                
-            case LabelTypeFORVar:
-            case LabelTypeFORLimit:
-            case LabelTypeGOSUB:
-            case LabelTypeCALL:
-            case LabelTypeONCALL:
-                // should not happen in compile time
-                errorCode = ErrorSyntax;
-                break;
-        }
+        errorCode = itp_labelStackError(item);
         if (errorCode != ErrorNone)
         {
             return err_makeCoreError(errorCode, item->token->sourcePosition);
@@ -1545,4 +1509,38 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return ErrorSyntax;
     }
     return ErrorNone;
+}
+
+enum ErrorCode itp_labelStackError(struct LabelStackItem *item)
+{
+    switch (item->type)
+    {
+        case LabelTypeIF:
+        case LabelTypeELSEIF:
+        case LabelTypeELSE:
+            return ErrorIfWithoutEndIf;
+            
+        case LabelTypeFOR:
+            return  ErrorForWithoutNext;
+            
+        case LabelTypeDO:
+            return ErrorDoWithoutLoop;
+            
+        case LabelTypeREPEAT:
+            return ErrorRepeatWithoutUntil;
+            
+        case LabelTypeWHILE:
+            return ErrorWhileWithoutWend;
+            
+        case LabelTypeSUB:
+            return ErrorSubWithoutEndSub;
+            
+        case LabelTypeFORVar:
+        case LabelTypeFORLimit:
+        case LabelTypeGOSUB:
+        case LabelTypeCALL:
+        case LabelTypeONCALL:
+            // should not happen in compile time
+            return ErrorSyntax;
+    }
 }

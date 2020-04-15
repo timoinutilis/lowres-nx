@@ -136,5 +136,6 @@ struct TypedValue itp_evaluateOptionalExpression(struct Core *core, enum TypeCla
 struct TypedValue itp_evaluateOptionalNumericExpression(struct Core *core, int min, int max);
 bool itp_isEndOfCommand(struct Interpreter *interpreter);
 enum ErrorCode itp_endOfCommand(struct Interpreter *interpreter);
+enum ErrorCode itp_labelStackError(struct LabelStackItem *item);
 
 #endif /* interpreter_h */
