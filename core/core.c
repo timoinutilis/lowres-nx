@@ -247,6 +247,11 @@ bool core_getDebug(struct Core *core)
     return core->interpreter->debug;
 }
 
+bool core_isKeyboardEnabled(struct Core *core)
+{
+    return core->machine->ioRegisters.attr.keyboardEnabled;
+}
+
 bool core_shouldRender(struct Core *core)
 {
     enum State state = core->interpreter->state;

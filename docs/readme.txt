@@ -24,6 +24,8 @@ Please read the introduction (at least "Getting Started") of the manual.
 	Dev Menu     Esc
 	Pause        Return/P
 	Fullscreen   Ctrl+f
+	Fullwidth    Ctrl+w
+	View Area    Ctrl+v/Space
 	Screenshot
 	   large     Ctrl+s
 	   original  Ctrl+Shift+s
@@ -52,9 +54,12 @@ Please read the introduction (at least "Getting Started") of the manual.
 
 	-fullscreen yes/no
 	Start the application in fullscreen mode
+
+	-fullwidth yes/no
+	Start the application in fullwidth mode, Ctrl+v or Space key toggles view area
 	
 	-disabledev yes/no
-	Disable the Development Menu, ESC key quits LowRes NX
+	Disable the Development Menu, Esc key quits LowRes NX
 
 	program.nx
 	Name of the program to run

@@ -648,6 +648,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = BZ4VC623NH;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -664,6 +665,7 @@
 					/usr/local/lib,
 					/usr/local/Cellar/libpng/1.6.21/lib,
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.LowRes-NX-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -677,6 +679,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = BZ4VC623NH;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -693,6 +696,7 @@
 					/usr/local/lib,
 					/usr/local/Cellar/libpng/1.6.21/lib,
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.inutilis.LowRes-NX-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

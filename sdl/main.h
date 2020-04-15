@@ -30,6 +30,12 @@ enum MainState {
     MainStateDevMenu,
 };
 
+enum ViewArea {
+    ViewAreaCenter,
+    ViewAreaBottom,
+    ViewAreaTop,
+};
+
 void bootNX(void);
 void rebootNX(void);
 bool hasProgram(void);

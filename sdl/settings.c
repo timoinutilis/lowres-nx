@@ -154,6 +154,17 @@ void settings_setParameter(struct Parameters *parameters, const char *key, const
             parameters->disabledev = false;
         }
     }
+    else if (strcmp(key, "fullwidth") == 0)
+    {
+        if (strcmp(value, optionYes) == 0)
+        {
+            parameters->fullwidth = true;
+        }
+        else if (strcmp(value, optionNo) == 0)
+        {
+            parameters->fullwidth = false;
+        }
+    }
     else
     {
         printf("unknown parameter %s\n", key);
@@ -182,7 +193,12 @@ void settings_saveAs(struct Settings *settings, const char *filename)
         fputs(settings->file.fullscreen ? optionYes : optionNo, file);
         fputs("\n\n", file);
         
-        fputs("# Disable the Development Menu, ESC key quits LowRes NX.\n# disabledev yes/no\n", file);
+        fputs("# Start the application in fullwidth mode, Ctrl+v or Space key toggles view area.\n# fullwidth yes/no\n", file);
+        fputs("fullwidth ", file);
+        fputs(settings->file.fullwidth ? optionYes : optionNo, file);
+        fputs("\n\n", file);
+        
+        fputs("# Disable the Development Menu, Esc key quits LowRes NX.\n# disabledev yes/no\n", file);
         fputs("disabledev ", file);
         fputs(settings->file.disabledev ? optionYes : optionNo, file);
         fputs("\n\n", file);

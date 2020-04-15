@@ -58,6 +58,7 @@ void updateScreenRect(int winW, int winH);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
+bool toggleViewArea(void);
 void audioCallback(void *userdata, Uint8 *stream, int len);
 void saveScreenshot(void *pixels, int scale);
 
@@ -93,6 +94,7 @@ bool mouseEnabled = false;
 int messageNumber = 0;
 bool hasUsedInputLastUpdate = false;
 int screenshotRequestedWithScale = 0;
+enum ViewArea viewArea = ViewAreaCenter;
 
 int main(int argc, const char * argv[])
 {
@@ -507,6 +509,22 @@ void update(void *arg)
                         screenshotRequestedWithScale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 4;
                         forceRender = true;
                     }
+                    else if (keycode == SDLK_w)
+                    {
+                        settings.session.fullwidth = !settings.session.fullwidth;
+                        viewArea = ViewAreaCenter;
+                        int width, height;
+                        SDL_GetWindowSize(window, &width, &height);
+                        updateScreenRect(width, height);
+                        forceRender = true;
+                    }
+                    else if (keycode == SDLK_v)
+                    {
+                        if (toggleViewArea())
+                        {
+                            forceRender = true;
+                        }
+                    }
                 }
                 else if (keycode == SDLK_ESCAPE)
                 {
@@ -523,6 +541,17 @@ void update(void *arg)
                         }
                     }
 #endif
+                }
+                else if (keycode == SDLK_SPACE)
+                {
+                    if (!core_isKeyboardEnabled(runner.core))
+                    {
+                        if (toggleViewArea())
+                        {
+                            forceRender = true;
+                            hasInput = false;
+                        }
+                    }
                 }
 #endif
                 break;
@@ -712,11 +741,37 @@ void update(void *arg)
 
 void updateScreenRect(int winW, int winH)
 {
-    int factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
+    int factor;
+    if (settings.session.fullwidth)
+    {
+        factor = fmax(1, winW / SCREEN_WIDTH);
+    }
+    else
+    {
+        factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
+    }
+    
     int nxScreenW = SCREEN_WIDTH * factor;
     int nxScreenH = SCREEN_HEIGHT * factor;
     screenRect.x = (winW - nxScreenW) / 2;
-    screenRect.y = (winH - nxScreenH) / 2;
+    
+    if (nxScreenH < winH)
+    {
+        viewArea = ViewAreaCenter;
+    }
+    switch (viewArea)
+    {
+        case ViewAreaCenter:
+            screenRect.y = (winH - nxScreenH) / 2;
+            break;
+        case ViewAreaTop:
+            screenRect.y = 0;
+            break;
+        case ViewAreaBottom:
+            screenRect.y = winH - nxScreenH;
+            break;
+    }
+    
     screenRect.w = nxScreenW;
     screenRect.h = nxScreenH;
     SDL_SetTextInputRect(&screenRect);
@@ -748,6 +803,19 @@ void setTouchPosition(int windowX, int windowY)
 {
     coreInput.touchX = (windowX - screenRect.x) * SCREEN_WIDTH / screenRect.w;
     coreInput.touchY = (windowY - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
+}
+
+bool toggleViewArea()
+{
+    if (settings.session.fullwidth)
+    {
+        viewArea = (viewArea + 1) % 3;
+        int width, height;
+        SDL_GetWindowSize(window, &width, &height);
+        updateScreenRect(width, height);
+        return true;
+    }
+    return false;
 }
 
 void audioCallback(void *userdata, Uint8 *stream, int len)

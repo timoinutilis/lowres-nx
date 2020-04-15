@@ -28,6 +28,7 @@
 
 struct Parameters {
     bool fullscreen;
+    bool fullwidth;
     bool disabledev;
 };
 
