@@ -321,6 +321,8 @@ enum ErrorCode cmd_WINDOW(struct Core *core)
         core->interpreter->textLib.windowWidth = wValue.v.floatValue;
         core->interpreter->textLib.windowHeight = hValue.v.floatValue;
         core->interpreter->textLib.bg = bgValue.v.floatValue;
+        core->interpreter->textLib.cursorX = 0;
+        core->interpreter->textLib.cursorY = 0;
     }
     
     return itp_endOfCommand(interpreter);
