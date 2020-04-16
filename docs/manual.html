@@ -979,7 +979,7 @@ DO
 LOOP
 </pre>
 
-<p>Performs commands in an endless loop. You can use GOTO to exit it.
+<p>Performs commands in an endless loop. You can use GOTO or EXIT to leave it.
 </p>
 
 <pre class="example">
@@ -1024,6 +1024,23 @@ WHILE A&lt;10
   PRINT A
   A=A+1
 WEND
+</pre>
+
+
+<h3 id="_EXIT" name="EXIT">EXIT</h3>
+<pre>
+EXIT
+</pre>
+
+<p>Exits immediately from a loop created with the FOR...NEXT, REPEAT...UNTIL, WHILE...WEND, or DO...LOOP commands.</p>
+
+<pre class="example">
+DO
+  INPUT "ENTER E TO EXIT:";A$
+  IF A$="E" THEN EXIT
+  PRINT "GOING ON..."
+LOOP
+PRINT "END"
 </pre>
 
 

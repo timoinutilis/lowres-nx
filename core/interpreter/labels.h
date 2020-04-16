@@ -49,5 +49,6 @@ struct LabelStackItem {
 enum ErrorCode lab_pushLabelStackItem(struct Interpreter *interpreter, enum LabelType type, struct Token *token);
 struct LabelStackItem *lab_popLabelStackItem(struct Interpreter *interpreter);
 struct LabelStackItem *lab_peekLabelStackItem(struct Interpreter *interpreter);
+struct LabelStackItem *lab_searchLabelStackItem(struct Interpreter *interpreter, enum LabelType types[], int numTypes);
 
 #endif /* labels_h */

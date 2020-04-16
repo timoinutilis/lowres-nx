@@ -62,6 +62,7 @@ const char *ErrorStrings[] = {
     "DO Without LOOP",
     "REPEAT Without UNTIL",
     "WHILE Without WEND",
+    "EXIT Not Inside Loop",
     "Directory Not Loaded",
     "Division By Zero",
     "Variable Not Initialized",

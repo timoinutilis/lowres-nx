@@ -1453,7 +1453,14 @@ enum ErrorCode itp_evaluateCommand(struct Core *core)
             return cmd_GLOBAL(core);
             
         case TokenEXIT:
-            return cmd_EXIT_SUB(core);
+            switch (itp_getNextTokenType(interpreter))
+            {
+                case TokenSUB:
+                    return cmd_EXIT_SUB(core);
+                default:
+                    return cmd_EXIT(core);
+            }
+            break;
             
         case TokenPAUSE:
             return cmd_PAUSE(core);

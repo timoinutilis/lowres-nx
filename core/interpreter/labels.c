@@ -49,3 +49,20 @@ struct LabelStackItem *lab_peekLabelStackItem(struct Interpreter *interpreter)
     return NULL;
 }
 
+struct LabelStackItem *lab_searchLabelStackItem(struct Interpreter *interpreter, enum LabelType types[], int numTypes)
+{
+    int i = interpreter->numLabelStackItems - 1;
+    while (i >= 0)
+    {
+        struct LabelStackItem *item = &interpreter->labelStackItems[i];
+        for (int j = 0; j < numTypes; j++)
+        {
+            if (item->type == types[j])
+            {
+                return item;
+            }
+        }
+        --i;
+    }
+    return NULL;
+}

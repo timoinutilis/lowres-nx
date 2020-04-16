@@ -65,6 +65,7 @@ enum ErrorCode {
     ErrorDoWithoutLoop,
     ErrorRepeatWithoutUntil,
     ErrorWhileWithoutWend,
+    ErrorExitNotInsideLoop,
     ErrorDirectoryNotLoaded,
     ErrorDivisionByZero,
     ErrorVariableNotInitialized,
