@@ -38,8 +38,6 @@ void stats_init(struct Stats *stats)
 
 void stats_deinit(struct Stats *stats)
 {
-    tok_freeTokens(stats->tokenizer);
-    
     free(stats->romDataManager->data);
     stats->romDataManager->data = NULL;
     
@@ -55,19 +53,29 @@ struct CoreError stats_update(struct Stats *stats, const char *sourceCode)
     stats->numTokens = 0;
     stats->romSize = 0;
     
+    struct CoreError error = err_noCoreError();
+    
     const char *upperCaseSourceCode = uppercaseString(sourceCode);
-    if (!upperCaseSourceCode) return err_makeCoreError(ErrorOutOfMemory, -1);
+    if (!upperCaseSourceCode)
+    {
+        error = err_makeCoreError(ErrorOutOfMemory, -1);
+        goto cleanup;
+    }
     
-    //TODO free resources on error
-    
-    struct CoreError error = tok_tokenizeUppercaseProgram(stats->tokenizer, upperCaseSourceCode);
-    if (error.code != ErrorNone) return error;
+    error = tok_tokenizeUppercaseProgram(stats->tokenizer, upperCaseSourceCode);
+    if (error.code != ErrorNone)
+    {
+        goto cleanup;
+    }
     
     stats->numTokens = stats->tokenizer->numTokens;
     
     struct DataManager *romDataManager = stats->romDataManager;
     error = data_uppercaseImport(romDataManager, upperCaseSourceCode, false);
-    if (error.code != ErrorNone) return error;
+    if (error.code != ErrorNone)
+    {
+        goto cleanup;
+    }
     
     stats->romSize = data_currentSize(stats->romDataManager);
     
@@ -78,8 +86,12 @@ struct CoreError stats_update(struct Stats *stats, const char *sourceCode)
         stats->romSize += 1024;
     }
     
+cleanup:
     tok_freeTokens(stats->tokenizer);
-    free((void *)upperCaseSourceCode);
+    if (upperCaseSourceCode)
+    {
+        free((void *)upperCaseSourceCode);
+    }
     
-    return err_noCoreError();
+    return error;
 }
