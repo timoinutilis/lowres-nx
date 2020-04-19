@@ -35,6 +35,7 @@ enum ErrorCode cmd_CLS(struct Core *core);
 enum ErrorCode cmd_WINDOW(struct Core *core);
 enum ErrorCode cmd_FONT(struct Core *core);
 enum ErrorCode cmd_LOCATE(struct Core *core);
+struct TypedValue fnc_CURSOR(struct Core *core);
 enum ErrorCode cmd_CLW(struct Core *core);
 enum ErrorCode cmd_TRACE(struct Core *core);
 

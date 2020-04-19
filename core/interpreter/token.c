@@ -78,6 +78,8 @@ const char *TokenStrings[] = {
     "COLOR",
     "COPY",
     "COS",
+    "CURSOR.X",
+    "CURSOR.Y",
     "DATA",
     "DEC",
     "DIM",

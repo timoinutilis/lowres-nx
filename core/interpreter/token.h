@@ -82,6 +82,8 @@ enum TokenType {
     TokenCOLOR,
     TokenCOPY,
     TokenCOS,
+    TokenCURSORX,
+    TokenCURSORY,
     TokenDATA,
     TokenDEC,
     TokenDIM,

@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 #include "core.h"
 #include "text_lib.h"
 
@@ -374,6 +375,37 @@ enum ErrorCode cmd_LOCATE(struct Core *core)
     }
     
     return itp_endOfCommand(interpreter);
+}
+
+struct TypedValue fnc_CURSOR(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // CURSOR.?
+    enum TokenType type = interpreter->pc->type;
+    ++interpreter->pc;
+        
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        switch (type)
+        {
+            case TokenCURSORX:
+                value.v.floatValue = interpreter->textLib.cursorX;
+                break;
+                
+            case TokenCURSORY:
+                value.v.floatValue = interpreter->textLib.cursorY;
+                break;
+                
+            default:
+                assert(0);
+                break;
+        }
+    }
+    return value;
 }
 
 enum ErrorCode cmd_CLW(struct Core *core)

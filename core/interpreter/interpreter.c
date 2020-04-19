@@ -1113,6 +1113,10 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
         case TokenMCELLC:
             return fnc_MCELL(core);
             
+        case TokenCURSORX:
+        case TokenCURSORY:
+            return fnc_CURSOR(core);
+            
         case TokenUP:
         case TokenDOWN:
         case TokenLEFT:
