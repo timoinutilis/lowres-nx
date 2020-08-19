@@ -196,6 +196,7 @@ const char *TokenStrings[] = {
     "TO",
     "TRACE",
     "TRACK",
+    "UBOUND",
     "UNTIL",
     "UP",
     "VAL",
@@ -223,7 +224,6 @@ const char *TokenStrings[] = {
     "SHARED",
     "STATIC",
     "TEMPO",
-    "UBOUND",
     "VOICE",
     "WRITE",
 

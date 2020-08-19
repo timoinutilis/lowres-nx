@@ -644,6 +644,27 @@ PRINT SCORES(0),SCORES(9)
 <p>With the optional GLOBAL keyword the arrays will be accessable
 from all subprograms.</p>
 
+
+<h3 id="_UBOUND" name="UBOUND">=UBOUND</h3>
+<pre>
+UBOUND(var[,dimension])
+</pre>
+
+<p>Returns the upper bound (the highest index) of a dimension of the
+array <em>var</em>.</p>
+
+<p>The <em>dimension</em> parameter is an optional number
+used when the array is multi-dimensional, and specifies the dimension
+of the array. The default value is 1.</p>
+
+<pre class="example">
+DIM SCORES(9)
+FOR I=0 TO UBOUND(SCORES)
+  PRINT SCORES(I)
+NEXT I
+</pre>
+
+
 <h2 id="Labels">Labels</h2>
 
 <p>A label marks a position in a program and is used for commands
@@ -3407,7 +3428,7 @@ TOUCH.Y,
 TOUCHSCREEN,
 TRACE,
 TRACK,
-UBOUND*,
+UBOUND,
 UNTIL,
 UP,
 VAL,

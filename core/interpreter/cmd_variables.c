@@ -128,6 +128,52 @@ enum ErrorCode cmd_DIM(struct Core *core)
     return itp_endOfCommand(interpreter);
 }
 
+struct TypedValue fnc_UBOUND(struct Core *core)
+{
+    struct Interpreter *interpreter = core->interpreter;
+    
+    // UBOUND
+    ++interpreter->pc;
+    
+    // bracket open
+    if (interpreter->pc->type != TokenBracketOpen) return val_makeError(ErrorSyntax);
+    ++interpreter->pc;
+    
+    // array
+    if (interpreter->pc->type != TokenIdentifier && interpreter->pc->type != TokenStringIdentifier) return val_makeError(ErrorSyntax);
+    int symbolIndex = interpreter->pc->symbolIndex;
+    ++interpreter->pc;
+    
+    int d = 0;
+    if (interpreter->pc->type == TokenComma)
+    {
+        // comma
+        ++interpreter->pc;
+        
+        // dimension value
+        struct TypedValue dValue = itp_evaluateNumericExpression(core, 1, MAX_ARRAY_DIMENSIONS);
+        if (dValue.type == ValueTypeError) return val_makeError(dValue.v.errorCode);
+        
+        d = dValue.v.floatValue - 1;
+    }
+    
+    // bracket close
+    if (interpreter->pc->type != TokenBracketClose) return val_makeError(ErrorSyntax);
+    ++interpreter->pc;
+    
+    struct TypedValue value;
+    value.type = ValueTypeFloat;
+    
+    if (interpreter->pass == PassRun)
+    {
+        struct ArrayVariable *variable = var_getArrayVariable(interpreter, symbolIndex, interpreter->subLevel);
+        if (!variable) return val_makeError(ErrorArrayNotDimensionized);
+        
+        value.v.floatValue = variable->dimensionSizes[d] - 1;
+    }
+    return value;
+}
+
 enum ErrorCode cmd_SWAP(struct Core *core)
 {
     struct Interpreter *interpreter = core->interpreter;

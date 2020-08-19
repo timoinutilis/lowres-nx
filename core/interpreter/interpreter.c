@@ -1088,7 +1088,10 @@ struct TypedValue itp_evaluateFunction(struct Core *core)
             
         case TokenINKEY:
             return fnc_INKEY(core);
-        
+            
+        case TokenUBOUND:
+            return fnc_UBOUND(core);
+            
         case TokenROM:
         case TokenSIZE:
             return fnc_ROM_SIZE(core);

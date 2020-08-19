@@ -200,6 +200,7 @@ enum TokenType {
     TokenTO,
     TokenTRACE,
     TokenTRACK,
+    TokenUBOUND,
     TokenUNTIL,
     TokenUP,
     TokenVAL,
@@ -227,7 +228,6 @@ enum TokenType {
     TokenSHARED,
     TokenSTATIC,
     TokenTEMPO,
-    TokenUBOUND,
     TokenVOICE,
     TokenWRITE,
     
