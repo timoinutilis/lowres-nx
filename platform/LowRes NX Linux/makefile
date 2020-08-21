@@ -1,7 +1,7 @@
 # Declaration of variables
 CC = gcc
-CC_FLAGS =  -D __LINUX__-w -I ../../core -I ../../core/machine -I ../../core/accessories -I ../../core/datamanager -I ../../core/interpreter -I ../../core/libraries -I ../../core/overlay -lSDL2main -lSDL2 -lm
-CC_FLAGS_MAIN =  -D __LINUX__ -lSDL2main `sdl2-config --cflags --static-libs`
+CC_FLAGS =  -D __LINUX__ -w -I ../../core -I ../../core/machine -I ../../core/accessories -I ../../core/datamanager -I ../../core/interpreter -I ../../core/libraries -I ../../core/overlay -lSDL2main -lSDL2 -lm
+CC_FLAGS_MAIN =  -D __LINUX__ -lSDL2main -lSDL2 -lm `sdl2-config --cflags --static-libs`
 
 # File names
 EXEC = output/LowResNX
