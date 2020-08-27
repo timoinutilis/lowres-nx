@@ -44,13 +44,25 @@ const char *defaultDisk = "Disk.nx";
 const int defaultWindowScale = 4;
 const int joyAxisThreshold = 16384;
 const int bootIntroStateAddress = 0xA000;
+const int numMappings = 2;
 
-const int keyboardControls[2][8] = {
-    // up, down, left, right, button A, button B, alt. button A, alt. button B
-    {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
-        SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_N, SDL_SCANCODE_M},
-    {SDL_SCANCODE_E, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_F,
-        SDL_SCANCODE_TAB, SDL_SCANCODE_Q, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_A}
+const int keyboardControls[numMappings][2][8] = {
+    // mapping 0
+    {
+        // up, down, left, right, button A, button B, alt. button A, alt. button B
+        {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
+            SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_N, SDL_SCANCODE_M},
+        {SDL_SCANCODE_E, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_F,
+            SDL_SCANCODE_TAB, SDL_SCANCODE_Q, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_A}
+    },
+    // mapping 1
+    {
+        // up, down, left, right, button A, button B, alt. button A, alt. button B
+        {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
+            SDL_SCANCODE_J, SDL_SCANCODE_K, SDL_SCANCODE_I, SDL_SCANCODE_U},
+        {SDL_SCANCODE_E, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_F, // player 2 unused
+            SDL_SCANCODE_TAB, SDL_SCANCODE_Q, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_A}
+    }
 };
 
 void update(void *arg);
@@ -625,12 +637,13 @@ void update(void *arg)
         else
         {
             int ci = i - numJoysticks;
-            gamepad->up = state[keyboardControls[ci][0]];
-            gamepad->down = state[keyboardControls[ci][1]];
-            gamepad->left = state[keyboardControls[ci][2]];
-            gamepad->right = state[keyboardControls[ci][3]];
-            gamepad->buttonA = state[keyboardControls[ci][4]] || state[keyboardControls[ci][6]];
-            gamepad->buttonB = state[keyboardControls[ci][5]] || state[keyboardControls[ci][7]];
+            int m = settings.session.mapping;
+            gamepad->up = state[keyboardControls[m][ci][0]];
+            gamepad->down = state[keyboardControls[m][ci][1]];
+            gamepad->left = state[keyboardControls[m][ci][2]];
+            gamepad->right = state[keyboardControls[m][ci][3]];
+            gamepad->buttonA = state[keyboardControls[m][ci][4]] || state[keyboardControls[m][ci][6]];
+            gamepad->buttonB = state[keyboardControls[m][ci][5]] || state[keyboardControls[m][ci][7]];
         }
     }
     

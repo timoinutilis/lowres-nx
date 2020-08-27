@@ -165,6 +165,14 @@ void settings_setParameter(struct Parameters *parameters, const char *key, const
             parameters->fullwidth = false;
         }
     }
+    else if (strcmp(key, "mapping") == 0)
+    {
+        int m = atoi(value);
+        if (m >= 0 && m < 2)
+        {
+            parameters->mapping = m;
+        }
+    }
     else
     {
         printf("unknown parameter %s\n", key);
@@ -202,7 +210,10 @@ void settings_saveAs(struct Settings *settings, const char *filename)
         fputs("disabledev ", file);
         fputs(settings->file.disabledev ? optionYes : optionNo, file);
         fputs("\n\n", file);
-
+        
+        fputs("# Set the key mapping. 0 is standard, 1 is GameShell.\n# mapping 0-1\n", file);
+        fprintf(file, "mapping %d\n\n", settings->file.mapping);
+        
         fputs("# Add tools for the Edit ROM menu (max 4).\n# tool My Tool.nx\n", file);
         for (int i = 0; i < settings->numTools; i++)
         {
