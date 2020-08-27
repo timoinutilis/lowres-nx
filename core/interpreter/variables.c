@@ -44,6 +44,11 @@ struct SimpleVariable *var_createSimpleVariable(struct Interpreter *interpreter,
         *errorCode = ErrorOutOfMemory;
         return NULL;
     }
+    if (subLevel > 127)
+    {
+        *errorCode = ErrorStackOverflow;
+        return NULL;
+    }
     struct SimpleVariable *variable = &interpreter->simpleVariables[interpreter->numSimpleVariables];
     interpreter->numSimpleVariables++;
     memset(variable, 0, sizeof(struct SimpleVariable));
@@ -169,6 +174,11 @@ struct ArrayVariable *var_createArrayVariable(struct Interpreter *interpreter, e
     if (interpreter->numArrayVariables >= MAX_ARRAY_VARIABLES)
     {
         *errorCode = ErrorOutOfMemory;
+        return NULL;
+    }
+    if (subLevel > 127)
+    {
+        *errorCode = ErrorStackOverflow;
         return NULL;
     }
     struct ArrayVariable *variable = &interpreter->arrayVariables[interpreter->numArrayVariables];
