@@ -44,9 +44,8 @@ const char *defaultDisk = "Disk.nx";
 const int defaultWindowScale = 4;
 const int joyAxisThreshold = 16384;
 const int bootIntroStateAddress = 0xA000;
-const int numMappings = 2;
 
-const int keyboardControls[numMappings][2][8] = {
+const int keyboardControls[2][2][8] = {
     // mapping 0
     {
         // up, down, left, right, button A, button B, alt. button A, alt. button B
@@ -170,8 +169,10 @@ int main(int argc, const char * argv[])
         {
             machine_poke(runner.core, bootIntroStateAddress, 1);
         }
-
-        updateScreenRect(SCREEN_WIDTH * defaultWindowScale, SCREEN_HEIGHT * defaultWindowScale);
+        
+        int width, height;
+        SDL_GetWindowSize(window, &width, &height);
+        updateScreenRect(width, height);
         
 #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop_arg(update, NULL, -1, true);
