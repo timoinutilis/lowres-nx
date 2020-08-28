@@ -59,8 +59,8 @@ const int keyboardControls[2][2][8] = {
         // up, down, left, right, button A, button B, alt. button A, alt. button B
         {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
             SDL_SCANCODE_J, SDL_SCANCODE_K, SDL_SCANCODE_I, SDL_SCANCODE_U},
-        {SDL_SCANCODE_E, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_F, // player 2 unused
-            SDL_SCANCODE_TAB, SDL_SCANCODE_Q, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_A}
+        {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
+            SDL_SCANCODE_H, SDL_SCANCODE_L, SDL_SCANCODE_O, SDL_SCANCODE_Y}
     }
 };
 
@@ -575,11 +575,11 @@ void update(void *arg)
                             hasInput = false;
                         }
                     }
-                    else if (keycode == SDLK_PLUS)
+                    else if (scancode == SDL_SCANCODE_KP_PLUS)
                     {
                         changeVolume(-1);
                     }
-                    else if (keycode == SDLK_MINUS)
+                    else if (scancode == SDL_SCANCODE_KP_MINUS)
                     {
                         changeVolume(+1);
                     }
