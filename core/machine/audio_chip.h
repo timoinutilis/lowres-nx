@@ -135,6 +135,6 @@ struct AudioInternals {
 
 void audio_reset(struct Core *core);
 void audio_bufferRegisters(struct Core *core);
-void audio_renderAudio(struct Core *core, int16_t *output, int numSamples, int outputFrequency);
+void audio_renderAudio(struct Core *core, int16_t *output, int numSamples, int outputFrequency, int volume);
 
 #endif /* audio_chip_h */

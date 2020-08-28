@@ -201,7 +201,7 @@ void settings_saveAs(struct Settings *settings, const char *filename)
         fputs(settings->file.fullscreen ? optionYes : optionNo, file);
         fputs("\n\n", file);
         
-        fputs("# Start the application in fullwidth mode, Ctrl+v or Space key toggles view area.\n# fullwidth yes/no\n", file);
+        fputs("# Start the application in fullwidth mode, Ctrl+v toggles view area.\n# fullwidth yes/no\n", file);
         fputs("fullwidth ", file);
         fputs(settings->file.fullwidth ? optionYes : optionNo, file);
         fputs("\n\n", file);

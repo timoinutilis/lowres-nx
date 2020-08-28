@@ -25,13 +25,15 @@ Please read the introduction (at least "Getting Started") of the manual.
 	Pause        Return/P
 	Fullscreen   Ctrl+f
 	Fullwidth    Ctrl+w
-	View Area    Ctrl+v/Space
+	View Area    Ctrl+v
 	Screenshot
 	   large     Ctrl+s
 	   original  Ctrl+Shift+s
 	Debug        Ctrl+d
 	Reload/Run   Ctrl+r
 	Eject        Ctrl+e
+	Volume up    Ctrl+Plus
+	Volume down  Ctrl+Minus
 	Quit         Esc (if disabledev)
 
 
@@ -56,10 +58,13 @@ Please read the introduction (at least "Getting Started") of the manual.
 	Start the application in fullscreen mode
 
 	-fullwidth yes/no
-	Start the application in fullwidth mode, Ctrl+v or Space key toggles view area
-	
+	Start the application in fullwidth mode, Ctrl+v toggles view area
+
 	-disabledev yes/no
 	Disable the Development Menu, Esc key quits LowRes NX
+
+	-mapping 0-1
+    Set the key mapping. 0 is standard, 1 is GameShell.
 
 	program.nx
 	Name of the program to run

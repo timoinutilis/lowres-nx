@@ -70,6 +70,7 @@ void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
 bool toggleViewArea(void);
+void changeVolume(int delta);
 void audioCallback(void *userdata, Uint8 *stream, int len);
 void saveScreenshot(void *pixels, int scale);
 
@@ -106,6 +107,7 @@ int messageNumber = 0;
 bool hasUsedInputLastUpdate = false;
 int screenshotRequestedWithScale = 0;
 enum ViewArea viewArea = ViewAreaCenter;
+int volume = 0; // 0 = max, it's a bit shift
 
 int main(int argc, const char * argv[])
 {
@@ -538,6 +540,14 @@ void update(void *arg)
                             forceRender = true;
                         }
                     }
+                    else if (keycode == SDLK_PLUS)
+                    {
+                        changeVolume(-1);
+                    }
+                    else if (keycode == SDLK_MINUS)
+                    {
+                        changeVolume(+1);
+                    }
                 }
                 else if (keycode == SDLK_ESCAPE)
                 {
@@ -555,15 +565,23 @@ void update(void *arg)
                     }
 #endif
                 }
-                else if (keycode == SDLK_SPACE)
+                else if (settings.session.mapping == 1 && !core_isKeyboardEnabled(runner.core))
                 {
-                    if (!core_isKeyboardEnabled(runner.core))
+                    if (keycode == SDLK_SPACE)
                     {
                         if (toggleViewArea())
                         {
                             forceRender = true;
                             hasInput = false;
                         }
+                    }
+                    else if (keycode == SDLK_PLUS)
+                    {
+                        changeVolume(-1);
+                    }
+                    else if (keycode == SDLK_MINUS)
+                    {
+                        changeVolume(+1);
                     }
                 }
 #endif
@@ -692,7 +710,7 @@ void update(void *arg)
                     {
                         overlay_message(runner.core, "KEYBOARD");
                     }
-                    if (attr.gamepadsEnabled && !attr.keyboardEnabled)
+                    if (attr.gamepadsEnabled && !attr.keyboardEnabled && settings.session.mapping == 0)
                     {
                         if (attr.gamepadsEnabled == 2)
                         {
@@ -832,11 +850,21 @@ bool toggleViewArea()
     return false;
 }
 
+void changeVolume(int delta)
+{
+    volume += delta;
+    if (volume < 0) volume = 0;
+    if (volume > 6) volume = 6;
+    char message[16];
+    sprintf(message, "VOLUME %d%%", 100 >> volume);
+    overlay_message(runner.core, message);
+}
+
 void audioCallback(void *userdata, Uint8 *stream, int len)
 {
     int16_t *samples = (int16_t *)stream;
     int numSamples = len / NUM_CHANNELS;
-    audio_renderAudio(userdata, samples, numSamples, audioSpec.freq);
+    audio_renderAudio(userdata, samples, numSamples, audioSpec.freq, volume);
 }
 
 void saveScreenshot(void *pixels, int scale)
