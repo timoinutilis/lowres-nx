@@ -167,10 +167,18 @@ void settings_setParameter(struct Parameters *parameters, const char *key, const
     }
     else if (strcmp(key, "mapping") == 0)
     {
-        int m = atoi(value);
-        if (m >= 0 && m < 2)
+        int i = atoi(value);
+        if (i >= 0 && i < 2)
         {
-            parameters->mapping = m;
+            parameters->mapping = i;
+        }
+    }
+    else if (strcmp(key, "skip") == 0)
+    {
+        int i = atoi(value);
+        if (i >= 0)
+        {
+            parameters->skip = i;
         }
     }
     else
@@ -213,6 +221,9 @@ void settings_saveAs(struct Settings *settings, const char *filename)
         
         fputs("# Set the key mapping. 0 is standard, 1 is GameShell.\n# mapping 0-1\n", file);
         fprintf(file, "mapping %d\n\n", settings->file.mapping);
+        
+        fputs("# Skip frames.\n# skip 0-3\n", file);
+        fprintf(file, "skip %d\n\n", settings->file.skip);
         
         fputs("# Add tools for the Edit ROM menu (max 4).\n# tool My Tool.nx\n", file);
         for (int i = 0; i < settings->numTools; i++)

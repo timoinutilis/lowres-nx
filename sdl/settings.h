@@ -31,6 +31,7 @@ struct Parameters {
     bool fullwidth;
     bool disabledev;
     int mapping;
+    int skip;
 };
 
 struct Settings {
