@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Timo Kloss
+// Copyright 2016-2020 Timo Kloss
 //
 // This file is part of LowRes NX.
 //
@@ -36,28 +36,67 @@ void video_renderPlane(struct Character *characters, struct Plane *plane, int si
     int planeY = y + scrollY;
     int row = (planeY >> divShift) & 31;
     int cellY = planeY & 7;
-    for (int x = 0; x < SCREEN_WIDTH; x++)
+    
+    int x = 0;
+    int b = 0;
+    uint8_t d0 = 0;
+    uint8_t d1 = 0;
+    uint8_t pal = 0;
+    uint8_t pri = 0;
+    
+    int pre = scrollX & 7;
+    
+    while (x < SCREEN_WIDTH)
     {
-        int planeX = x + scrollX;
-        int column = (planeX >> divShift) & 31;
-        struct Cell *cell = &plane->cells[row][column];
-        if (cell->attr.priority >= (*scanlineBuffer >> 7))
+        if (!b)
         {
-            int cellX = planeX & 7;
+            int planeX = x + scrollX;
+            int column = (planeX >> divShift) & 31;
+            struct Cell *cell = &plane->cells[row][column];
+            
             int index = cell->character;
             if (sizeMode)
             {
                 index += (cell->attr.flipX ? (planeX >> 3) + 1 : planeX >> 3) & 1;
                 index += ((cell->attr.flipY ? (planeY >> 3) + 1 : planeY >> 3) & 1) << 4;
             }
+            
             struct Character *character = &characters[index];
-            int pixel = video_getCharacterPixel(character, cell->attr.flipX ? (7 - cellX) : cellX, cell->attr.flipY ? (7 - cellY) : cellY);
-            if (pixel)
+            pal = cell->attr.palette << 2;
+            pri = cell->attr.priority << 7;
+            
+            int fcy = cell->attr.flipY ? (7 - cellY) : cellY;
+            d0 = character->data[fcy];
+            d1 = character->data[fcy | 8];
+            if (cell->attr.flipX)
             {
-                *scanlineBuffer = pixel | (cell->attr.palette << 2) | (cell->attr.priority << 7) | pixelFlag;
+                // reverse bits hack from http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits
+                d0 = ((d0 * 0x0802LU & 0x22110LU) | (d0 * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16;
+                d1 = ((d1 * 0x0802LU & 0x22110LU) | (d1 * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16;
             }
         }
-        scanlineBuffer++;
+        
+        if (pre)
+        {
+            --pre;
+        }
+        else
+        {
+            if (pri >= (*scanlineBuffer >> 7))
+            {
+                int pixel = ((d0 >> 7) & 1) | ((d1 >> 6) & 2);
+                if (pixel)
+                {
+                    *scanlineBuffer = pixel | pal | pri | pixelFlag;
+                }
+            }
+            ++scanlineBuffer;
+            ++x;
+        }
+
+        d0 <<= 1;
+        d1 <<= 1;
+        b = (b + 1) & 7;
     }
 }
 

@@ -173,12 +173,15 @@ void settings_setParameter(struct Parameters *parameters, const char *key, const
             parameters->mapping = i;
         }
     }
-    else if (strcmp(key, "skip") == 0)
+    else if (strcmp(key, "disabledelay") == 0)
     {
-        int i = atoi(value);
-        if (i >= 0)
+        if (strcmp(value, optionYes) == 0)
         {
-            parameters->skip = i;
+            parameters->disabledelay = true;
+        }
+        else if (strcmp(value, optionNo) == 0)
+        {
+            parameters->disabledelay = false;
         }
     }
     else
@@ -222,8 +225,10 @@ void settings_saveAs(struct Settings *settings, const char *filename)
         fputs("# Set the key mapping. 0 is standard, 1 is GameShell.\n# mapping 0-1\n", file);
         fprintf(file, "mapping %d\n\n", settings->file.mapping);
         
-        fputs("# Skip frames.\n# skip 0-3\n", file);
-        fprintf(file, "skip %d\n\n", settings->file.skip);
+        fputs("# Disable the delay for too short frames.\n# disabledelay yes/no\n", file);
+        fputs("disabledelay ", file);
+        fputs(settings->file.disabledelay ? optionYes : optionNo, file);
+        fputs("\n\n", file);
         
         fputs("# Add tools for the Edit ROM menu (max 4).\n# tool My Tool.nx\n", file);
         for (int i = 0; i < settings->numTools; i++)

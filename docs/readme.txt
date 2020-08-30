@@ -66,8 +66,8 @@ Please read the introduction (at least "Getting Started") of the manual.
 	-mapping 0-1
     Set the key mapping. 0 is standard, 1 is GameShell.
 
-    -skip 0-3
-	Skip frames.
+    -disabledelay yes/no
+    Disable the delay for too short frames.
 
 	program.nx
 	Name of the program to run

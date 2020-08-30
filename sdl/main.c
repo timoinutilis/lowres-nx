@@ -64,8 +64,7 @@ const int keyboardControls[2][2][8] = {
     }
 };
 
-bool update(void);
-void render(void);
+void update(void *arg);
 void updateScreenRect(int winW, int winH);
 void configureJoysticks(void);
 void closeJoysticks(void);
@@ -78,12 +77,6 @@ void saveScreenshot(void *pixels, int scale);
 #ifdef __EMSCRIPTEN__
 void onloaded(const char *filename);
 void onerror(const char *filename);
-void emscriptenUpdate(void *arg) {
-    if (update())
-    {
-        render();
-    }
-}
 #endif
 
 
@@ -184,32 +177,22 @@ int main(int argc, const char * argv[])
         updateScreenRect(width, height);
         
 #ifdef __EMSCRIPTEN__
-        emscripten_set_main_loop_arg(emscriptenUpdate, NULL, -1, true);
+        emscripten_set_main_loop_arg(update, NULL, -1, true);
 #else
-        bool shouldRender = false;
-        int frameTicks = 1000 * (settings.session.skip + 1) / 60;
-        
         while (!quit)
         {
             Uint32 ticks = SDL_GetTicks();
             
-            shouldRender |= update();
-            if (shouldRender)
-            {
-                render();
-                shouldRender = false;
-            }
+            update(NULL);
             
-            for (int i = 0; i < settings.session.skip; i++)
+            if (!settings.session.disabledelay || runner.core->machineInternals->isEnergySaving)
             {
-                shouldRender |= update();
-            }
-            
-            // limit to 60 FPS
-            Uint32 ticksDelta = SDL_GetTicks() - ticks;
-            if (ticksDelta < frameTicks)
-            {
-                SDL_Delay(frameTicks - ticksDelta);
+                // limit to 60 FPS
+                Uint32 ticksDelta = SDL_GetTicks() - ticks;
+                if (ticksDelta < 16)
+                {
+                    SDL_Delay(16 - ticksDelta);
+                }
             }
         }
         
@@ -404,7 +387,7 @@ void setMouseEnabled(bool enabled)
     updateMouseMode();
 }
 
-bool update()
+void update(void *arg)
 {
     SDL_Event event;
     bool hasInput = false;
@@ -768,29 +751,27 @@ bool update()
         SDL_PauseAudioDevice(audioDevice, 0);
     }
     
-    return core_shouldRender(runner.core) || forceRender;
-}
-
-void render()
-{
-    SDL_RenderClear(renderer);
-    
-    void *pixels = NULL;
-    int pitch = 0;
-    SDL_LockTexture(texture, NULL, &pixels, &pitch);
-    
-    video_renderScreen(runner.core, pixels);
-    
-    if (screenshotRequestedWithScale > 0)
+    if (core_shouldRender(runner.core) || forceRender)
     {
-        saveScreenshot(pixels, screenshotRequestedWithScale);
-        screenshotRequestedWithScale = 0;
+        SDL_RenderClear(renderer);
+        
+        void *pixels = NULL;
+        int pitch = 0;
+        SDL_LockTexture(texture, NULL, &pixels, &pitch);
+        
+        video_renderScreen(runner.core, pixels);
+        
+        if (screenshotRequestedWithScale > 0)
+        {
+            saveScreenshot(pixels, screenshotRequestedWithScale);
+            screenshotRequestedWithScale = 0;
+        }
+        
+        SDL_UnlockTexture(texture);
+        SDL_RenderCopy(renderer, texture, NULL, &screenRect);
+        
+        SDL_RenderPresent(renderer);
     }
-    
-    SDL_UnlockTexture(texture);
-    SDL_RenderCopy(renderer, texture, NULL, &screenRect);
-    
-    SDL_RenderPresent(renderer);
 }
 
 void updateScreenRect(int winW, int winH)
