@@ -69,7 +69,7 @@ void updateScreenRect(int winW, int winH);
 void configureJoysticks(void);
 void closeJoysticks(void);
 void setTouchPosition(int windowX, int windowY);
-bool toggleViewArea(void);
+void toggleZoom(void);
 void changeVolume(int delta);
 void audioCallback(void *userdata, Uint8 *stream, int len);
 void saveScreenshot(void *pixels, int scale);
@@ -106,7 +106,6 @@ bool mouseEnabled = false;
 int messageNumber = 0;
 bool hasUsedInputLastUpdate = false;
 int screenshotRequestedWithScale = 0;
-enum ViewArea viewArea = ViewAreaCenter;
 int volume = 0; // 0 = max, it's a bit shift
 
 int main(int argc, const char * argv[])
@@ -527,21 +526,10 @@ void update(void *arg)
                         screenshotRequestedWithScale = (event.key.keysym.mod & KMOD_SHIFT) ? 1 : 4;
                         forceRender = true;
                     }
-                    else if (keycode == SDLK_w)
+                    else if (keycode == SDLK_z)
                     {
-                        settings.session.fullwidth = !settings.session.fullwidth;
-                        viewArea = ViewAreaCenter;
-                        int width, height;
-                        SDL_GetWindowSize(window, &width, &height);
-                        updateScreenRect(width, height);
+                        toggleZoom();
                         forceRender = true;
-                    }
-                    else if (keycode == SDLK_v)
-                    {
-                        if (toggleViewArea())
-                        {
-                            forceRender = true;
-                        }
                     }
                     else if (keycode == SDLK_PLUS)
                     {
@@ -572,11 +560,9 @@ void update(void *arg)
                 {
                     if (keycode == SDLK_SPACE)
                     {
-                        if (toggleViewArea())
-                        {
-                            forceRender = true;
-                            hasInput = false;
-                        }
+                        toggleZoom();
+                        forceRender = true;
+                        hasInput = false;
                     }
                     else if (scancode == SDL_SCANCODE_KP_PLUS)
                     {
@@ -776,39 +762,52 @@ void update(void *arg)
 
 void updateScreenRect(int winW, int winH)
 {
-    int factor;
-    if (settings.session.fullwidth)
+    switch (settings.session.zoom)
     {
-        factor = fmax(1, winW / SCREEN_WIDTH);
-    }
-    else
-    {
-        factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
-    }
-    
-    int nxScreenW = SCREEN_WIDTH * factor;
-    int nxScreenH = SCREEN_HEIGHT * factor;
-    screenRect.x = (winW - nxScreenW) / 2;
-    
-    if (nxScreenH < winH)
-    {
-        viewArea = ViewAreaCenter;
-    }
-    switch (viewArea)
-    {
-        case ViewAreaCenter:
+        case ZoomPixelPerfect: {
+            int factor = fmax(1, fmin(winW / SCREEN_WIDTH, winH / SCREEN_HEIGHT));
+            
+            int nxScreenW = SCREEN_WIDTH * factor;
+            int nxScreenH = SCREEN_HEIGHT * factor;
+            
+            screenRect.w = nxScreenW;
+            screenRect.h = nxScreenH;
+            screenRect.x = (winW - nxScreenW) / 2;
             screenRect.y = (winH - nxScreenH) / 2;
             break;
-        case ViewAreaTop:
+        }
+        case ZoomLarge: {
+            float factor = fmax(1, fmin(winW / (float)SCREEN_WIDTH, winH / (float)SCREEN_HEIGHT));
+            
+            int nxScreenW = SCREEN_WIDTH * factor;
+            int nxScreenH = SCREEN_HEIGHT * factor;
+            
+            screenRect.w = nxScreenW;
+            screenRect.h = nxScreenH;
+            screenRect.x = (winW - nxScreenW) / 2;
+            screenRect.y = (winH - nxScreenH) / 2;
+            break;
+        }
+        case ZoomOverscan: {
+            float factor = fmax(winW / (float)SCREEN_WIDTH, winH / (float)SCREEN_HEIGHT);
+            
+            int nxScreenW = SCREEN_WIDTH * factor;
+            int nxScreenH = SCREEN_HEIGHT * factor;
+            
+            screenRect.w = nxScreenW;
+            screenRect.h = nxScreenH;
+            screenRect.x = (winW - nxScreenW) / 2;
+            screenRect.y = (winH - nxScreenH) / 2;
+            break;
+        }
+        case ZoomSqueeze:
+            screenRect.w = winW;
+            screenRect.h = winH;
+            screenRect.x = 0;
             screenRect.y = 0;
             break;
-        case ViewAreaBottom:
-            screenRect.y = winH - nxScreenH;
-            break;
     }
-    
-    screenRect.w = nxScreenW;
-    screenRect.h = nxScreenH;
+
     SDL_SetTextInputRect(&screenRect);
 }
 
@@ -840,17 +839,12 @@ void setTouchPosition(int windowX, int windowY)
     coreInput.touchY = (windowY - screenRect.y) * SCREEN_HEIGHT / screenRect.h;
 }
 
-bool toggleViewArea()
+void toggleZoom()
 {
-    if (settings.session.fullwidth)
-    {
-        viewArea = (viewArea + 1) % 3;
-        int width, height;
-        SDL_GetWindowSize(window, &width, &height);
-        updateScreenRect(width, height);
-        return true;
-    }
-    return false;
+    settings.session.zoom = (settings.session.zoom + 1) % 4;
+    int width, height;
+    SDL_GetWindowSize(window, &width, &height);
+    updateScreenRect(width, height);
 }
 
 void changeVolume(int delta)

@@ -30,10 +30,11 @@ enum MainState {
     MainStateDevMenu,
 };
 
-enum ViewArea {
-    ViewAreaCenter,
-    ViewAreaBottom,
-    ViewAreaTop,
+enum Zoom {
+    ZoomPixelPerfect,
+    ZoomLarge,
+    ZoomOverscan,
+    ZoomSqueeze,
 };
 
 void bootNX(void);

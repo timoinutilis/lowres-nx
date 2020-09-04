@@ -28,7 +28,7 @@
 
 struct Parameters {
     bool fullscreen;
-    bool fullwidth;
+    int zoom;
     bool disabledev;
     int mapping;
     int disabledelay;

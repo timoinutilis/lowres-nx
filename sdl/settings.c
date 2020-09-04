@@ -154,21 +154,10 @@ void settings_setParameter(struct Parameters *parameters, const char *key, const
             parameters->disabledev = false;
         }
     }
-    else if (strcmp(key, "fullwidth") == 0)
-    {
-        if (strcmp(value, optionYes) == 0)
-        {
-            parameters->fullwidth = true;
-        }
-        else if (strcmp(value, optionNo) == 0)
-        {
-            parameters->fullwidth = false;
-        }
-    }
     else if (strcmp(key, "mapping") == 0)
     {
         int i = atoi(value);
-        if (i >= 0 && i < 2)
+        if (i >= 0 && i <= 1)
         {
             parameters->mapping = i;
         }
@@ -182,6 +171,14 @@ void settings_setParameter(struct Parameters *parameters, const char *key, const
         else if (strcmp(value, optionNo) == 0)
         {
             parameters->disabledelay = false;
+        }
+    }
+    else if (strcmp(key, "zoom") == 0)
+    {
+        int i = atoi(value);
+        if (i >= 0 && i <= 3)
+        {
+            parameters->zoom = i;
         }
     }
     else
@@ -212,17 +209,15 @@ void settings_saveAs(struct Settings *settings, const char *filename)
         fputs(settings->file.fullscreen ? optionYes : optionNo, file);
         fputs("\n\n", file);
         
-        fputs("# Start the application in fullwidth mode, Ctrl+v toggles view area.\n# fullwidth yes/no\n", file);
-        fputs("fullwidth ", file);
-        fputs(settings->file.fullwidth ? optionYes : optionNo, file);
-        fputs("\n\n", file);
+        fputs("# Start the application in zoom mode: 0 = pixel perfect, 1 = large, 2 = overscan, 3 = squeeze.\n# zoom 0-3\n", file);
+        fprintf(file, "zoom %d\n\n", settings->file.zoom);
         
         fputs("# Disable the Development Menu, Esc key quits LowRes NX.\n# disabledev yes/no\n", file);
         fputs("disabledev ", file);
         fputs(settings->file.disabledev ? optionYes : optionNo, file);
         fputs("\n\n", file);
         
-        fputs("# Set the key mapping. 0 is standard, 1 is GameShell.\n# mapping 0-1\n", file);
+        fputs("# Set the key mapping. 0 = standard, 1 = GameShell.\n# mapping 0-1\n", file);
         fprintf(file, "mapping %d\n\n", settings->file.mapping);
         
         fputs("# Disable the delay for too short frames.\n# disabledelay yes/no\n", file);

@@ -24,8 +24,7 @@ Please read the introduction (at least "Getting Started") of the manual.
 	Dev Menu     Esc
 	Pause        Return/P
 	Fullscreen   Ctrl+f
-	Fullwidth    Ctrl+w
-	View Area    Ctrl+v
+	Zoom Mode    Ctrl+z
 	Screenshot
 	   large     Ctrl+s
 	   original  Ctrl+Shift+s
@@ -57,8 +56,8 @@ Please read the introduction (at least "Getting Started") of the manual.
 	-fullscreen yes/no
 	Start the application in fullscreen mode
 
-	-fullwidth yes/no
-	Start the application in fullwidth mode, Ctrl+v toggles view area
+	-zoom 0-3
+	Start the application in zoom mode: 0 = pixel perfect, 1 = large, 2 = overscan, 3 = squeeze.
 
 	-disabledev yes/no
 	Disable the Development Menu, Esc key quits LowRes NX
