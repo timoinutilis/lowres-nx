@@ -1441,9 +1441,9 @@ function integrateWasmJS() {
 
   var method = 'native-wasm';
 
-  var wasmTextFile = 'LowResNX016.wast';
-  var wasmBinaryFile = 'LowResNX016.wasm';
-  var asmjsCodeFile = 'LowResNX016.temp.asm.js';
+  var wasmTextFile = 'LowResNX110.wast';
+  var wasmBinaryFile = 'LowResNX110.wasm';
+  var asmjsCodeFile = 'LowResNX110.temp.asm.js';
 
   if (typeof Module['locateFile'] === 'function') {
     if (!isDataURI(wasmTextFile)) {
@@ -1745,7 +1745,7 @@ function _emscripten_asm_const_iiii(code, a0, a1, a2) {
 
 STATIC_BASE = GLOBAL_BASE;
 
-STATICTOP = STATIC_BASE + 95072;
+STATICTOP = STATIC_BASE + 95056;
 /* global initializers */  __ATINIT__.push({ func: function() { ___emscripten_environ_constructor() } });
 
 
@@ -1754,7 +1754,7 @@ STATICTOP = STATIC_BASE + 95072;
 
 
 
-var STATIC_BUMP = 95072;
+var STATIC_BUMP = 95056;
 Module["STATIC_BASE"] = STATIC_BASE;
 Module["STATIC_BUMP"] = STATIC_BUMP;
 
