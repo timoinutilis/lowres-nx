@@ -63,10 +63,10 @@ Please read the introduction (at least "Getting Started") of the manual.
 	Disable the Development Menu, Esc key quits LowRes NX
 
 	-mapping 0-1
-    Set the key mapping. 0 is standard, 1 is GameShell.
+	Set the key mapping. 0 is standard, 1 is GameShell.
 
-    -disabledelay yes/no
-    Disable the delay for too short frames.
+	-disabledelay yes/no
+	Disable the delay for too short frames.
 
 	program.nx
 	Name of the program to run
