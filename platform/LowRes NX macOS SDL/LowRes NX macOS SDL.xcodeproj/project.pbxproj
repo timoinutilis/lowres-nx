@@ -12,6 +12,7 @@
 		9251FDE621259EDE003915D9 /* cmd_audio.c in Sources */ = {isa = PBXBuildFile; fileRef = 9251FDE521259EDE003915D9 /* cmd_audio.c */; };
 		9258F207218C49C000CE81D6 /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 9258F206218C49C000CE81D6 /* utils.c */; };
 		925D482D2121FF76003F1B0D /* audio_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 925D482C2121FF76003F1B0D /* audio_lib.c */; };
+		925F6BEE25039D12005E1179 /* core_stats.c in Sources */ = {isa = PBXBuildFile; fileRef = 925F6BEC25039D11005E1179 /* core_stats.c */; };
 		9284722B20F9F4FA00B82653 /* dev_menu.c in Sources */ = {isa = PBXBuildFile; fileRef = 9284722A20F9F4FA00B82653 /* dev_menu.c */; };
 		9287EAC920D85E4E000BBEB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9287EAC820D85E4E000BBEB1 /* Assets.xcassets */; };
 		9287EB2D20D85EEB000BBEB1 /* cmd_variables.c in Sources */ = {isa = PBXBuildFile; fileRef = 9287EADC20D85EEB000BBEB1 /* cmd_variables.c */; };
@@ -84,6 +85,8 @@
 		9258F206218C49C000CE81D6 /* utils.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = utils.c; sourceTree = "<group>"; };
 		925D482B2121FF76003F1B0D /* audio_lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = audio_lib.h; sourceTree = "<group>"; };
 		925D482C2121FF76003F1B0D /* audio_lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = audio_lib.c; sourceTree = "<group>"; };
+		925F6BEC25039D11005E1179 /* core_stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_stats.c; sourceTree = "<group>"; };
+		925F6BED25039D12005E1179 /* core_stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core_stats.h; sourceTree = "<group>"; };
 		9284722920F9F4FA00B82653 /* dev_menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_menu.h; sourceTree = "<group>"; };
 		9284722A20F9F4FA00B82653 /* dev_menu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dev_menu.c; sourceTree = "<group>"; };
 		9284722C20F9FA5900B82653 /* dev_menu_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_menu_data.h; sourceTree = "<group>"; };
@@ -232,6 +235,8 @@
 			children = (
 				9287EB2C20D85EEB000BBEB1 /* core_delegate.c */,
 				9287EB1D20D85EEB000BBEB1 /* core_delegate.h */,
+				925F6BEC25039D11005E1179 /* core_stats.c */,
+				925F6BED25039D12005E1179 /* core_stats.h */,
 				9287EB1E20D85EEB000BBEB1 /* core.c */,
 				9287EB0D20D85EEB000BBEB1 /* core.h */,
 				9287EB0E20D85EEB000BBEB1 /* accessories */,
@@ -524,6 +529,7 @@
 				9287EB4320D85EEB000BBEB1 /* value.c in Sources */,
 				9287EB4820D85EEB000BBEB1 /* sprites_lib.c in Sources */,
 				925D482D2121FF76003F1B0D /* audio_lib.c in Sources */,
+				925F6BEE25039D12005E1179 /* core_stats.c in Sources */,
 				9287EB3020D85EEB000BBEB1 /* cmd_background.c in Sources */,
 				9287EB3720D85EEB000BBEB1 /* cmd_text.c in Sources */,
 			);
