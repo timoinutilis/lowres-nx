@@ -46,6 +46,14 @@ void delegate_diskDriveDidSave(struct Core *core)
     }
 }
 
+void delegate_diskDriveIsFull(struct Core *core)
+{
+    if (core->delegate->diskDriveIsFull)
+    {
+        core->delegate->diskDriveIsFull(core->delegate->context, &core->diskDrive->dataManager);
+    }
+}
+
 void delegate_controlsDidChange(struct Core *core)
 {
     if (core->delegate->controlsDidChange)

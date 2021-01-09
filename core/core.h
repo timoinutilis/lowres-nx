@@ -21,7 +21,7 @@
 #ifndef core_h
 #define core_h
 
-#define CORE_VERSION "1.1"
+#define CORE_VERSION "1.2"
 
 #include <stdio.h>
 #include <stdbool.h>

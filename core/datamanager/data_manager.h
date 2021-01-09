@@ -51,6 +51,7 @@ char *data_export(struct DataManager *manager);
 
 int data_currentSize(struct DataManager *manager);
 
+bool data_canSetEntry(struct DataManager *manager, int index, int length);
 void data_setEntry(struct DataManager *manager, int index, const char *comment, uint8_t *source, int length);
 
 #endif /* data_manager_h */

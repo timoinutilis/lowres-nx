@@ -44,9 +44,33 @@ enum ErrorCode cmd_LOAD(struct Core *core)
     struct TypedValue addressValue = itp_evaluateExpression(core, TypeClassNumeric);
     if (addressValue.type == ValueTypeError) return addressValue.v.errorCode;
     
+    int maxLength = 0;
+    int offset = 0;
+    if (interpreter->pc->type == TokenComma)
+    {
+        ++interpreter->pc;
+        
+        // max length value
+        struct TypedValue maxLengthValue = itp_evaluateNumericExpression(core, 0, DATA_SIZE);
+        if (maxLengthValue.type == ValueTypeError) return maxLengthValue.v.errorCode;
+        maxLength = maxLengthValue.v.floatValue;
+        
+        if (interpreter->pc->type == TokenComma)
+        {
+            ++interpreter->pc;
+            
+            // offset value
+            struct TypedValue offsetValue = itp_evaluateNumericExpression(core, 0, DATA_SIZE);
+            if (offsetValue.type == ValueTypeError) return offsetValue.v.errorCode;
+            offset = offsetValue.v.floatValue;
+        }
+    }
+    
     if (interpreter->pass == PassRun)
     {
-        bool ready = disk_loadFile(core, fileValue.v.floatValue, addressValue.v.floatValue);
+        bool pokeFailed = false;
+        bool ready = disk_loadFile(core, fileValue.v.floatValue, addressValue.v.floatValue, maxLength, offset, &pokeFailed);
+        if (pokeFailed) return ErrorIllegalMemoryAccess;
         
         interpreter->exitEvaluation = true;
         if (!ready)
@@ -95,12 +119,18 @@ enum ErrorCode cmd_SAVE(struct Core *core)
     ++interpreter->pc;
     
     // length value
-    struct TypedValue lengthValue = itp_evaluateNumericExpression(core, 1, DATA_SIZE - 1);
+    struct TypedValue lengthValue = itp_evaluateNumericExpression(core, 1, DATA_SIZE);
     if (lengthValue.type == ValueTypeError) return lengthValue.v.errorCode;
     
     if (interpreter->pass == PassRun)
     {
-        bool ready = disk_saveFile(core, fileValue.v.floatValue, commentValue.v.stringValue->chars, addressValue.v.floatValue, lengthValue.v.floatValue);
+        int address = addressValue.v.floatValue;
+        int length = lengthValue.v.floatValue;
+        if (address + length > 0x10000)
+        {
+            return ErrorIllegalMemoryAccess;
+        }
+        bool ready = disk_saveFile(core, fileValue.v.floatValue, commentValue.v.stringValue->chars, address, length);
         rcstring_release(commentValue.v.stringValue);
         
         interpreter->exitEvaluation = true;

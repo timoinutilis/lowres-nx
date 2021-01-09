@@ -51,6 +51,9 @@ struct CoreDelegate {
     /** Called when a disk data entry was saved */
     void (*diskDriveDidSave)(void *context, struct DataManager *diskDataManager);
     
+    /** Called when a disk data entry was tried to be saved, but the disk is full */
+    void (*diskDriveIsFull)(void *context, struct DataManager *diskDataManager);
+    
     /** Called when keyboard or gamepad settings changed */
     void (*controlsDidChange)(void *context, struct ControlsInfo controlsInfo);
     
@@ -64,6 +67,7 @@ struct CoreDelegate {
 void delegate_interpreterDidFail(struct Core *core, struct CoreError coreError);
 bool delegate_diskDriveWillAccess(struct Core *core);
 void delegate_diskDriveDidSave(struct Core *core);
+void delegate_diskDriveIsFull(struct Core *core);
 void delegate_controlsDidChange(struct Core *core);
 void delegate_persistentRamWillAccess(struct Core *core, uint8_t *destination, int size);
 void delegate_persistentRamDidChange(struct Core *core, uint8_t *data, int size);

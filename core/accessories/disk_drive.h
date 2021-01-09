@@ -37,6 +37,6 @@ void disk_reset(struct Core *core);
 
 bool disk_prepare(struct Core *core);
 bool disk_saveFile(struct Core *core, int index, char *comment, int address, int length);
-bool disk_loadFile(struct Core *core, int index, int address);
+bool disk_loadFile(struct Core *core, int index, int address, int maxLength, int offset, bool *pokeFailed);
 
 #endif /* disk_drive_h */

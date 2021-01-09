@@ -28,6 +28,7 @@
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager);
+void diskDriveIsFull(void *context, struct DataManager *diskDataManager);
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo);
 void persistentRamWillAccess(void *context, uint8_t *destination, int size);
 void persistentRamDidChange(void *context, uint8_t *data, int size);
@@ -46,6 +47,7 @@ void runner_init(struct Runner *runner)
         runner->coreDelegate.interpreterDidFail = interpreterDidFail;
         runner->coreDelegate.diskDriveWillAccess = diskDriveWillAccess;
         runner->coreDelegate.diskDriveDidSave = diskDriveDidSave;
+        runner->coreDelegate.diskDriveIsFull = diskDriveIsFull;
         runner->coreDelegate.controlsDidChange = controlsDidChange;
         runner->coreDelegate.persistentRamWillAccess = persistentRamWillAccess;
         runner->coreDelegate.persistentRamDidChange = persistentRamDidChange;
@@ -196,6 +198,13 @@ void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
         free(output);
     }
 #endif
+}
+
+/** Called when a disk data entry was tried to be saved, but the disk is full */
+void diskDriveIsFull(void *context, struct DataManager *diskDataManager)
+{
+    struct Runner *runner = context;
+    overlay_message(runner->core, "DISK IS FULL");
 }
 
 /** Called when keyboard or gamepad settings changed */

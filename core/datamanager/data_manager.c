@@ -295,6 +295,19 @@ int data_currentSize(struct DataManager *manager)
     return size;
 }
 
+bool data_canSetEntry(struct DataManager *manager, int index, int length)
+{
+    int size = 0;
+    for (int i = 0; i < MAX_ENTRIES; i++)
+    {
+        if (i != index)
+        {
+            size += manager->entries[i].length;
+        }
+    }
+    return size + length <= DATA_SIZE;
+}
+
 void data_setEntry(struct DataManager *manager, int index, const char *comment, uint8_t *source, int length)
 {
     struct DataEntry *entry = &manager->entries[index];
@@ -302,7 +315,7 @@ void data_setEntry(struct DataManager *manager, int index, const char *comment, 
         
     // move data of higher entries
     int nextStart = entry->start + length;
-    assert(nextStart < DATA_SIZE);
+    assert(nextStart <= DATA_SIZE);
         
     if (length > entry->length) // new entry is bigger
     {

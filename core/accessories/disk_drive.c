@@ -70,16 +70,23 @@ bool disk_saveFile(struct Core *core, int index, char *comment, int address, int
         return false;
     }
     
-    assert(address >= 0 && address < sizeof(struct Machine));
+    assert(address >= 0 && address + length <= sizeof(struct Machine));
     struct DataManager *dataManager = &core->diskDrive->dataManager;
-    uint8_t *source = &((uint8_t *)core->machine)[address];
-    data_setEntry(dataManager, index, comment, source, length);
-    
-    core->delegate->diskDriveDidSave(core->delegate->context, dataManager);
+    if (!data_canSetEntry(dataManager, index, length))
+    {
+        delegate_diskDriveIsFull(core);
+    }
+    else
+    {
+        uint8_t *source = &((uint8_t *)core->machine)[address];
+        data_setEntry(dataManager, index, comment, source, length);
+        
+        delegate_diskDriveDidSave(core);
+    }
     return true;
 }
 
-bool disk_loadFile(struct Core *core, int index, int address)
+bool disk_loadFile(struct Core *core, int index, int address, int maxLength, int offset, bool *pokeFailed)
 {
     if (!disk_prepare(core))
     {
@@ -90,12 +97,24 @@ bool disk_loadFile(struct Core *core, int index, int address)
     uint8_t *data = core->diskDrive->dataManager.data;
     
     // read file
-    int start = entry->start;
+    int start = entry->start + offset;
     int length = entry->length;
+    if (maxLength > 0 && length > maxLength)
+    {
+        length = maxLength;
+    }
+    if (offset + length > entry->length)
+    {
+        length = entry->length - offset;
+    }
     for (int i = 0; i < length; i++)
     {
         bool poke = machine_poke(core, address + i, data[i + start]);
-        assert(poke);
+        if (!poke)
+        {
+            *pokeFailed = true;
+            return true;
+        }
     }
     return true;
 }
