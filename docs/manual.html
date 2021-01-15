@@ -129,7 +129,7 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 
 <h3 id="Creative-Tools">Creative Tools</h3>
 
-<p>LowRes NX includes all the tools you need: The Character Designer for editing sprites, tiles and fonts, the Background Designer for tile maps and screen layouts, as well as the Sound Composer for music and sound effects. All of these are just normal BASIC programs. You can change and improve them or even create your own custom editors.</p>
+<p>LowRes NX includes all the tools you need: The Gfx Designer for editing sprites, tiles, fonts and maps, as well as the Sound Composer for music and sound effects. All of these are just normal BASIC programs. You can change and improve them or even create your own custom editors.</p>
 
 <h3 id="Share-and-Play">Share and Play</h3>
 
@@ -158,8 +158,7 @@ p + h3, ul + h3, pre + h3, table + h3, div + h3 {
 <ul>
 	<li><a href="#Getting-Started">Getting Started</a></li>
 	<li><a href="#Editing">Editing</a></li>
-	<li><a href="#Character-Designer">Character Designer</a></li>
-	<li><a href="#Background-Designer">Background Designer</a></li>
+	<li><a href="#Gfx-Designer">Gfx Designer</a></li>
 	<li><a href="#Sound-Composer">Sound Composer</a></li>
 	<li><a href="#Language-Basics">Language Basics</a></li>
 	<li><a href="#Program-Flow-Control">Program Flow Control</a></li>
@@ -285,7 +284,7 @@ program.</li>
 </ul>
 
 <p>Let's try it. Open your program with the moving "A" (from the
-"Getting Started" chapter) and select "Char Designer" from the Tools
+"Getting Started" chapter) and select "Gfx Designer" from the Tools
 menu.</p>
 
 <div class="info-mobile">
@@ -296,10 +295,10 @@ Open your program, tap the Tools button and select the tool.
 Run your program and press the Escape key to enter the development
 menu. Then press the Edit (ED) button and select the tool.
 By default the tools menu is empty, so drag and drop the programs
-"Char Designer", "BG Designer" and "Sound Designer" into the window.
+"Gfx Designer" and "Sound Designer" into the window.
 </div>
 
-<p>Draw something as character #1 (keep #0 empty), then tap on "Disk"
+<p>Draw something as character #1 (keep #0 empty), then tap on "File"
 and save as file 2 ("Main Characters"). Now return to the source code editor and you will see some hexadecimal data below your program.
 This is your image! To see it, change the line</p>
 <pre class="example">
@@ -343,19 +342,24 @@ If you want to use the default font, make sure to keep ROM entry 0
 unused.</p>
 
 
-<h1 id="Character-Designer">Character Designer</h1>
+<h1 id="Gfx-Designer">Gfx Designer</h1>
 
 <img class="illustration" src="manual-images/illustration_painting.png"  srcset="manual-images/illustration_painting.png 1x, manual-images/illustration_painting@2x.png 2x"/>
 
-<p>Use the Character Designer to draw your sprites and background
-tiles. It shows images in grayscale only, black is used as
-transparent background. Color palettes can be created later in the
-Background Designer.</p>
-<p>The Character Designer loads file number 2 on startup, but
-keep in mind that it does not save automatically.</p>
+<p>Use the Gfx Designer to draw characters (sprites, tiles, fonts),
+design backgrounds (tile maps, screen layouts) and edit color palettes.</p>
+
+<p>On the bottom right there are three tabs for the different
+sections of the program: The character editor, the palette editor and
+the background editor. You can use the keys 1, 2 and 3 to switch
+between them when running LowRes NX on a computer.</p>
+
+<p>The Gfx Designer loads the main palettes (file 1), characters (file 2),
+and background (file 3) on startup, but keep in mind that it doesn't
+save automatically.</p>
 
 
-<h2 id="CD-Main-Screen">Main Screen</h2>
+<h2 id="GD-Character-Editor">The Character Editor</h2>
 
 <p>At the bottom part you see the 256 characters split into four pages.
 There you can select the current one for editing. Keep the last page
@@ -365,6 +369,9 @@ be empty for a clean background.</p>
 selected color.</p>
 
 <table>
+<tr><td>FILE</td><td>Go to the characters file menu.</td></tr>
+<tr><td>MOV</td><td>Move the pixels of the current character.</td></tr>
+<tr><td>16*16</td><td>Go to the 16x16-pixel edit screen.</td></tr>
 <tr><td>FLIP</td><td>Flip the current character horizontally or vertically.</td></tr>
 <tr><td>SPIN</td><td>Rotate the current character.</td></tr>
 <tr><td>CLR</td><td>Clear the current character with the selected
@@ -372,75 +379,93 @@ color.</td></tr>
 <tr><td>CUT</td><td>Copy and clear the current character.</td></tr>
 <tr><td>COP</td><td>Copy the current character.</td></tr>
 <tr><td>PAS</td><td>Paste the copied character.</td></tr>
-<tr><td>DISK</td><td>Go to the disk menu.</td></tr>
-<tr><td>16*16</td><td>Go to the 16x16-pixel edit screen.</td></tr>
-<tr><td>FON</td><td>Copy the standard font to the current page.</td></tr>
-<tr><td>NEW</td><td>Clear all characters.</td></tr>
+<tr><td>SEL</td><td>Change the size of the selection.</td></tr>
 </table>
 
-<h2 id="CD-Disk-Menu">Disk Menu</h2>
-
-<p>The list shows all 16 files of the current virtual disk, or in
-other words the ROM entries of the program you are editing. Select one
-(usually number 2) and tap on Load or Save.</p>
+<p>The size of the selection affects all edit tools on this screen, as
+well as drawing in the background editor.</p>
 
 
-<h1 id="Background-Designer">Background Designer</h1>
+<h2 id="GD-Palette-Editor">The Palette Editor</h2>
+
+<p>The bottom part is identical to the character editor.</p>
+<p>In the box at the left you select the current color palette.</p>
+<p>On the right you can edit each color of the current
+palette using the RGB sliders. The first color is usually transparent
+and unused, except the first color of palette 0, which is used as the
+screen backdrop color.</p>
+
+<table>
+<tr><td>FILE</td><td>Go to the palettes file menu.</td></tr>
+</table>
+
+
+<h2 id="GD-Background-Editor">The Background Editor</h2>
 
 <img class="illustration" src="manual-images/illustration_building.png" srcset="manual-images/illustration_building.png 1x, manual-images/illustration_building@2x.png 2x"/>
 
-<p>The Background Designer allows you to create tile-based screens or
-level maps of different sizes. Additionally it's for creating color palettes. On the bottom right there are three tabs for the different
-sections of the program: The map editor, the selection screen and
-the disk menu.</p>
-<p>The Background Designer loads the main characters (file 1),
-palettes (file 2) and background (file 3) on startup, but keep in
-mind that it doesn't save automatically.</p>
-
-
-<h2 id="BD-Selection-Screen">Selection Screen</h2>
-
-<p>On the top there is the character selector. Drag to select several
-characters at once. In the box at the left you select the current
-color palette. On the right you can edit each color of the current
-palette using the RGB sliders. The first color is usually transparent
-and unused, except the first color of palette 0, which is used as the
-screen backdrop color.
-</p>
-
-
-<h2 id="BD-Map-Editor">Map Editor</h2>
-
 <p>Here you draw your background using the character and color palette
-currently selected on the selection screen. On the bottom appear some
-tools:</p>
+currently selected on the other screens.</p>
 
 <table>
+<tr><td>FILE</td><td>Go to the background file menu.</td></tr>
 <tr><td>Pan</td><td>Drag the visible map area.</td></tr>
-<tr><td>Stamp</td><td>Draw with the selected character and color
-palette, using the selected flip and priority attributes.</td></tr>
-<tr><td>Paint</td><td>Change the color palette only.</td></tr>
-<tr><td>Priority</td><td>Change the priority only. Cells with priority
-1 are shown in green, all others in red.</td></tr>
+<tr><td>Draw</td><td>Draw with the current mode.</td></tr>
+<tr><td>Erase</td><td>Erase cells including their attributes.</td></tr>
 <tr><td>FLIP</td><td>Toggles the X/Y flip attributes.</td></tr>
 <tr><td>PRI</td><td>Toggles the priority attribute.</td></tr>
 </table>
 
-<p>You can use the arrow keys to scroll the map when running LowRes
-NX on a computer.</p>
+<p>You can use the arrow or WASD keys to scroll the map when running LowRes
+NX on a computer. The keys Z, X, C, V and B select the tool.</p>
+
+<p>The draw tool has different modes. By tapping the button again,
+when it's already selected, you can change the mode:</p>
+
+<table>
+<tr><td>Draw</td><td>Edit single cells.</td></tr>
+<tr><td>Fill</td><td>Edit areas by dragging.</td></tr>
+<tr><td>Character</td><td>Draw with the selected character and color
+palette, using the selected flip and priority attributes.</td></tr>
+<tr><td>Palette</td><td>Change the color palette only.</td></tr>
+<tr><td>Priority</td><td>Change the priority only. Cells with priority
+1 are shown in green, all others in red.</td></tr>
+<tr><td>Stamp</td><td>Select an area by dragging and then draw with it
+(copy and paste).</td></tr>
+</table>
 
 
-<h2 id="BD-Disk-Menu">Disk Menu</h2>
+<h2 id="GD-File-Menu">File Menu</h2>
 
 <p>From here you load and save characters, color palettes and the
-background separately. There is no option to save everything at once.
-For the background there are two additional options:</p>
+background separately. There is no option to save everything at once.</p>
 
+<p>The list shows all 16 files of the current virtual disk, or in
+other words the ROM entries of the program you are editing. Select one
+and tap on Load or Save.</p>
+
+<h3 id="GD-File-Characters">Characters</h3>
+<table>
+<tr><td>NEW</td><td>Clear all characters.
+</td></tr>
+<tr><td>FON</td><td>Copy a standard font to the current page.</td></tr>
+<tr><td>PAG</td><td>Load only one page from the selected file to the
+current page. Useful to include fonts from another file, for example.</td></tr>
+</table>
+
+<h3 id="GD-File-Palettes">Palettes</h3>
+<table>
+<tr><td>NEW</td><td>Reset to the default colors.
+</td></tr>
+</table>
+
+<h3 id="GD-File-Backgrounds">Backgrounds</h3>
 <table>
 <tr><td>NEW</td><td>Clear the complete background (keeping its size).
 </td></tr>
 <tr><td>SIZE</td><td>Go to the size menu, where you can choose
-the width and height of the background (in cells), as well as the cell size (8x8 or 16x16 pixels).</td></tr>
+the width and height of the background (in cells), as well as the cell
+size (8x8 or 16x16 pixels).</td></tr>
 </table>
 
 
@@ -2464,10 +2489,14 @@ wouldn't have a disk drive.</p>
 
 <h3 id="_LOAD" name="LOAD">LOAD</h3>
 
-<pre>LOAD f,a</pre>
+<pre>LOAD f,a[,n[,o]]</pre>
 
-<p>Loads the file number <em>f</em> from the current virtual disk to memory starting
-at address <em>a</em>.</p>
+<p>Loads the file number <em>f</em> from the current virtual disk to
+memory starting at address <em>a</em>.</p>
+
+<p>Optionally the parameter <em>n</em> can be used for the maximum
+number of bytes that should be loaded. 0 means no limit. With the
+optional parameter <em>o</em> an offset in the file can be set.</p>
 
 <p>LOAD is meant to be used for tools only. Use ROM entries for game
 data or persistent memory for game states.</p>
