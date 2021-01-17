@@ -2,9 +2,18 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+## Mac files
+.DS_Store
+
+## vscode setting files
+c_cpp_properties.json
+settings.json
+
 ## Build generated
 build/
 DerivedData/
+*.o
+*.bc
 
 ## Various settings
 *.pbxuser

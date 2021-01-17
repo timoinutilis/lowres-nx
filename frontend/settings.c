@@ -23,7 +23,9 @@
 #include "settings.h"
 #include "system_paths.h"
 #include "utils.h"
+#ifndef __LIBRETRO__
 #include "sdl_include.h"
+#endif
 #include <string.h>
 
 const char *optionYes = "yes";
@@ -119,7 +121,7 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
 
 bool settings_filename(char *destination)
 {
-#if SETTINGS_FILE
+#if SETTINGS_FILE && !__LIBRETRO__
     char *prefPath = SDL_GetPrefPath("Inutilis Software", "LowRes NX");
     if (prefPath)
     {

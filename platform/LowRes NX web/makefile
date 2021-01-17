@@ -5,8 +5,8 @@ CC_FLAGS_MAIN = -s USE_SDL=2
 
 # File names
 EXEC = output/LowResNX110.js
-SOURCES = $(wildcard ../../core/*.c) $(wildcard ../../core/*/*.c) $(wildcard ../../sdl/*.c)
-OBJECTS = $(SOURCES:.c=.bc)
+SOURCES = $(wildcard ../../core/*.c) $(wildcard ../../core/*/*.c) $(wildcard ../../frontend/*.c)
+OBJECTS = $(SOURCES:.c=.o)
  
 # Main target
 $(EXEC): $(OBJECTS)
@@ -14,7 +14,7 @@ $(EXEC): $(OBJECTS)
 	$(CC) $(CC_FLAGS_MAIN) $(OBJECTS) -o $(EXEC)
 
 # To obtain object files
-%.bc: %.c
+%.o: %.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
 
 # To remove generated files

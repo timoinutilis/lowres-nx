@@ -21,6 +21,7 @@
 #ifndef main_h
 #define main_h
 
+#ifndef __LIBRETRO__
 #include <stdbool.h>
 
 enum MainState {
@@ -51,4 +52,5 @@ void getDiskFilename(char *outputString);
 void getRamFilename(char *outputString);
 void setMouseEnabled(bool enabled);
 
+#endif
 #endif /* main_h */

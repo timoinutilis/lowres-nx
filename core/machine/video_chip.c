@@ -233,7 +233,11 @@ void video_renderScreen(struct Core *core, uint32_t *outputRGB)
             int g = (color >> 2) & 0x03;
             int b = color & 0x03;
             // add some gray (0x0F) to simulate screen
+#if __LIBRETRO__
+            *outputPixel = (b * 0x55) | ((g * 0x55) << 8) | ((r * 0x55) << 16) | 0x000F0F0F;
+#else
             *outputPixel = (r * 0x55) | ((g * 0x55) << 8) | ((b * 0x55) << 16) | 0x000F0F0F;
+#endif
             outputPixel++;
         }
     }

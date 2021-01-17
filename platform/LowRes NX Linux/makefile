@@ -5,8 +5,8 @@ CC_FLAGS_MAIN =  -D __LINUX__ -lSDL2main -lSDL2 -lm `sdl2-config --cflags --stat
 
 # File names
 EXEC = output/LowResNX
-SOURCES = $(wildcard ../../core/*.c) $(wildcard ../../core/*/*.c) $(wildcard ../../sdl/*.c)
-OBJECTS = $(SOURCES:.c=.bc)
+SOURCES = $(wildcard ../../core/*.c) $(wildcard ../../core/*/*.c) $(wildcard ../../frontend/*.c)
+OBJECTS = $(SOURCES:.c=.o)
  
 # Main target
 $(EXEC): $(OBJECTS)
@@ -14,7 +14,7 @@ $(EXEC): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(EXEC) $(CC_FLAGS_MAIN) 
 
 # To obtain object files
-%.bc: %.c
+%.o: %.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
 
 # To remove generated files

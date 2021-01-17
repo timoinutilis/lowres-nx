@@ -1,0 +1,44 @@
+#Set the path to the core's libretro-common directory here
+#LIBRETRO_COMM_DIR := $(CORE_DIR)/drivers/libretro/libretro-common
+
+INCFLAGS       :=  -lm -D __LINUX__ -w   -I ../../core -I ../../core/machine -I ../../core/accessories -I ../../core/datamanager -I ../../core/interpreter -I ../../core/libraries -I ../../core/overlay
+
+#Uncomment this to include the libretro-common include directory
+#INCFLAGS      += -I$(LIBRETRO_COMM_DIR)/include
+COREDEFINES    = -D__LIBRETRO__
+
+INCLUDE_STDINT = 0
+ifneq (,$(findstring msvc2003,$(platform)))
+INCLUDE_STDINT = 1
+endif
+
+ifneq (,$(findstring msvc2005,$(platform)))
+INCLUDE_STDINT = 1
+endif
+
+ifeq ($(INCLUDE_STDINT), 1)
+INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
+endif
+
+ifneq (,$(findstring msvc,$(platform)))
+COREDEFINES += -DINLINE=_inline
+else
+COREDEFINES += -DINLINE=inline
+endif
+
+ifeq ($(PSS_STYLE),2)
+COREDEFINES += -DPSS_STYLE=2
+else
+COREDEFINES += -DPSS_STYLE=1
+endif
+
+# Add C sourcecode files to this
+SOURCES_C     :=  $(wildcard ../../core/*.c) $(wildcard ../../core/*/*.c) ../../frontend/boot_intro.c ../../frontend/dev_menu.c ../../frontend/libretro_lowres.c ../../frontend/libretro.c ../../frontend/runner.c ../../frontend/settings.c ../../frontend/system_paths.c ../../frontend/utils.c
+
+
+# Add C++ sourcecode files to this
+SOURCES_CXX   := 
+ifeq ($(STATIC_LINKING),1)
+else
+# Files from libretro-common should be put inside the else block here
+endif

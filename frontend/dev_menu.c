@@ -23,13 +23,18 @@
 #if DEV_MENU
 
 #include "dev_menu.h"
+#if __LIBRETRO__
+#include "libretro.h"
+#include "libretro_lowres.h";
+#else
+#include "sdl_include.h"
 #include "main.h"
+#endif
 #include "dev_menu_data.h"
 #include "text_lib.h"
 #include "string_utils.h"
 #include "system_paths.h"
 #include "utils.h"
-#include "sdl_include.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>

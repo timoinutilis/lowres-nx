@@ -129,13 +129,13 @@
     <ClCompile Include="..\..\..\core\overlay\overlay_data.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\boot_intro.c">
+    <ClCompile Include="..\..\..\frontend\boot_intro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\main.c">
+    <ClCompile Include="..\..\..\frontend\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\settings.c">
+    <ClCompile Include="..\..\..\frontend\settings.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\core\interpreter\cmd_audio.c">
@@ -144,19 +144,19 @@
     <ClCompile Include="..\..\..\core\libraries\audio_lib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\dev_menu.c">
+    <ClCompile Include="..\..\..\frontend\dev_menu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\runner.c">
+    <ClCompile Include="..\..\..\frontend\runner.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\screenshot.c">
+    <ClCompile Include="..\..\..\frontend\screenshot.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\system_paths.c">
+    <ClCompile Include="..\..\..\frontend\system_paths.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sdl\utils.c">
+    <ClCompile Include="..\..\..\frontend\utils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -281,7 +281,7 @@
     <ClInclude Include="..\..\..\core\overlay\overlay_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\boot_intro.h">
+    <ClInclude Include="..\..\..\frontend\boot_intro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -290,7 +290,7 @@
     <ClInclude Include="resource1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\settings.h">
+    <ClInclude Include="..\..\..\frontend\settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\core\interpreter\cmd_audio.h">
@@ -299,31 +299,31 @@
     <ClInclude Include="..\..\..\core\libraries\audio_lib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\config.h">
+    <ClInclude Include="..\..\..\frontend\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\dev_menu.h">
+    <ClInclude Include="..\..\..\frontend\dev_menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\dev_menu_data.h">
+    <ClInclude Include="..\..\..\frontend\dev_menu_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\main.h">
+    <ClInclude Include="..\..\..\frontend\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\runner.h">
+    <ClInclude Include="..\..\..\frontend\runner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\screenshot.h">
+    <ClInclude Include="..\..\..\frontend\screenshot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\system_paths.h">
+    <ClInclude Include="..\..\..\frontend\system_paths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\utils.h">
+    <ClInclude Include="..\..\..\frontend\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdl\sdl_include.h">
+    <ClInclude Include="..\..\..\frontend\sdl_include.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

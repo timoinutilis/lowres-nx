@@ -19,8 +19,13 @@
 //
 
 #include "runner.h"
+#if __LIBRETRO__
+#include "libretro.h"
+#include "libretro_lowres.h"
+#else
 #include "main.h"
 #include "sdl_include.h"
+#endif
 #include "system_paths.h"
 #include <string.h>
 #include <stdlib.h>
@@ -210,6 +215,28 @@ void diskDriveIsFull(void *context, struct DataManager *diskDataManager)
 /** Called when keyboard or gamepad settings changed */
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 {
+#if __LIBRETRO__
+
+     // user hints for controls
+    struct Runner *runner = context;
+    union IOAttributes attr = runner->core->machine->ioRegisters.attr;
+    if (attr.touchEnabled && !attr.keyboardEnabled)
+    {
+        overlay_message(runner->core, "TOUCH/MOUSE");
+    }
+    if (attr.keyboardEnabled && !attr.touchEnabled)
+    {
+        overlay_message(runner->core, "KEYBOARD");
+    }
+    if (attr.gamepadsEnabled && !attr.keyboardEnabled)
+    {
+        char str[10];
+        sprintf(str, "GAMEPAD(%d)", attr.gamepadsEnabled);
+        overlay_message(runner->core, str);
+        init_joysticks(controlsInfo.numGamepadsEnabled);
+    }
+#else
+
     if (   controlsInfo.keyboardMode == KeyboardModeOn
         || (controlsInfo.keyboardMode == KeyboardModeOptional && !SDL_HasScreenKeyboardSupport()) )
     {
@@ -223,6 +250,8 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
         SDL_StopTextInput();
     }
     setMouseEnabled(controlsInfo.isTouchEnabled);
+    
+#endif
 }
 
 /** Called when persistent RAM will be accessed the first time */
