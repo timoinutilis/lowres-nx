@@ -19,13 +19,13 @@
 //
 
 #include "config.h"
-
 #include "settings.h"
 #include "system_paths.h"
 #include "utils.h"
 #ifndef __LIBRETRO__
 #include "sdl_include.h"
 #endif
+#include <stdlib.h>
 #include <string.h>
 
 const char *optionYes = "yes";

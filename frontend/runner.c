@@ -230,7 +230,7 @@ void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
     }
     if (attr.gamepadsEnabled && !attr.keyboardEnabled)
     {
-        char str[10];
+        char str[11];
         sprintf(str, "GAMEPAD(%d)", attr.gamepadsEnabled);
         overlay_message(runner->core, str);
         init_joysticks(controlsInfo.numGamepadsEnabled);

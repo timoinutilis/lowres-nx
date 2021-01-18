@@ -25,7 +25,7 @@
 #include "dev_menu.h"
 #if __LIBRETRO__
 #include "libretro.h"
-#include "libretro_lowres.h";
+#include "libretro_lowres.h"
 #else
 #include "sdl_include.h"
 #include "main.h"

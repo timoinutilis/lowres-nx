@@ -13,6 +13,7 @@ filter_out1 = $(filter-out $(firstword $1),$1)
 filter_out2 = $(call filter_out1,$(call filter_out1,$1))
 unixpath = $(subst \,/,$1)
 unixcygpath = /$(subst :,,$(call unixpath,$1))
+plateform=ios
 
 ifeq ($(platform),)
 	platform = unix
@@ -47,7 +48,7 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 endif
 
 # Replace 'sample' with the name of the core
-TARGET_NAME := "LowRes_NX"
+TARGET_NAME := "lowresnx"
 GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
 ifneq ($(GIT_VERSION)," unknown")
 	CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"

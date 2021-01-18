@@ -1,0 +1,37 @@
+
+INCFLAGS       :=   -I ../../core \
+                    -I ../../core/machine \
+                    -I ../../core/accessories \
+                    -I ../../core/datamanager \
+                    -I ../../core/interpreter \
+                    -I ../../core/libraries \
+                    -I ../../core/overlay
+
+COREDEFINES    = -D__LIBRETRO__
+
+ifneq (,$(findstring msvc,$(platform)))
+COREDEFINES += -DINLINE=_inline
+else
+COREDEFINES += -DINLINE=inline
+endif
+
+ifeq ($(PSS_STYLE),2)
+COREDEFINES += -DPSS_STYLE=2
+else
+COREDEFINES += -DPSS_STYLE=1
+endif
+
+# Add C sourcecode files to this
+SOURCES_C     :=  $(wildcard ../../core/*.c)\
+                  $(wildcard ../../core/*/*.c)\
+                  ../../frontend/boot_intro.c\
+                  ../../frontend/dev_menu.c\
+                  ../../frontend/libretro_lowres.c\
+                  ../../frontend/libretro.c\
+                  ../../frontend/runner.c\
+                  ../../frontend/settings.c\
+                  ../../frontend/system_paths.c\
+                  ../../frontend/utils.c
+
+# Add C++ sourcecode files to this
+SOURCES_CXX   := 

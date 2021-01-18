@@ -10,7 +10,7 @@
 #include "config.h"
 #if __LIBRETRO__
 #include "libretro.h"
-#include "libretro_lowres.h";
+#include "libretro_lowres.h"
 #include "core.h" //Lowres-NX API
 #include "runner.h"
 #include "dev_menu.h"
@@ -39,6 +39,7 @@ const char *defaultDisk = "Disk.nx";
 const int bootIntroStateAddress = 0xA000;
 static uint8_t *pixels;
 static uint16_t *audio_buf;
+bool hasInput = false;
 long ticks = 0;
 
 struct Runner runner;
@@ -87,7 +88,7 @@ void init_joysticks(int numjoysticks);
 void main_init()
 {
     memset(&coreInput, 0, sizeof(struct CoreInput));
-    settings_init(&settings, mainProgramFilename, NULL, NULL);
+    settings_init(&settings, mainProgramFilename, 0, 0);
     runner_init(&runner);
     pixels = (uint8_t*)malloc(VIDEO_PIXELS * sizeof(uint32_t));
     audio_buf = (uint16_t*)malloc(AUDIO_SAMPLES * sizeof(uint16_t));
@@ -150,6 +151,7 @@ int main_deinit()
     runner_deinit(&runner);
     free(pixels);
     pixels = NULL;
+    return 0;
 }
 
 void bootNX()
@@ -325,6 +327,17 @@ int update_gamepad(int player)
 	// A/B
     coreInput.gamepads[player].buttonA = input_state_cb(player, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
     coreInput.gamepads[player].buttonB = input_state_cb(player, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
+    
+    // Pause on start
+    if(input_state_cb(player, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START))
+    {
+        coreInput.pause = true;
+    }
+    // Restart the game on select
+    if(input_state_cb(player, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT))
+    {
+        retro_reset();
+    }
 
     return coreInput.gamepads[player].up
         +coreInput.gamepads[player].down
@@ -386,7 +399,8 @@ int update_mouse(){
 
 void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t keymod)
 {
-    if(down)
+    hasInput = true;
+    if (down)
     {
         if(character != 0)
         {
@@ -429,7 +443,7 @@ void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t 
         }
 
 #if HOT_KEYS
-        uint16_t ctrlPressed = keymod && 0x02;
+        uint16_t ctrlPressed = keymod & 0x02;
         if(ctrlPressed)
         {
             switch(keycode)
@@ -456,11 +470,7 @@ void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t 
                 // Not available in libretro ?
                 break;
             case RETROK_r:
-                if (hasProgram())
-                {
-                    runMainProgram();
-                    overlay_message(runner.core, "RELOADED");
-                }
+                retro_reset();
                 break;
             case RETROK_e:
                 rebootNX();
@@ -490,7 +500,6 @@ void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t 
 int update_inputs()
 {
    ticks++;
-   bool hasInput = false;
 
    // Let libretro know that we need updated input states.
    input_poll_cb();
@@ -513,7 +522,6 @@ int update_inputs()
     // Just to be sure we got a bool
     hasInput = hasInput > 0;
 
-    
     switch (mainState)
     {
         case MainStateUndefined:
@@ -548,6 +556,7 @@ int update_inputs()
             dev_update(&devMenu, &coreInput);
 #endif
             break;
+        hasInput = false;
     }
     
     hasUsedInputLastUpdate = coreInput.out_hasUsedInput;
@@ -562,7 +571,7 @@ void videoCallback()
 {
     if (core_shouldRender(runner.core) || forceRender)
     {
-        video_renderScreen(runner.core, pixels);
+        video_renderScreen(runner.core, (uint32_t*) pixels);
         video_cb(pixels, SCREEN_WIDTH, SCREEN_HEIGHT, sizeof(uint32_t)*SCREEN_WIDTH);
         
     }
@@ -572,8 +581,8 @@ void audioCallback()
 {
     if (core_shouldRender(runner.core) || forceRender)
     {
-        audio_renderAudio(runner.core, audio_buf, AUDIO_SAMPLES, SAMPLING_RATE, volume);
-        audio_batch_cb(audio_buf, AUDIO_SAMPLES/2);
+        audio_renderAudio(runner.core, (int16_t *) audio_buf, AUDIO_SAMPLES, SAMPLING_RATE, volume);
+        audio_batch_cb((const int16_t *) audio_buf, AUDIO_SAMPLES/2);
     }
 }
 void changeVolume(int delta)
@@ -708,8 +717,12 @@ void retro_set_video_refresh(retro_video_refresh_t cb)
 
 void retro_reset(void)
 {
-    log_cb(RETRO_LOG_INFO, "[LowRes NX] Reseting game (NIY)\n");
-
+    log_cb(RETRO_LOG_INFO, "[LowRes NX] Reseting game\n");
+    if (hasProgram())
+    {
+        runMainProgram();
+        overlay_message(runner.core, "RELOADED");
+    }
 }
 
 static void audio_set_state(bool enable)
@@ -738,7 +751,7 @@ bool retro_load_game(const struct retro_game_info *info)
 {
    log_cb(RETRO_LOG_INFO, "[LowRes NX] Loading ROM\n");
    if(!initialized)
-      retro_init;
+      retro_init();
 
    // Pixel format.
    enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
@@ -748,27 +761,28 @@ bool retro_load_game(const struct retro_game_info *info)
 	}
 
     // Check for the content.
-	if (info == NULL) {
-		log_cb(RETRO_LOG_ERROR, "[LowRes NX] No content information provided.\n");
-		return false;
-	}
-
-	// Ensure content data is available.
-	if (info->path == NULL) {
+	if (info == NULL || info->path == NULL) {
 		log_cb(RETRO_LOG_ERROR, "[LowRes NX] No game path provided.\n");
-		return false;
-	}
+        bootNX();
+
+        return true;
+    }
    selectProgram(info->path);
    return true;
 }
 
 void retro_unload_game(void)
 {
+    if(initialized)
+    {
+        core_willSuspendProgram(runner.core);
+        bootNX();
+    }
 }
 
 unsigned retro_get_region(void)
 {
-   return RETRO_REGION_PAL;
+   return RETRO_REGION_NTSC;
 }
 
 bool retro_load_game_special(unsigned type, const struct retro_game_info *info, size_t num)
@@ -778,29 +792,29 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info *info, 
 
 size_t retro_serialize_size(void)
 {
-   return 2;
+   return 0;
 }
 
 bool retro_serialize(void *data_, size_t size)
 {
-   if (size < 2)
+    
+    log_cb(RETRO_LOG_INFO, "[LowRes NX] Serializing NIY\n");
+    /*if (!initialized && size < sizeof(struct Core))
       return false;
 
-   uint8_t *data = data_;
-   data[0] = 0;
-   data[1] = 0;
-   return true;
+    data_ = (uint8_t *) runner.core->machine;
+    */
+    return false;
 }
 
 bool retro_unserialize(const void *data_, size_t size)
 {
-   if (size < 2)
+    log_cb(RETRO_LOG_INFO, "[LowRes NX] Unserializing NIY\n");
+    /*if (!initialized && size < sizeof(struct Core))
       return false;
-
-   const uint8_t *data = data_;
-   int x_coord = data[0] & 31;
-   int y_coord = data[1] & 31;
-   return true;
+    runner.core = (struct Core *) data_;
+    */
+    return false;
 }
 
 void *retro_get_memory_data(unsigned id)

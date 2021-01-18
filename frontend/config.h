@@ -21,7 +21,7 @@
 #ifndef config_h
 #define config_h
 
-#ifdef __EMSCRIPTEN__
+#if  defined(__EMSCRIPTEN__) || defined(__LIBRETRO__)
 #define DEV_MENU 0
 #define SCREENSHOTS 0
 #define HOT_KEYS 0

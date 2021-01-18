@@ -38,7 +38,8 @@ struct Plane *txtlib_getBackground(struct TextLib *lib, int bg)
             
         default:
             assert(0);
-    }
+            return NULL;
+        }
 }
 
 void txtlib_setCellAt(struct Plane *plane, int x, int y, int character, union CharacterAttributes attr)

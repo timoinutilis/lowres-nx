@@ -39,6 +39,8 @@ void desktop_path(char *buffer, size_t size)
 #elif defined(__LINUX__)
     strncpy(buffer, getenv("HOME"), size - 1);
     strncat(buffer, "/Desktop/", size - 1);
+#elif defined(__LIBRETRO__)
+	// not used
 #else
 #error Not implemented yet
 #endif
