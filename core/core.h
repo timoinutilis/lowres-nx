@@ -55,6 +55,7 @@ struct CoreInput {
     int touchX;
     int touchY;
     bool touch;
+    bool touchlastframe;
     char key;
     bool out_hasUsedInput;
 };

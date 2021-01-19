@@ -39,7 +39,6 @@ const char *defaultDisk = "Disk.nx";
 const int bootIntroStateAddress = 0xA000;
 static uint8_t *pixels;
 static uint16_t *audio_buf;
-bool hasInput = false;
 long ticks = 0;
 
 struct Runner runner;
@@ -55,11 +54,12 @@ char mainProgramFilename[FILENAME_MAX] = "";
 int numJoysticks = 0;
 
 bool quit = false;
-static bool releasedTouch = false;
 bool forceRender = false;
-bool hasUsedInputLastUpdate = false;
 int volume = 0; // 0 = max, it's a bit shift
 
+bool hasInput = false;
+bool mouseReleased = false;
+bool hasUsedInputLastUpdate = false;
 
 void main_init();
 int main_deinit();
@@ -79,7 +79,7 @@ int update_gamepad(int player);
 int mouse_pointer_convert(float coord, float full);
 int update_mouse();
 void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t keymod);
-int update_inputs();
+int update();
 void changeVolume(int delta);
 void init_joysticks(int numjoysticks);
 
@@ -361,40 +361,38 @@ void setMouseEnabled(bool enabled){
     //nothing to do for libretro
 }
 
-/**
- * Retrieve pointer information from libretro.
- */
 int update_mouse(){
-
-    // Mouse pressed
     bool pressed = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED);
- 
-    if(pressed && !coreInput.touch)
+    int touchX = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
+    int touchY = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
+    
+    touchX = mouse_pointer_convert(touchX, SCREEN_WIDTH);
+    touchY = mouse_pointer_convert(touchY, SCREEN_HEIGHT);
+    /*if(pressed)
+    {
+        char message[30];
+        sprintf(message, "[LowRes NX] %d %d %d --was-- %d %d %d\n", pressed, touchX, touchY, coreInput.touch, coreInput.touchX, coreInput.touchY );
+        log_cb(RETRO_LOG_DEBUG, message);
+    }*/
+
+    if(pressed && !coreInput.touchlastframe)
     {
         coreInput.touch = true;
-
-        // Get the Pointer X and Y, and convert it to screen position.
-        int touchX = mouse_pointer_convert(
-            input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X),
-            SCREEN_WIDTH);
-        int touchY = mouse_pointer_convert(
-            input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y),
-            SCREEN_HEIGHT);
-
-        if(touchX * touchY > 0)
-        {
-            coreInput.touchX = touchX;
-            coreInput.touchY = touchY;
-        }
-
-        char message[16];
-        sprintf(message, "TOUCH %d %d", coreInput.touchX, coreInput.touchY);
-        overlay_message(runner.core, message);
-    }else if(!pressed){
-        coreInput.touch = false;
+        hasInput = true;
     }
-
-    return coreInput.touch>0;
+    if(!pressed)
+    {
+        coreInput.touch = false;
+        hasInput = false;
+    }
+    if(coreInput.touch && touchX != 0 && touchY != 0 && (touchX != coreInput.touchX || touchX != coreInput.touchX))
+    {
+        coreInput.touchX  = touchX;
+        coreInput.touchY  = touchY;
+        
+        hasInput = true;
+    }
+    return hasInput;
 }
 
 void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t keymod)
@@ -495,22 +493,24 @@ void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t 
 *  to be executed each frame
 * - poll events
 * - update states, etc...
-* returns 0 if should quit
+* returns true if should quit
 **/
-int update_inputs()
+int update()
 {
    ticks++;
 
-   // Let libretro know that we need updated input states.
-   input_poll_cb();
+    hasInput = false;
+    // Let libretro know that we need updated input states.
+    input_poll_cb();
 
-   // user hints for controls
-   union IOAttributes attr = runner.core->machine->ioRegisters.attr;
-   if (attr.touchEnabled)
-   {
-      // Mouse Input
-      hasInput += update_mouse();
+    // user hints for controls
+    union IOAttributes attr = runner.core->machine->ioRegisters.attr;
+    if (attr.touchEnabled)
+    {
+    // Mouse Input
+    hasInput += update_mouse();
     }
+
     if (attr.gamepadsEnabled && settings.session.mapping == 0)
     {
         // Gamepad Input
@@ -518,10 +518,16 @@ int update_inputs()
             hasInput += update_gamepad(i);
         }
     }
-   
+
     // Just to be sure we got a bool
     hasInput = hasInput > 0;
-
+    /*
+    char message[32];
+    sprintf(message, "[LowRes NX] %d %d\n", coreInput.touch, coreInput.touchlastframe);
+    log_cb(RETRO_LOG_DEBUG, message);
+    */
+    core_update(runner.core, &coreInput);
+    
     switch (mainState)
     {
         case MainStateUndefined:
@@ -543,24 +549,27 @@ int update_inputs()
             
         case MainStateRunningProgram:
         case MainStateRunningTool:
-            core_update(runner.core, &coreInput);
+        {
 
             if (hasInput && runner.core->interpreter->state == StateEnd)
             {
                 overlay_message(runner.core, "END OF PROGRAM");
             }
             break;
-            
+        }   
         case MainStateDevMenu:
 #if DEV_MENU
             dev_update(&devMenu, &coreInput);
 #endif
             break;
-        hasInput = false;
+        
     }
     
     hasUsedInputLastUpdate = coreInput.out_hasUsedInput;
-
+    if(coreInput.touch)
+    {
+        coreInput.touchlastframe = true;
+    }
     return quit;
 }
 
@@ -718,6 +727,7 @@ void retro_set_video_refresh(retro_video_refresh_t cb)
 void retro_reset(void)
 {
     log_cb(RETRO_LOG_INFO, "[LowRes NX] Reseting game\n");
+    bootNX();
     if (hasProgram())
     {
         runMainProgram();
@@ -736,7 +746,7 @@ void retro_run(void)
    //log_cb(RETRO_LOG_INFO, "[LowRes NX] Retro run\n");
    if (!initialized)return;
    
-   bool quit = update_inputs();
+   bool quit = update();
    if(quit){
       retro_deinit();
       environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);

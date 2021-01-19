@@ -21,11 +21,18 @@
 #ifndef config_h
 #define config_h
 
-#if  defined(__EMSCRIPTEN__) || defined(__LIBRETRO__)
+#if  defined(__EMSCRIPTEN__)
 #define DEV_MENU 0
 #define SCREENSHOTS 0
 #define HOT_KEYS 0
 #define SETTINGS_FILE 0
+
+#elif defined(__LIBRETRO__)
+#define DEV_MENU 1
+#define SCREENSHOTS 0
+#define HOT_KEYS 1
+#define SETTINGS_FILE 1
+
 #else
 #define DEV_MENU 1
 #define SCREENSHOTS 1
