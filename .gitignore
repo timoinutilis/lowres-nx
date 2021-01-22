@@ -70,3 +70,4 @@ platform/LowRes NX Win/.vs/
 *.bc
 platform/LowRes NX web/output
 Disk.nx
+*.o

@@ -87,6 +87,9 @@
 		925D482C2121FF76003F1B0D /* audio_lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = audio_lib.c; sourceTree = "<group>"; };
 		925F6BEC25039D11005E1179 /* core_stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_stats.c; sourceTree = "<group>"; };
 		925F6BED25039D12005E1179 /* core_stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core_stats.h; sourceTree = "<group>"; };
+		92648F1625BAD73D008559AA /* libretro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libretro.h; sourceTree = "<group>"; };
+		92648F6425BAE851008559AA /* libretro_main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libretro_main.h; sourceTree = "<group>"; };
+		92648F6525BAE851008559AA /* libretro_main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = libretro_main.c; sourceTree = "<group>"; };
 		9284722920F9F4FA00B82653 /* dev_menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_menu.h; sourceTree = "<group>"; };
 		9284722A20F9F4FA00B82653 /* dev_menu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dev_menu.c; sourceTree = "<group>"; };
 		9284722C20F9FA5900B82653 /* dev_menu_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_menu_data.h; sourceTree = "<group>"; };
@@ -201,11 +204,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		92648F1225BAD356008559AA /* libretro */ = {
+			isa = PBXGroup;
+			children = (
+				92648F1625BAD73D008559AA /* libretro.h */,
+				92648F6425BAE851008559AA /* libretro_main.h */,
+				92648F6525BAE851008559AA /* libretro_main.c */,
+			);
+			name = libretro;
+			path = ../../libretro;
+			sourceTree = "<group>";
+		};
 		9287EAB920D85E4D000BBEB1 = {
 			isa = PBXGroup;
 			children = (
 				9287EAD820D85EEB000BBEB1 /* core */,
 				9287EB5320D85EF7000BBEB1 /* sdl */,
+				92648F1225BAD356008559AA /* libretro */,
 				9287EAC420D85E4D000BBEB1 /* LowRes NX macOS SDL */,
 				9287EAC320D85E4D000BBEB1 /* Products */,
 				9287EB5720D85F43000BBEB1 /* Frameworks */,
