@@ -46,6 +46,7 @@ static struct Core *core = NULL;
 static struct CoreDelegate coreDelegate;
 static struct CoreInput coreInput;
 static long ticks = 0;
+static bool hasInput = false;
 static bool hasUsedInputLastUpdate = false;
 static bool messageShownUsingDisk = false;
 static enum MainState mainState = MainStateUndefined;
@@ -102,7 +103,7 @@ void init_joysticks()
 /**
  * Retrieve gamepad information from libretro.
  */
-void update_gamepad(int player)
+bool update_gamepad(int player)
 {
     // D-Pad
     coreInput.gamepads[player].up = input_state_callback(player, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
@@ -120,6 +121,9 @@ void update_gamepad(int player)
     {
         coreInput.pause = true;
     }
+    
+    struct CoreInputGamepad gamepad = coreInput.gamepads[player];
+    return gamepad.buttonA || gamepad.buttonB || gamepad.up || gamepad.down || gamepad.left || gamepad.right;
 }
 
 int mouse_pointer_convert(float coord, float full)
@@ -128,19 +132,23 @@ int mouse_pointer_convert(float coord, float full)
     return (int)((coord + max) / (max * 2.0f) * full);
 }
 
-void update_mouse()
+bool update_mouse()
 {
     // Get the Pointer X and Y, and convert it to screen position.
     coreInput.touchX = mouse_pointer_convert(input_state_callback(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X), SCREEN_WIDTH);
     coreInput.touchY = mouse_pointer_convert(input_state_callback(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y), SCREEN_HEIGHT);
     
     coreInput.touch = input_state_callback(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED);
+    
+    return coreInput.touch;
 }
 
 void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t key_modifiers)
 {
     if (down)
     {
+        hasInput = true;
+        
         if (character != 0)
         {
             // Text input
@@ -158,7 +166,6 @@ void keyboard_pressed(bool down, unsigned keycode, uint32_t character, uint16_t 
         {
         case RETROK_RETURN:
             coreInput.key = CoreInputKeyReturn;
-            coreInput.pause = true;
             break;
         case RETROK_BACKSPACE:
             coreInput.key = CoreInputKeyBackspace;
@@ -357,18 +364,22 @@ RETRO_API void retro_reset(void)
  */
 RETRO_API void retro_run(void)
 {
-    bool hasInput = false; //TODO: set this on input
-    
     input_poll_callback();
     
     if (core && pixels && audio_buf)
     {
         for (int i = 0; i < NUM_GAMEPADS; ++i)
         {
-            update_gamepad(i);
+            if (update_gamepad(i))
+            {
+                hasInput = true;
+            }
         }
         
-        update_mouse();
+        if (update_mouse())
+        {
+            hasInput = true;
+        }
         
         switch (mainState)
         {
@@ -413,6 +424,8 @@ RETRO_API void retro_run(void)
                 break;
         }
         
+        hasUsedInputLastUpdate = coreInput.out_hasUsedInput;
+        
         video_renderScreen(core, pixels);
         video_refresh_callback(pixels, SCREEN_WIDTH, SCREEN_HEIGHT, sizeof(uint32_t) * SCREEN_WIDTH);
         
@@ -420,6 +433,7 @@ RETRO_API void retro_run(void)
         audio_sample_batch_callback(audio_buf, AUDIO_SAMPLES / 2);
     }
     
+    hasInput = false;
     ++ticks;
 }
 
