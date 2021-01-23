@@ -23,4 +23,10 @@
 
 #include <stdio.h>
 
+enum MainState {
+    MainStateUndefined,
+    MainStateBootIntro,
+    MainStateRunningProgram
+};
+
 #endif /* libretro_main_h */

@@ -21,6 +21,14 @@
 #ifndef boot_intro_h
 #define boot_intro_h
 
+extern const int bootIntroStateAddress;
 extern const char *bootIntroSourceCode;
+
+enum BootIntroState {
+    BootIntroStateDefault,
+    BootIntroStateProgramAvailable,
+    BootIntroStateReadyToRun,
+    BootIntroStateDone
+};
 
 #endif /* boot_intro_h */

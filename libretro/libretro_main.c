@@ -24,6 +24,7 @@
 #include <stdarg.h>
 #include "libretro.h"
 #include "core.h"
+#include "boot_intro.h"
 
 #define SAMPLING_RATE 44100.0f
 #define VIDEO_PIXELS SCREEN_WIDTH * SCREEN_HEIGHT
@@ -38,13 +39,20 @@ static retro_audio_sample_batch_t audio_sample_batch_callback;
 static retro_input_poll_t input_poll_callback;
 static retro_input_state_t input_state_callback;
 
-static struct Core *core;
+static uint32_t *pixels;
+static int16_t *audio_buf;
+
+static struct Core *core = NULL;
 static struct CoreDelegate coreDelegate;
 static struct CoreInput coreInput;
 static long ticks = 0;
+static bool hasUsedInputLastUpdate = false;
+static bool messageShownUsingDisk = false;
+static enum MainState mainState = MainStateUndefined;
+static char *sourceCode = NULL;
 
-static uint32_t *pixels;
-static int16_t *audio_buf;
+void bootNX(void);
+void runMainProgram(void);
 
 void interpreterDidFail(void *context, struct CoreError coreError);
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager);
@@ -181,7 +189,7 @@ RETRO_API void retro_set_environment(retro_environment_t callback)
 {
     environment_callback = callback;
     
-    bool no_content = true;
+    bool no_content = false;
     callback(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_content);
     
     if (callback(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
@@ -196,6 +204,11 @@ RETRO_API void retro_set_environment(retro_environment_t callback)
         keyboard_pressed
     };
     callback(RETRO_ENVIRONMENT_SET_KEYBOARD_CALLBACK, &kcb);
+    
+    //TODO: have a look at these:
+    // RETRO_ENVIRONMENT_SET_MESSAGE
+    // RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK
+    // RETRO_ENVIRONMENT_SET_MEMORY_MAPS
 }
 
 RETRO_API void retro_set_video_refresh(retro_video_refresh_t callback)
@@ -249,6 +262,8 @@ RETRO_API void retro_init(void)
     audio_buf = calloc(AUDIO_SAMPLES, sizeof(int16_t));
     
     init_joysticks();
+    
+    bootNX();
 }
 
 RETRO_API void retro_deinit(void)
@@ -329,6 +344,7 @@ RETRO_API void retro_set_controller_port_device(unsigned port, unsigned device)
 RETRO_API void retro_reset(void)
 {
     log(RETRO_LOG_INFO, "[LowRes NX] Reset\n");
+    runMainProgram();
 }
 
 /* Runs the game for one video frame.
@@ -341,6 +357,8 @@ RETRO_API void retro_reset(void)
  */
 RETRO_API void retro_run(void)
 {
+    bool hasInput = false; //TODO: set this on input
+    
     input_poll_callback();
     
     if (core && pixels && audio_buf)
@@ -352,7 +370,48 @@ RETRO_API void retro_run(void)
         
         update_mouse();
         
-        core_update(core, &coreInput);
+        switch (mainState)
+        {
+            case MainStateUndefined:
+                break;
+                
+            case MainStateBootIntro:
+                core_update(core, &coreInput);
+                if (machine_peek(core, bootIntroStateAddress) == BootIntroStateReadyToRun)
+                {
+                    machine_poke(core, bootIntroStateAddress, BootIntroStateDone);
+                    runMainProgram();
+                }
+                break;
+                
+            case MainStateRunningProgram:
+                core_update(core, &coreInput);
+                if (hasInput)
+                {
+                    if (core->interpreter->state == StateEnd)
+                    {
+                        overlay_message(core, "END OF PROGRAM");
+                    }
+                    else if (!coreInput.out_hasUsedInput && !hasUsedInputLastUpdate)
+                    {
+                        // user hints for controls
+                        union IOAttributes attr = core->machine->ioRegisters.attr;
+                        if (attr.touchEnabled && !attr.keyboardEnabled)
+                        {
+                            overlay_message(core, "TOUCH/MOUSE");
+                        }
+                        if (attr.keyboardEnabled && !attr.touchEnabled)
+                        {
+                            overlay_message(core, "KEYBOARD");
+                        }
+                        if (attr.gamepadsEnabled && !attr.keyboardEnabled)
+                        {
+                            overlay_message(core, "GAMEPAD");
+                        }
+                    }
+                }
+                break;
+        }
         
         video_renderScreen(core, pixels);
         video_refresh_callback(pixels, SCREEN_WIDTH, SCREEN_HEIGHT, sizeof(uint32_t) * SCREEN_WIDTH);
@@ -400,30 +459,21 @@ RETRO_API void retro_cheat_set(unsigned index, bool enabled, const char *code)
 RETRO_API bool retro_load_game(const struct retro_game_info *game)
 {
     log(RETRO_LOG_INFO, "[LowRes NX] Load game\n");
-        
-    if (!game || !game->data)
-    {
-        return true;
-    }
     
-    if (core)
+    if (core && game && game->data)
     {
-        char *sourceCode = calloc(1, game->size + 1); // +1 for terminator
+        sourceCode = calloc(1, game->size + 1); // +1 for terminator
         if (sourceCode)
         {
             memcpy(sourceCode, game->data, game->size);
-
-            struct CoreError error = core_compileProgram(core, game->data);
-            if (error.code != ErrorNone)
+            if (mainState == MainStateBootIntro)
             {
-                core_traceError(core, error);
+                machine_poke(core, bootIntroStateAddress, BootIntroStateProgramAvailable);
             }
-            
-            core_willRunProgram(core, ticks);
-            
-            free(sourceCode);
-            sourceCode = NULL;
-            
+            else
+            {
+                runMainProgram();
+            }
             return true;
         }
     }
@@ -444,6 +494,12 @@ RETRO_API void retro_unload_game(void)
     {
         core_willSuspendProgram(core);
     }
+    
+    if (sourceCode)
+    {
+        free(sourceCode);
+        sourceCode = NULL;
+    }
 }
 
 /* Gets region of game. */
@@ -455,15 +511,63 @@ RETRO_API unsigned retro_get_region(void)
 /* Gets region of memory. */
 RETRO_API void *retro_get_memory_data(unsigned id)
 {
-    return NULL;
+    switch (id)
+    {
+        case RETRO_MEMORY_SAVE_RAM:
+            return core->machine->persistentRam;
+        default:
+            return NULL;
+    }
 }
 
 RETRO_API size_t retro_get_memory_size(unsigned id)
 {
-    return 0;
+    switch (id)
+    {
+        case RETRO_MEMORY_SAVE_RAM:
+            return PERSISTENT_RAM_SIZE;
+        default:
+            return 0;
+    }
 }
 
 /* ======== LowRes NX ======== */
+
+void bootNX()
+{
+    if (!core) return;
+    
+    mainState = MainStateBootIntro;
+    
+    struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
+    if (error.code != ErrorNone)
+    {
+        core_traceError(core, error);
+    }
+    
+    core->interpreter->debug = false;
+    core_willRunProgram(core, ticks / 60);
+}
+
+void runMainProgram()
+{
+    if (!core || !sourceCode) return;
+    
+    core_willSuspendProgram(core);
+    
+    struct CoreError error = core_compileProgram(core, sourceCode);
+    if (error.code != ErrorNone)
+    {
+        core_traceError(core, error);
+    }
+    else
+    {
+        core_willRunProgram(core, ticks / 60);
+        mainState = MainStateRunningProgram;
+    }
+    
+    messageShownUsingDisk = false;
+}
 
 /** Called on error */
 void interpreterDidFail(void *context, struct CoreError coreError)
@@ -474,7 +578,11 @@ void interpreterDidFail(void *context, struct CoreError coreError)
 /** Returns true if the disk is ready, false if not. In case of not, core_diskLoaded must be called when ready. */
 bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 {
-    overlay_message(core, "NO DISK");
+    if (!messageShownUsingDisk)
+    {
+        overlay_message(core, "NO DISK");
+        messageShownUsingDisk = true;
+    }
     return true;
 }
 
@@ -492,22 +600,6 @@ void diskDriveIsFull(void *context, struct DataManager *diskDataManager)
 /** Called when keyboard or gamepad settings changed */
 void controlsDidChange(void *context, struct ControlsInfo controlsInfo)
 {
-    // user hints for controls
-    union IOAttributes attr = core->machine->ioRegisters.attr;
-    if (attr.touchEnabled && !attr.keyboardEnabled)
-    {
-        overlay_message(core, "TOUCH/MOUSE");
-    }
-    if (attr.keyboardEnabled && !attr.touchEnabled)
-    {
-        overlay_message(core, "KEYBOARD");
-    }
-    if (attr.gamepadsEnabled && !attr.keyboardEnabled)
-    {
-        char str[11];
-        sprintf(str, "GAMEPAD(%d)", attr.gamepadsEnabled);
-        overlay_message(core, str);
-    }
 }
 
 /** Called when persistent RAM will be accessed the first time */
