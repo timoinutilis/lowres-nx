@@ -83,7 +83,7 @@ void dev_show(struct DevMenu *devMenu, bool reload)
     textLib->core = core;
     
     itp_endProgram(core);
-    machine_reset(core);
+    machine_reset(core, true);
     overlay_reset(core);
     
     core->machine->ioRegisters.attr.touchEnabled = 1;

@@ -218,7 +218,7 @@ void bootNX()
 {
     mainState = MainStateBootIntro;
     
-    struct CoreError error = core_compileProgram(runner.core, bootIntroSourceCode);
+    struct CoreError error = core_compileProgram(runner.core, bootIntroSourceCode, true);
     if (error.code != ErrorNone)
     {
         core_traceError(runner.core, error);

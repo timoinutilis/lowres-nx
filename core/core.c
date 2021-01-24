@@ -86,9 +86,9 @@ void core_setDelegate(struct Core *core, struct CoreDelegate *delegate)
     core->delegate = delegate;
 }
 
-struct CoreError core_compileProgram(struct Core *core, const char *sourceCode)
+struct CoreError core_compileProgram(struct Core *core, const char *sourceCode, bool resetPersistent)
 {
-    machine_reset(core);
+    machine_reset(core, resetPersistent);
     overlay_reset(core);
     disk_reset(core);
     return itp_compileProgram(core, sourceCode);

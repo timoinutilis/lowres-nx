@@ -553,7 +553,7 @@ void bootNX()
     
     mainState = MainStateBootIntro;
     
-    struct CoreError error = core_compileProgram(core, bootIntroSourceCode);
+    struct CoreError error = core_compileProgram(core, bootIntroSourceCode, true);
     if (error.code != ErrorNone)
     {
         core_traceError(core, error);
@@ -569,7 +569,7 @@ void runMainProgram()
     
     core_willSuspendProgram(core);
     
-    struct CoreError error = core_compileProgram(core, sourceCode);
+    struct CoreError error = core_compileProgram(core, sourceCode, false);
     if (error.code != ErrorNone)
     {
         core_traceError(core, error);
