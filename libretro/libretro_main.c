@@ -48,6 +48,8 @@ static struct CoreInput coreInput;
 static long ticks = 0;
 static bool hasInput = false;
 static bool hasUsedInputLastUpdate = false;
+static bool hasPressesPause = false;
+static bool hasPressesPauseLastUpdate = false;
 static bool messageShownUsingDisk = false;
 static enum MainState mainState = MainStateUndefined;
 static char *sourceCode = NULL;
@@ -116,10 +118,9 @@ bool update_gamepad(int player)
     coreInput.gamepads[player].buttonB = input_state_callback(player, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
     
     // Pause (Start button)
-    //TODO: only on button press (first frame down)
     if (input_state_callback(player, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START))
     {
-        coreInput.pause = true;
+        hasPressesPause = true;
     }
     
     struct CoreInputGamepad gamepad = coreInput.gamepads[player];
@@ -376,6 +377,11 @@ RETRO_API void retro_run(void)
             }
         }
         
+        if (hasPressesPause && !hasPressesPauseLastUpdate)
+        {
+            coreInput.pause = true;
+        }
+        
         if (update_mouse())
         {
             hasInput = true;
@@ -434,6 +440,10 @@ RETRO_API void retro_run(void)
     }
     
     hasInput = false;
+    
+    hasPressesPauseLastUpdate = hasPressesPause;
+    hasPressesPause = false;
+    
     ++ticks;
 }
 
