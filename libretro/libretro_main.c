@@ -76,6 +76,12 @@ static void fallback_log(enum retro_log_level level, const char *fmt, ...)
    va_end(va);
 }
 
+void show_message(const char *txt)
+{
+    struct retro_message msg = { txt, 120 };
+    environment_callback(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
+}
+
 void init_joysticks()
 {
     struct retro_input_descriptor desc[] =
@@ -206,17 +212,12 @@ RETRO_API void retro_set_environment(retro_environment_t callback)
         log = fallback_log;
     
     enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
-    environment_callback(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt);
+    callback(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt);
     
     struct retro_keyboard_callback kcb = {
         keyboard_pressed
     };
     callback(RETRO_ENVIRONMENT_SET_KEYBOARD_CALLBACK, &kcb);
-    
-    //TODO: have a look at these:
-    // RETRO_ENVIRONMENT_SET_MESSAGE
-    // RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK
-    // RETRO_ENVIRONMENT_SET_MEMORY_MAPS
 }
 
 RETRO_API void retro_set_video_refresh(retro_video_refresh_t callback)
@@ -407,7 +408,7 @@ RETRO_API void retro_run(void)
                 {
                     if (core->interpreter->state == StateEnd)
                     {
-                        overlay_message(core, "END OF PROGRAM");
+                        show_message("End of program");
                     }
                     else if (!coreInput.out_hasUsedInput && !hasUsedInputLastUpdate)
                     {
@@ -415,15 +416,15 @@ RETRO_API void retro_run(void)
                         union IOAttributes attr = core->machine->ioRegisters.attr;
                         if (attr.touchEnabled && !attr.keyboardEnabled)
                         {
-                            overlay_message(core, "TOUCH/MOUSE");
+                            show_message("Touch/mouse expected");
                         }
                         if (attr.keyboardEnabled && !attr.touchEnabled)
                         {
-                            overlay_message(core, "KEYBOARD");
+                            show_message("Keyboard expected");
                         }
                         if (attr.gamepadsEnabled && !attr.keyboardEnabled)
                         {
-                            overlay_message(core, "GAMEPAD");
+                            show_message("Joypad expected");
                         }
                     }
                 }
@@ -604,7 +605,7 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 {
     if (!messageShownUsingDisk)
     {
-        overlay_message(core, "NO DISK");
+        show_message("No virtual disk");
         messageShownUsingDisk = true;
     }
     return true;
@@ -613,7 +614,7 @@ bool diskDriveWillAccess(void *context, struct DataManager *diskDataManager)
 /** Called when a disk data entry was saved */
 void diskDriveDidSave(void *context, struct DataManager *diskDataManager)
 {
-    overlay_message(core, "NO DISK");
+    show_message("No virtual disk");
 }
 
 /** Called when a disk data entry was tried to be saved, but the disk is full */
