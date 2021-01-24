@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:LowRes NX macOS SDL.xcodeproj">
+      location = "self:/Users/timokloss/projects/lowres-nx/platform/macOS/LowRes NX macOS.xcodeproj">
    </FileRef>
 </Workspace>

@@ -6,7 +6,7 @@ Build for LINUX
 ```bash
 sudo apt install git make build-essential libsdl2-dev
 git clone https://github.com/timoinutilis/lowres-nx.git
-cd lowres-nx/platform/LowRes\ NX\ Linux/
+cd lowres-nx/platform/Linux/
 make
 ./output/LowResNX
 ```
