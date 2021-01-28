@@ -8,8 +8,8 @@
 .core-defs:
   variables:
     CORENAME: lowresnx
-    MAKEFILE_PATH: platform/libretro
-    JNI_PATH: platform/libretro
+    MAKEFILE_PATH: platform/LibRetro
+    JNI_PATH: platform/LibRetro
 
 # Inclusion templates, required for the build to work
 include:
