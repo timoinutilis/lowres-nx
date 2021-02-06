@@ -87,6 +87,9 @@
 		925D482C2121FF76003F1B0D /* audio_lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = audio_lib.c; sourceTree = "<group>"; };
 		925F6BEC25039D11005E1179 /* core_stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core_stats.c; sourceTree = "<group>"; };
 		925F6BED25039D12005E1179 /* core_stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core_stats.h; sourceTree = "<group>"; };
+		92648F1625BAD73D008559AA /* libretro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libretro.h; sourceTree = "<group>"; };
+		92648F6425BAE851008559AA /* libretro_main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libretro_main.h; sourceTree = "<group>"; };
+		92648F6525BAE851008559AA /* libretro_main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = libretro_main.c; sourceTree = "<group>"; };
 		9284722920F9F4FA00B82653 /* dev_menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_menu.h; sourceTree = "<group>"; };
 		9284722A20F9F4FA00B82653 /* dev_menu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dev_menu.c; sourceTree = "<group>"; };
 		9284722C20F9FA5900B82653 /* dev_menu_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_menu_data.h; sourceTree = "<group>"; };
@@ -201,12 +204,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		92648F1225BAD356008559AA /* libretro */ = {
+			isa = PBXGroup;
+			children = (
+				92648F1625BAD73D008559AA /* libretro.h */,
+				92648F6425BAE851008559AA /* libretro_main.h */,
+				92648F6525BAE851008559AA /* libretro_main.c */,
+			);
+			name = libretro;
+			path = ../../libretro;
+			sourceTree = "<group>";
+		};
 		9287EAB920D85E4D000BBEB1 = {
 			isa = PBXGroup;
 			children = (
 				9287EAD820D85EEB000BBEB1 /* core */,
 				9287EB5320D85EF7000BBEB1 /* sdl */,
-				9287EAC420D85E4D000BBEB1 /* LowRes NX macOS SDL */,
+				92648F1225BAD356008559AA /* libretro */,
+				9287EAC420D85E4D000BBEB1 /* LowRes NX macOS */,
 				9287EAC320D85E4D000BBEB1 /* Products */,
 				9287EB5720D85F43000BBEB1 /* Frameworks */,
 			);
@@ -220,14 +235,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9287EAC420D85E4D000BBEB1 /* LowRes NX macOS SDL */ = {
+		9287EAC420D85E4D000BBEB1 /* LowRes NX macOS */ = {
 			isa = PBXGroup;
 			children = (
 				9287EAC820D85E4E000BBEB1 /* Assets.xcassets */,
 				9287EACD20D85E4E000BBEB1 /* Info.plist */,
 				9287EAD020D85E4E000BBEB1 /* LowRes_NX_macOS_SDL.entitlements */,
 			);
-			path = "LowRes NX macOS SDL";
+			path = "LowRes NX macOS";
 			sourceTree = "<group>";
 		};
 		9287EAD820D85EEB000BBEB1 /* core */ = {
@@ -239,6 +254,8 @@
 				925F6BED25039D12005E1179 /* core_stats.h */,
 				9287EB1E20D85EEB000BBEB1 /* core.c */,
 				9287EB0D20D85EEB000BBEB1 /* core.h */,
+				921F986520DAD4DF0052F233 /* boot_intro.c */,
+				921F986420DAD4DF0052F233 /* boot_intro.h */,
 				9287EB0E20D85EEB000BBEB1 /* accessories */,
 				9287EB1120D85EEB000BBEB1 /* datamanager */,
 				9287EAD920D85EEB000BBEB1 /* interpreter */,
@@ -382,8 +399,6 @@
 				9284722920F9F4FA00B82653 /* dev_menu.h */,
 				9284722A20F9F4FA00B82653 /* dev_menu.c */,
 				9284722C20F9FA5900B82653 /* dev_menu_data.h */,
-				921F986420DAD4DF0052F233 /* boot_intro.h */,
-				921F986520DAD4DF0052F233 /* boot_intro.c */,
 				921E0F132104BD7100F3C512 /* settings.h */,
 				921E0F142104BD7100F3C512 /* settings.c */,
 				92D708922181C0ED00F40043 /* screenshot.h */,
@@ -449,7 +464,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 9287EABD20D85E4D000BBEB1 /* Build configuration list for PBXProject "LowRes NX macOS SDL" */;
+			buildConfigurationList = 9287EABD20D85E4D000BBEB1 /* Build configuration list for PBXProject "LowRes NX macOS" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -662,7 +677,7 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				INFOPLIST_FILE = "LowRes NX macOS SDL/Info.plist";
+				INFOPLIST_FILE = "LowRes NX macOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -694,7 +709,7 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				INFOPLIST_FILE = "LowRes NX macOS SDL/Info.plist";
+				INFOPLIST_FILE = "LowRes NX macOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -714,7 +729,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9287EABD20D85E4D000BBEB1 /* Build configuration list for PBXProject "LowRes NX macOS SDL" */ = {
+		9287EABD20D85E4D000BBEB1 /* Build configuration list for PBXProject "LowRes NX macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9287EAD120D85E4E000BBEB1 /* Debug */,

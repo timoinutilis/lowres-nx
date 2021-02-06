@@ -38,6 +38,7 @@ struct Plane *txtlib_getBackground(struct TextLib *lib, int bg)
             
         default:
             assert(0);
+            return NULL;
     }
 }
 

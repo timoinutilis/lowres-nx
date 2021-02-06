@@ -90,7 +90,7 @@ struct CoreError runner_loadProgram(struct Runner *runner, const char *filename)
         {
             fread(sourceCode, size, 1, file);
             
-            error = core_compileProgram(runner->core, sourceCode);
+            error = core_compileProgram(runner->core, sourceCode, true);
             free(sourceCode);
         }
         else

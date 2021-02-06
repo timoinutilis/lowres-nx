@@ -44,7 +44,6 @@
 const char *defaultDisk = "Disk.nx";
 const int defaultWindowScale = 4;
 const int joyAxisThreshold = 16384;
-const int bootIntroStateAddress = 0xA000;
 
 const int keyboardControls[2][2][8] = {
     // mapping 0
@@ -169,7 +168,7 @@ int main(int argc, const char * argv[])
         bootNX();
         if (mainProgramFilename[0] != 0)
         {
-            machine_poke(runner.core, bootIntroStateAddress, 1);
+            machine_poke(runner.core, bootIntroStateAddress, BootIntroStateProgramAvailable);
         }
         
         int width, height;
@@ -219,7 +218,7 @@ void bootNX()
 {
     mainState = MainStateBootIntro;
     
-    struct CoreError error = core_compileProgram(runner.core, bootIntroSourceCode);
+    struct CoreError error = core_compileProgram(runner.core, bootIntroSourceCode, true);
     if (error.code != ErrorNone)
     {
         core_traceError(runner.core, error);
@@ -252,7 +251,7 @@ void selectProgram(const char *filename)
     strncpy(mainProgramFilename, filename, FILENAME_MAX - 1);
     if (mainState == MainStateBootIntro)
     {
-        machine_poke(runner.core, bootIntroStateAddress, 1);
+        machine_poke(runner.core, bootIntroStateAddress, BootIntroStateProgramAvailable);
     }
     else
     {
@@ -668,9 +667,9 @@ void update(void *arg)
                 overlay_message(runner.core, "DRAG .NX INTO WINDOW");
             }
             core_update(runner.core, &coreInput);
-            if (machine_peek(runner.core, bootIntroStateAddress) == 2)
+            if (machine_peek(runner.core, bootIntroStateAddress) == BootIntroStateReadyToRun)
             {
-                machine_poke(runner.core, bootIntroStateAddress, 3);
+                machine_poke(runner.core, bootIntroStateAddress, BootIntroStateDone);
 #ifdef __EMSCRIPTEN__
                 emscripten_async_wget(mainProgramFilename, mainProgramFilename, onloaded, onerror);
 #else

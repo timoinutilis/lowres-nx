@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2018 Timo Kloss
+// Copyright 2021 Timo Kloss, Antoine Fauroux
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -18,9 +18,15 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-#ifndef boot_intro_h
-#define boot_intro_h
+#ifndef libretro_main_h
+#define libretro_main_h
 
-extern const char *bootIntroSourceCode;
+#include <stdio.h>
 
-#endif /* boot_intro_h */
+enum MainState {
+    MainStateUndefined,
+    MainStateBootIntro,
+    MainStateRunningProgram
+};
+
+#endif /* libretro_main_h */
