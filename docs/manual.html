@@ -1477,9 +1477,8 @@ LOOP
 <h1 id="Graphics">Graphics</h1>
 
 <p>All graphics in LowRes NX are based on characters. A character is an
-8x8-pixel image with 3 colors plus transparent. They are usually
-designed in black and white, but are displayed with one of the 8
-programmable color palettes.</p>
+8x8-pixel image with 3 colors plus transparent. It's displayed with
+one of the 8 programmable color palettes.</p>
 
 <p>At program start all characters from ROM entry 2 are copied to
 video RAM to make them immediately usable.</p>
@@ -1556,6 +1555,9 @@ NEXT X
 
 <p>Sets all attributes of sprite <em>n</em> (0-63) as a single 8-bit value.
 See <a href="#Sprite-Registers">"Sprite Registers"</a> for more information.</p>
+
+<p>NOTE: It's easier to set these values with the attributes syntax of the
+<a href="#_SPRITE">SPRITE</a> command.</p>
 
 
 <h3 id="_SPRITE-OFF" name="SPRITE OFF,SPRITE,OFF">SPRITE OFF</h3>
@@ -1709,6 +1711,8 @@ PRINT "XN SERWOL"
 <p>Sets all attributes for cell and text commands as a single
 8-bit value. See <a href="#BG-Data">"BG Data"</a> for more information.</p>
 
+<p>NOTE: It's easier to use the commands <a href="#_PAL">PAL</a>, <a href="#_FLIP">FLIP</a> and <a href="#_PRIO">PRIO</a>.</p>
+
 
 <h3 id="_BG" name="BG">BG</h3>
 
@@ -1808,7 +1812,7 @@ BG TINT 10,8 TO 15,11 PAL 1
 map starts at memory address <em>a</em>, has a width of <em>w</em> and
 a height of <em>h</em> cells.</p>
 
-<p>Without the size parameters, Background Designer's data
+<p>Without the size parameters, Gfx Designer's background data
 format is assumed: The width is read from address <em>a</em>+2, the
 height from <em>a</em>+3 and the actual map data starts at <em>a</em>+4.</p>
 
@@ -1830,7 +1834,7 @@ BG SOURCE $A000,32,32
 current background.</p>
 
 <pre class="example">
-'SHOW SCREEN FROM BG DESIGNER
+'SHOW SCREEN FROM GFX DESIGNER
 BG COPY 0,0,20,16 TO 0,0
 </pre>
 
