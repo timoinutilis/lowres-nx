@@ -126,6 +126,7 @@ else ifeq ($(platform), osx)
 	SHARED := -dynamiclib
 	ifeq ($(arch),ppc)
 		ENDIANNESS_DEFINES += -DMSB_FIRST
+		CFLAGS += -std=gnu99
 	endif
 	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
 	OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
@@ -201,6 +202,15 @@ else ifeq ($(platform), sncps3)
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
+else ifeq ($(platform), ps2)
+	TARGET := $(TARGET_NAME)_libretro_$(platform).a
+	CC = mips64r5900el-ps2-elf-gcc$(EXE_EXT)
+	CXX = mips64r5900el-ps2-elf-g++$(EXE_EXT)
+	AR = mips64r5900el-ps2-elf-ar$(EXE_EXT)
+	PLATFORM_DEFINES := -DPS2 -G0 -fomit-frame-pointer -ffast-math
+	STATIC_LINKING=1
+	EXTERNAL_ZLIB=1
+
 # PSP
 else ifeq ($(platform), psp1)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
@@ -244,6 +254,18 @@ else ifeq ($(platform), ctr)
 	CXXFLAGS += -march=armv6k -mtune=mpcore -mfloat-abi=hard
 	CXXFLAGS += -Wall -mword-relocations
 	CXXFLAGS += -fomit-frame-pointer -fstrict-aliasing -ffast-math
+	STATIC_LINKING=1
+	EXTERNAL_ZLIB=1
+
+# Nintendo Switch (libnx)
+else ifeq ($(platform), libnx)
+	include $(DEVKITPRO)/libnx/switch_rules
+	PORTLIBS := $(PORTLIBS_PATH)/switch
+	TARGET := $(TARGET_NAME)_libretro_$(platform).a
+	DEFINES := -DSWITCH=1 -D__SWITCH__ -DARM
+	CFLAGS += $(DEFINES) -fPIE -I$(PORTLIBS)/include/ -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -specs=$(LIBNX)/switch.specs
+	CFLAGS += -march=armv8-a -mtune=cortex-a57 -mtp=soft -mcpu=cortex-a57+crc+fp+simd -ffast-math
+	CXXFLAGS += $(CFLAGS)
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -576,7 +598,8 @@ CFLAGS += -D_CRT_SECURE_NO_DEPRECATE
 # Windows
 else
 	TARGET := $(TARGET_NAME)_libretro.dll
-	CC = gcc
+	CC ?= gcc
+	CXX ?= g++
 	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=$(CORE_DIR)/link.T
    PSS_STYLE :=2
 endif
