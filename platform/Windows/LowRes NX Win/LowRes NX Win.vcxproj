@@ -94,8 +94,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,8 +125,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\..\sdl;..\..\..\core\overlay;..\..\..\core\machine;..\..\..\core\libraries;..\..\..\core\interpreter;..\..\..\core\datamanager;..\..\..\core\accessories;..\..\..\core;C:\Users\BARBARA\Documents\Timo\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -134,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\core\accessories\disk_drive.c" />
+    <ClCompile Include="..\..\..\core\boot_intro.c" />
     <ClCompile Include="..\..\..\core\core.c" />
     <ClCompile Include="..\..\..\core\core_delegate.c" />
     <ClCompile Include="..\..\..\core\datamanager\data_manager.c" />
@@ -173,7 +176,6 @@
     <ClCompile Include="..\..\..\core\machine\video_chip.c" />
     <ClCompile Include="..\..\..\core\overlay\overlay.c" />
     <ClCompile Include="..\..\..\core\overlay\overlay_data.c" />
-    <ClCompile Include="..\..\..\sdl\boot_intro.c" />
     <ClCompile Include="..\..\..\sdl\dev_menu.c" />
     <ClCompile Include="..\..\..\sdl\main.c" />
     <ClCompile Include="..\..\..\sdl\runner.c" />
@@ -183,9 +185,17 @@
     <ClCompile Include="..\..\..\sdl\utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="LowRes NX Win.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="..\..\..\core\accessories\disk_drive.h" />
+    <ClInclude Include="..\..\..\core\boot_intro.h" />
     <ClInclude Include="..\..\..\core\core.h" />
     <ClInclude Include="..\..\..\core\core_delegate.h" />
+    <ClInclude Include="..\..\..\core\core_stats.h" />
     <ClInclude Include="..\..\..\core\datamanager\data_manager.h" />
     <ClInclude Include="..\..\..\core\interpreter\charsets.h" />
     <ClInclude Include="..\..\..\core\interpreter\cmd_audio.h" />
@@ -225,25 +235,6 @@
     <ClInclude Include="..\..\..\core\machine\video_chip.h" />
     <ClInclude Include="..\..\..\core\overlay\overlay.h" />
     <ClInclude Include="..\..\..\core\overlay\overlay_data.h" />
-    <ClInclude Include="..\..\..\sdl\boot_intro.h" />
-    <ClInclude Include="..\..\..\sdl\config.h" />
-    <ClInclude Include="..\..\..\sdl\dev_menu.h" />
-    <ClInclude Include="..\..\..\sdl\dev_menu_data.h" />
-    <ClInclude Include="..\..\..\sdl\main.h" />
-    <ClInclude Include="..\..\..\sdl\runner.h" />
-    <ClInclude Include="..\..\..\sdl\screenshot.h" />
-    <ClInclude Include="..\..\..\sdl\sdl_include.h" />
-    <ClInclude Include="..\..\..\sdl\settings.h" />
-    <ClInclude Include="..\..\..\sdl\system_paths.h" />
-    <ClInclude Include="..\..\..\sdl\utils.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="LowRes NX Win.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
