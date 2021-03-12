@@ -14,7 +14,7 @@ The programming language of LowRes NX is based on second-generation, structured 
 
 ## Creative Tools
 
-LowRes NX includes all the tools you need: The Character Designer for editing sprites, tiles and fonts, the Background Designer for tile maps and screen layouts, as well as the Sound Composer for music and sound effects. All of these are just normal BASIC programs. You can change and improve them or even create your own custom editors.
+LowRes NX includes all the tools you need: The Gfx Designer for editing sprites, tiles, fonts and maps, as well as the Sound Composer for music and sound effects. All of these are just normal BASIC programs. You can change and improve them or even create your own custom editors.
 
 ## Share and Play
 
