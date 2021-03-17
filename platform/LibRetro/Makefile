@@ -143,25 +143,38 @@ else ifneq (,$(findstring ios,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_ios.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
+        MINVERSION := 
 	ifeq ($(IOSSDK),)
-		IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
+	  IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 	endif
 	ifeq ($(platform),ios-arm64)
-		CC = cc -arch arm64 -isysroot $(IOSSDK)
+	  CC = cc -arch arm64 -isysroot $(IOSSDK)
 	else
 	  CC = cc -arch armv7 -isysroot $(IOSSDK)
 	endif
-	CFLAGS += -DIOS
+	CFLAGS   += -DIOS
 	CXXFLAGS += -DIOS
 ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
-	CC +=  -miphoneos-version-min=8.0
-	CFLAGS += -miphoneos-version-min=8.0
-	CXXFLAGS += -miphoneos-version-min=8.0
+	MINVERSION = -miphoneos-version-min=8.0
 else
-	CC +=  -miphoneos-version-min=5.0
-	CFLAGS += -miphoneos-version-min=5.0
-	CXXFLAGS += -miphoneos-version-min=5.0
+	MINVERSION = -miphoneos-version-min=5.0
 endif
+	CFLAGS   += $(MINVERSION)
+	CXXFLAGS += $(MINVERSION)
+
+else ifeq ($(platform), tvos-arm64)
+        TARGET := $(TARGET_NAME)_libretro_tvos.dylib
+        fpic := -fPIC
+        SHARED := -dynamiclib
+        CFLAGS += -DIOS
+        CXXFLAGS += -DIOS
+
+ifeq ($(IOSSDK),)
+        IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
+endif
+
+        CC  = cc -arch arm64 -isysroot $(IOSSDK)
+        CXX = c++ -arch arm64 -isysroot $(IOSSDK)
 
 # Theos iOS
 else ifeq ($(platform), theos_ios)
