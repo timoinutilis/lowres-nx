@@ -416,7 +416,18 @@ else ifeq ($(platform), gcw0)
 	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,-no-undefined
 	PLATFORM_DEFINES += -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
 	EXTERNAL_ZLIB = 1
-	
+
+# Miyoo
+else ifeq ($(platform), miyoo)
+	TARGET := $(TARGET_NAME)_libretro.so
+	CC = /opt/miyoo/usr/bin/arm-linux-gcc
+	CXX = /opt/miyoo/usr/bin/arm-linux-g++
+	AR = /opt/miyoo/usr/bin/arm-linux-ar
+	fpic := -fPIC
+	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,-no-undefined
+	PLATFORM_DEFINES += -ffast-math -mcpu=arm926ej-s
+	EXTERNAL_ZLIB = 1
+
 # Windows MSVC 2017 all architectures
 else ifneq (,$(findstring windows_msvc2017,$(platform)))
 
