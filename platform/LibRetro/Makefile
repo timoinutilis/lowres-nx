@@ -257,8 +257,9 @@ else ifeq ($(platform), vita)
 # DOS
 else ifeq ($(platform), dos)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
-	CC = i686-pc-msdosdjgpp-gcc
-	AR = i686-pc-msdosdjgpp-ar
+	CC = i586-pc-msdosdjgpp-gcc
+	CXX = i586-pc-msdosdjgpp-g++
+	AR = i586-pc-msdosdjgpp-ar
 	CFLAGS += -march=i386
 	CXXFLAGS += -march=i386
 	STATIC_LINKING=1
