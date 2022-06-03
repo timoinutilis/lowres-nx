@@ -25,7 +25,7 @@
 struct RCString *rcstring_new(const char *chars, size_t len)
 {
     size_t size = sizeof(struct RCString) + len;
-    struct RCString *string = malloc(size);
+    struct RCString *string = (struct RCString *) malloc(size);
     if (string)
     {
         string->refCount = 1; // retain

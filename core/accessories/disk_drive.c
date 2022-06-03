@@ -55,7 +55,7 @@ bool disk_prepare(struct Core *core)
     struct DataManager *dataManager = &core->diskDrive->dataManager;
     if (dataManager->data == NULL)
     {
-        dataManager->data = calloc(DATA_SIZE, 1);
+        dataManager->data = (uint8_t *) calloc(DATA_SIZE, 1);
         if (!dataManager->data) exit(EXIT_FAILURE);
         
         data_init(dataManager);

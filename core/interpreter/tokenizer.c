@@ -151,7 +151,7 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
             int number = 0;
             while (*character)
             {
-                char *spos = strchr(CharSetHex, *character);
+                char *spos = (char *) strchr(CharSetHex, *character);
                 if (spos)
                 {
                     int digit = (int)(spos - CharSetHex);
