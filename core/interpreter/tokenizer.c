@@ -225,7 +225,7 @@ struct CoreError tok_tokenizeUppercaseProgram(struct Tokenizer *tokenizer, const
                     else
                     {
                         // symbol found!
-                        foundKeywordToken = i;
+                        foundKeywordToken = (enum TokenType) i;
                         character += keywordLen;
                         break;
                     }
