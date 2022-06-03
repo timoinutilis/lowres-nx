@@ -3,7 +3,6 @@ PSS_STYLE=1
 EXTERNAL_ZLIB=0
 HAVE_GRIFFIN=1
 STATIC_LINKING=0
-ENDIANNESS_DEFINES=
 
 SPACE :=
 SPACE := $(SPACE) $(SPACE)
@@ -125,7 +124,6 @@ else ifeq ($(platform), osx)
 	fpic := -fPIC
 	SHARED := -dynamiclib
 	ifeq ($(arch),ppc)
-		ENDIANNESS_DEFINES += -DMSB_FIRST
 		CFLAGS += -std=gnu99
 	endif
 	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
@@ -210,7 +208,6 @@ else ifeq ($(platform), ps3)
 	CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
 	AR = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-ar.exe
 	PLATFORM_DEFINES := -D__CELLOS_LV2
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -220,7 +217,6 @@ else ifeq ($(platform), sncps3)
 	CC = $(CELL_SDK)/host-win32/sn/bin/ps3ppusnc.exe
 	AR = $(CELL_SDK)/host-win32/sn/bin/ps3snarl.exe
 	PLATFORM_DEFINES := -D__CELLOS_LV2
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -322,7 +318,6 @@ else ifeq ($(platform), psl1ght)
 	CC = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
 	AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -D__CELLOS_LV2
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -332,7 +327,6 @@ else ifeq ($(platform), xenon)
 	CC = xenon-gcc$(EXE_EXT)
 	AR = xenon-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -D__LIBXENON__
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -343,7 +337,6 @@ else ifeq ($(platform), ngc)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -DGEKKO -DHW_DOL -mrvl -mcpu=750 -meabi -mhard-float
 	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -354,7 +347,6 @@ else ifeq ($(platform), wii)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float
 	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -365,7 +357,6 @@ else ifeq ($(platform), wiiu)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -DGEKKO -DHW_RVL -mwup -mcpu=750 -meabi -mhard-float
 	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -612,7 +603,6 @@ PATH := $(call unixcygpath,$(XEDK)/bin/win32):$(PATH)
 PSS_STYLE :=2
 CFLAGS   += -D_XBOX -D_XBOX360
 CXXFLAGS += -D_XBOX -D_XBOX360
-ENDIANNESS_DEFINES += -DMSB_FIRST
 STATIC_LINKING=1
 
 # Windows MSVC 2005 x86
@@ -722,8 +712,8 @@ else
 WARNING_DEFINES = -Wno-write-strings
 endif
 
-CFLAGS   += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES) $(ENDIANNESS_DEFINES)
-CXXFLAGS += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES) $(ENDIANNESS_DEFINES)
+CFLAGS   += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES)
+CXXFLAGS += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES)
 LDFLAGS  += $(LIBM)
 
 ifeq ($(platform), psp1)
