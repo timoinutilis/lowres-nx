@@ -473,7 +473,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 
 	TargetArchMoniker = $(subst $(WinPartition)_,,$(PlatformSuffix))
 
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 	LD = link.exe
 
@@ -509,7 +509,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 	endif
 	VsInstallRoot := $(VsInstallRoot)
 
-	VcCompilerToolsVer := $(shell cat "$(VsInstallRoot)/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt" | grep -o '[0-9\.]*')
+	VcCompilerToolsVer := $(shell cat "$(VsInstallRoot)/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt" | grep -io '[0-9\.]*')
 	VcCompilerToolsDir := $(VsInstallRoot)/VC/Tools/MSVC/$(VcCompilerToolsVer)
 
 	WindowsSDKSharedIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include\$(WindowsSDKVersion)\shared")
@@ -541,7 +541,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 
 # Windows MSVC 2010 x64
 else ifeq ($(platform), windows_msvc2010_x64)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin/amd64"):$(PATH)
@@ -550,18 +550,21 @@ INCLUDE := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/include")
 LIB := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/lib/amd64")
 BIN := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin")
 
-WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib/x64
-WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib/x64
+WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
+WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
 
-export INCLUDE := $(INCLUDE)
-export LIB := $(LIB);$(WindowsSdkDir)
+WindowsSDKIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include")
+WindowsSDKLibDir := $(shell cygpath -w "$(WindowsSdkDir)\Lib\x64")
+
+export INCLUDE := $(INCLUDE);$(WindowsSDKIncludeDir);../../msvc-compat
+export LIB := $(LIB);$(WindowsSDKLibDir)
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
 LDFLAGS += -DLL
 
 # Windows MSVC 2010 x86
 else ifeq ($(platform), windows_msvc2010_x86)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin"):$(PATH)
@@ -570,10 +573,10 @@ INCLUDE := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/include")
 LIB := $(shell IFS=$$'\n'; cygpath -w "$(VS100COMNTOOLS)../../VC/lib")
 BIN := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin")
 
-WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib
-WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib
+WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')lib
+WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')lib
 
-export INCLUDE := $(INCLUDE)
+export INCLUDE := $(INCLUDE);../../msvc-compat
 export LIB := $(LIB);$(WindowsSdkDir)
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
@@ -614,7 +617,7 @@ STATIC_LINKING=1
 
 # Windows MSVC 2005 x86
 else ifeq ($(platform), windows_msvc2005_x86)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/bin"):$(PATH)
@@ -625,7 +628,7 @@ BIN := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/bin")
 
 WindowsSdkDir := $(INETSDK)
 
-export INCLUDE := $(INCLUDE);$(INETSDK)/Include;src/drivers/libretro/msvc/msvc-2005
+export INCLUDE := $(INCLUDE);$(INETSDK)/Include;../../msvc-compat
 export LIB := $(LIB);$(WindowsSdkDir);$(INETSDK)/Lib
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
@@ -634,7 +637,7 @@ CFLAGS += -D_CRT_SECURE_NO_DEPRECATE
 
 # Windows MSVC 2003 x86
 else ifeq ($(platform), windows_msvc2003_x86)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS71COMNTOOLS)../../Vc7/bin"):$(PATH)
@@ -645,7 +648,7 @@ BIN := $(shell IFS=$$'\n'; cygpath "$(VS71COMNTOOLS)../../Vc7/bin")
 
 WindowsSdkDir := $(INETSDK)
 
-export INCLUDE := $(INCLUDE);$(INETSDK)/Include;src/drivers/libretro/msvc/msvc-2005
+export INCLUDE := $(INCLUDE);$(INETSDK)/Include;../../msvc-compat
 export LIB := $(LIB);$(WindowsSdkDir);$(INETSDK)/Lib
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
