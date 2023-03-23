@@ -3,7 +3,6 @@ PSS_STYLE=1
 EXTERNAL_ZLIB=0
 HAVE_GRIFFIN=1
 STATIC_LINKING=0
-ENDIANNESS_DEFINES=
 
 SPACE :=
 SPACE := $(SPACE) $(SPACE)
@@ -125,7 +124,6 @@ else ifeq ($(platform), osx)
 	fpic := -fPIC
 	SHARED := -dynamiclib
 	ifeq ($(arch),ppc)
-		ENDIANNESS_DEFINES += -DMSB_FIRST
 		CFLAGS += -std=gnu99
 	endif
 	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
@@ -210,7 +208,6 @@ else ifeq ($(platform), ps3)
 	CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
 	AR = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-ar.exe
 	PLATFORM_DEFINES := -D__CELLOS_LV2
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -220,7 +217,6 @@ else ifeq ($(platform), sncps3)
 	CC = $(CELL_SDK)/host-win32/sn/bin/ps3ppusnc.exe
 	AR = $(CELL_SDK)/host-win32/sn/bin/ps3snarl.exe
 	PLATFORM_DEFINES := -D__CELLOS_LV2
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -322,7 +318,6 @@ else ifeq ($(platform), psl1ght)
 	CC = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
 	AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -D__CELLOS_LV2
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -332,7 +327,6 @@ else ifeq ($(platform), xenon)
 	CC = xenon-gcc$(EXE_EXT)
 	AR = xenon-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -D__LIBXENON__
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -343,7 +337,6 @@ else ifeq ($(platform), ngc)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -DGEKKO -DHW_DOL -mrvl -mcpu=750 -meabi -mhard-float
 	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -354,7 +347,6 @@ else ifeq ($(platform), wii)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float
 	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -365,7 +357,6 @@ else ifeq ($(platform), wiiu)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	PLATFORM_DEFINES := -DGEKKO -DHW_RVL -mwup -mcpu=750 -meabi -mhard-float
 	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
-	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
 
@@ -473,7 +464,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 
 	TargetArchMoniker = $(subst $(WinPartition)_,,$(PlatformSuffix))
 
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 	LD = link.exe
 
@@ -509,7 +500,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 	endif
 	VsInstallRoot := $(VsInstallRoot)
 
-	VcCompilerToolsVer := $(shell cat "$(VsInstallRoot)/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt" | grep -o '[0-9\.]*')
+	VcCompilerToolsVer := $(shell cat "$(VsInstallRoot)/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt" | grep -io '[0-9\.]*')
 	VcCompilerToolsDir := $(VsInstallRoot)/VC/Tools/MSVC/$(VcCompilerToolsVer)
 
 	WindowsSDKSharedIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include\$(WindowsSDKVersion)\shared")
@@ -541,7 +532,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 
 # Windows MSVC 2010 x64
 else ifeq ($(platform), windows_msvc2010_x64)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin/amd64"):$(PATH)
@@ -550,18 +541,21 @@ INCLUDE := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/include")
 LIB := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/lib/amd64")
 BIN := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin")
 
-WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib/x64
-WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib/x64
+WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
+WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
 
-export INCLUDE := $(INCLUDE)
-export LIB := $(LIB);$(WindowsSdkDir)
+WindowsSDKIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include")
+WindowsSDKLibDir := $(shell cygpath -w "$(WindowsSdkDir)\Lib\x64")
+
+export INCLUDE := $(INCLUDE);$(WindowsSDKIncludeDir);../../msvc-compat
+export LIB := $(LIB);$(WindowsSDKLibDir)
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
 LDFLAGS += -DLL
 
 # Windows MSVC 2010 x86
 else ifeq ($(platform), windows_msvc2010_x86)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin"):$(PATH)
@@ -570,10 +564,10 @@ INCLUDE := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/include")
 LIB := $(shell IFS=$$'\n'; cygpath -w "$(VS100COMNTOOLS)../../VC/lib")
 BIN := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin")
 
-WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib
-WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -o '[A-Z]:\\.*')lib
+WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')lib
+WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')lib
 
-export INCLUDE := $(INCLUDE)
+export INCLUDE := $(INCLUDE);../../msvc-compat
 export LIB := $(LIB);$(WindowsSdkDir)
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
@@ -609,12 +603,11 @@ PATH := $(call unixcygpath,$(XEDK)/bin/win32):$(PATH)
 PSS_STYLE :=2
 CFLAGS   += -D_XBOX -D_XBOX360
 CXXFLAGS += -D_XBOX -D_XBOX360
-ENDIANNESS_DEFINES += -DMSB_FIRST
 STATIC_LINKING=1
 
 # Windows MSVC 2005 x86
 else ifeq ($(platform), windows_msvc2005_x86)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/bin"):$(PATH)
@@ -625,7 +618,7 @@ BIN := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/bin")
 
 WindowsSdkDir := $(INETSDK)
 
-export INCLUDE := $(INCLUDE);$(INETSDK)/Include;src/drivers/libretro/msvc/msvc-2005
+export INCLUDE := $(INCLUDE);$(INETSDK)/Include;../../msvc-compat
 export LIB := $(LIB);$(WindowsSdkDir);$(INETSDK)/Lib
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
@@ -634,7 +627,7 @@ CFLAGS += -D_CRT_SECURE_NO_DEPRECATE
 
 # Windows MSVC 2003 x86
 else ifeq ($(platform), windows_msvc2003_x86)
-	CC  = cl.exe
+	CC  = cl.exe -TP
 	CXX = cl.exe
 
 PATH := $(shell IFS=$$'\n'; cygpath "$(VS71COMNTOOLS)../../Vc7/bin"):$(PATH)
@@ -645,7 +638,7 @@ BIN := $(shell IFS=$$'\n'; cygpath "$(VS71COMNTOOLS)../../Vc7/bin")
 
 WindowsSdkDir := $(INETSDK)
 
-export INCLUDE := $(INCLUDE);$(INETSDK)/Include;src/drivers/libretro/msvc/msvc-2005
+export INCLUDE := $(INCLUDE);$(INETSDK)/Include;../../msvc-compat
 export LIB := $(LIB);$(WindowsSdkDir);$(INETSDK)/Lib
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
@@ -719,8 +712,8 @@ else
 WARNING_DEFINES = -Wno-write-strings
 endif
 
-CFLAGS   += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES) $(ENDIANNESS_DEFINES)
-CXXFLAGS += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES) $(ENDIANNESS_DEFINES)
+CFLAGS   += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES)
+CXXFLAGS += $(COREDEFINES) $(fpic) $(WARNING_DEFINES) $(DEFINES)
 LDFLAGS  += $(LIBM)
 
 ifeq ($(platform), psp1)

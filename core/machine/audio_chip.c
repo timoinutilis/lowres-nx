@@ -213,7 +213,7 @@ void audio_renderAudioBuffer(struct AudioRegisters *lifeRegisters, struct AudioR
                 uint8_t lfoAccu8 = voiceIn->lfoAccumulator;
                 uint8_t lfoSample = 0;
                 
-                enum LFOWaveType lfoWaveType = voice->lfoAttr.wave;
+                enum LFOWaveType lfoWaveType = (enum LFOWaveType) voice->lfoAttr.wave;
                 switch (lfoWaveType)
                 {
                     case LFOWaveTypeTriangle:
@@ -285,7 +285,7 @@ void audio_renderAudioBuffer(struct AudioRegisters *lifeRegisters, struct AudioR
                 
                 uint16_t sample = 0x7FFF; // silence
                 
-                enum WaveType waveType = voice->attr.wave;
+                enum WaveType waveType = (enum WaveType) voice->attr.wave;
                 switch (waveType)
                 {
                     case WaveTypeSawtooth:

@@ -108,7 +108,12 @@ struct TypedValue fnc_BIN_HEX(struct Core *core)
         }
         else if (type == TokenHEX)
         {
+#ifdef _MSC_VER
+	    _snprintf(rcstring->chars, maxLen, "%0*X", width, x);
+	    rcstring->chars[maxLen] = '\0';
+#else
             snprintf(rcstring->chars, maxLen + 1, "%0*X", width, x);
+#endif
         }
         resultValue.v.stringValue = rcstring;
         interpreter->cycles += maxLen;
@@ -442,8 +447,13 @@ struct TypedValue fnc_STR(struct Core *core)
     {
         struct RCString *rcstring = rcstring_new(NULL, 20);
         if (!rcstring) return val_makeError(ErrorOutOfMemory);
-        
+
+#ifdef _MSC_VER
+	_snprintf(rcstring->chars, 19, "%0.7g", numericValue.v.floatValue);
+	rcstring->chars[19] = '\0';
+#else
         snprintf(rcstring->chars, 20, "%0.7g", numericValue.v.floatValue);
+#endif
         resultValue.v.stringValue = rcstring;
         interpreter->cycles += strlen(rcstring->chars);
     }

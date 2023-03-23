@@ -27,13 +27,13 @@ void stats_init(struct Stats *stats)
 {
     memset(stats, 0, sizeof(struct Stats));
     
-    stats->tokenizer = calloc(1, sizeof(struct Tokenizer));
+    stats->tokenizer = (struct Tokenizer *) calloc(1, sizeof(struct Tokenizer));
     if (!stats->tokenizer) exit(EXIT_FAILURE);
     
-    stats->romDataManager = calloc(1, sizeof(struct DataManager));
+    stats->romDataManager = (struct DataManager *) calloc(1, sizeof(struct DataManager));
     if (!stats->romDataManager) exit(EXIT_FAILURE);
     
-    stats->romDataManager->data = calloc(1, DATA_SIZE);
+    stats->romDataManager->data = (uint8_t *) calloc(1, DATA_SIZE);
     if (!stats->romDataManager->data) exit(EXIT_FAILURE);
 }
 

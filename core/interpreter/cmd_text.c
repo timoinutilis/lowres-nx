@@ -53,7 +53,13 @@ enum ErrorCode cmd_PRINT(struct Core *core)
             else if (value.type == ValueTypeFloat)
             {
                 char buffer[20];
-                snprintf(buffer, 20, "%0.7g", value.v.floatValue);
+#ifdef _MSC_VER
+		_snprintf(buffer, 19, "%0.7g", value.v.floatValue);
+		buffer[19] = '\0';
+#else
+		snprintf(buffer, 20, "%0.7g", value.v.floatValue);
+#endif
+
                 txtlib_printText(lib, buffer);
             }
         }
@@ -459,7 +465,12 @@ enum ErrorCode cmd_TRACE(struct Core *core)
                 if (debug)
                 {
                     char buffer[20];
+#ifdef _MSC_VER
+		    _snprintf(buffer, 19, "%0.7g", value.v.floatValue);
+		    buffer[19] = '\0';
+#else
                     snprintf(buffer, 20, "%0.7g", value.v.floatValue);
+#endif
                     txtlib_printText(lib, buffer);
                 }
             }

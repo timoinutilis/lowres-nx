@@ -96,7 +96,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
     {
         size_t length = (size_t)(character - input);
         
-        char *diskSourceCode = malloc(length + 1);
+        char *diskSourceCode = (char *) malloc(length + 1);
         if (!diskSourceCode) exit(EXIT_FAILURE);
         
         stringConvertCopy(diskSourceCode, input, length);
@@ -151,7 +151,7 @@ struct CoreError data_uppercaseImport(struct DataManager *manager, const char *i
             int value = 0;
             while (*character && *character != '#')
             {
-                char *spos = strchr(CharSetHex, *character);
+                char *spos = (char *) strchr(CharSetHex, *character);
                 if (spos)
                 {
                     int digit = (int)(spos - CharSetHex);
@@ -205,7 +205,7 @@ char *data_export(struct DataManager *manager)
     size_t outputSize = data_calcOutputSize(manager);
     if (outputSize > 0)
     {
-        char *output = malloc(outputSize);
+        char *output = (char *) malloc(outputSize);
         if (output)
         {
             char *current = output;

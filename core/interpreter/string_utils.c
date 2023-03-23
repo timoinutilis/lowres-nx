@@ -25,7 +25,7 @@
 const char *uppercaseString(const char *source)
 {
     size_t len = strlen(source);
-    char *buffer = malloc(len + 1);
+    char *buffer = (char *) malloc(len + 1);
     if (buffer)
     {
         const char *sourceChar = source;
@@ -60,7 +60,7 @@ const char *lineString(const char *source, int pos)
     if (end > start)
     {
         size_t len = end - start;
-        char *buffer = malloc(len + 1);
+        char *buffer = (char *) malloc(len + 1);
         if (buffer)
         {
             strncpy(buffer, start, len);
