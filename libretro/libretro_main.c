@@ -251,7 +251,7 @@ RETRO_API void retro_init(void)
 {
     log(RETRO_LOG_INFO, "[LowRes NX] Initialization\n");
     
-    core = calloc(1, sizeof(struct Core));
+    core = (struct Core *) calloc(1, sizeof(struct Core));
     if (core)
     {
         core_init(core);
@@ -267,8 +267,8 @@ RETRO_API void retro_init(void)
         core_setDelegate(core, &coreDelegate);
     }
     
-    pixels = calloc(VIDEO_PIXELS, sizeof(uint32_t));
-    audio_buf = calloc(AUDIO_SAMPLES, sizeof(int16_t));
+    pixels = (uint32_t *) calloc(VIDEO_PIXELS, sizeof(uint32_t));
+    audio_buf = (int16_t *) calloc(AUDIO_SAMPLES, sizeof(int16_t));
     
     init_joysticks();
     
@@ -487,7 +487,7 @@ RETRO_API bool retro_load_game(const struct retro_game_info *game)
     
     if (core && game && game->data)
     {
-        sourceCode = calloc(1, game->size + 1); // +1 for terminator
+        sourceCode = (char *) calloc(1, game->size + 1); // +1 for terminator
         if (sourceCode)
         {
             memcpy(sourceCode, game->data, game->size);

@@ -163,7 +163,7 @@ struct ArrayVariable *var_dimVariable(struct Interpreter *interpreter, enum Erro
         *errorCode = ErrorOutOfMemory;
         return NULL;
     }
-    variable->values = calloc(size, sizeof(union Value));
+    variable->values = (union Value *) calloc(size, sizeof(union Value));
     if (!variable->values) exit(EXIT_FAILURE);
     
     variable->numValues = (int)size;

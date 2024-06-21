@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include "error.h"
+#include "value.h"
 
 struct Core;
 
