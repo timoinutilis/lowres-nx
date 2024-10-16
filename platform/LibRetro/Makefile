@@ -170,6 +170,7 @@ else
 endif
 	CFLAGS   += $(MINVERSION)
 	CXXFLAGS += $(MINVERSION)
+	LDFLAGS  += $(MINVERSION)
 
 else ifeq ($(platform), tvos-arm64)
         TARGET := $(TARGET_NAME)_libretro_tvos.dylib
