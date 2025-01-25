@@ -130,12 +130,21 @@ else ifeq ($(platform), osx)
 	endif
 	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
 	OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
+   ifeq ($(OSX_LT_MAVERICKS),YES)
 	fpic += -mmacosx-version-min=10.1
-	ifndef ($(NOUNIVERSAL))
-		CFLAGS += $(ARCHFLAGS)
-		CXXFLAGS += $(ARCHFLAGS)
-		LDFLAGS += $(ARCHFLAGS)
-	endif
+   endif
+
+   ifeq ($(CROSS_COMPILE),1)
+		TARGET_RULE   = -target $(LIBRETRO_APPLE_PLATFORM) -isysroot $(LIBRETRO_APPLE_ISYSROOT)
+		CFLAGS   += $(TARGET_RULE)
+		CPPFLAGS += $(TARGET_RULE)
+		CXXFLAGS += $(TARGET_RULE)
+		LDFLAGS  += $(TARGET_RULE)
+   endif
+
+	CFLAGS  += $(ARCHFLAGS)
+	CXXFLAGS  += $(ARCHFLAGS)
+	LDFLAGS += $(ARCHFLAGS)
 
 # iOS
 else ifneq (,$(findstring ios,$(platform)))
@@ -143,25 +152,39 @@ else ifneq (,$(findstring ios,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_ios.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
+        MINVERSION := 
 	ifeq ($(IOSSDK),)
-		IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
+	  IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 	endif
 	ifeq ($(platform),ios-arm64)
-		CC = cc -arch arm64 -isysroot $(IOSSDK)
+	  CC = cc -arch arm64 -isysroot $(IOSSDK)
 	else
 	  CC = cc -arch armv7 -isysroot $(IOSSDK)
 	endif
-	CFLAGS += -DIOS
+	CFLAGS   += -DIOS
 	CXXFLAGS += -DIOS
 ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
-	CC +=  -miphoneos-version-min=8.0
-	CFLAGS += -miphoneos-version-min=8.0
-	CXXFLAGS += -miphoneos-version-min=8.0
+	MINVERSION = -miphoneos-version-min=8.0
 else
-	CC +=  -miphoneos-version-min=5.0
-	CFLAGS += -miphoneos-version-min=5.0
-	CXXFLAGS += -miphoneos-version-min=5.0
+	MINVERSION = -miphoneos-version-min=5.0
 endif
+	CFLAGS   += $(MINVERSION)
+	CXXFLAGS += $(MINVERSION)
+	LDFLAGS  += $(MINVERSION)
+
+else ifeq ($(platform), tvos-arm64)
+        TARGET := $(TARGET_NAME)_libretro_tvos.dylib
+        fpic := -fPIC
+        SHARED := -dynamiclib
+        CFLAGS += -DIOS
+        CXXFLAGS += -DIOS
+
+ifeq ($(IOSSDK),)
+        IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
+endif
+
+        CC  = cc -arch arm64 -isysroot $(IOSSDK)
+        CXX = c++ -arch arm64 -isysroot $(IOSSDK)
 
 # Theos iOS
 else ifeq ($(platform), theos_ios)
@@ -235,8 +258,9 @@ else ifeq ($(platform), vita)
 # DOS
 else ifeq ($(platform), dos)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
-	CC = i686-pc-msdosdjgpp-gcc
-	AR = i686-pc-msdosdjgpp-ar
+	CC = i586-pc-msdosdjgpp-gcc
+	CXX = i586-pc-msdosdjgpp-g++
+	AR = i586-pc-msdosdjgpp-ar
 	CFLAGS += -march=i386
 	CXXFLAGS += -march=i386
 	STATIC_LINKING=1
@@ -340,8 +364,8 @@ else ifeq ($(platform), wiiu)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
 	CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
-	PLATFORM_DEFINES := -DGEKKO -DHW_RVL -mwup -mcpu=750 -meabi -mhard-float
-	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
+	PLATFORM_DEFINES := -DGEKKO -DHW_RVL -mcpu=750 -meabi -mhard-float
+	PLATFORM_DEFINES += -ffunction-sections -fdata-sections -D__wiiu__ -D__wut__
 	ENDIANNESS_DEFINES += -DMSB_FIRST
 	STATIC_LINKING=1
 	EXTERNAL_ZLIB=1
@@ -393,8 +417,42 @@ else ifeq ($(platform), gcw0)
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,-no-undefined
 	PLATFORM_DEFINES += -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
+	CFLAGS += -std=gnu11
 	EXTERNAL_ZLIB = 1
-	
+# RS90
+else ifeq ($(platform), rs90)
+   TARGET := $(TARGET_NAME)_libretro.so
+   CC = /opt/rs90-toolchain/usr/bin/mipsel-linux-gcc
+   CXX = /opt/rs90-toolchain/usr/bin/mipsel-linux-g++
+   AR = /opt/rs90-toolchain/usr/bin/mipsel-linux-ar
+   fpic := -fPIC
+   SHARED := -shared -Wl,-version-script=$(CORE_DIR)/link.T
+   PLATFORM_DEFINES := -DCC_RESAMPLER -DCC_RESAMPLER_NO_HIGHPASS
+   CFLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+   CXXFLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+# RETROFW
+else ifeq ($(platform), retrofw)
+	EXT ?= so
+	TARGET := $(TARGET_NAME)_libretro.$(EXT)
+	CC = /opt/retrofw-toolchain/usr/bin/mipsel-linux-gcc
+	AR = /opt/retrofw-toolchain/usr/bin/mipsel-linux-ar
+	fpic := -fPIC
+	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
+	CFLAGS += -ffast-math -march=mips32 -mtune=mips32 -mhard-float
+	CXXFLAGS += -ffast-math -march=mips32 -mtune=mips32 -mhard-float
+	LIBS = -lm
+
+# Miyoo
+else ifeq ($(platform), miyoo)
+	TARGET := $(TARGET_NAME)_libretro.so
+	CC = /opt/miyoo/usr/bin/arm-linux-gcc
+	CXX = /opt/miyoo/usr/bin/arm-linux-g++
+	AR = /opt/miyoo/usr/bin/arm-linux-ar
+	fpic := -fPIC
+	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,-no-undefined
+	PLATFORM_DEFINES += -ffast-math -mcpu=arm926ej-s
+	EXTERNAL_ZLIB = 1
+
 # Windows MSVC 2017 all architectures
 else ifneq (,$(findstring windows_msvc2017,$(platform)))
 

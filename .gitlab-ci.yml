@@ -42,12 +42,20 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/osx-arm64.yml'
 
+  # DJGPP
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/djgpp-static.yml'
+
   ################################## CELLULAR ################################
   # Android
   - project: 'libretro-infrastructure/ci-templates'
     file: '/android-jni.yml'
     
-  # iOS 9
+  # iOS
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ios-arm64.yml'
+
+  # iOS (armv7)
   - project: 'libretro-infrastructure/ci-templates'
     file: '/ios9.yml'
 
@@ -83,7 +91,19 @@ include:
   # Nintendo Switch
   - project: 'libretro-infrastructure/ci-templates'
     file: '/libnx-static.yml'
-    
+
+  # tvOS (AppleTV)
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/tvos-arm64.yml'
+
+  # OpenDingux
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/dingux-mips32.yml'
+
+  # OpenDingux (ARM)
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/dingux-arm32.yml'
+
   #################################### MISC ##################################
   # Emscripten
   - project: 'libretro-infrastructure/ci-templates'
@@ -122,6 +142,12 @@ libretro-build-linux-x64:
 libretro-build-linux-i686:
   extends:
     - .libretro-linux-i686-make-default
+    - .core-defs
+
+# DJGPP
+libretro-build-djgpp-i586:
+  extends:
+    - .libretro-djgpp-static-retroarch-master
     - .core-defs
 
 # MacOS 64-bit
@@ -167,10 +193,22 @@ android-x86:
     - .libretro-android-jni-x86
     - .core-defs
 
-# iOS 9
-libretro-build-ios-9:
+# iOS
+libretro-build-ios-arm64:
+  extends:
+    - .libretro-ios-arm64-make-default
+    - .core-defs
+
+# iOS (armv7) [iOS 9 and up]
+libretro-build-ios9:
   extends:
     - .libretro-ios9-make-default
+    - .core-defs
+    
+# tvOS
+libretro-build-tvos-arm64:
+  extends:
+    - .libretro-tvos-arm64-make-default
     - .core-defs
 
 ################################### CONSOLES #################################
@@ -221,7 +259,37 @@ libretro-build-libnx-aarch64:
   extends:
     - .libretro-libnx-static-retroarch-master
     - .core-defs
-    
+
+# OpenDingux
+libretro-build-dingux-mips32:
+  extends:
+    - .libretro-dingux-mips32-make-default
+    - .core-defs
+
+# OpenDingux Beta
+libretro-build-dingux-odbeta-mips32:
+  extends:
+    - .libretro-dingux-odbeta-mips32-make-default
+    - .core-defs
+
+# OpenDingux Beta
+libretro-build-rs90-odbeta-mips32:
+  extends:
+    - .libretro-rs90-odbeta-mips32-make-default
+    - .core-defs
+
+# RetroFW
+libretro-build-retrofw-mips32:
+  extends:
+    - .libretro-retrofw-mips32-make-default
+    - .core-defs
+
+# Miyoo
+libretro-build-miyoo-arm32:
+  extends:
+    - .libretro-miyoo-arm32-make-default
+    - .core-defs
+
 #################################### MISC ##################################
 # Emscripten
 libretro-build-emscripten:
