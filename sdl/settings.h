@@ -33,6 +33,7 @@ struct Parameters {
     bool disabledev;
     int mapping;
     int disabledelay;
+    bool store;
 };
 
 struct Settings {

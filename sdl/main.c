@@ -24,6 +24,7 @@
 #include "core.h"
 #include "runner.h"
 #include "dev_menu.h"
+#include "store.h"
 #include "settings.h"
 #include "system_paths.h"
 #include "utils.h"
@@ -40,6 +41,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <strings.h>
 
 const char *defaultDisk = "Disk.nx";
 const int defaultWindowScale = 4;
@@ -83,6 +85,8 @@ void onerror(const char *filename);
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
+SDL_Texture *previewTexture = NULL;
+int previewTextureIndex = -1;
 SDL_AudioDeviceID audioDevice = 0;
 SDL_AudioSpec audioSpec;
 
@@ -90,6 +94,8 @@ struct Runner runner;
 #if DEV_MENU
 struct DevMenu devMenu;
 #endif
+struct Store store;
+bool storeMode = false;
 struct Settings settings;
 struct CoreInput coreInput;
 
@@ -117,6 +123,7 @@ int main(int argc, const char * argv[])
 #if DEV_MENU
     dev_init(&devMenu, &runner, &settings);
 #endif
+    store_init(&store, &runner);
     
     if (runner_isOkay(&runner))
     {
@@ -166,7 +173,13 @@ int main(int argc, const char * argv[])
         configureJoysticks();
         
         bootNX();
-        if (mainProgramFilename[0] != 0)
+        if (settings.session.store)
+        {
+            // --store flag: go directly to store
+            snprintf(mainProgramFilename, FILENAME_MAX, "store.nx");
+            machine_poke(runner.core, bootIntroStateAddress, BootIntroStateProgramAvailable);
+        }
+        else if (mainProgramFilename[0] != 0)
         {
             machine_poke(runner.core, bootIntroStateAddress, BootIntroStateProgramAvailable);
         }
@@ -203,6 +216,7 @@ int main(int argc, const char * argv[])
     
     SDL_CloseAudioDevice(audioDevice);
     
+    if (previewTexture) SDL_DestroyTexture(previewTexture);
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -231,7 +245,8 @@ void bootNX()
 void rebootNX()
 {
     core_willSuspendProgram(runner.core);
-    
+
+    storeMode = false;
     mainProgramFilename[0] = 0;
     bootNX();
 }
@@ -259,10 +274,24 @@ void selectProgram(const char *filename)
     }
 }
 
+static bool isStoreFile(const char *filename)
+{
+    const char *name = strrchr(filename, PATH_SEPARATOR_CHAR);
+    name = name ? name + 1 : filename;
+    return (strcasecmp(name, "store.nx") == 0);
+}
+
 void runMainProgram()
 {
     core_willSuspendProgram(runner.core);
-    
+
+    // Check if this is the store launcher
+    if (isStoreFile(mainProgramFilename))
+    {
+        showStore();
+        return;
+    }
+
     struct CoreError error = runner_loadProgram(&runner, mainProgramFilename);
 #if DEV_MENU
     devMenu.lastError = error;
@@ -303,11 +332,32 @@ void showDevMenu()
 {
 #if DEV_MENU
     core_willSuspendProgram(runner.core);
-    
+
     bool reload = (mainState == MainStateRunningTool);
     mainState = MainStateDevMenu;
     dev_show(&devMenu, reload);
 #endif
+}
+
+static char storeFilePath[FILENAME_MAX] = "";
+
+void showStore()
+{
+    core_willSuspendProgram(runner.core);
+    mainState = MainStateStore;
+
+    if (!storeMode)
+    {
+        // First time: full init
+        storeMode = true;
+        strncpy(storeFilePath, mainProgramFilename, FILENAME_MAX - 1);
+        store_show(&store, storeFilePath);
+    }
+    else
+    {
+        // Returning from a program: resume with position
+        store_resume(&store);
+    }
 }
 
 bool usesMainProgramAsDisk()
@@ -546,6 +596,17 @@ void update(void *arg)
                     {
                         quit = true;
                     }
+                    else if (storeMode)
+                    {
+                        if (mainState != MainStateStore)
+                        {
+                            showStore();
+                        }
+                        else
+                        {
+                            coreInput.key = 27; // ESC as key for store back navigation
+                        }
+                    }
 #if DEV_MENU
                     else if (hasProgram())
                     {
@@ -555,6 +616,16 @@ void update(void *arg)
                         }
                     }
 #endif
+                }
+                else if ((keycode == SDLK_RETURN || keycode == SDLK_z) && !(event.key.keysym.mod & KMOD_CTRL))
+                {
+                    if (!storeMode)
+                    {
+                        snprintf(mainProgramFilename, FILENAME_MAX, "store.nx");
+                        showStore();
+                        coreInput.key = 0;
+                        coreInput.pause = false;
+                    }
                 }
                 else if (settings.session.mapping == 1 && !core_isKeyboardEnabled(runner.core))
                 {
@@ -619,6 +690,13 @@ void update(void *arg)
                 if (event.jbutton.button == 2)
                 {
                     coreInput.pause = true;
+                    if (!storeMode)
+                    {
+                        snprintf(mainProgramFilename, FILENAME_MAX, "store.nx");
+                        showStore();
+                        coreInput.key = 0;
+                        coreInput.pause = false;
+                    }
                 }
                 break;
             }
@@ -727,6 +805,10 @@ void update(void *arg)
             dev_update(&devMenu, &coreInput);
 #endif
             break;
+
+        case MainStateStore:
+            store_update(&store, &coreInput);
+            break;
     }
     
     hasUsedInputLastUpdate = coreInput.out_hasUsedInput;
@@ -737,25 +819,94 @@ void update(void *arg)
         SDL_PauseAudioDevice(audioDevice, 0);
     }
     
+    // Update preview texture when in store mode
+    if (mainState == MainStateStore)
+    {
+        int pw, ph;
+        uint8_t *previewRGB = store_getPreviewPixels(&store, &pw, &ph);
+        if (previewRGB && store.previewIndex != previewTextureIndex)
+        {
+            if (!previewTexture)
+            {
+                previewTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+                SDL_SetTextureBlendMode(previewTexture, SDL_BLENDMODE_BLEND);
+            }
+            void *texPixels = NULL;
+            int texPitch = 0;
+            SDL_LockTexture(previewTexture, NULL, &texPixels, &texPitch);
+            uint32_t *dst = (uint32_t *)texPixels;
+            for (int y = 0; y < SCREEN_HEIGHT; y++)
+            {
+                for (int x = 0; x < SCREEN_WIDTH; x++)
+                {
+                    uint8_t *src = previewRGB + (y * SCREEN_WIDTH + x) * 3;
+                    dst[y * (texPitch / 4) + x] = src[0] | (src[1] << 8) | (src[2] << 16) | 0xFF000000;
+                }
+            }
+            SDL_UnlockTexture(previewTexture);
+            previewTextureIndex = store.previewIndex;
+        }
+        else if (!previewRGB && previewTexture)
+        {
+            SDL_DestroyTexture(previewTexture);
+            previewTexture = NULL;
+            previewTextureIndex = -1;
+        }
+    }
+    else if (previewTexture)
+    {
+        SDL_DestroyTexture(previewTexture);
+        previewTexture = NULL;
+        previewTextureIndex = -1;
+    }
+
     if (core_shouldRender(runner.core) || forceRender)
     {
         SDL_RenderClear(renderer);
-        
+
+        // Draw preview behind the main screen
+        if (previewTexture)
+        {
+            SDL_RenderCopy(renderer, previewTexture, NULL, &screenRect);
+        }
+
         void *pixels = NULL;
         int pitch = 0;
         SDL_LockTexture(texture, NULL, &pixels, &pitch);
-        
+
         video_renderScreen(runner.core, pixels);
-        
+
         if (screenshotRequestedWithScale > 0)
         {
             saveScreenshot(pixels, screenshotRequestedWithScale);
             screenshotRequestedWithScale = 0;
         }
-        
+
+        // Make store UI semi-transparent so preview shows through,
+        // but keep bright pixels (text) fully opaque
+        if (mainState == MainStateStore && previewTexture)
+        {
+            uint32_t *px = (uint32_t *)pixels;
+            for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
+            {
+                uint32_t c = px[i];
+                int r = c & 0xFF;
+                int g = (c >> 8) & 0xFF;
+                int b = (c >> 16) & 0xFF;
+                int brightness = (r + g + b) / 3;
+                uint32_t alpha = (brightness > 0x80) ? 0xFF : 0xC0;
+                px[i] = (c & 0x00FFFFFF) | (alpha << 24);
+            }
+            SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+        }
+        else
+        {
+            SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+        }
+
         SDL_UnlockTexture(texture);
         SDL_RenderCopy(renderer, texture, NULL, &screenRect);
-        
+
         SDL_RenderPresent(renderer);
     }
 }
