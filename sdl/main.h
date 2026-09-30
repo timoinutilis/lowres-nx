@@ -29,6 +29,7 @@ enum MainState {
     MainStateRunningProgram,
     MainStateRunningTool,
     MainStateDevMenu,
+    MainStateStore,
 };
 
 enum Zoom {
@@ -50,5 +51,6 @@ bool usesMainProgramAsDisk(void);
 void getDiskFilename(char *outputString);
 void getRamFilename(char *outputString);
 void setMouseEnabled(bool enabled);
+void showStore(void);
 
 #endif /* main_h */

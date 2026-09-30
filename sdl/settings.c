@@ -101,7 +101,9 @@ void settings_init(struct Settings *settings, char *filenameOut, int argc, const
     for (int i = 1; i < argc; i++)
     {
         const char *arg = argv[i];
-        if (*arg == '-') {
+        if (strcmp(arg, "--store") == 0) {
+            settings->session.store = true;
+        } else if (*arg == '-') {
             i++;
             if (i < argc)
             {
